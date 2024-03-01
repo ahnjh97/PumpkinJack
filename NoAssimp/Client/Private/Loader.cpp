@@ -76,7 +76,7 @@ HRESULT CLoader::Loading_For_Logo()
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 	/* For.Prototype_Component_Texture_Logo */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_LOGO, TEXT("Prototype_Component_Texture_Logo"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Default%d.jpg"), 2))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Default%d.jpg"), 2))))
 		return E_FAIL;
 
 
@@ -104,7 +104,7 @@ HRESULT CLoader::Loading_For_GamePlay()
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 	/* Prototype_Component_Texture_Terrain */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Terrain"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Tile0.jpg")))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Tile0.jpg")))))
 		return E_FAIL;
 
 	///* Prototype_Component_Texture_Player */
