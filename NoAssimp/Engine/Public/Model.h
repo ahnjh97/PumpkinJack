@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Component.h"
+#include <fstream>
 
 BEGIN(Engine)
 
@@ -42,6 +43,7 @@ private:
 
 	string						m_strDirectory;
 	streampos					m_filePointerPos;
+	ifstream					m_InputFile;
 
 private:
 	HRESULT Ready_Meshes();

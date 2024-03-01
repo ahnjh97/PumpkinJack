@@ -15,20 +15,18 @@ CMesh::CMesh(const CMesh& rhs)
 HRESULT CMesh::Initialize_Prototype(CModel::TYPE eModelType, string strDirectory, streampos filePtPos, const vector<CBone*>& Bones, _fmatrix TransformMatrix)
 {
 	m_strDirectory = strDirectory;
-	ifstream inputFile(m_strDirectory.c_str(), ios::in | ios::binary);
-	if (!inputFile.is_open())
+	m_InputFile.open(m_strDirectory.c_str(), ios::in | ios::binary);
+	if (!m_InputFile.is_open())
 	{
 		string tempstr = "Failed To Open : " + m_strDirectory;
 		MessageBoxA(nullptr, tempstr.c_str(), "error", MB_OK);
 		return E_FAIL;
 	}
-	inputFile.seekg(filePtPos); // 여기서부터 읽기 시작
-	inputFile.read(reinterpret_cast<char*>(&m_szName), sizeof(m_szName));
-	inputFile.read(reinterpret_cast<char*>(&m_iMaterialIndex), sizeof(m_iMaterialIndex));
-	inputFile.read(reinterpret_cast<char*>(&m_iNumVertices), sizeof(m_iNumVertices));
-	inputFile.read(reinterpret_cast<char*>(&m_iFaces), sizeof(m_iFaces));
-	m_filePointerPos = inputFile.tellg();
-	inputFile.close();
+	m_InputFile.seekg(filePtPos); // 여기서부터 읽기 시작
+	m_InputFile.read(reinterpret_cast<char*>(&m_szName), sizeof(m_szName));
+	m_InputFile.read(reinterpret_cast<char*>(&m_iMaterialIndex), sizeof(m_iMaterialIndex));
+	m_InputFile.read(reinterpret_cast<char*>(&m_iNumVertices), sizeof(m_iNumVertices));
+	m_InputFile.read(reinterpret_cast<char*>(&m_iFaces), sizeof(m_iFaces));
 
 	m_iNumIndices = m_iFaces * 3;
 	m_iIndexStride = sizeof(_uint);
@@ -58,26 +56,16 @@ HRESULT CMesh::Initialize_Prototype(CModel::TYPE eModelType, string strDirectory
 	m_BufferDesc.StructureByteStride = 0;
 
 
-	ifstream inputFile2(m_strDirectory.c_str(), ios::in | ios::binary);
-	if (!inputFile2.is_open())
-	{
-		string tempstr = "Failed To Open : " + m_strDirectory;
-		MessageBoxA(nullptr, tempstr.c_str(), "error", MB_OK);
-		return E_FAIL;
-	}
-	inputFile2.seekg(m_filePointerPos); // 여기서부터 읽기 시작
-
-
 	_uint* pIndices = new _uint[m_iNumIndices];
 	ZeroMemory(pIndices, sizeof(_uint) * m_iNumIndices);
 
 
 	for (size_t i = 0; i < m_iNumIndices; i++)
 	{
-		inputFile2.read(reinterpret_cast<char*>(&pIndices[i]), sizeof(_uint));
+		m_InputFile.read(reinterpret_cast<char*>(&pIndices[i]), sizeof(_uint));
 	}
-	m_filePointerPos = inputFile2.tellg();
-	inputFile2.close();
+	m_filePointerPos = m_InputFile.tellg();
+	m_InputFile.close();
 
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);
 	m_InitialData.pSysMem = pIndices;
@@ -111,26 +99,13 @@ HRESULT CMesh::Ready_Vertices_For_NonAnimModel(_fmatrix TransformMatrix)
 	m_BufferDesc.MiscFlags = 0;
 	m_BufferDesc.StructureByteStride = m_iVertexStride;
 
-	
-	ifstream inputFile(m_strDirectory.c_str(), ios::in | ios::binary);
-	if (!inputFile.is_open())
-	{
-		string tempstr = "Failed To Open : " + m_strDirectory;
-		MessageBoxA(nullptr, tempstr.c_str(), "error", MB_OK);
-		return E_FAIL;
-	}
-	inputFile.seekg(m_filePointerPos); // 여기서부터 읽기 시작
-
 
 	VTXMESH* pVertices = new VTXMESH[m_iNumVertices];
 	ZeroMemory(pVertices, sizeof(VTXMESH) * m_iNumVertices);
 	for (size_t i = 0; i < m_iNumVertices; i++)
 	{
-		inputFile.read(reinterpret_cast<char*>(&pVertices[i]), sizeof(VTXMESH));
+		m_InputFile.read(reinterpret_cast<char*>(&pVertices[i]), sizeof(VTXMESH));
 	}
-	m_filePointerPos = inputFile.tellg();
-	inputFile.close();
-
 
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);
 	m_InitialData.pSysMem = pVertices;

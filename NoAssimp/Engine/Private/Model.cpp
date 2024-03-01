@@ -42,6 +42,14 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelFilePath,
 	if (secondLastSlashPos != string::npos) 
 		m_strDirectory = "../../../model_txt/" +  strModelFilePath.substr(secondLastSlashPos + 1, lastSlashPos - secondLastSlashPos - 1) + ".txt";
 
+	m_InputFile.open(m_strDirectory.c_str(), ios::in | ios::binary);
+	if (!m_InputFile.is_open())
+	{
+		string tempstr = "Failed To Open : " + m_strDirectory;
+		MessageBoxA(nullptr, tempstr.c_str(), "error", MB_OK);
+		return E_FAIL;
+	}
+
 	XMStoreFloat4x4(&m_TransformMatrix, TransformMatrix);
 
 	/* 읽은 정보를 바탕으로해서 내가 사용하기 좋게 정리한다.  */
@@ -100,16 +108,8 @@ HRESULT CModel::Render(_uint iMeshIndex)
 
 HRESULT CModel::Ready_Meshes()
 {
-	ifstream inputFile(m_strDirectory.c_str(), ios::in | ios::binary);
-	if (!inputFile.is_open())
-	{
-		string tempstr = "Failed To Open : " + m_strDirectory;
-		MessageBoxA(nullptr, tempstr.c_str(), "error", MB_OK);
-		return E_FAIL;
-	}
-	inputFile.read(reinterpret_cast<char*>(&m_iNumMeshes), sizeof(m_iNumMeshes));
-	m_filePointerPos = inputFile.tellg();
-	inputFile.close();
+	m_InputFile.read(reinterpret_cast<char*>(&m_iNumMeshes), sizeof(m_iNumMeshes));
+	m_filePointerPos = m_InputFile.tellg();
 
 	for (size_t i = 0; i < m_iNumMeshes; i++)
 	{
@@ -126,15 +126,8 @@ HRESULT CModel::Ready_Meshes()
 
 HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 {
-	ifstream inputFile(m_strDirectory.c_str(), ios::in | ios::binary);
-	if (!inputFile.is_open())
-	{
-		string tempstr = "Failed To Open : " + m_strDirectory;
-		MessageBoxA(nullptr, tempstr.c_str(), "error", MB_OK);
-		return E_FAIL;
-	}
-	inputFile.seekg(m_filePointerPos); // 여기서부터 읽기 시작
-	inputFile.read(reinterpret_cast<char*>(&m_iNumMaterials), sizeof(m_iNumMaterials));
+	m_InputFile.seekg(m_filePointerPos); // 여기서부터 읽기 시작
+	m_InputFile.read(reinterpret_cast<char*>(&m_iNumMaterials), sizeof(m_iNumMaterials));
 
 	while (true)
 	{
@@ -143,11 +136,11 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 		MATERIAL_TEXTURE			MeshMaterial{};
 		_char			szFullPath[MAX_PATH] = { "" };
 		_tchar			szPerfectPath[MAX_PATH] = { L"" };
-		inputFile.read(reinterpret_cast<char*>(&iTemp), sizeof(iTemp));
+		m_InputFile.read(reinterpret_cast<char*>(&iTemp), sizeof(iTemp));
 		if (iTemp == m_iNumMaterials)
 			break;
-		inputFile.read(reinterpret_cast<char*>(&jTemp), sizeof(jTemp));
-		inputFile.read(reinterpret_cast<char*>(&szFullPath), sizeof(szFullPath));
+		m_InputFile.read(reinterpret_cast<char*>(&jTemp), sizeof(jTemp));
+		m_InputFile.read(reinterpret_cast<char*>(&szFullPath), sizeof(szFullPath));
 		
 		MultiByteToWideChar(CP_ACP, 0, szFullPath, strlen(szFullPath), szPerfectPath, MAX_PATH);
 		MeshMaterial.MaterialTextures[jTemp] = CTexture::Create(m_pDevice, m_pContext, szPerfectPath);
@@ -159,8 +152,8 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 		else // 벡터 안에있는 배열의 원소 수정
 			m_Materials[iTemp].MaterialTextures[jTemp] = MeshMaterial.MaterialTextures[jTemp];
 	}
-	m_filePointerPos = inputFile.tellg();
-	inputFile.close();
+	m_filePointerPos = m_InputFile.tellg();
+	m_InputFile.close();
 	return S_OK;
 }
 

@@ -3,6 +3,7 @@
 /* 디자이너분들이 저장해준 정점과 인덱스의 정보를 바탕으로해서 정점, 인덱스버퍼를 새엏나다.  */
 #include "VIBuffer.h"
 #include "Model.h"
+#include <fstream>
 
 BEGIN(Engine)
 
@@ -33,6 +34,7 @@ private:
 	_uint					m_iFaces = {0};
 	string					m_strDirectory;
 	streampos				m_filePointerPos;
+	ifstream				m_InputFile;
 
 private:
 	HRESULT Ready_Vertices_For_NonAnimModel(_fmatrix TransformationMatrix);
