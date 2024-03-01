@@ -1,0 +1,58 @@
+# # Prerequisites
+# *.d
+
+# # Compiled Object files
+# *.slo
+# *.lo
+# *.o
+# *.obj
+
+# # Precompiled Headers
+# *.gch
+# *.pch
+
+# # Compiled Dynamic libraries
+# *.so
+# *.dylib
+# *.dll
+
+# # Fortran module files
+# *.mod
+# *.smod
+
+# # Compiled Static libraries
+# *.lai
+# *.la
+# *.a
+
+# # Executables
+# *.exe
+# *.out
+# *.app
+
+# *.manifest
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+
+ipch/
+*.opendb
+.vs/
+*.exp
+*.pdb
+
+Assimp/Client_Assimp/Default/x64
+Assimp/Engine/Default/x64
+NoAssimp/Client/Default/x64
+NoAssimp/Engine/Default/x64
+
+Assimp/Client_Assimp/Bin/Client.pdb
+Assimp/Client_Assimp/Bin/Engine.dll
+Assimp/Engine/Bin/Engine.pdb
+NoAssimp/Client/Bin/Client.pdb
+NoAssimp/Client/Bin/Engine.dll
+NoAssimp/Engine/Bin/Engine.pdb
+*.db
+*.ini
