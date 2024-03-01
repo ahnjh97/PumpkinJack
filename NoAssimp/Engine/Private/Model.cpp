@@ -109,11 +109,10 @@ HRESULT CModel::Render(_uint iMeshIndex)
 HRESULT CModel::Ready_Meshes()
 {
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumMeshes), sizeof(m_iNumMeshes));
-	m_filePointerPos = m_InputFile.tellg();
 
 	for (size_t i = 0; i < m_iNumMeshes; i++)
 	{
-		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_eModelType, m_strDirectory, m_filePointerPos, m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
+		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_eModelType, m_strDirectory, m_InputFile, m_filePointerPos, m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
 		if (nullptr == pMesh)
 			return E_FAIL;
 
@@ -126,7 +125,6 @@ HRESULT CModel::Ready_Meshes()
 
 HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 {
-	m_InputFile.seekg(m_filePointerPos); // 여기서부터 읽기 시작
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumMaterials), sizeof(m_iNumMaterials));
 
 	while (true)
@@ -152,7 +150,7 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 		else // 벡터 안에있는 배열의 원소 수정
 			m_Materials[iTemp].MaterialTextures[jTemp] = MeshMaterial.MaterialTextures[jTemp];
 	}
-	m_filePointerPos = m_InputFile.tellg();
+
 	m_InputFile.close();
 	return S_OK;
 }

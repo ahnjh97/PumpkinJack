@@ -2,27 +2,26 @@
 #include "Bone.h"
 #include <fstream>
 
-CMesh::CMesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CVIBuffer(pDevice, pContext)
+CMesh::CMesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ifstream& fileStream)
+	: CVIBuffer(pDevice, pContext), m_InputFile(fileStream)
 {
 }
 
 CMesh::CMesh(const CMesh& rhs)
-	: CVIBuffer(rhs), m_iFaces{rhs.m_iFaces}
+	: CVIBuffer(rhs), m_iFaces{rhs.m_iFaces}, m_InputFile(ifstream())
 {
 }
 
 HRESULT CMesh::Initialize_Prototype(CModel::TYPE eModelType, string strDirectory, streampos filePtPos, const vector<CBone*>& Bones, _fmatrix TransformMatrix)
 {
 	m_strDirectory = strDirectory;
-	m_InputFile.open(m_strDirectory.c_str(), ios::in | ios::binary);
 	if (!m_InputFile.is_open())
 	{
 		string tempstr = "Failed To Open : " + m_strDirectory;
 		MessageBoxA(nullptr, tempstr.c_str(), "error", MB_OK);
 		return E_FAIL;
 	}
-	m_InputFile.seekg(filePtPos); // 여기서부터 읽기 시작
+
 	m_InputFile.read(reinterpret_cast<char*>(&m_szName), sizeof(m_szName));
 	m_InputFile.read(reinterpret_cast<char*>(&m_iMaterialIndex), sizeof(m_iMaterialIndex));
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumVertices), sizeof(m_iNumVertices));
@@ -64,8 +63,6 @@ HRESULT CMesh::Initialize_Prototype(CModel::TYPE eModelType, string strDirectory
 	{
 		m_InputFile.read(reinterpret_cast<char*>(&pIndices[i]), sizeof(_uint));
 	}
-	m_filePointerPos = m_InputFile.tellg();
-	m_InputFile.close();
 
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);
 	m_InitialData.pSysMem = pIndices;
@@ -201,9 +198,9 @@ HRESULT CMesh::Ready_Vertices_For_AnimModel(const vector<CBone*>& Bones)
 	return S_OK;
 }
 
-CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CModel::TYPE eModelType, string strDirectory, streampos filePtPos, const vector<CBone*>& Bones, _fmatrix TransformMatrix)
+CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CModel::TYPE eModelType, string strDirectory, ifstream& fileStream, streampos filePtPos, const vector<CBone*>& Bones, _fmatrix TransformMatrix)
 {
-	CMesh* pInstance = new CMesh(pDevice, pContext);
+	CMesh* pInstance = new CMesh(pDevice, pContext, fileStream);
 
 	if (FAILED(pInstance->Initialize_Prototype(eModelType, strDirectory, filePtPos, Bones, TransformMatrix)))
 	{

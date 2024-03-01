@@ -10,7 +10,7 @@ BEGIN(Engine)
 class CMesh final : public CVIBuffer
 {
 private:
-	CMesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CMesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ifstream& fileStream);
 	CMesh(const CMesh& rhs);
 	virtual ~CMesh() = default;
 
@@ -34,14 +34,14 @@ private:
 	_uint					m_iFaces = {0};
 	string					m_strDirectory;
 	streampos				m_filePointerPos;
-	ifstream				m_InputFile;
+	ifstream&				m_InputFile;
 
 private:
 	HRESULT Ready_Vertices_For_NonAnimModel(_fmatrix TransformationMatrix);
 	HRESULT Ready_Vertices_For_AnimModel(const vector<CBone*>& Bones);
 
 public:
-	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CModel::TYPE eModelType, string strDirectory, streampos filePtPos, const vector<class CBone*>& Bones, _fmatrix TransformMatrix);
+	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CModel::TYPE eModelType, string strDirectory, ifstream& fileStream, streampos filePtPos, const vector<class CBone*>& Bones, _fmatrix TransformMatrix);
 	virtual CMesh* Clone(void* pArg);
 	virtual void Free() override;
 };
