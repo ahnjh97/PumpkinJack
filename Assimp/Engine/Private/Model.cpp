@@ -49,6 +49,18 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelFilePath,
 
 	XMStoreFloat4x4(&m_TransformMatrix, TransformMatrix);
 
+	// 파일입출력
+	string tempFileName = "tempTXT.txt";
+	if (m_eModelType == TYPE_NONANIM)
+		remove(tempFileName.c_str()); // 이전에 남아있던거에 덮어쓰지 말고 새로운 파일에 하도록
+	m_OutputFile.open(tempFileName, ios::out | ios::binary | ios::app);
+
+	if (!m_OutputFile.is_open()) // 임시파일 열렸는지 확인
+	{
+		MSG_BOX(TEXT("Failed to open tempTXT.txt"));
+		return E_FAIL;
+	}
+
 	/* 읽은 정보를 바탕으로해서 내가 사용하기 좋게 정리한다.  */
 	if (eType == TYPE_ANIM)
 	{
@@ -108,25 +120,11 @@ HRESULT CModel::Ready_Meshes()
 {
 	m_iNumMeshes = m_pAIScene->mNumMeshes;
 
-	// 파일입출력
-	string tempFileName = "tempTXT.txt";
-	if (m_eModelType == TYPE_NONANIM)
-		remove(tempFileName.c_str()); // 이전에 남아있던거에 덮어쓰지 말고 새로운 파일에 하도록
-	ofstream tempOutputFile(tempFileName, ios::out | ios::binary | ios::app);
-
-	if (!tempOutputFile.is_open()) // 임시파일 열렸는지 확인
-	{
-		MSG_BOX(TEXT("Failed to open tempTXT.txt"));
-		return E_FAIL;
-	}
-
-	// 임시파일에 정보쓰기
-	tempOutputFile.write(reinterpret_cast<const char*>(&m_iNumMeshes), sizeof(m_iNumMeshes));
-	tempOutputFile.close();
+	m_OutputFile.write(reinterpret_cast<const char*>(&m_iNumMeshes), sizeof(m_iNumMeshes));
 
 	for (size_t i = 0; i < m_iNumMeshes; i++)
 	{
-		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_eModelType, m_pAIScene->mMeshes[i], m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
+		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_eModelType, m_pAIScene->mMeshes[i], m_OutputFile, m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
 		if (nullptr == pMesh)
 			return E_FAIL;
 
@@ -140,16 +138,7 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 {
 	m_iNumMaterials = m_pAIScene->mNumMaterials;
 
-	// 파일입출력
-	string tempFileName = "tempTXT.txt";
-	ofstream tempOutputFile(tempFileName, ios::out | ios::binary | ios::app);
-
-	if (!tempOutputFile.is_open()) // 임시파일 열렸는지 확인
-	{
-		MSG_BOX(TEXT("Failed to open tempTXT.txt"));
-		return E_FAIL;
-	}
-	tempOutputFile.write(reinterpret_cast<const char*>(&m_iNumMaterials), sizeof(m_iNumMaterials));
+	m_OutputFile.write(reinterpret_cast<const char*>(&m_iNumMaterials), sizeof(m_iNumMaterials));
 
 	for (_uint i = 0; i < m_iNumMaterials; i++)
 	{
@@ -190,18 +179,20 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 			if (nullptr == MeshMaterial.MaterialTextures[j])
 				return E_FAIL;
 
-			tempOutputFile.write(reinterpret_cast<const char*>(&i), sizeof(_uint));
-			tempOutputFile.write(reinterpret_cast<const char*>(&j), sizeof(_uint));
-			tempOutputFile.write(reinterpret_cast<const char*>(&szFullPath), sizeof(szFullPath));
+			m_OutputFile.write(reinterpret_cast<const char*>(&i), sizeof(_uint));
+			m_OutputFile.write(reinterpret_cast<const char*>(&j), sizeof(_uint));
+			m_OutputFile.write(reinterpret_cast<const char*>(&szFullPath), sizeof(szFullPath));
 			m_strDirectory = szDirectory;
 		}
 		
 		m_Materials.push_back(MeshMaterial);
 
 	}
-	tempOutputFile.write(reinterpret_cast<const char*>(&m_iNumMaterials), sizeof(_uint)); // loop멈추기용
-	tempOutputFile.close();
-	if (!tempOutputFile)
+	m_OutputFile.write(reinterpret_cast<const char*>(&m_iNumMaterials), sizeof(_uint)); // loop멈추기용
+	m_OutputFile.close();
+	
+	string tempFileName = "tempTXT.txt";
+	if (!m_OutputFile)
 	{
 		MSG_BOX(TEXT("Failed to write data to tempTXT.txt"));
 		remove(tempFileName.c_str()); // 임시파일 삭제

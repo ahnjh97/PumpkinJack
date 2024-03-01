@@ -2,13 +2,13 @@
 #include "Bone.h"
 #include <fstream>
 
-CMesh::CMesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CVIBuffer(pDevice, pContext)
+CMesh::CMesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ofstream& fileStream)
+	: CVIBuffer(pDevice, pContext), m_OutputFile(fileStream)
 {
 }
 
 CMesh::CMesh(const CMesh& rhs)
-	: CVIBuffer(rhs)
+	: CVIBuffer(rhs), m_OutputFile(ofstream())
 {
 }
 
@@ -45,7 +45,6 @@ HRESULT CMesh::Initialize_Prototype(CModel::TYPE eModelType, const aiMesh* pAIMe
 	m_BufferDesc.StructureByteStride = 0;
 
 
-
 	_uint* pIndices = new _uint[m_iNumIndices];
 	ZeroMemory(pIndices, sizeof(_uint) * m_iNumIndices);
 
@@ -61,20 +60,10 @@ HRESULT CMesh::Initialize_Prototype(CModel::TYPE eModelType, const aiMesh* pAIMe
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);
 	m_InitialData.pSysMem = pIndices;
 
-	// 파일입출력
-	string tempFileName = "tempTXT.txt";
-	ofstream tempOutputFile(tempFileName, ios::out | ios::binary | ios::app);
-	if (!tempOutputFile.is_open()) // 임시파일 열렸는지 확인
-	{
-		MSG_BOX(TEXT("Failed to open tempTXT.txt"));
-		return E_FAIL;
-	}
-
 	for (size_t i = 0; i < m_iNumIndices; i++)
 	{
-		tempOutputFile.write(reinterpret_cast<const char*>(&pIndices[i]), sizeof(_uint));
+		m_OutputFile.write(reinterpret_cast<const char*>(&pIndices[i]), sizeof(_uint));
 	}
-	tempOutputFile.close();
 
 	if (FAILED(__super::Create_Buffer(&m_pIB)))
 		return E_FAIL;
@@ -93,19 +82,10 @@ HRESULT CMesh::Initialize(void* pArg)
 
 HRESULT CMesh::Ready_Vertices_For_NonAnimModel(const aiMesh* pAIMesh, _fmatrix TransformMatrix)
 {
-	// 파일입출력
-	string tempFileName = "tempTXT.txt";
-	ofstream tempOutputFile(tempFileName, ios::out | ios::binary | ios::app);
-	if (!tempOutputFile.is_open()) // 임시파일 열렸는지 확인
-	{
-		MSG_BOX(TEXT("Failed to open tempTXT.txt"));
-		return E_FAIL;
-	}
-	// 임시파일에 정보쓰기
-	tempOutputFile.write(reinterpret_cast<const char*>(&m_szName), sizeof(m_szName));
-	tempOutputFile.write(reinterpret_cast<const char*>(&m_iMaterialIndex), sizeof(m_iMaterialIndex));
-	tempOutputFile.write(reinterpret_cast<const char*>(&m_iNumVertices), sizeof(m_iNumVertices));
-	tempOutputFile.write(reinterpret_cast<const char*>(&pAIMesh->mNumFaces), sizeof(pAIMesh->mNumFaces));
+	m_OutputFile.write(reinterpret_cast<const char*>(&m_szName), sizeof(m_szName));
+	m_OutputFile.write(reinterpret_cast<const char*>(&m_iMaterialIndex), sizeof(m_iMaterialIndex));
+	m_OutputFile.write(reinterpret_cast<const char*>(&m_iNumVertices), sizeof(m_iNumVertices));
+	m_OutputFile.write(reinterpret_cast<const char*>(&pAIMesh->mNumFaces), sizeof(pAIMesh->mNumFaces));
 
 	m_iVertexStride = sizeof(VTXMESH);
 
@@ -133,13 +113,9 @@ HRESULT CMesh::Ready_Vertices_For_NonAnimModel(const aiMesh* pAIMesh, _fmatrix T
 		memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
 		memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
 
-		/*tempOutputFile.write(reinterpret_cast<const char*>(&pVertices[i].vPosition), sizeof(pVertices[i].vPosition));
-		tempOutputFile.write(reinterpret_cast<const char*>(&pVertices[i].vNormal), sizeof(pVertices[i].vNormal));
-		tempOutputFile.write(reinterpret_cast<const char*>(&pVertices[i].vTexcoord), sizeof(pVertices[i].vTexcoord));
-		tempOutputFile.write(reinterpret_cast<const char*>(&pVertices[i].vTangent), sizeof(pVertices[i].vTangent));*/
-		tempOutputFile.write(reinterpret_cast<const char*>(&pVertices[i]), sizeof(VTXMESH));
+		m_OutputFile.write(reinterpret_cast<const char*>(&pVertices[i]), sizeof(VTXMESH));
 	}
-	tempOutputFile.close();
+
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);
 	m_InitialData.pSysMem = pVertices;
 
@@ -234,9 +210,9 @@ HRESULT CMesh::Ready_Vertices_For_AnimModel(const aiMesh* pAIMesh, const vector<
 	return S_OK;
 }
 
-CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CModel::TYPE eModelType, const aiMesh* pAIMesh, const vector<CBone*>& Bones, _fmatrix TransformMatrix)
+CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CModel::TYPE eModelType, const aiMesh* pAIMesh, ofstream& fileStream , const vector<CBone*>& Bones, _fmatrix TransformMatrix)
 {
-	CMesh* pInstance = new CMesh(pDevice, pContext);
+	CMesh* pInstance = new CMesh(pDevice, pContext, fileStream);
 
 	if (FAILED(pInstance->Initialize_Prototype(eModelType, pAIMesh, Bones, TransformMatrix)))
 	{

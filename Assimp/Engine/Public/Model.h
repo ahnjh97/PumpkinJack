@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Component.h"
+#include <fstream>
 
 BEGIN(Engine)
 
@@ -42,6 +43,7 @@ private:
 
 	vector<class CBone*>		m_Bones;
 	string						m_strDirectory;
+	ofstream					m_OutputFile;
 
 private:
 	HRESULT Ready_Meshes();
