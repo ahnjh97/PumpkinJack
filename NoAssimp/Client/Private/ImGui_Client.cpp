@@ -19,8 +19,8 @@ void CImGui_Client::Tick(_float fTimeDelta)
 {
 	if (Check_Pick())
 	{
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Monster"))))
-			return;
+		/*if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Monster"))))
+			return;*/
 
 		MSG_BOX(TEXT("Monster Added"));
 	}

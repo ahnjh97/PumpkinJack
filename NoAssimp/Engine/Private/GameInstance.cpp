@@ -91,8 +91,8 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 	m_pInput_Device->Tick();
 
 	m_pObject_Manager->Tick(fTimeDelta);	
-	//
-	// m_pPicking->Update();
+	
+	m_pPicking->Update();
 	m_pPipeLine->Tick();
 
 
@@ -101,8 +101,8 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 	/* 반복적인 갱신이 필요한 객체들의 Tick함수를 호출한다. */
 	m_pLevel_Manager->Tick(fTimeDelta);
 
-	/*if (m_pImGui_Manager)
-		m_pImGui_Manager->Tick(fTimeDelta);*/
+	if (m_pImGui_Manager)
+		m_pImGui_Manager->Tick(fTimeDelta);
 
 }
 
