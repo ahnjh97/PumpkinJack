@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "..\Public\Level_Logo.h"
+#include "Level_Logo.h"
 
 #include "GameInstance.h"
 #include "Level_Loading.h"

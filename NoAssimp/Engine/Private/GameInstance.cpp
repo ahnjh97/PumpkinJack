@@ -5,6 +5,8 @@
 #include "Object_Manager.h"
 #include "Level_Manager.h"
 #include "Timer_Manager.h"
+#include "ImGui_Manager.h"
+#include "Picking.h"
 
 #include "Renderer.h"
 
@@ -62,9 +64,20 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	if (nullptr == m_pComponent_Manager)
 		return E_FAIL;
 
+	m_pPicking = CPicking::Create(*ppDevice, *ppContext, EngineDesc.hWnd, EngineDesc.iWinSizeX, EngineDesc.iWinSizeY);
+	if (nullptr == m_pComponent_Manager)
+		return E_FAIL;
 
+	return S_OK;
+}
 
-	
+HRESULT CGameInstance::Initialize_ImGui(CMyImGui* pImGui)
+{
+	m_pImGui_Manager = CImGui_Manager::Create(pImGui);
+
+	if (nullptr == m_pImGui_Manager)
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -78,13 +91,18 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 	m_pInput_Device->Tick();
 
 	m_pObject_Manager->Tick(fTimeDelta);	
-
+	//
+	// m_pPicking->Update();
 	m_pPipeLine->Tick();
+
 
 	m_pObject_Manager->Late_Tick(fTimeDelta);
 	
 	/* 반복적인 갱신이 필요한 객체들의 Tick함수를 호출한다. */
 	m_pLevel_Manager->Tick(fTimeDelta);
+
+	/*if (m_pImGui_Manager)
+		m_pImGui_Manager->Tick(fTimeDelta);*/
 
 }
 
@@ -104,6 +122,9 @@ HRESULT CGameInstance::Draw(const _float4& vClearColor)
 	m_pRenderer->Render();
 
 	m_pLevel_Manager->Render();	
+
+	if (m_pImGui_Manager)
+		m_pImGui_Manager->Render();
 
 	m_pGraphic_Device->Present();
 
@@ -150,6 +171,38 @@ _long CGameInstance::Get_DIMouseMove(MOUSEMOVESTATE eMouseState)
 		return 0;
 
 	return m_pInput_Device->Get_DIMouseMove(eMouseState);
+}
+
+_bool CGameInstance::KeyDown(_ubyte byKeyID)
+{
+	if (nullptr == m_pInput_Device)
+		return 0;
+
+	return m_pInput_Device->KeyDown(byKeyID);
+}
+
+_bool CGameInstance::KeyUp(_ubyte byKeyID)
+{
+	if (nullptr == m_pInput_Device)
+		return 0;
+
+	return m_pInput_Device->KeyUp(byKeyID);
+}
+
+_bool CGameInstance::MouseDown(_int button)
+{
+	if (nullptr == m_pInput_Device)
+		return 0;
+
+	return m_pInput_Device->MouseDown(button);
+}
+
+_bool CGameInstance::MouseUp(_int button)
+{
+	if (nullptr == m_pInput_Device)
+		return 0;
+
+	return m_pInput_Device->MouseUp(button);
 }
 
 HRESULT CGameInstance::Add_RenderGroup(CRenderer::RENDERGROUP eRenderGroup, CGameObject * pRenderObject)
@@ -278,6 +331,11 @@ _float4 CGameInstance::Get_CamPosition_Float4() const
 		return _float4();
 
 	return m_pPipeLine->Get_CamPosition_Float4();
+}
+
+void CGameInstance::Transform_PickingToLocalSpace(const CTransform* pTransform, _float3* pRayDir, _float3* pRayPos)
+{
+	m_pPicking->Transform_PickingToLocalSpace(pTransform, pRayDir, pRayPos);
 }
 
 

@@ -88,6 +88,18 @@
     <Filter Include="01.Utility\02.Components\Model\Bone">
       <UniqueIdentifier>{7e8c8169-8671-4f07-b0b0-565b0d1d2a00}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\06. Picking">
+      <UniqueIdentifier>{08ea044e-f871-4785-a1d2-3c17e916c139}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\07. MyImGui">
+      <UniqueIdentifier>{87df510c-1d66-4377-a28a-058678e089d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\07. MyImGui\ImGui">
+      <UniqueIdentifier>{3e571219-2a9c-4386-a67d-015f2d80af73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\07. MyImGui\Manager">
+      <UniqueIdentifier>{33a0aa5e-6144-4d54-8dcc-fa7c857c6232}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -170,6 +182,39 @@
     </ClCompile>
     <ClCompile Include="..\Private\Bone.cpp">
       <Filter>01.Utility\02.Components\Model\Bone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ImGui\imgui.cpp">
+      <Filter>01.Utility\07. MyImGui\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ImGui\imgui_demo.cpp">
+      <Filter>01.Utility\07. MyImGui\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ImGui\imgui_draw.cpp">
+      <Filter>01.Utility\07. MyImGui\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ImGui\imgui_impl_dx11.cpp">
+      <Filter>01.Utility\07. MyImGui\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ImGui\imgui_impl_win32.cpp">
+      <Filter>01.Utility\07. MyImGui\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ImGui\imgui_tables.cpp">
+      <Filter>01.Utility\07. MyImGui\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ImGui\imgui_widgets.cpp">
+      <Filter>01.Utility\07. MyImGui\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ImGui\ImGuizmo.cpp">
+      <Filter>01.Utility\07. MyImGui\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Picking.cpp">
+      <Filter>01.Utility\06. Picking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MyImGui.cpp">
+      <Filter>01.Utility\07. MyImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ImGui_Manager.cpp">
+      <Filter>01.Utility\07. MyImGui\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -265,6 +310,42 @@
     </ClInclude>
     <ClInclude Include="..\Public\Bone.h">
       <Filter>01.Utility\02.Components\Model\Bone</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ImGui\imconfig.h">
+      <Filter>01.Utility\07. MyImGui\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ImGui\imgui.h">
+      <Filter>01.Utility\07. MyImGui\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ImGui\imgui_impl_dx11.h">
+      <Filter>01.Utility\07. MyImGui\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ImGui\imgui_impl_win32.h">
+      <Filter>01.Utility\07. MyImGui\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ImGui\imgui_internal.h">
+      <Filter>01.Utility\07. MyImGui\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ImGui\ImGuizmo.h">
+      <Filter>01.Utility\07. MyImGui\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ImGui\imstb_rectpack.h">
+      <Filter>01.Utility\07. MyImGui\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ImGui\imstb_textedit.h">
+      <Filter>01.Utility\07. MyImGui\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ImGui\imstb_truetype.h">
+      <Filter>01.Utility\07. MyImGui\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Picking.h">
+      <Filter>01.Utility\06. Picking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MyImGui.h">
+      <Filter>01.Utility\07. MyImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ImGui_Manager.h">
+      <Filter>01.Utility\07. MyImGui\Manager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

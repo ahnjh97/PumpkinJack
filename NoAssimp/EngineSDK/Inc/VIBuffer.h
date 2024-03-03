@@ -22,6 +22,8 @@ public:
 	HRESULT Bind_Buffers();
 
 protected:
+	_bool bRayTriangleIntersect(_float3 _vRayPos, _float3 _vRayDir, _float3 _v0, _float3 _v1, _float3 _v2, _float& _fDis) const;
+
 	ID3D11Buffer*				m_pVB = { nullptr };
 	ID3D11Buffer*				m_pIB = { nullptr };
 

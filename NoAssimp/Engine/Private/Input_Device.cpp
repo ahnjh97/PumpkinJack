@@ -5,6 +5,42 @@ Engine::CInput_Device::CInput_Device(void)
 
 }
 
+_bool CInput_Device::KeyDown(_ubyte byKeyID)
+{
+	// 이전에 안눌림 && 현재 눌림
+	return (!(m_byPreKeyState[byKeyID] & 0x80) && (m_byKeyState[byKeyID] & 0x80));
+}
+
+_bool CInput_Device::KeyPressing(_ubyte byKeyID)
+{
+	// 이전에 눌림 && 현재 눌림
+	return ((m_byPreKeyState[byKeyID] & 0x80) && (m_byKeyState[byKeyID] & 0x80));
+}
+
+_bool CInput_Device::KeyUp(_ubyte byKeyID)
+{
+	// 이전에 눌림 && 현재 안눌림
+	return ((m_byPreKeyState[byKeyID] & 0x80) && !(m_byKeyState[byKeyID] & 0x80));
+}
+
+_bool CInput_Device::MouseDown(_int button)
+{
+	// 이전에 안눌림 && 현재 눌림
+	return (!(m_tPreMouseState.rgbButtons[button] & 0x80) && (m_tMouseState.rgbButtons[button] & 0x80));
+}
+
+_bool CInput_Device::MousePressing(_int button)
+{
+	// 이전에 눌림 && 현재 눌림
+	return ((m_tPreMouseState.rgbButtons[button] & 0x80) && (m_tMouseState.rgbButtons[button] & 0x80));
+}
+
+_bool CInput_Device::MouseUp(_int button)
+{
+	// 이전에 눌림 && 현재 안눌림
+	return ((m_tPreMouseState.rgbButtons[button] & 0x80) && !(m_tMouseState.rgbButtons[button] & 0x80));
+}
+
 HRESULT Engine::CInput_Device::Initialize(HINSTANCE hInst, HWND hWnd)
 {
 	// DInput 컴객체를 생성하는 함수
@@ -48,7 +84,9 @@ HRESULT Engine::CInput_Device::Initialize(HINSTANCE hInst, HWND hWnd)
 
 void Engine::CInput_Device::Tick(void)
 {
-	
+	// 이전상태 저장
+	memcpy(&m_byPreKeyState, &m_byKeyState, sizeof(m_byKeyState));
+	memcpy(&m_tPreMouseState.rgbButtons, &m_tMouseState.rgbButtons, sizeof(m_tMouseState.rgbButtons));
 	/* 키보드와 마우스가 어떤 입력상태를 가지고 있는지를 저장한ㄷ.ㅏ */
 	m_pKeyBoard->GetDeviceState(256, m_byKeyState);
 	m_pMouse->GetDeviceState(sizeof(m_tMouseState), &m_tMouseState);

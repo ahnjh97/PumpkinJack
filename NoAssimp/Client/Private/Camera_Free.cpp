@@ -37,37 +37,34 @@ void CCamera_Free::Tick(_float fTimeDelta)
 {
 	if (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80)
 	{
-		m_pTransformCom->Go_Left(fTimeDelta);
+		m_pTransformCom->Go_Left(fTimeDelta, 1);
 	}
 	if (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80)
 	{
-		m_pTransformCom->Go_Right(fTimeDelta);
+		m_pTransformCom->Go_Right(fTimeDelta, 1);
 	}
 	if (m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80)
 	{
-		m_pTransformCom->Go_Straight(fTimeDelta);
+		m_pTransformCom->Go_Straight(fTimeDelta, 1);
 	}
 	if (m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80)
 	{
-		m_pTransformCom->Go_Backward(fTimeDelta);
+		m_pTransformCom->Go_Backward(fTimeDelta, 1);
 	}
 
 	
-
 	_long	MouseMove = { 0 };
-
-	if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_X))
+	if (m_pGameInstance->Get_DIMouseState(DIMKS_LBUTTON) & 0x80) // 좌클릭 중인경우
 	{
-		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * MouseMove * m_fMouseSensor);
+		if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_X))
+		{
+			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * MouseMove * m_fMouseSensor);
+		}
+		if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_Y))
+		{
+			m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), fTimeDelta * MouseMove * m_fMouseSensor);
+		}
 	}
-	if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_Y))
-	{
-		m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), fTimeDelta * MouseMove * m_fMouseSensor);
-	}
-
-
-
-
 
 	__super::Bind_PipeLines();
 }

@@ -16,6 +16,7 @@ private:
 
 public:
 	HRESULT Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, const ENGINE_DESC& EngineDesc, _Inout_ ID3D11Device** ppDevice, _Inout_ ID3D11DeviceContext** ppContext);
+	HRESULT	Initialize_ImGui(class CMyImGui* pImGui);
 	void Tick_Engine(_float fTimeDelta);
 	HRESULT Draw(const _float4& vClearColor = _float4(0.f, 0.f, 1.f, 1.f));
 	HRESULT Clear(_uint iClearLevelIndex);
@@ -24,6 +25,10 @@ public: /* For.Input_Device */
 	_byte	Get_DIKeyState(_ubyte byKeyID);
 	_byte	Get_DIMouseState(MOUSEKEYSTATE eMouse);
 	_long	Get_DIMouseMove(MOUSEMOVESTATE eMouseState);
+	_bool	KeyDown(_ubyte byKeyID);
+	_bool	KeyUp(_ubyte byKeyID);
+	_bool	MouseDown(_int button);
+	_bool	MouseUp(_int button);
 
 public: /* For.Renderer */
 	HRESULT Add_RenderGroup(CRenderer::RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
@@ -54,6 +59,9 @@ public: /* For.PipeLine */
 	_vector Get_CamPosition_Vector() const;
 	_float4 Get_CamPosition_Float4() const;
 
+public: /* For. Picking*/
+	void Transform_PickingToLocalSpace(const class CTransform* pTransform, _Out_ _float3* pRayDir, _Out_ _float3* pRayPos);
+
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };
 	class CInput_Device*			m_pInput_Device = { nullptr };
@@ -63,7 +71,8 @@ private:
 	class CRenderer*				m_pRenderer = { nullptr };
 	class CTimer_Manager*			m_pTimer_Manager = { nullptr };	
 	class CPipeLine*				m_pPipeLine = { nullptr };
-
+	class CImGui_Manager*			m_pImGui_Manager = { nullptr };
+	class CPicking*					m_pPicking = { nullptr };
 
 
 public:		

@@ -35,16 +35,11 @@ public:
 		memcpy(&m_WorldMatrix.m[eState], &vTemp, sizeof(_float4));
 	}
 
-	void Set_State(STATE eState, const _float4& vState)
-	{
-		memcpy(&m_WorldMatrix.m[eState], &vState, sizeof(_float4));
-	}
+	void Set_State(STATE eState, const _float4& vState)	{ memcpy(&m_WorldMatrix.m[eState], &vState, sizeof(_float4)); }
 
 	void Set_Scaled(_float fScaleX, _float fScaleY, _float fScaleZ);
 
-	_vector Get_State_Vector(STATE eState) {
-		return XMLoadFloat4x4(&m_WorldMatrix).r[eState];
-	}
+	_vector Get_State_Vector(STATE eState) { return XMLoadFloat4x4(&m_WorldMatrix).r[eState]; }
 
 	_float4 Get_State_Float4(STATE eState) {
 		_float4		vTemp;
@@ -59,21 +54,15 @@ public:
 			XMVectorGetX(XMVector3Length(WorldMatrix.r[STATE_LOOK])));
 	}
 
-	_float4x4 Get_WorldFloat4x4() const {
-		return m_WorldMatrix;
-	}
-	_matrix Get_WorldMatrix() const {
-		return XMLoadFloat4x4(&m_WorldMatrix);
-	}
+	_float4x4 Get_WorldFloat4x4() const { return m_WorldMatrix; }
+	_matrix Get_WorldMatrix() const { return XMLoadFloat4x4(&m_WorldMatrix); }
 
 	_float4x4 Get_WorldFloat4x4_Inverse() const {
 		_float4x4	WorldMatrixInverse;
 		XMStoreFloat4x4(&WorldMatrixInverse, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
 		return WorldMatrixInverse;
 	}
-	_matrix Get_WorldMatrix_Inverse() const {
-		return XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix));
-	}
+	_matrix Get_WorldMatrix_Inverse() const { return XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)); }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -83,10 +72,11 @@ public:
 	HRESULT Bind_ShaderResource(class CShader* pShader, const _char* pConstantName);
 
 public:
-	void Go_Straight(_float fTimeDelta);
-	void Go_Backward(_float fTimeDelta);
-	void Go_Left(_float fTimeDelta);
-	void Go_Right(_float fTimeDelta);
+	void Go_Straight(_float fTimeDelta, _uint iNum = 0);
+	void Go_Backward(_float fTimeDelta, _uint iNum = 0);
+	void Go_Left(_float fTimeDelta, _uint iNum = 0);
+	void Go_Right(_float fTimeDelta, _uint iNum = 0);
+
 	void Look_At(_fvector vPosition);
 	void Look_At_ForLandObject(_fvector vPosition);
 	void Move_toTarget(_fvector vTargetPos, _float fTimeDelta, _float fMinDistance = 0.f);	

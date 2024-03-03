@@ -48,45 +48,53 @@ HRESULT CTransform::Bind_ShaderResource(CShader * pShader, const _char * pConsta
 	
 }
 
-void CTransform::Go_Straight(_float fTimeDelta)
+void CTransform::Go_Straight(_float fTimeDelta, _uint iNum)
 {
 	_vector		vPosition = Get_State_Vector(STATE_POSITION);
 	_vector		vLook = Get_State_Vector(STATE_LOOK);
+
+	if (iNum != 0)
+		vLook = XMVectorSetY(vLook, 0.f);
 
 	vPosition += XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;
-
 	Set_State(STATE_POSITION, vPosition);
 }
 
 
 
-void CTransform::Go_Backward(_float fTimeDelta)
+void CTransform::Go_Backward(_float fTimeDelta, _uint iNum)
 {
 	_vector		vPosition = Get_State_Vector(STATE_POSITION);
 	_vector		vLook = Get_State_Vector(STATE_LOOK);
 
-	vPosition -= XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;
+	if (iNum != 0)
+		vLook = XMVectorSetY(vLook, 0.f);
 
+	vPosition -= XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;
 	Set_State(STATE_POSITION, vPosition);
 }
 
-void CTransform::Go_Left(_float fTimeDelta)
+void CTransform::Go_Left(_float fTimeDelta, _uint iNum)
 {
 	_vector		vPosition = Get_State_Vector(STATE_POSITION);
 	_vector		vRight = Get_State_Vector(STATE_RIGHT);
+
+	if (iNum != 0)
+		vRight = XMVectorSetY(vRight, 0.f);
 
 	vPosition -= XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta;
-
 	Set_State(STATE_POSITION, vPosition);
 }
 
-void CTransform::Go_Right(_float fTimeDelta)
+void CTransform::Go_Right(_float fTimeDelta, _uint iNum)
 {
 	_vector		vPosition = Get_State_Vector(STATE_POSITION);
 	_vector		vRight = Get_State_Vector(STATE_RIGHT);
 
-	vPosition += XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta;
+	if (iNum != 0)
+		vRight = XMVectorSetY(vRight, 0.f);
 
+	vPosition += XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta;
 	Set_State(STATE_POSITION, vPosition);
 }
 

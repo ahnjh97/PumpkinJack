@@ -12,8 +12,12 @@ private:
 	virtual ~CVIBuffer_Terrain() = default;
 
 public:
+	virtual HRESULT Initialize_Prototype(_uint iX, _uint iZ);
 	virtual HRESULT Initialize_Prototype(const wstring& strHeightMapFilePath);
 	virtual HRESULT Initialize(void* pArg);
+
+public:
+	_float3 Pick_Pos(const class CTransform* pTransform) const;
 
 private:
 	_uint				m_iNumVerticesX = { 0 };
@@ -21,6 +25,7 @@ private:
 
 public:
 	static CVIBuffer_Terrain* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring& strHeightMapFilePath);
+	static CVIBuffer_Terrain* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _uint iX, _uint iZ);
 	virtual CComponent* Clone(void* pArg);
 	virtual void Free() override;
 };

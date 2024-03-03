@@ -20,12 +20,8 @@ private:
 public:
 	HRESULT Initialize(LEVEL eNextLevelID);
 	HRESULT Start();
-	_bool isFinished() const {
-		return m_isFinished;
-	}
-	void Output() {
-		SetWindowText(g_hWnd, m_strLoadingText.c_str());
-	}
+	_bool isFinished() const { return m_isFinished; }
+	void Output() {	SetWindowText(g_hWnd, m_strLoadingText.c_str()); }
 	
 
 private:
@@ -43,6 +39,7 @@ private:
 private:
 	HRESULT Loading_For_Logo();
 	HRESULT Loading_For_GamePlay();
+	HRESULT Loading_For_MapTool();
 
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID);

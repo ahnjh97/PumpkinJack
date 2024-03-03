@@ -73,6 +73,41 @@ HRESULT CVIBuffer::Bind_Buffers()
 	return S_OK;
 }
 
+_bool CVIBuffer::bRayTriangleIntersect(_float3 _vRayPos, _float3 _vRayDir, _float3 _v0, _float3 _v1, _float3 _v2, _float& _fDis) const
+{
+	return false;
+	//XMVECTOR o = XMLoadFloat3(&_vRayPos);
+	//XMVECTOR d = XMVector3Normalize(XMLoadFloat3(&_vRayDir));
+	//XMVECTOR v0 = XMLoadFloat3(&_v0);
+	//XMVECTOR v1 = XMLoadFloat3(&_v1);
+	//XMVECTOR v2 = XMLoadFloat3(&_v2);
+
+	//XMVECTOR e1 = v1 - v0;
+	//XMVECTOR e2 = v2 - v0;
+	//XMVECTOR h = XMVector3Cross(d, e2);
+	//float a = XMVectorGetX(XMVector3Dot(e1, h));
+
+	//if (a > -FLT_EPSILON && a < FLT_EPSILON)
+	//	return false;
+
+	//float f = 1.0f / a;
+	//XMVECTOR s = o - v0;
+	//float u = f * XMVectorGetX(XMVector3Dot(s, h));
+
+	//if (u < 0.0f || u > 1.0f)
+	//	return false;
+
+	//XMVECTOR q = XMVector3Cross(s, e1);
+	//float v = f * XMVectorGetX(XMVector3Dot(d, q));
+
+	//if (v < 0.0f || u + v > 1.0f)
+	//	return false;
+
+	//_fDis = f * XMVectorGetX(XMVector3Dot(e2, q));
+
+	//return _fDis > FLT_EPSILON;
+}
+
 
 
 HRESULT CVIBuffer::Create_Buffer(ID3D11Buffer ** ppBuffer)

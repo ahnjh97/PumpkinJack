@@ -16,6 +16,7 @@ private:
 
 public:
 	HRESULT Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, const ENGINE_DESC& EngineDesc, _Inout_ ID3D11Device** ppDevice, _Inout_ ID3D11DeviceContext** ppContext);
+	HRESULT	Initialize_ImGui(class CMyImGui* pImGui);
 	void Tick_Engine(_float fTimeDelta);
 	HRESULT Draw(const _float4& vClearColor = _float4(0.f, 0.f, 1.f, 1.f));
 	HRESULT Clear(_uint iClearLevelIndex);
@@ -62,6 +63,7 @@ private:
 	class CRenderer*				m_pRenderer = { nullptr };
 	class CTimer_Manager*			m_pTimer_Manager = { nullptr };	
 	class CPipeLine*				m_pPipeLine = { nullptr };
+	class CImGui_Manager*			m_pImGui_Manager = { nullptr };
 
 
 

@@ -19,16 +19,22 @@ HRESULT CMonster::Initialize_Prototype()
 
 HRESULT CMonster::Initialize(void * pArg)
 {
-	GAMEOBJECT_DESC		GameObjectDesc{};
+	GAMEOBJECT_DESC GameObjectDesc = {}; // = (GAMEOBJECT_DESC*)pArg;
 
+	
 	GameObjectDesc.fSpeedPerSec = 10.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+
+
 
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;	
+
+	/*if (pGameObjectDesc)
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, pGameObjectDesc->vPosition);*/
 	
 	return S_OK;
 }

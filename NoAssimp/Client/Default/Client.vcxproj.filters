@@ -22,9 +22,6 @@
     <Filter Include="01.Levels\GamePlay">
       <UniqueIdentifier>{8b1d5579-1fb9-493c-96b9-62d618153e5d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\Loading\Loader">
-      <UniqueIdentifier>{17ab5a45-d880-40f6-b518-e747936c79d3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects">
       <UniqueIdentifier>{c4cae272-dd94-43ce-85e6-ecc0b24de4d0}</UniqueIdentifier>
     </Filter>
@@ -42,6 +39,18 @@
     </Filter>
     <Filter Include="02.GameObjects\Monster">
       <UniqueIdentifier>{50e192cf-62e9-428c-8e92-b730a586d56b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_MyImGui">
+      <UniqueIdentifier>{9c1d6565-90e9-4f70-b4b3-975ecb0b33ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\MapTool">
+      <UniqueIdentifier>{32c2c183-be08-4bf2-b552-63cb8a4031b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\_Loader">
+      <UniqueIdentifier>{17ab5a45-d880-40f6-b518-e747936c79d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Terrain\Grid">
+      <UniqueIdentifier>{0841abf2-9ab3-4a8c-964a-fe3f09299bfe}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -73,7 +82,7 @@
       <Filter>01.Levels\Logo</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Loader.h">
-      <Filter>01.Levels\Loading\Loader</Filter>
+      <Filter>01.Levels\_Loader</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BackGround.h">
       <Filter>02.GameObjects\BackGround</Filter>
@@ -89,6 +98,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\Monster.h">
       <Filter>02.GameObjects\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ImGui_Client.h">
+      <Filter>_MyImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_MapTool.h">
+      <Filter>01.Levels\MapTool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Grid.h">
+      <Filter>02.GameObjects\Terrain\Grid</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -111,7 +129,7 @@
       <Filter>01.Levels\Logo</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Loader.cpp">
-      <Filter>01.Levels\Loading\Loader</Filter>
+      <Filter>01.Levels\_Loader</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BackGround.cpp">
       <Filter>02.GameObjects\BackGround</Filter>
@@ -124,6 +142,15 @@
     </ClCompile>
     <ClCompile Include="..\private\Monster.cpp">
       <Filter>02.GameObjects\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ImGui_Client.cpp">
+      <Filter>_MyImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_MapTool.cpp">
+      <Filter>01.Levels\MapTool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Grid.cpp">
+      <Filter>02.GameObjects\Terrain\Grid</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
