@@ -36,8 +36,8 @@ public:
 	}
 
 	void Set_State(STATE eState, const _float4& vState)	{ memcpy(&m_WorldMatrix.m[eState], &vState, sizeof(_float4)); }
-
 	void Set_Scaled(_float fScaleX, _float fScaleY, _float fScaleZ);
+	void Set_WorldMatrix(_float4x4 _matWorld) { m_WorldMatrix = _matWorld; }
 
 	_vector Get_State_Vector(STATE eState) { return XMLoadFloat4x4(&m_WorldMatrix).r[eState]; }
 
@@ -55,14 +55,14 @@ public:
 	}
 
 	_float4x4 Get_WorldFloat4x4() const { return m_WorldMatrix; }
-	_matrix Get_WorldMatrix() const { return XMLoadFloat4x4(&m_WorldMatrix); }
+	_matrix Get_WorldMatrix() const { return ::XMLoadFloat4x4(&m_WorldMatrix); }
 
 	_float4x4 Get_WorldFloat4x4_Inverse() const {
 		_float4x4	WorldMatrixInverse;
-		XMStoreFloat4x4(&WorldMatrixInverse, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
+		::XMStoreFloat4x4(&WorldMatrixInverse, XMMatrixInverse(nullptr, ::XMLoadFloat4x4(&m_WorldMatrix)));
 		return WorldMatrixInverse;
 	}
-	_matrix Get_WorldMatrix_Inverse() const { return XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)); }
+	_matrix Get_WorldMatrix_Inverse() const { return XMMatrixInverse(nullptr, ::XMLoadFloat4x4(&m_WorldMatrix)); }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;

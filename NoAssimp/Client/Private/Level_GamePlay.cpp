@@ -14,6 +14,15 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
+	string strFileName = "../../../objects_txt/Level_GamePlay.txt";
+	m_InputFile.open(strFileName, ios::in | ios::binary);
+	if (!m_InputFile.is_open())
+	{
+		string tempstr = "Failed : " + strFileName;
+		MessageBoxA(nullptr, tempstr.c_str(), "error", MB_OK);
+		return E_FAIL;
+	}
+
 	/*
 	if (FAILED(Ready_Lights()))
 		return E_FAIL;

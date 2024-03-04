@@ -20,12 +20,11 @@ HRESULT CMonster::Initialize_Prototype()
 HRESULT CMonster::Initialize(void * pArg)
 {
 	GAMEOBJECT_DESC GameObjectDesc = {}; // = (GAMEOBJECT_DESC*)pArg;
-
+	if (pArg)
+		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
 	
 	GameObjectDesc.fSpeedPerSec = 10.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-
-
 
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
@@ -33,8 +32,8 @@ HRESULT CMonster::Initialize(void * pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;	
 
-	/*if (pGameObjectDesc)
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, pGameObjectDesc->vPosition);*/
+	if (pArg)
+		m_pTransformCom->Set_WorldMatrix(GameObjectDesc.matWorld);
 	
 	return S_OK;
 }

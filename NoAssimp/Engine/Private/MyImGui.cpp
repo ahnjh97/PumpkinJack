@@ -18,15 +18,6 @@ HRESULT CMyImGui::Initialize(HWND hWnd)
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    //ImFont* font = io.Fonts->AddFontFromFileTTF("../Bin/Resources/Font/Korean2.ttf",
-    //    14.5f, NULL, io.Fonts->GetGlyphRangesKorean());	/* 폰트 추가 */
-
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-
-    /* IMGUI 스타일 설정 */
-    //ImGui::StyleColorsClassic();
-
-    /* IMGUI에게 장치 초기화 */
     ImGui_ImplWin32_Init(hWnd);
     ImGui_ImplDX11_Init(m_pDevice, m_pContext);
 
@@ -84,12 +75,12 @@ void CMyImGui::EditGuizmo(_float4x4& worldMatrix)
 
     static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::ROTATE);
     static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
-    /*  if (m_pGameInstance->Get_DIKeyState('T') == DOWN)
-          mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-      if (m_pGameInstance->Get_KeyState('R') == DOWN)
-          mCurrentGizmoOperation = ImGuizmo::ROTATE;
-      if (m_pGameInstance->Get_KeyState('V') == DOWN)
-          mCurrentGizmoOperation = ImGuizmo::SCALE;*/
+      //if (m_pGameInstance->KeyDown(DIK_T))
+      //    mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+      //if (m_pGameInstance->KeyDown(DIK_R))
+      //    mCurrentGizmoOperation = ImGuizmo::ROTATE;
+      //if (m_pGameInstance->KeyDown(DIK_V))
+      //    mCurrentGizmoOperation = ImGuizmo::SCALE;
 
     if (ImGui::RadioButton("Position", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
         mCurrentGizmoOperation = ImGuizmo::TRANSLATE;

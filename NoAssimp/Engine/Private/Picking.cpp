@@ -56,7 +56,7 @@ void CPicking::Transform_PickingToLocalSpace(const CTransform* pTransform, _Out_
 {
 	_matrix	WorldMatrixInv = pTransform->Get_WorldMatrix_Inverse();
 	XMStoreFloat3(pRayDir, XMVector3TransformNormal(XMLoadFloat3(&m_vRayDir), WorldMatrixInv));
-	XMStoreFloat3(pRayPos, XMVector3TransformNormal(XMLoadFloat3(&m_vRayPos), WorldMatrixInv));
+	XMStoreFloat3(pRayPos, XMVector3TransformCoord(XMLoadFloat3(&m_vRayPos), WorldMatrixInv));
 }
 
 CPicking* CPicking::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, HWND hWnd, _uint iWinSizeX, _uint iWinSizeY)

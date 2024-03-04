@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "..\Public\Camera_Free.h"
+#include "ImGuizmo.h"
 
 CCamera_Free::CCamera_Free(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CCamera{ pDevice, pContext }
@@ -54,7 +55,7 @@ void CCamera_Free::Tick(_float fTimeDelta)
 
 	
 	_long	MouseMove = { 0 };
-	if (m_pGameInstance->Get_DIMouseState(DIMKS_LBUTTON) & 0x80) // 좌클릭 중인경우
+	if ((m_pGameInstance->Get_DIMouseState(DIMKS_LBUTTON) & 0x80) && !ImGuizmo::IsOver()) // 좌클릭 중인경우 && 기즈모를 클릭중이지 않은경우
 	{
 		if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_X))
 		{

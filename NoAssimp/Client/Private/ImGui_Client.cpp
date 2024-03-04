@@ -2,6 +2,11 @@
 #include "ImGui_Client.h"
 #include "GameInstance.h"
 #include "Monster.h"
+#include "GameObject.h"
+#include <locale>
+#include <codecvt>
+#include <fstream>
+
 
 CImGui_Client::CImGui_Client(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMyImGui{ pDevice, pContext }
@@ -12,6 +17,7 @@ HRESULT CImGui_Client::Initialize()
 {
 	__super::Initialize(g_hWnd);
 
+
 	return S_OK;
 }
 
@@ -19,10 +25,18 @@ void CImGui_Client::Tick(_float fTimeDelta)
 {
 	if (Check_Pick())
 	{
-		/*if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Monster"))))
-			return;*/
+		_float4 vTemp(m_vPickPos.x, m_vPickPos.y, m_vPickPos.z, 1.0f); // 위치
+		CGameObject::GAMEOBJECT_DESC tempDesc = {};
+		memcpy(&tempDesc.matWorld.m[CTransform::STATE_POSITION], &vTemp, sizeof(_float4));
 
-		MSG_BOX(TEXT("Monster Added"));
+		// string을 wstring으로 변환
+		string narrowString = "Prototype_GameObject_Monster";
+		wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+		wstring wstrPrototypeTag = converter.from_bytes(narrowString); // converter.from_bytes(charArray); -> char배열 변환
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Monster"), wstrPrototypeTag, &tempDesc)))
+			return;
+
+		
 	}
 
 	bCallNewFrame = false;
@@ -57,9 +71,7 @@ void CImGui_Client::Tick(_float fTimeDelta)
 		ImGui::End();
 	}
 
-	/*CGameObject* pMonster = *m_pGameInstance->Get_LayerList(LEVEL_EDITOR, TEXT("Layer_Monster"))->begin();
-	CTransform* transform = (CTransform*)pMonster->Get_Component(g_strTransformTag);
-	EditGuizmo(transform->Get_WorldFloat4x4());*/
+	EditGuizmo(_float4x4());
 }
 
 HRESULT CImGui_Client::Render()

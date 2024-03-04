@@ -134,9 +134,8 @@ HRESULT CLoader::Loading_For_GamePlay()
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 	/* Prototype_Component_VIBuffer_Terrain */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Height.bmp")))))
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 100, 100))))
 		return E_FAIL;
-
 	_matrix		TransformMatrix = XMMatrixIdentity();
 
 	/* Prototype_Component_Model_Fiona */
@@ -154,16 +153,6 @@ HRESULT CLoader::Loading_For_GamePlay()
 		return E_FAIL;
 
 
-
-
-	///* Prototype_Component_VIBuffer_Cube */
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Cube"),
-	//	CVIBuffer_Cube::Create(m_pGraphic_Device))))
-	//	return E_FAIL;
-
-	///*if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"),
-	//	CVIBuffer_Terrain::Create(m_pGraphic_Device, 1000, 1000))))
-	//	return E_FAIL;*/	
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
 	/* For.Prototype_Component_Shader_VtxNorTex */
