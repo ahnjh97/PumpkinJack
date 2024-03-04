@@ -100,7 +100,7 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 	
 	/* 반복적인 갱신이 필요한 객체들의 Tick함수를 호출한다. */
 	m_pLevel_Manager->Tick(fTimeDelta);
-
+	
 	if (m_pImGui_Manager)
 		m_pImGui_Manager->Tick(fTimeDelta);
 
@@ -221,6 +221,14 @@ HRESULT CGameInstance::Open_Level(_uint iNewLevelID, CLevel * pNewLevel)
 	return m_pLevel_Manager->Open_Level(iNewLevelID, pNewLevel);
 }
 
+_uint CGameInstance::Get_CurrentLevelID()
+{
+	if (nullptr == m_pLevel_Manager)
+		return E_FAIL;
+
+	return m_pLevel_Manager->Get_CurrentLevelID();
+}
+
 HRESULT CGameInstance::Add_Prototype(const wstring & strPrototypeTag, CGameObject * pPrototype)
 {
 	if (nullptr == m_pObject_Manager)
@@ -243,6 +251,14 @@ const CComponent * CGameInstance::Get_Component(_uint iLevelIndex, const wstring
 		return nullptr;
 
 	return m_pObject_Manager->Get_Component(iLevelIndex, strLayerTag, strComTag, iIndex);
+}
+
+_bool CGameInstance::Binarize_Objects(string strLevel)
+{
+	if (nullptr == m_pObject_Manager)
+		return false;
+
+	return m_pObject_Manager->Binarize_Objects(strLevel);
 }
 
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const wstring & strPrototypeTag, CComponent * pPrototype)

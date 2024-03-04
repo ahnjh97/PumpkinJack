@@ -16,10 +16,15 @@ public:
 			0.0f, 0.0f, 0.0f, 1.0f);
 	}GAMEOBJECT_DESC;
 
+
 protected:
 	CGameObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CGameObject(const CGameObject& rhs);
 	virtual ~CGameObject() = default;
+
+public:
+	void Set_PrototypeTag(const wstring& _wstrPrototypeTag) { wstrPrototypeTag = _wstrPrototypeTag; }
+	pair<wstring, _float4x4> Get_ParsingData();
 
 public:
 	class CComponent* Get_Component(const wstring& strComTag);
@@ -43,6 +48,9 @@ protected:
 
 protected:
 	HRESULT Add_Component(_uint iLevelIndex, const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut, void* pArg = nullptr);
+
+private:
+	wstring wstrPrototypeTag = {};
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

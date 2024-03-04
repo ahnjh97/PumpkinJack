@@ -43,7 +43,7 @@ HRESULT CLevel_GamePlay::Initialize()
 	*/
 
 	
-
+	m_InputFile.close();
 	return S_OK;
 }
 
@@ -118,11 +118,25 @@ HRESULT CLevel_GamePlay::Ready_LandObject()
 //
 HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 {
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Monster"))))
-		return E_FAIL;
+	wchar_t wcharBuf[MAX_PATH];
+	_float4x4 matWorld{};
 
+	while (true)
+	{
+		if (m_InputFile.eof())
+			break;
+		
+		m_InputFile.read(reinterpret_cast<char*>(&wcharBuf), sizeof(wcharBuf));
+		m_InputFile.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
 
+		wstring wstrPrototypeTag = wcharBuf;
 
+		CGameObject::GAMEOBJECT_DESC tempDesc = {};
+		tempDesc.matWorld = matWorld;
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, wstrPrototypeTag, &tempDesc)))
+			return E_FAIL;
+	}
+	
 	return S_OK;
 }
 

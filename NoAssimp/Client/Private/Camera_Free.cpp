@@ -55,17 +55,27 @@ void CCamera_Free::Tick(_float fTimeDelta)
 
 	
 	_long	MouseMove = { 0 };
-	if ((m_pGameInstance->Get_DIMouseState(DIMKS_LBUTTON) & 0x80) && !ImGuizmo::IsOver()) // 좌클릭 중인경우 && 기즈모를 클릭중이지 않은경우
+	if (m_pGameInstance->Get_CurrentLevelID() == LEVEL_MAPTOOL)
 	{
-		if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_X))
+		if ((m_pGameInstance->Get_DIMouseState(DIMKS_LBUTTON) & 0x80) && !ImGuizmo::IsOver()) // 좌클릭 중인경우 && 기즈모를 클릭중이지 않은경우
 		{
-			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * MouseMove * m_fMouseSensor);
-		}
-		if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_Y))
-		{
-			m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), fTimeDelta * MouseMove * m_fMouseSensor);
+			if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_X))
+				m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * MouseMove * m_fMouseSensor);
+			if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_Y))
+				m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), fTimeDelta * MouseMove * m_fMouseSensor);
 		}
 	}
+	else
+	{
+		//if ((m_pGameInstance->Get_DIMouseState(DIMKS_LBUTTON) & 0x80)) // 좌클릭 중인경우
+		//{
+			if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_X))
+				m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * MouseMove * m_fMouseSensor);
+			if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_Y))
+				m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), fTimeDelta * MouseMove * m_fMouseSensor);
+		//}
+	}
+
 
 	__super::Bind_PipeLines();
 }

@@ -33,10 +33,8 @@ void CImGui_Client::Tick(_float fTimeDelta)
 		string narrowString = "Prototype_GameObject_Monster";
 		wstring_convert<std::codecvt_utf8<wchar_t>> converter;
 		wstring wstrPrototypeTag = converter.from_bytes(narrowString); // converter.from_bytes(charArray); -> char배열 변환
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Monster"), wstrPrototypeTag, &tempDesc)))
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Parse"), wstrPrototypeTag, &tempDesc)))
 			return;
-
-		
 	}
 
 	bCallNewFrame = false;
@@ -72,6 +70,11 @@ void CImGui_Client::Tick(_float fTimeDelta)
 	}
 
 	EditGuizmo(_float4x4());
+
+	string strLevel = "Level_GamePlay"; // 임시로 이렇게. 메뉴 만들어서 고를수 있도록 할것
+
+	if((m_pGameInstance->Get_DIKeyState(DIK_LCONTROL) & 0x80) && m_pGameInstance->KeyDown(DIK_S))
+		m_pGameInstance->Binarize_Objects(strLevel);
 }
 
 HRESULT CImGui_Client::Render()

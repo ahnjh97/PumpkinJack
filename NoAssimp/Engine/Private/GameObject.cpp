@@ -2,7 +2,6 @@
 #include "GameInstance.h"
 
 
-
 CGameObject::CGameObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -22,6 +21,18 @@ CGameObject::CGameObject(const CGameObject & rhs)
 	Safe_AddRef(m_pDevice);
 	Safe_AddRef(m_pContext);
 }
+
+pair<wstring, _float4x4> CGameObject::Get_ParsingData()
+{
+	pair<wstring, _float4x4> tempPair;
+	tempPair.first = wstrPrototypeTag;
+
+	if (m_pTransformCom != nullptr)
+		tempPair.second = m_pTransformCom->Get_WorldFloat4x4();
+
+	return tempPair;
+}
+
 
 CComponent * CGameObject::Get_Component(const wstring & strComTag)
 {

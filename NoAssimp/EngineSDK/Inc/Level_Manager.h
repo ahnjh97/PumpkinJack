@@ -16,6 +16,9 @@ private:
 	virtual ~CLevel_Manager() = default;
 
 public:
+	_uint Get_CurrentLevelID() { return m_iCurrentLevelID; }
+
+public:
 	HRESULT Initialize();
 	HRESULT Open_Level(_uint iNewLevelID, class CLevel* pNewLevel);
 	void Tick(_float fTimeDelta);
