@@ -246,7 +246,7 @@ HRESULT CVIBuffer_Terrain::Initialize(void * pArg)
 	return S_OK;
 }
 
-_float3 CVIBuffer_Terrain::Pick_Pos(const CTransform* pTransform) const
+_float3 CVIBuffer_Terrain::Get_PickPos(const CTransform* pTransform) const
 {
 	_float3 vRayDir, vRayPos;
 	m_pGameInstance->Transform_PickingToLocalSpace(pTransform, &vRayDir, &vRayPos);

@@ -1,7 +1,6 @@
 #include "..\Public\GameObject.h"
 #include "GameInstance.h"
 
-
 CGameObject::CGameObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -42,6 +41,18 @@ CComponent * CGameObject::Get_Component(const wstring & strComTag)
 		return nullptr;
 
 	return iter->second;	
+}
+
+CModel* CGameObject::Find_Model()
+{
+	for (auto mapIter : m_Components)
+	{
+		size_t found = mapIter.first.find(TEXT("Model"));
+		if (found != wstring::npos) // 찾은 경우
+			return dynamic_cast<CModel*>(mapIter.second);
+	}
+
+	return nullptr;
 }
 
 HRESULT CGameObject::Initialize_Prototype()

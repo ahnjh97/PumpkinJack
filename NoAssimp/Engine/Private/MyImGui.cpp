@@ -73,7 +73,7 @@ void CMyImGui::EditGuizmo(_float4x4& worldMatrix)
     ImGui::Begin("Guizmo Tool");
     ImGuizmo::BeginFrame();
 
-    static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::ROTATE);
+    static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::TRANSLATE);
     static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
       //if (m_pGameInstance->KeyDown(DIK_T))
       //    mCurrentGizmoOperation = ImGuizmo::TRANSLATE;

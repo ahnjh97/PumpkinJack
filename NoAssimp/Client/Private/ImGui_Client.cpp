@@ -6,6 +6,7 @@
 #include <locale>
 #include <codecvt>
 #include <fstream>
+#include "ImGuizmo.h"
 
 
 CImGui_Client::CImGui_Client(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -23,19 +24,17 @@ HRESULT CImGui_Client::Initialize()
 
 void CImGui_Client::Tick(_float fTimeDelta)
 {
-	if (Check_Pick())
+	OnRightClick();
+	if (!ImGui::IsAnyItemHovered() && m_pGameInstance->MouseDown(DIMKS_LBUTTON)) // 모델선택: 
 	{
-		_float4 vTemp(m_vPickPos.x, m_vPickPos.y, m_vPickPos.z, 1.0f); // 위치
-		CGameObject::GAMEOBJECT_DESC tempDesc = {};
-		memcpy(&tempDesc.matWorld.m[CTransform::STATE_POSITION], &vTemp, sizeof(_float4));
-
-		// string을 wstring으로 변환
-		string narrowString = "Prototype_GameObject_Monster";
-		wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-		wstring wstrPrototypeTag = converter.from_bytes(narrowString); // converter.from_bytes(charArray); -> char배열 변환
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Parse"), wstrPrototypeTag, &tempDesc)))
-			return;
+		CGameObject* pObj = m_pGameInstance->Select_ModelByPicking(m_pGameInstance->Get_CurrentLevelID());
+		if (pObj != nullptr)
+			m_pPickedObject = pObj;
 	}
+		
+
+	if (m_pGameInstance->KeyDown(DIK_ESCAPE)) // esc누르면 선택 취소
+		m_pPickedObject = nullptr;
 
 	bCallNewFrame = false;
 	__super::Tick(fTimeDelta);
@@ -69,7 +68,7 @@ void CImGui_Client::Tick(_float fTimeDelta)
 		ImGui::End();
 	}
 
-	EditGuizmo(_float4x4());
+	Edit_Object(); // 선택한 객체 월드행렬 수정
 
 	string strLevel = "Level_GamePlay"; // 임시로 이렇게. 메뉴 만들어서 고를수 있도록 할것
 
@@ -87,7 +86,7 @@ HRESULT CImGui_Client::Render()
 	return S_OK;
 }
 
-_bool CImGui_Client::Check_Pick()
+void CImGui_Client::OnRightClick()
 {
 	if (m_pGameInstance->MouseDown(DIMKS_RBUTTON))
 	{
@@ -95,23 +94,49 @@ _bool CImGui_Client::Check_Pick()
 		if (!pTerrainBuf)
 		{
 			MSG_BOX(TEXT("Grid-> Failed to get : TerrainBuffer "));
-			return false;
+			return;
 		}
 		const CTransform* pTransform = dynamic_cast<const CTransform*>(m_pGameInstance->Get_Component(LEVEL_MAPTOOL, TEXT("Layer_Grid"), g_strTransformTag));
 		if (!pTransform)
 		{
 			MSG_BOX(TEXT("Grid-> Failed to get : pTransform"));
-			return false;
+			return;
 		}
 
-		m_vPickPos = pTerrainBuf->Pick_Pos(pTransform);
+		m_vPickPos = pTerrainBuf->Get_PickPos(pTransform);
 
 		if (!XMVector3Equal(XMLoadFloat3(&m_vPickPos), XMVectorSet(0.f, 0.f, 0.f, 0.f)))
 		{
-			return true;
+			_float4 vTemp(m_vPickPos.x, m_vPickPos.y, m_vPickPos.z, 1.0f); // 위치
+			CGameObject::GAMEOBJECT_DESC tempDesc = {};
+			memcpy(&tempDesc.matWorld.m[CTransform::STATE_POSITION], &vTemp, sizeof(_float4));
+
+			// string을 wstring으로 변환
+			string narrowString = "Prototype_GameObject_Monster";
+			wstring_convert<codecvt_utf8<wchar_t>> converter;
+			wstring wstrPrototypeTag = converter.from_bytes(narrowString); // converter.from_bytes(charArray); -> char배열 변환
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Parse"), wstrPrototypeTag, &tempDesc)))
+				return;
 		}
 	}
-	return false;
+}
+
+void CImGui_Client::Edit_Object()
+{
+	if (m_pPickedObject != nullptr)
+	{
+		CTransform* pTransform = dynamic_cast<CTransform*>(m_pPickedObject->Get_Component(g_strTransformTag));
+		if (pTransform == nullptr)
+		{
+			EditGuizmo(_float4x4());
+			return;
+		}
+		_float4x4 tempMatrix = pTransform->Get_WorldFloat4x4();
+		EditGuizmo(tempMatrix); // 선택한 모델의 월드행렬을 수정 
+		pTransform->Set_WorldMatrix(tempMatrix);
+	}
+	else
+		EditGuizmo(_float4x4());
 }
 
 CImGui_Client* CImGui_Client::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

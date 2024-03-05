@@ -261,6 +261,14 @@ _bool CGameInstance::Binarize_Objects(string strLevel)
 	return m_pObject_Manager->Binarize_Objects(strLevel);
 }
 
+CGameObject* CGameInstance::Select_ModelByPicking(_uint iLevelIndex)
+{
+	if (nullptr == m_pObject_Manager)
+		return false;
+
+	return m_pObject_Manager->Select_ModelByPicking(iLevelIndex);
+}
+
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const wstring & strPrototypeTag, CComponent * pPrototype)
 {
 	if (nullptr == m_pComponent_Manager)

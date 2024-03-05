@@ -15,11 +15,13 @@ public:
 	virtual void				Tick(_float fTimeDelta)		override;
 	virtual HRESULT				Render()					override;
 
-	_bool						Check_Pick();
+	void						OnRightClick();
+	void						Edit_Object();
 
 private:
 	_bool						bCallNewFrame = { false };
 	_float3						m_vPickPos = {};
+	CGameObject*				m_pPickedObject = { nullptr };
 
 public:
 	static CImGui_Client* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

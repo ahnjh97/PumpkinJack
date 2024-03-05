@@ -28,6 +28,7 @@ public:
 
 public:
 	class CComponent* Get_Component(const wstring& strComTag);
+	class CModel* Find_Model();
 
 public:
 	virtual HRESULT Initialize_Prototype();

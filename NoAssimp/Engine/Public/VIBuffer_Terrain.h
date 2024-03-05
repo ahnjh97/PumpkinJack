@@ -17,7 +17,7 @@ public:
 	virtual HRESULT Initialize(void* pArg);
 
 public:
-	_float3 Pick_Pos(const class CTransform* pTransform) const;
+	_float3 Get_PickPos(const class CTransform* pTransform) const;
 
 private:
 	_uint				m_iNumVerticesX = { 0 };

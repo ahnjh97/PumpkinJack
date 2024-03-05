@@ -17,6 +17,8 @@ private:
 
 public:
 	_uint Get_NumMeshes() const { return m_iNumMeshes; }
+	_bool Check_BoundingBox(const class CTransform* pTransform) const;
+	_float3 Check_Meshes(const class CTransform* pTransform) const;
 
 public:
 	virtual HRESULT Initialize_Prototype(TYPE eType, const string& strModelFilePath, _fmatrix TransformMatrix);
@@ -44,13 +46,12 @@ private:
 	string						m_strDirectory;
 	streampos					m_filePointerPos;
 	ifstream					m_InputFile;
+	BoundingBox					m_BoundingBox;
 
 private:
 	HRESULT Ready_Meshes();
 	HRESULT Ready_Materials(const _char* pModelFilePath);
 	//HRESULT Ready_Bones(aiNode* pAINode, _int iParentIndex = -1);
-
-
 
 public:
 	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelFilePath, _fmatrix TransformMatrix);

@@ -42,6 +42,7 @@ public: /* For.Object_Manager */
 	HRESULT Add_Clone(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg = nullptr);
 	const CComponent* Get_Component(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strComTag, _uint iIndex = 0);
 	_bool Binarize_Objects(string strLevel);
+	CGameObject* Select_ModelByPicking(_uint iLevelIndex); // MapTool에서의 모델선택
 
 public: /* For.Component_Manager */
 	HRESULT Add_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag, class CComponent* pPrototype);

@@ -1,7 +1,8 @@
-#include "..\Public\Object_Manager.h"
+#include "Object_Manager.h"
 #include "GameObject.h"
 #include "Layer.h"
 #include <fstream>
+#include "Model.h"
 
 CObject_Manager::CObject_Manager()
 {
@@ -144,7 +145,7 @@ _bool CObject_Manager::Binarize_Objects(string strLevel)
 			if (mapIter.second == nullptr)
 				continue;
 
-			size_t found = mapIter.first.find(TEXT("Layer_Parse")); // 일단 임시로 monster
+			size_t found = mapIter.first.find(TEXT("Layer_Parse")); // 일단 임시로 Layer_Parse
 			if (found == wstring::npos) // 찾지못한경우
 				continue;
 
@@ -190,6 +191,50 @@ _bool CObject_Manager::Binarize_Objects(string strLevel)
 	return true;
 }
 
+CGameObject* CObject_Manager::Select_ModelByPicking(_uint iLevelIndex)
+{
+	vector<CGameObject*> vecPickedObjects;
+
+	for (auto mapIter : m_pLayers[iLevelIndex])
+	{
+		if (mapIter.second == nullptr)
+			continue;
+
+		size_t found = mapIter.first.find(TEXT("Layer_Parse")); // 일단 임시로 Layer_Parse
+		if (found == wstring::npos) // 찾지못한경우
+			continue;
+
+		list<CGameObject*>& objectList = mapIter.second->Get_ObjectList();
+		if (objectList.empty())
+			continue;
+
+		for (auto objectListIter : objectList)
+		{
+			CModel* pModel = objectListIter->Find_Model();
+			if (pModel == nullptr)
+				continue;
+
+			CTransform* pTransform = dynamic_cast<CTransform*>(objectListIter->Get_Component(g_strTransformTag));
+			/*if (pModel->Check_BoundingBox(pTransform) == false) // BoundingBox 이거 이상함
+				continue;*/
+
+			_float3 vPickPos = pModel->Check_Meshes(pTransform);
+			_vector vTemp = XMLoadFloat3(&vPickPos);
+			_bool bResult = XMVector3Equal(vTemp, ::XMVectorSet(0.f, 0.f, 0.f, 0.f)); // 
+			if (false == bResult) // 피킹 성공
+				vecPickedObjects.push_back(objectListIter);
+		}
+	}
+
+	if (vecPickedObjects.empty())
+		return nullptr;
+
+	for (auto vecIter : vecPickedObjects)
+	{
+		// 가장 거리가 가까운 놈 찾기
+		return vecPickedObjects[0];
+	}
+}
 
 CObject_Manager * CObject_Manager::Create(_uint iNumLevels)
 {

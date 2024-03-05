@@ -1,6 +1,7 @@
 #include "Mesh.h"
 #include "Bone.h"
 #include <fstream>
+#include "GameInstance.h"
 
 CMesh::CMesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ifstream& fileStream)
 	: CVIBuffer(pDevice, pContext), m_InputFile(fileStream)
@@ -26,6 +27,8 @@ HRESULT CMesh::Initialize_Prototype(CModel::TYPE eModelType, string strDirectory
 	m_InputFile.read(reinterpret_cast<char*>(&m_iMaterialIndex), sizeof(m_iMaterialIndex));
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumVertices), sizeof(m_iNumVertices));
 	m_InputFile.read(reinterpret_cast<char*>(&m_iFaces), sizeof(m_iFaces));
+
+	m_pVerticesPos = new _float3[m_iNumVertices];
 
 	m_iNumIndices = m_iFaces * 3;
 	m_iIndexStride = sizeof(_uint);
@@ -56,12 +59,14 @@ HRESULT CMesh::Initialize_Prototype(CModel::TYPE eModelType, string strDirectory
 
 
 	_uint* pIndices = new _uint[m_iNumIndices];
+	m_pIndices = new _uint[m_iNumIndices];
 	ZeroMemory(pIndices, sizeof(_uint) * m_iNumIndices);
 
 
 	for (size_t i = 0; i < m_iNumIndices; i++)
 	{
 		m_InputFile.read(reinterpret_cast<char*>(&pIndices[i]), sizeof(_uint));
+		m_pIndices[i] = pIndices[i];
 	}
 
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);
@@ -80,6 +85,46 @@ HRESULT CMesh::Initialize_Prototype(CModel::TYPE eModelType, string strDirectory
 HRESULT CMesh::Initialize(void* pArg)
 {
 	return S_OK;
+}
+
+_float3 CMesh::Get_PickPos(const CTransform* pTransform) const
+{
+	vector<_float3> vecPickPos;
+
+	_float3 vRayDir, vRayPos;
+	m_pGameInstance->Transform_PickingToLocalSpace(pTransform, &vRayDir, &vRayPos);
+	_vector vPickPos;
+	_float fDis;
+
+	_uint		iNumIndices = { 0 };
+	for (size_t i = 0; i < m_iFaces; i++)
+	{
+		_vector v0 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
+		_vector v1 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
+		_vector v2 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
+
+		_vector vecRayDir = ::XMVector3Normalize(::XMLoadFloat3(&vRayDir));
+		_vector vecRayPos = ::XMLoadFloat3(&vRayPos);
+		if (::TriangleTests::Intersects(vecRayPos, vecRayDir, v0, v1, v2, fDis))
+		{
+			vPickPos = vecRayPos + vecRayDir * fDis;
+
+			_matrix* pWorldMatrix = &pTransform->Get_WorldMatrix();
+			vPickPos = XMVector3TransformCoord(vPickPos, *pWorldMatrix);
+			_float3 tempPos;
+			::XMStoreFloat3(&tempPos, vPickPos);
+
+			/*if (!XMVector3Equal(vPickPos, XMVectorSet(0.f, 0.f, 0.f, 0.f)))
+				vecPickPos.push_back(tempPos);*/
+			return tempPos;
+		}
+	}
+
+	if (vecPickPos.empty())
+		return _float3();
+
+	// 카메라와 가장 거리가 가까운놈 계산 
+	return vecPickPos[0];
 }
 
 HRESULT CMesh::Ready_Vertices_For_NonAnimModel(_fmatrix TransformMatrix)
@@ -102,6 +147,10 @@ HRESULT CMesh::Ready_Vertices_For_NonAnimModel(_fmatrix TransformMatrix)
 	for (size_t i = 0; i < m_iNumVertices; i++)
 	{
 		m_InputFile.read(reinterpret_cast<char*>(&pVertices[i]), sizeof(VTXMESH));
+		m_pVerticesPos[i] = pVertices[i].vPosition;
+
+		m_MinMax.first = _float3(min(m_pVerticesPos[i].x, m_MinMax.first.x), min(m_pVerticesPos[i].y, m_MinMax.first.y), min(m_pVerticesPos[i].z, m_MinMax.first.z));
+		m_MinMax.second = _float3(max(m_pVerticesPos[i].x, m_MinMax.second.x), max(m_pVerticesPos[i].y, m_MinMax.second.y), max(m_pVerticesPos[i].z, m_MinMax.second.z));
 	}
 
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);
@@ -220,5 +269,11 @@ CMesh* CMesh::Clone(void* pArg)
 void CMesh::Free()
 {
 
-	__super::Free();
+	__super::Free();	
+	
+	if (false == m_isCloned)
+	{
+		Safe_Delete_Array(m_pIndices);
+		Safe_Delete_Array(m_pVerticesPos);
+	}
 }

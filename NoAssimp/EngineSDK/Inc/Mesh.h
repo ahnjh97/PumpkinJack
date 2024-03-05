@@ -17,24 +17,34 @@ private:
 public:
 	_uint Get_MaterialIndex() const { return m_iMaterialIndex; }
 	streampos Get_IncreasedFilePtPos() { return m_filePointerPos; }
+	pair<_float3, _float3> Get_MinMax() { return m_MinMax; }
 
 public:
 	virtual HRESULT Initialize_Prototype(CModel::TYPE eModelType, string strDirectory, streampos filePtPos, const vector<CBone*>& Bones, _fmatrix TransformMatrix);
 	virtual HRESULT Initialize(void* pArg) override;
 
+public:
+	_float3 Get_PickPos(const class CTransform* pTransform) const;
+
+
 private:
-	_char					m_szName[MAX_PATH] = { "" };
+	_char				m_szName[MAX_PATH] = { "" };
 
 	/* 이 메시는 모델에서 로드해놓은 머테리얼들 중 몇번째 머테리얼을 이용하는가? */
-	_uint					m_iMaterialIndex = { 0 };
+	_uint				m_iMaterialIndex = { 0 };
 
-	_uint					m_iNumBones = { 0 };
-	vector<_uint>			m_Bones;
+	_uint				m_iNumBones = { 0 };
+	vector<_uint>		m_Bones;
 
-	_uint					m_iFaces = {0};
-	string					m_strDirectory;
-	streampos				m_filePointerPos;
-	ifstream&				m_InputFile;
+	_uint				m_iFaces = {0};
+	string				m_strDirectory;
+	streampos			m_filePointerPos;
+	ifstream&			m_InputFile;
+
+	_float3*			m_pVerticesPos = { nullptr }; // 정점 위치 
+	_uint*				m_pIndices = { nullptr }; // 인덱스 버퍼 
+
+	pair<_float3, _float3> m_MinMax = {};
 
 private:
 	HRESULT Ready_Vertices_For_NonAnimModel(_fmatrix TransformationMatrix);

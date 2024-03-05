@@ -5,6 +5,7 @@
 #include "Shader.h"
 #include "Texture.h"
 #include <fstream>
+#include "GameInstance.h"
 
 CModel::CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent{ pDevice, pContext }
@@ -33,6 +34,34 @@ CModel::CModel(const CModel& rhs)
 	}
 }
 
+_bool CModel::Check_BoundingBox(const CTransform* pTransform) const
+{
+	_float3 vRayDir{}, vRayPos{};
+	_float fDis;
+	m_pGameInstance->Transform_PickingToLocalSpace(pTransform, &vRayDir, &vRayPos);
+	_vector vecRayDir = ::XMVector3Normalize(::XMLoadFloat3(&vRayDir));
+	_vector vecRayPos = ::XMLoadFloat3(&vRayPos);
+	return m_BoundingBox.Intersects(vecRayPos, vecRayDir, fDis);
+}
+
+_float3 CModel::Check_Meshes(const CTransform* pTransform) const
+{
+	vector<_float3> vecPickPos;
+	for (auto iter : m_Meshes)
+	{
+		_float3 vTemp = iter->Get_PickPos(pTransform);
+		_vector vPickPos = ::XMLoadFloat3(&vTemp);
+		if (!XMVector3Equal(vPickPos, XMVectorSet(0.f, 0.f, 0.f, 0.f)))
+			vecPickPos.push_back(vTemp);
+	}
+
+	if(vecPickPos.empty())
+		return _float3();
+
+	// 가장 가까운놈 계산 필요
+	return vecPickPos[0];
+}
+
 HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelFilePath, _fmatrix TransformMatrix)
 {
 	m_eModelType = eType;
@@ -50,7 +79,7 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelFilePath,
 		return E_FAIL;
 	}
 
-	XMStoreFloat4x4(&m_TransformMatrix, TransformMatrix);
+	::XMStoreFloat4x4(&m_TransformMatrix, TransformMatrix);
 
 	/* 읽은 정보를 바탕으로해서 내가 사용하기 좋게 정리한다.  */
 	if (eType == TYPE_ANIM)
@@ -109,6 +138,7 @@ HRESULT CModel::Render(_uint iMeshIndex)
 HRESULT CModel::Ready_Meshes()
 {
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumMeshes), sizeof(m_iNumMeshes));
+	_float3 vMin{}, vMax{};
 
 	for (size_t i = 0; i < m_iNumMeshes; i++)
 	{
@@ -118,8 +148,15 @@ HRESULT CModel::Ready_Meshes()
 
 		m_Meshes.push_back(pMesh);
 		m_filePointerPos = pMesh->Get_IncreasedFilePtPos(); // 파일포인터 위치 갱신
+
+		pair<_float3, _float3> pairMinMax = pMesh->Get_MinMax();
+
+		vMin = _float3(min(pairMinMax.first.x, vMin.x), min(pairMinMax.first.y, vMin.y), min(pairMinMax.first.z, vMin.z));
+		vMax = _float3(max(pairMinMax.second.x, vMax.x), max(pairMinMax.second.y, vMax.y), max(pairMinMax.second.z, vMax.z));
 	}
 
+	BoundingBox tempBox(vMin, vMax);
+	m_BoundingBox = tempBox;
 	return S_OK;
 }
 

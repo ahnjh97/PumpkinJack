@@ -116,6 +116,7 @@ HRESULT CLevel_GamePlay::Ready_LandObject()
 //	return S_OK;
 //}
 //
+
 HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 {
 	wchar_t wcharBuf[MAX_PATH];
