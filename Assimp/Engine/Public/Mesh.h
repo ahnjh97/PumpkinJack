@@ -21,6 +21,9 @@ public:
 	virtual HRESULT Initialize_Prototype(CModel::TYPE eModelType, const aiMesh* pAIMesh, const vector<CBone*>& Bones, _fmatrix TransformMatrix);
 	virtual HRESULT Initialize(void* pArg) override;
 
+public:
+	HRESULT Stock_Matrices(const vector<CBone*>& Bones, _float4x4* pMeshBoneMatrices);
+
 private:
 	_char					m_szName[MAX_PATH] = { "" };
 
@@ -29,6 +32,7 @@ private:
 
 	_uint					m_iNumBones = { 0 };
 	vector<_uint>			m_Bones;
+	vector<_float4x4>		m_OffsetMatrices;
 
 	ofstream&				m_OutputFile;
 

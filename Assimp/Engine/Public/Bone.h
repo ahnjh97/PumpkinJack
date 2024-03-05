@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Base.h"
-
+#include <fstream>
 /* 뼈의 정보를 표현하기위한 타입 세가지 제공하낟. */
 /* aiNode, aiBone, aiAnimNode */
 
@@ -14,11 +14,20 @@ private:
 	virtual ~CBone() = default;
 
 public:
+	void Set_TransformationMatrix(_fmatrix TransformationMatrix) {
+		XMStoreFloat4x4(&m_TransformationMatrix, TransformationMatrix);	}
+
+public:
+	const _float4x4* Get_CombinedTransformationMatrix() const {
+		return &m_CombinedTransformationMatrix;	}
+
+public:
 	HRESULT Initialize(const aiNode* pAINode, _int iParentIndex);
 	void Invalidate_CombinedTransformationMatrix(const vector<CBone*>& Bones);
-	_bool Compare_Name(const _char* pBoneName) {
-		return !strcmp(m_szName, pBoneName);
-	}
+	_bool Compare_Name(const _char* pBoneName) { return !strcmp(m_szName, pBoneName); }
+
+public:
+	void Write_BoneData(ofstream& fileStream);
 
 private:
 	_char				m_szName[MAX_PATH] = { "" };
@@ -33,6 +42,7 @@ private:
 
 public:
 	static CBone* Create(const aiNode* pAINode, _int  iParentIndex);
+	CBone* Clone();
 	virtual void Free() override;
 };
 

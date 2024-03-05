@@ -32,6 +32,13 @@ void CBone::Invalidate_CombinedTransformationMatrix(const vector<CBone*>& Bones)
 
 }
 
+void CBone::Write_BoneData(ofstream& fileStream)
+{
+	fileStream.write(reinterpret_cast<const char*>(&m_iParentBoneIndex), sizeof(m_iParentBoneIndex));
+	fileStream.write(reinterpret_cast<const char*>(&m_szName), sizeof(m_szName));
+	fileStream.write(reinterpret_cast<const char*>(&m_TransformationMatrix), sizeof(m_TransformationMatrix));
+}
+
 CBone* CBone::Create(const aiNode* pAINode, _int  iParentIndex)
 {
 	CBone* pInstance = new CBone();
@@ -44,6 +51,11 @@ CBone* CBone::Create(const aiNode* pAINode, _int  iParentIndex)
 	}
 
 	return pInstance;
+}
+
+CBone* CBone::Clone()
+{
+	return new CBone(*this);
 }
 
 void CBone::Free()

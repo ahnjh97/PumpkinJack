@@ -100,6 +100,9 @@
     <Filter Include="01.Utility\07. MyImGui\ImGui">
       <UniqueIdentifier>{33853901-4ff7-42b5-abe0-fa160b478152}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\02.Components\Model\Animation\Channel">
+      <UniqueIdentifier>{7e447b20-dc38-43ae-a603-70b5bee91807}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -215,6 +218,9 @@
     </ClCompile>
     <ClCompile Include="..\ImGui\ImGuizmo.cpp">
       <Filter>01.Utility\07. MyImGui\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Channel.cpp">
+      <Filter>01.Utility\02.Components\Model\Animation\Channel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -346,6 +352,9 @@
     </ClInclude>
     <ClInclude Include="..\ImGui\imstb_truetype.h">
       <Filter>01.Utility\07. MyImGui\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Channel.h">
+      <Filter>01.Utility\02.Components\Model\Animation\Channel</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

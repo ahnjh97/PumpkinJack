@@ -142,14 +142,14 @@ HRESULT CLoader::Loading_For_GamePlay()
 	TransformMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
 
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Resources/Models/Fiona/Fiona.fbx", TransformMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Resources/Models/Fiona/Fiona.fbx", TransformMatrix))))
 		return E_FAIL;
 	
 	/* Prototype_Component_Model_SkeletonBoss */
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_SkeletonBoss"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Resources/Models/SkeletonBoss/SkeletonBoss.fbx", TransformMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Resources/Models/SkeletonBoss/SkeletonBoss.fbx", TransformMatrix))))
 		return E_FAIL;
 
 

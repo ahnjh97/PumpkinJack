@@ -19,10 +19,13 @@ CModel::CModel(const CModel& rhs)
 	, m_iNumMaterials{ rhs.m_iNumMaterials }
 	, m_Materials{ rhs.m_Materials }
 	, m_TransformMatrix{ rhs.m_TransformMatrix }
-	, m_Bones{ rhs.m_Bones }
+	, m_iNumAnimations{ rhs.m_iNumAnimations }
 {
-	for (auto& pBone : m_Bones)
-		Safe_AddRef(pBone);
+	for (auto& pPrototypeAnimation : rhs.m_Animations)
+		m_Animations.push_back(pPrototypeAnimation->Clone());
+
+	for (auto& pPrototypeBone : rhs.m_Bones)
+		m_Bones.push_back(pPrototypeBone->Clone());
 
 	for (auto& pMesh : m_Meshes)
 		Safe_AddRef(pMesh);
@@ -66,6 +69,11 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelFilePath,
 	{
 		if (FAILED(Ready_Bones(m_pAIScene->mRootNode)))
 			return E_FAIL;
+
+		for (auto boneIter : m_Bones)
+		{
+			boneIter->Write_BoneData(m_OutputFile);
+		}
 	}
 
 	/* 모델을 구성하는 메시들을 생성한다. */
@@ -76,12 +84,29 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelFilePath,
 	if (FAILED(Ready_Materials(strModelFilePath.c_str())))
 		return E_FAIL;
 
+	if (eType == TYPE_ANIM)
+	{
+		if (FAILED(Ready_Animations()))
+			return E_FAIL;
+	}
+
+	if(FAILED(RenameBinaryFile())) // 파일 닫고, 임시파일-> 최종파일 이름
+		return E_FAIL;
+
 	return S_OK;
 }
 
 HRESULT CModel::Initialize(void* pArg)
 {
 	return S_OK;
+}
+
+HRESULT CModel::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, _uint iMeshIndex)
+{
+	ZeroMemory(m_MeshBoneMatrices, sizeof(_float4x4) * 512);
+	m_Meshes[iMeshIndex]->Stock_Matrices(m_Bones, m_MeshBoneMatrices);
+
+	return pShader->Bind_Matrices(pConstantName, m_MeshBoneMatrices, 512);
 }
 
 HRESULT CModel::Bind_ShaderResource(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType)
@@ -94,13 +119,16 @@ HRESULT CModel::Bind_ShaderResource(CShader* pShader, const _char* pConstantName
 	if (iMeshMaterialIndex >= m_iNumMaterials)
 		return E_FAIL;
 
-	m_Materials[iMeshMaterialIndex].MaterialTextures[eTextureType]->Bind_ShaderResource(pShader, pConstantName);
+	if (nullptr != m_Materials[iMeshMaterialIndex].MaterialTextures[eTextureType])
+		m_Materials[iMeshMaterialIndex].MaterialTextures[eTextureType]->Bind_ShaderResource(pShader, pConstantName);
 
 	return S_OK;
 }
 
 HRESULT CModel::Play_Animation(_float fTimeDelta)
 {
+	/* 현재 애니메이션에 맞는 뼈의 상태(m_TransformationMatrix)를 갱신해준다. */
+	m_Animations[m_iCurrentAnimIndex]->Invalidate_TransformationMatrix(fTimeDelta, m_Bones, m_isLoop);
 
 	for (auto& pBone : m_Bones)
 		pBone->Invalidate_CombinedTransformationMatrix(m_Bones);
@@ -189,33 +217,7 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 
 	}
 	m_OutputFile.write(reinterpret_cast<const char*>(&m_iNumMaterials), sizeof(_uint)); // loop멈추기용
-	m_OutputFile.close();
 	
-	string tempFileName = "tempTXT.txt";
-	if (!m_OutputFile)
-	{
-		MSG_BOX(TEXT("Failed to write data to tempTXT.txt"));
-		remove(tempFileName.c_str()); // 임시파일 삭제
-		return E_FAIL;
-	}
-	// 원본파일 삭제
-	size_t lastSlashPos = m_strDirectory.find_last_of("/");
-	size_t secondLastSlashPos = m_strDirectory.find_last_of("/", lastSlashPos - 1);
-
-	if (secondLastSlashPos != string::npos) {
-		string modelName = m_strDirectory.substr(secondLastSlashPos + 1, lastSlashPos - secondLastSlashPos - 1);
-		m_strDirectory = modelName;
-	}
-	m_strDirectory = "../../../model_txt/" + m_strDirectory + ".txt";
-	remove(m_strDirectory.c_str());
-
-	// 임시파일의 파일이름을 원본파일의 이름으로 변경
-	if (std::rename(tempFileName.c_str(), m_strDirectory.c_str()) != 0)
-	{
-		MSG_BOX(TEXT("Failed to rename : tempTXT.txt"));
-		std::remove(tempFileName.c_str()); // 임시파일 삭제
-		return E_FAIL;
-	}
 	return S_OK;
 }
 
@@ -232,6 +234,66 @@ HRESULT CModel::Ready_Bones(aiNode* pAINode, _int iParentIndex)
 	for (size_t i = 0; i < pAINode->mNumChildren; i++)
 	{
 		Ready_Bones(pAINode->mChildren[i], iParent);
+	}
+
+	return S_OK;
+}
+
+HRESULT CModel::Ready_Animations()
+{
+	m_iNumAnimations = m_pAIScene->mNumAnimations;
+	m_OutputFile.write(reinterpret_cast<const char*>(&m_iNumAnimations), sizeof(m_iNumAnimations));
+
+	for (size_t i = 0; i < m_iNumAnimations; i++)
+	{
+		CAnimation* pAnimation = CAnimation::Create(m_pAIScene->mAnimations[i], m_Bones);
+		if (nullptr == pAnimation)
+			return E_FAIL;
+
+		m_Animations.push_back(pAnimation);
+	}
+
+	for (auto vecIter : m_Animations)
+	{
+		vecIter->Write_AnimationData(m_OutputFile);
+	}
+
+	return S_OK;
+}
+
+HRESULT CModel::RenameBinaryFile()
+{
+	m_OutputFile.close();
+
+	string tempFileName = "tempTXT.txt";
+	if (!m_OutputFile)
+	{
+		MSG_BOX(TEXT("Failed to write data to tempTXT.txt"));
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return E_FAIL;
+	}
+	// 원본파일 삭제
+	size_t lastSlashPos = m_strDirectory.find_last_of("/");
+	size_t secondLastSlashPos = m_strDirectory.find_last_of("/", lastSlashPos - 1);
+
+	if (secondLastSlashPos != string::npos) {
+		string modelName = m_strDirectory.substr(secondLastSlashPos + 1, lastSlashPos - secondLastSlashPos - 1);
+		m_strDirectory = modelName;
+	}
+
+	string strTxt = ".txt";
+	if (m_eModelType == TYPE_ANIM)
+		strTxt = "_Anim" + strTxt;
+
+	m_strDirectory = "../../../model_txt/" + m_strDirectory + strTxt;
+	remove(m_strDirectory.c_str());
+
+	// 임시파일의 파일이름을 원본파일의 이름으로 변경
+	if (std::rename(tempFileName.c_str(), m_strDirectory.c_str()) != 0)
+	{
+		MSG_BOX(TEXT("Failed to rename : tempTXT.txt"));
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return E_FAIL;
 	}
 
 	return S_OK;
@@ -268,6 +330,16 @@ CComponent* CModel::Clone(void* pArg)
 void CModel::Free()
 {
 	__super::Free();
+
+	for (auto& pAnimation : m_Animations)
+		Safe_Release(pAnimation);
+
+	m_Animations.clear();
+
+	for (auto& pBone : m_Bones)
+		Safe_Release(pBone);
+
+	m_Bones.clear();
 
 	for (auto& Material : m_Materials)
 	{

@@ -23,6 +23,11 @@ HRESULT CMesh::Initialize_Prototype(CModel::TYPE eModelType, const aiMesh* pAIMe
 	m_eIndexFormat = DXGI_FORMAT_R32_UINT;
 	m_ePrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
+	m_OutputFile.write(reinterpret_cast<const char*>(&m_szName), sizeof(m_szName));
+	m_OutputFile.write(reinterpret_cast<const char*>(&m_iMaterialIndex), sizeof(m_iMaterialIndex));
+	m_OutputFile.write(reinterpret_cast<const char*>(&m_iNumVertices), sizeof(m_iNumVertices));
+	m_OutputFile.write(reinterpret_cast<const char*>(&pAIMesh->mNumFaces), sizeof(pAIMesh->mNumFaces));
+
 #pragma region VERTEX_BUFFER
 
 	HRESULT hr = CModel::TYPE_NONANIM == eModelType ? Ready_Vertices_For_NonAnimModel(pAIMesh, TransformMatrix) : Ready_Vertices_For_AnimModel(pAIMesh, Bones);
@@ -80,13 +85,18 @@ HRESULT CMesh::Initialize(void* pArg)
 	return S_OK;
 }
 
+HRESULT CMesh::Stock_Matrices(const vector<CBone*>& Bones, _float4x4* pMeshBoneMatrices)
+{
+	for (_uint i = 0; i < m_iNumBones; ++i)
+	{
+		XMStoreFloat4x4(&pMeshBoneMatrices[i], XMLoadFloat4x4(&m_OffsetMatrices[i]) * XMLoadFloat4x4(Bones[m_Bones[i]]->Get_CombinedTransformationMatrix()));
+	}
+
+	return S_OK;
+}
+
 HRESULT CMesh::Ready_Vertices_For_NonAnimModel(const aiMesh* pAIMesh, _fmatrix TransformMatrix)
 {
-	m_OutputFile.write(reinterpret_cast<const char*>(&m_szName), sizeof(m_szName));
-	m_OutputFile.write(reinterpret_cast<const char*>(&m_iMaterialIndex), sizeof(m_iMaterialIndex));
-	m_OutputFile.write(reinterpret_cast<const char*>(&m_iNumVertices), sizeof(m_iNumVertices));
-	m_OutputFile.write(reinterpret_cast<const char*>(&pAIMesh->mNumFaces), sizeof(pAIMesh->mNumFaces));
-
 	m_iVertexStride = sizeof(VTXMESH);
 
 	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
@@ -158,6 +168,12 @@ HRESULT CMesh::Ready_Vertices_For_AnimModel(const aiMesh* pAIMesh, const vector<
 	{
 		aiBone* pAIBone = pAIMesh->mBones[i];
 
+		_float4x4	OffsetMatrix;
+		memcpy(&OffsetMatrix, &pAIBone->mOffsetMatrix, sizeof(_float4x4));
+		XMStoreFloat4x4(&OffsetMatrix, XMMatrixTranspose(XMLoadFloat4x4(&OffsetMatrix)));
+
+		m_OffsetMatrices.push_back(OffsetMatrix);
+
 		_int	iBoneIndex = { -1 };
 
 		auto	iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool
@@ -197,6 +213,11 @@ HRESULT CMesh::Ready_Vertices_For_AnimModel(const aiMesh* pAIMesh, const vector<
 				pVertices[pAIBone->mWeights[j].mVertexId].vBlendWeights.w = pAIBone->mWeights[j].mWeight;
 			}
 		}
+	}
+
+	for (size_t i = 0; i < m_iNumVertices; i++)
+	{
+		m_OutputFile.write(reinterpret_cast<const char*>(&pVertices[i]), sizeof(VTXANIMMESH));
 	}
 
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);
