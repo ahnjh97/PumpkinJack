@@ -9,6 +9,14 @@ namespace Engine
 		unsigned int	iWinSizeX, iWinSizeY;
 	}ENGINE_DESC;
 
+	typedef struct
+	{
+		XMFLOAT3	vScale;
+		XMFLOAT4	vRotation;
+		XMFLOAT3	vTranslation;
+		float		fTime;
+	}KEYFRAME;
+
 	typedef struct ENGINE_DLL
 	{
 		XMFLOAT3		vPosition;

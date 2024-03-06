@@ -163,7 +163,9 @@ HRESULT CMesh::Ready_Vertices_For_AnimModel(const aiMesh* pAIMesh, const vector<
 	}
 
 	m_iNumBones = pAIMesh->mNumBones;
+	m_OutputFile.write(reinterpret_cast<const char*>(&m_iNumBones), sizeof(m_iNumBones));
 
+	_char szBoneName[MAX_PATH] = {};
 	for (size_t i = 0; i < m_iNumBones; i++)
 	{
 		aiBone* pAIBone = pAIMesh->mBones[i];
@@ -182,6 +184,9 @@ HRESULT CMesh::Ready_Vertices_For_AnimModel(const aiMesh* pAIMesh, const vector<
 				return pBone->Compare_Name(pAIBone->mName.data);
 			});
 
+		strcpy_s(szBoneName, pAIBone->mName.data);
+		m_OutputFile.write(reinterpret_cast<const char*>(&szBoneName), sizeof(szBoneName));
+		m_OutputFile.write(reinterpret_cast<const char*>(&m_OffsetMatrices[i]), sizeof(m_OffsetMatrices[i]));
 		m_Bones.push_back(iBoneIndex);
 
 		/* 이 뼈는 몇개의 정점들에게 영향을 준다. */
@@ -230,21 +235,13 @@ HRESULT CMesh::Ready_Vertices_For_AnimModel(const aiMesh* pAIMesh, const vector<
 		m_Bones.push_back(iBoneIndex);
 
 		_float4x4		OffsetMatrix;
-
 		XMStoreFloat4x4(&OffsetMatrix, XMMatrixIdentity());
-
 		m_OffsetMatrices.push_back(OffsetMatrix);
-
 	}
 
 	for (size_t i = 0; i < m_iNumVertices; i++)
 	{
 		m_OutputFile.write(reinterpret_cast<const char*>(&pVertices[i]), sizeof(VTXANIMMESH));
-	}
-
-	for (auto vecIter : m_OffsetMatrices)
-	{
-		m_OutputFile.write(reinterpret_cast<const char*>(&vecIter), sizeof(vecIter));
 	}
 
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);

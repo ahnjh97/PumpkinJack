@@ -70,6 +70,9 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelFilePath,
 		if (FAILED(Ready_Bones(m_pAIScene->mRootNode)))
 			return E_FAIL;
 
+		_uint iNumBones = m_Bones.size();
+		m_OutputFile.write(reinterpret_cast<const char*>(&iNumBones), sizeof(iNumBones));
+
 		for (auto boneIter : m_Bones)
 		{
 			boneIter->Write_BoneData(m_OutputFile);
@@ -128,7 +131,7 @@ HRESULT CModel::Bind_ShaderResource(CShader* pShader, const _char* pConstantName
 HRESULT CModel::Play_Animation(_float fTimeDelta)
 {
 	/* 현재 애니메이션에 맞는 뼈의 상태(m_TransformationMatrix)를 갱신해준다. */
-	m_Animations[m_iCurrentAnimIndex]->Invalidate_TransformationMatrix(fTimeDelta, m_Bones, m_isLoop);
+	m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrix(fTimeDelta, m_Bones, m_isLoop);
 
 	for (auto& pBone : m_Bones)
 		pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix));

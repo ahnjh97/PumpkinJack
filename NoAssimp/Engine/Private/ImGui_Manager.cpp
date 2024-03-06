@@ -6,6 +6,22 @@ CImGui_Manager::CImGui_Manager()
 {
 }
 
+_float3 CImGui_Manager::Get_PickPos()
+{
+	if (nullptr == m_pImGui)
+		return _float3();
+
+	return m_pImGui->Get_PickPos();
+}
+
+_bool CImGui_Manager::IsPicking()
+{
+	if (nullptr == m_pImGui)
+		return _bool();
+
+	return m_pImGui->IsPicking();
+}
+
 HRESULT CImGui_Manager::Initiailize(CMyImGui* pImGui)
 {
 	if (nullptr == pImGui)

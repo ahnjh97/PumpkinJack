@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Component.h"
-#include <fstream>
 #include "Animation.h"
+#include <fstream>
 
 BEGIN(Engine)
 

@@ -10,6 +10,8 @@ private:
 	CImGui_Client(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CImGui_Client() = default;
 
+
+
 public:
 	HRESULT						Initialize();
 	virtual void				Tick(_float fTimeDelta)		override;
@@ -20,8 +22,7 @@ public:
 
 private:
 	_bool						bCallNewFrame = { false };
-	_float3						m_vPickPos = {};
-	CGameObject*				m_pPickedObject = { nullptr };
+
 
 public:
 	static CImGui_Client* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

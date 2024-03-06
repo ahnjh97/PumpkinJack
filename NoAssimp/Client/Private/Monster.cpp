@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "..\Public\Monster.h"
+#include "Monster.h"
 
 CMonster::CMonster(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CGameObject{ pDevice, pContext }
@@ -34,6 +34,9 @@ HRESULT CMonster::Initialize(void * pArg)
 
 	if (pArg)
 		m_pTransformCom->Set_WorldMatrix(GameObjectDesc.matWorld);
+
+	m_pModelCom->Set_Animation(rand()%10, true);
+	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(rand() % 20, 2.f, rand() % 20, 1.f));
 	
 	return S_OK;
 }
@@ -44,6 +47,7 @@ void CMonster::Tick(_float fTimeDelta)
 
 void CMonster::Late_Tick(_float fTimeDelta)
 {
+	m_pModelCom->Play_Animation(fTimeDelta);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
@@ -52,13 +56,16 @@ HRESULT CMonster::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-
-
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+	//CModel::TYPE eModelType = m_pModelCom->Get_ModelType();
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
 		m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", i, aiTextureType_DIFFUSE);
+
+		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+			return E_FAIL;
+
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
 		if (FAILED(m_pShaderCom->Begin(0)))
@@ -67,16 +74,13 @@ HRESULT CMonster::Render()
 		m_pModelCom->Render(i);
 	}
 
-	//if (FAILED(m_pModelCom->Render()))
-	//	return E_FAIL;
-
 	return S_OK;
 }
 
 HRESULT CMonster::Add_Components()
 {
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxModel"), 
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimModel"), 
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 

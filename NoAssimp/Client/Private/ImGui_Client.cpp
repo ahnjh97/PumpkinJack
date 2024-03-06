@@ -115,8 +115,10 @@ void CImGui_Client::OnRightClick()
 			string narrowString = "Prototype_GameObject_Monster";
 			wstring_convert<codecvt_utf8<wchar_t>> converter;
 			wstring wstrPrototypeTag = converter.from_bytes(narrowString); // converter.from_bytes(charArray); -> char배열 변환
+			m_bIsPicking = true;
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Parse"), wstrPrototypeTag, &tempDesc)))
 				return;
+			m_bIsPicking = false;
 		}
 	}
 }

@@ -47,7 +47,7 @@ HRESULT CAnimation::Initialize(const aiAnimation* pAIAnimation, const vector<CBo
 	return S_OK;
 }
 
-void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector<CBone*>& Bones, _bool isLoop)
+void CAnimation::Update_TransformationMatrix(_float fTimeDelta, const vector<CBone*>& Bones, _bool isLoop)
 {
 	m_isFinished = false;
 

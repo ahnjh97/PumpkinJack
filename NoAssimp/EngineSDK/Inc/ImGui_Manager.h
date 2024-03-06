@@ -10,6 +10,9 @@ private:
 	virtual ~CImGui_Manager() = default;
 
 public:
+	_float3 Get_PickPos();
+	_bool IsPicking();
+public:
 	HRESULT					Initiailize(class CMyImGui* pImGui);
 	void					Tick(_float fTimeDelta);
 	HRESULT					Render();

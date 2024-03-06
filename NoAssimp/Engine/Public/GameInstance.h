@@ -65,6 +65,10 @@ public: /* For.PipeLine */
 public: /* For. Picking*/
 	void Transform_PickingToLocalSpace(const class CTransform* pTransform, _Out_ _float3* pRayDir, _Out_ _float3* pRayPos);
 
+public: /* For.ImGui_Manager*/
+	_float3 Get_PickPos() ;
+	_bool IsPicking();
+
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };
 	class CInput_Device*			m_pInput_Device = { nullptr };

@@ -362,6 +362,22 @@ void CGameInstance::Transform_PickingToLocalSpace(const CTransform* pTransform, 
 	m_pPicking->Transform_PickingToLocalSpace(pTransform, pRayDir, pRayPos);
 }
 
+_float3 CGameInstance::Get_PickPos()
+{
+	if(nullptr == m_pImGui_Manager)
+		return _float3();
+
+	return m_pImGui_Manager->Get_PickPos();
+}
+
+_bool CGameInstance::IsPicking()
+{
+	if (nullptr == m_pImGui_Manager)
+		return _bool();
+
+	return m_pImGui_Manager->IsPicking();
+}
+
 
 
 void CGameInstance::Release_Engine()

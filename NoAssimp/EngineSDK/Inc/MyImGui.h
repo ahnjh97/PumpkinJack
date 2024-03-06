@@ -1,5 +1,6 @@
 #pragma once
 #include "Base.h"
+#include "GameObject.h"
 
 BEGIN(Engine)
 
@@ -8,6 +9,10 @@ class ENGINE_DLL CMyImGui abstract : public CBase
 protected:
 	CMyImGui(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CMyImGui() = default;
+
+public:
+	_float3 Get_PickPos() { return m_vPickPos; }
+	_bool IsPicking() { return m_bIsPicking; }
 
 public:
 	virtual HRESULT		Initialize(HWND hWnd);
@@ -24,6 +29,10 @@ protected:
 	ID3D11DeviceContext* m_pContext = { nullptr };
 
 	map<const wstring, class CComponent*>		m_Components;
+
+	_float3						m_vPickPos = {};
+	_bool						m_bIsPicking = { false };
+	CGameObject*				m_pPickedObject = { nullptr };
 
 public:
 	virtual void								Free();

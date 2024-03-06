@@ -19,10 +19,14 @@ CModel::CModel(const CModel& rhs)
 	, m_iNumMaterials{ rhs.m_iNumMaterials }
 	, m_Materials{ rhs.m_Materials }
 	, m_TransformMatrix{ rhs.m_TransformMatrix }
-	, m_Bones{ rhs.m_Bones }
+	, m_iNumAnimations{ rhs.m_iNumAnimations }
+	, m_eModelType{ rhs.m_eModelType }
 {
-	for (auto& pBone : m_Bones)
-		Safe_AddRef(pBone);
+	for (auto& pPrototypeAnimation : rhs.m_Animations)
+		m_Animations.push_back(pPrototypeAnimation->Clone());
+
+	for (auto& pPrototypeBone : rhs.m_Bones)
+		m_Bones.push_back(pPrototypeBone->Clone());
 
 	for (auto& pMesh : m_Meshes)
 		Safe_AddRef(pMesh);
@@ -68,8 +72,12 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelFilePath,
 	size_t lastSlashPos = strModelFilePath.find_last_of("/");
 	size_t secondLastSlashPos = strModelFilePath.find_last_of("/", lastSlashPos - 1);
 
+	string strTxt = ".txt";
+	if (eType == TYPE_ANIM)
+		strTxt = "_Anim" + strTxt;
+
 	if (secondLastSlashPos != string::npos) 
-		m_strDirectory = "../../../model_txt/" +  strModelFilePath.substr(secondLastSlashPos + 1, lastSlashPos - secondLastSlashPos - 1) + ".txt";
+		m_strDirectory = "../../../model_txt/" +  strModelFilePath.substr(secondLastSlashPos + 1, lastSlashPos - secondLastSlashPos - 1) + strTxt;
 
 	m_InputFile.open(m_strDirectory.c_str(), ios::in | ios::binary);
 	if (!m_InputFile.is_open())
@@ -84,8 +92,8 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelFilePath,
 	/* 읽은 정보를 바탕으로해서 내가 사용하기 좋게 정리한다.  */
 	if (eType == TYPE_ANIM)
 	{
-		/*if (FAILED(Ready_Bones(m_pAIScene->mRootNode)))
-			return E_FAIL;*/
+		if (FAILED(Ready_Bones()))
+			return E_FAIL;
 	}
 
 	/* 모델을 구성하는 메시들을 생성한다. */
@@ -96,11 +104,30 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelFilePath,
 	if (FAILED(Ready_Materials(strModelFilePath.c_str())))
 		return E_FAIL;
 
+	if (eType == TYPE_ANIM)
+	{
+		if (FAILED(Ready_Animations()))
+			return E_FAIL;
+	}
+
+	m_InputFile.close();
 	return S_OK;
 }
 
 HRESULT CModel::Initialize(void* pArg)
 {
+	return S_OK;
+}
+
+HRESULT CModel::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, _uint iMeshIndex)
+{
+	if (m_eModelType == TYPE_ANIM)
+	{
+		ZeroMemory(m_MeshBoneMatrices, sizeof(_float4x4) * 512);
+		m_Meshes[iMeshIndex]->Stock_Matrices(m_Bones, m_MeshBoneMatrices);
+
+		return pShader->Bind_Matrices(pConstantName, m_MeshBoneMatrices, 512);
+	}
 	return S_OK;
 }
 
@@ -114,15 +141,19 @@ HRESULT CModel::Bind_ShaderResource(CShader* pShader, const _char* pConstantName
 	if (iMeshMaterialIndex >= m_iNumMaterials)
 		return E_FAIL;
 
-	m_Materials[iMeshMaterialIndex].MaterialTextures[eTextureType]->Bind_ShaderResource(pShader, pConstantName);
+	if (nullptr != m_Materials[iMeshMaterialIndex].MaterialTextures[eTextureType])
+		m_Materials[iMeshMaterialIndex].MaterialTextures[eTextureType]->Bind_ShaderResource(pShader, pConstantName);
 
 	return S_OK;
 }
 
 HRESULT CModel::Play_Animation(_float fTimeDelta)
 {
-	//for (auto& pBone : m_Bones)
-	//	pBone->Invalidate_CombinedTransformationMatrix(m_Bones);
+	/* 현재 애니메이션에 맞는 뼈의 상태(m_TransformationMatrix)를 갱신해준다. */
+	m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrix(fTimeDelta, m_Bones, m_isLoop);
+
+	for (auto& pBone : m_Bones)
+		pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
 
 	return S_OK;
 }
@@ -188,27 +219,45 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 			m_Materials[iTemp].MaterialTextures[jTemp] = MeshMaterial.MaterialTextures[jTemp];
 	}
 
-	m_InputFile.close();
+
 	return S_OK;
 }
 
-//HRESULT CModel::Ready_Bones(aiNode* pAINode, _int iParentIndex)
-//{
-//	CBone* pBone = CBone::Create(pAINode, iParentIndex);
-//	if (nullptr == pBone)
-//		return E_FAIL;
-//
-//	m_Bones.push_back(pBone);
-//
-//	_int		iParent = m_Bones.size() - 1;
-//
-//	for (size_t i = 0; i < pAINode->mNumChildren; i++)
-//	{
-//		Ready_Bones(pAINode->mChildren[i], iParent);
-//	}
-//
-//	return S_OK;
-//}
+HRESULT CModel::Ready_Bones()
+{
+	_uint iNumBones = {};
+
+	m_InputFile.read(reinterpret_cast<char*>(&iNumBones), sizeof(iNumBones));
+	m_Bones.reserve(iNumBones);
+
+	for (_uint i = 0; i < iNumBones; i++)
+	{
+		CBone* pBone = CBone::Create(m_InputFile);
+		if (nullptr == pBone)
+			return E_FAIL;
+
+		m_Bones.push_back(pBone);
+	}
+
+	return S_OK;
+}
+
+HRESULT CModel::Ready_Animations()
+{
+	m_InputFile.read(reinterpret_cast<char*>(&m_iNumAnimations), sizeof(m_iNumAnimations));
+	m_Animations.reserve(m_iNumAnimations);
+
+	for (size_t i = 0; i < m_iNumAnimations; i++)
+	{
+		CAnimation* pAnimation = CAnimation::Create(m_Bones, m_InputFile);
+		if (nullptr == pAnimation)
+			return E_FAIL;
+
+		m_Animations.push_back(pAnimation);
+	}
+
+	return S_OK;
+}
 
 CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelFilePath, _fmatrix TransformMatrix)
 {

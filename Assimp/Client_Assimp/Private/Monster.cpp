@@ -31,7 +31,7 @@ HRESULT CMonster::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pModelCom->Set_Animation(rand() % 20, true);
-	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(rand() % 20, 2.f, rand() % 20, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(rand() % 20, 2.f, rand() % 20, 1.f));
 
 	return S_OK;
 }
@@ -50,8 +50,6 @@ HRESULT CMonster::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
-
-
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 	CModel::TYPE eModelType = m_pModelCom->Get_ModelType();

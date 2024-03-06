@@ -24,6 +24,8 @@ public:
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
+	HRESULT Stock_Matrices(const vector<CBone*>& Bones, _float4x4* pMeshBoneMatrices);
+
 	_float3 Get_PickPos(const class CTransform* pTransform) const;
 
 
@@ -35,15 +37,17 @@ private:
 
 	_uint				m_iNumBones = { 0 };
 	vector<_uint>		m_Bones;
+	vector<_float4x4>	m_OffsetMatrices;
 
+	// 파일입출력 변수들
 	_uint				m_iFaces = {0};
 	string				m_strDirectory;
 	streampos			m_filePointerPos;
 	ifstream&			m_InputFile;
-
 	_float3*			m_pVerticesPos = { nullptr }; // 정점 위치 
 	_uint*				m_pIndices = { nullptr }; // 인덱스 버퍼 
 
+	// 바운딩박스
 	pair<_float3, _float3> m_MinMax = {};
 
 private:

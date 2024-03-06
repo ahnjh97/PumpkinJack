@@ -87,6 +87,16 @@ HRESULT CMesh::Initialize(void* pArg)
 	return S_OK;
 }
 
+HRESULT CMesh::Stock_Matrices(const vector<CBone*>& Bones, _float4x4* pMeshBoneMatrices)
+{
+	for (_uint i = 0; i < m_iNumBones; ++i)
+	{
+		XMStoreFloat4x4(&pMeshBoneMatrices[i], XMLoadFloat4x4(&m_OffsetMatrices[i]) * XMLoadFloat4x4(Bones[m_Bones[i]]->Get_CombinedTransformationMatrix()));
+	}
+
+	return S_OK;
+}
+
 _float3 CMesh::Get_PickPos(const CTransform* pTransform) const
 {
 	vector<_float3> vecPickPos;
@@ -166,84 +176,67 @@ HRESULT CMesh::Ready_Vertices_For_NonAnimModel(_fmatrix TransformMatrix)
 
 HRESULT CMesh::Ready_Vertices_For_AnimModel(const vector<CBone*>& Bones)
 {
-	//m_iVertexStride = sizeof(VTXANIMMESH);
+	m_iVertexStride = sizeof(VTXANIMMESH);
+	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
 
-	//ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+	/* 정점버퍼의 byte크기 */
+	m_BufferDesc.ByteWidth = m_iVertexStride * m_iNumVertices;
+	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	m_BufferDesc.CPUAccessFlags = 0;
+	m_BufferDesc.MiscFlags = 0;
+	m_BufferDesc.StructureByteStride = m_iVertexStride;
 
-	///* 정점버퍼의 byte크기 */
-	//m_BufferDesc.ByteWidth = m_iVertexStride * m_iNumVertices;
-	//m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	//m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	//m_BufferDesc.CPUAccessFlags = 0;
-	//m_BufferDesc.MiscFlags = 0;
-	//m_BufferDesc.StructureByteStride = m_iVertexStride;
+	VTXANIMMESH* pVertices = new VTXANIMMESH[m_iNumVertices];
+	ZeroMemory(pVertices, sizeof(VTXANIMMESH) * m_iNumVertices);
 
-	//VTXANIMMESH* pVertices = new VTXANIMMESH[m_iNumVertices];
-	//ZeroMemory(pVertices, sizeof(VTXANIMMESH) * m_iNumVertices);
 
-	//for (size_t i = 0; i < m_iNumVertices; i++)
-	//{
-	//	memcpy(&pVertices[i].vPosition, &pAIMesh->mVertices[i], sizeof(_float3));
-	//	memcpy(&pVertices[i].vNormal, &pAIMesh->mNormals[i], sizeof(_float3));
-	//	memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
-	//	memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
-	//}
+	m_InputFile.read(reinterpret_cast<char*>(&m_iNumBones), sizeof(m_iNumBones));
+	m_OffsetMatrices.reserve(m_iNumBones);
 
-	//m_iNumBones = pAIMesh->mNumBones;
+	_float4x4 offsetMat = {};
+	_char szBoneName[MAX_PATH] = {};
+	for (_uint i = 0; i < m_iNumBones; i++)
+	{
+		m_InputFile.read(reinterpret_cast<char*>(&szBoneName), sizeof(szBoneName));
+		m_InputFile.read(reinterpret_cast<char*>(&offsetMat), sizeof(offsetMat));
+		m_OffsetMatrices.push_back(offsetMat);
 
-	//for (size_t i = 0; i < m_iNumBones; i++)
-	//{
-	//	aiBone* pAIBone = pAIMesh->mBones[i];
+		_int	iBoneIndex = { -1 };
+		auto	iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool{
+				++iBoneIndex;
+				return pBone->Compare_Name(szBoneName);});
 
-	//	_int	iBoneIndex = { -1 };
+		m_Bones.push_back(iBoneIndex);
+	}
 
-	//	auto	iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool
-	//		{
-	//			++iBoneIndex;
-	//			return pBone->Compare_Name(pAIBone->mName.data);
-	//		});
+	if (0 == m_iNumBones)
+	{
+		m_iNumBones = 1;
+		_int	iBoneIndex = { -1 };
+		auto	iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool	{
+				++iBoneIndex; 
+				return pBone->Compare_Name(m_szName);	});
 
-	//	m_Bones.push_back(iBoneIndex);
+		m_Bones.push_back(iBoneIndex);
 
-	//	/* 이 뼈는 몇개의 정점들에게 영향을 준다. */
-	//	_uint		iNumWeights = pAIBone->mNumWeights;
+		_float4x4		OffsetMatrix;
+		XMStoreFloat4x4(&OffsetMatrix, XMMatrixIdentity());
+		m_OffsetMatrices.push_back(OffsetMatrix);
+	}
 
-	//	for (size_t j = 0; j < iNumWeights; j++)
-	//	{
-	//		if (0.0f == pVertices[pAIBone->mWeights[j].mVertexId].vBlendWeights.x)
-	//		{
-	//			pVertices[pAIBone->mWeights[j].mVertexId].vBlendIndices.x = i;
-	//			pVertices[pAIBone->mWeights[j].mVertexId].vBlendWeights.x = pAIBone->mWeights[j].mWeight;
-	//		}
+	for (size_t i = 0; i < m_iNumVertices; i++)
+	{
+		m_InputFile.read(reinterpret_cast<char*>(&pVertices[i]), sizeof(VTXANIMMESH));
+	}
 
-	//		else if (0.0f == pVertices[pAIBone->mWeights[j].mVertexId].vBlendWeights.y)
-	//		{
-	//			pVertices[pAIBone->mWeights[j].mVertexId].vBlendIndices.y = i;
-	//			pVertices[pAIBone->mWeights[j].mVertexId].vBlendWeights.y = pAIBone->mWeights[j].mWeight;
-	//		}
+	ZeroMemory(&m_InitialData, sizeof m_InitialData);
+	m_InitialData.pSysMem = pVertices;
 
-	//		else if (0.0f == pVertices[pAIBone->mWeights[j].mVertexId].vBlendWeights.z)
-	//		{
-	//			pVertices[pAIBone->mWeights[j].mVertexId].vBlendIndices.z = i;
-	//			pVertices[pAIBone->mWeights[j].mVertexId].vBlendWeights.z = pAIBone->mWeights[j].mWeight;
-	//		}
+	if (FAILED(__super::Create_Buffer(&m_pVB)))
+		return E_FAIL;
 
-	//		else if (0.0f == pVertices[pAIBone->mWeights[j].mVertexId].vBlendWeights.w)
-	//		{
-	//			pVertices[pAIBone->mWeights[j].mVertexId].vBlendIndices.w = i;
-	//			pVertices[pAIBone->mWeights[j].mVertexId].vBlendWeights.w = pAIBone->mWeights[j].mWeight;
-	//		}
-	//	}
-	//}
-
-	//ZeroMemory(&m_InitialData, sizeof m_InitialData);
-	//m_InitialData.pSysMem = pVertices;
-
-	//if (FAILED(__super::Create_Buffer(&m_pVB)))
-	//	return E_FAIL;
-
-	//Safe_Delete_Array(pVertices);
-
+	Safe_Delete_Array(pVertices);
 	return S_OK;
 }
 
