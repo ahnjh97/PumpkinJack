@@ -19,6 +19,7 @@ private:
 public:
 	_uint Get_NumMeshes() const { return m_iNumMeshes; }
 	_bool isFinished() { return m_Animations[m_iCurrentAnimIndex]->isFinished();}
+	TYPE Get_ModelType() { return m_eModelType; }
 
 public:
 	void Set_Animation(_uint iAnimIndex, _bool isLoop) { m_iCurrentAnimIndex = iAnimIndex; m_isLoop = isLoop; }

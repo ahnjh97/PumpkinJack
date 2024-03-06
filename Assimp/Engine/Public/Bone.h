@@ -23,7 +23,7 @@ public:
 
 public:
 	HRESULT Initialize(const aiNode* pAINode, _int iParentIndex);
-	void Invalidate_CombinedTransformationMatrix(const vector<CBone*>& Bones);
+	void Update_CombinedTransformationMatrix(const vector<CBone*>& Bones, _fmatrix TransformatrixMatrix);
 	_bool Compare_Name(const _char* pBoneName) { return !strcmp(m_szName, pBoneName); }
 
 public:

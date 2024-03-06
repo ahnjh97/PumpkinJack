@@ -35,10 +35,12 @@ VS_OUT VS_MAIN(VS_IN In)
 {
 	VS_OUT		Out = (VS_OUT)0;
 
+	float		fWeightW = 1.f - (In.vBlendWeights.x + In.vBlendWeights.y + In.vBlendWeights.z);
+
 	matrix		BoneMatrix = g_BoneMatrices[In.vBlendIndices.x] * In.vBlendWeights.x +
 		g_BoneMatrices[In.vBlendIndices.y] * In.vBlendWeights.y +
 		g_BoneMatrices[In.vBlendIndices.z] * In.vBlendWeights.z +
-		g_BoneMatrices[In.vBlendIndices.w] * In.vBlendWeights.w;
+		g_BoneMatrices[In.vBlendIndices.w] * fWeightW;
 
 	vector		vPosition = mul(vector(In.vPosition, 1.f), BoneMatrix);
 

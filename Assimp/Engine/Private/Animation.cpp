@@ -6,6 +6,20 @@ CAnimation::CAnimation()
 {
 }
 
+CAnimation::CAnimation(const CAnimation& rhs)
+	: m_fDuration{ rhs.m_fDuration }
+	, m_fTickPerSecond{ rhs.m_fTickPerSecond }
+	, m_fTrackPosition{ rhs.m_fTrackPosition }
+	, m_iNumChannels{ rhs.m_iNumChannels }
+	, m_Channels{ rhs.m_Channels }
+	, m_CurrentKeyFrameIndices{ rhs.m_CurrentKeyFrameIndices }
+	, m_isFinished{ rhs.m_isFinished }
+
+{
+	for (auto& pChannel : m_Channels)
+		Safe_AddRef(pChannel);
+}
+
 HRESULT CAnimation::Initialize(const aiAnimation* pAIAnimation, const vector<CBone*>& Bones)
 {
 	strcpy_s(m_szName, pAIAnimation->mName.data);

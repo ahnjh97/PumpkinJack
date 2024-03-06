@@ -20,6 +20,7 @@ CModel::CModel(const CModel& rhs)
 	, m_Materials{ rhs.m_Materials }
 	, m_TransformMatrix{ rhs.m_TransformMatrix }
 	, m_iNumAnimations{ rhs.m_iNumAnimations }
+	, m_eModelType{rhs.m_eModelType}
 {
 	for (auto& pPrototypeAnimation : rhs.m_Animations)
 		m_Animations.push_back(pPrototypeAnimation->Clone());
@@ -54,8 +55,7 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelFilePath,
 
 	// 파일입출력
 	string tempFileName = "tempTXT.txt";
-	if (m_eModelType == TYPE_NONANIM)
-		remove(tempFileName.c_str()); // 이전에 남아있던거에 덮어쓰지 말고 새로운 파일에 하도록
+	remove(tempFileName.c_str()); // 이전에 남아있던거에 덮어쓰지 말고 새로운 파일에 하도록
 	m_OutputFile.open(tempFileName, ios::out | ios::binary | ios::app);
 
 	if (!m_OutputFile.is_open()) // 임시파일 열렸는지 확인
@@ -131,7 +131,7 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 	m_Animations[m_iCurrentAnimIndex]->Invalidate_TransformationMatrix(fTimeDelta, m_Bones, m_isLoop);
 
 	for (auto& pBone : m_Bones)
-		pBone->Invalidate_CombinedTransformationMatrix(m_Bones);
+		pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
 
 	return S_OK;
 }

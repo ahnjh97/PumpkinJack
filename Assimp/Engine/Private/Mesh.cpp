@@ -215,9 +215,36 @@ HRESULT CMesh::Ready_Vertices_For_AnimModel(const aiMesh* pAIMesh, const vector<
 		}
 	}
 
+	if (0 == m_iNumBones)
+	{
+		m_iNumBones = 1;
+
+		_int	iBoneIndex = { -1 };
+
+		auto	iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool
+			{
+				++iBoneIndex;
+				return pBone->Compare_Name(m_szName);
+			});
+
+		m_Bones.push_back(iBoneIndex);
+
+		_float4x4		OffsetMatrix;
+
+		XMStoreFloat4x4(&OffsetMatrix, XMMatrixIdentity());
+
+		m_OffsetMatrices.push_back(OffsetMatrix);
+
+	}
+
 	for (size_t i = 0; i < m_iNumVertices; i++)
 	{
 		m_OutputFile.write(reinterpret_cast<const char*>(&pVertices[i]), sizeof(VTXANIMMESH));
+	}
+
+	for (auto vecIter : m_OffsetMatrices)
+	{
+		m_OutputFile.write(reinterpret_cast<const char*>(&vecIter), sizeof(vecIter));
 	}
 
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);
