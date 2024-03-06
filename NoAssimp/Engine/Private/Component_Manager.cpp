@@ -1,5 +1,6 @@
-#include "..\Public\Component_Manager.h"
+#include "Component_Manager.h"
 #include "Component.h"
+#include <typeinfo>
 
 CComponent_Manager::CComponent_Manager()
 {

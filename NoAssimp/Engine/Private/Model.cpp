@@ -6,6 +6,8 @@
 #include "Texture.h"
 #include <fstream>
 #include "GameInstance.h"
+#include <locale>
+#include <codecvt>
 
 CModel::CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent{ pDevice, pContext }
@@ -66,24 +68,26 @@ _float3 CModel::Check_Meshes(const CTransform* pTransform) const
 	return vecPickPos[0];
 }
 
-HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelFilePath, _fmatrix TransformMatrix)
+HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelName, _fmatrix TransformMatrix)
 {
 	m_eModelType = eType;
-	size_t lastSlashPos = strModelFilePath.find_last_of("/");
-	size_t secondLastSlashPos = strModelFilePath.find_last_of("/", lastSlashPos - 1);
-
+	string strFolderName = "Anim/";
 	string strTxt = ".txt";
-	if (eType == TYPE_ANIM)
-		strTxt = "_Anim" + strTxt;
 
-	if (secondLastSlashPos != string::npos) 
-		m_strDirectory = "../../../model_txt/" +  strModelFilePath.substr(secondLastSlashPos + 1, lastSlashPos - secondLastSlashPos - 1) + strTxt;
-
+	//if (strModelName.find("NonAnim") != string::npos) // NonAnimVersion
+	//	m_strDirectory = "../../../model_txt/Non" + strFolderName + strModelName + strTxt;
+	//else
+	{
+		if (eType == TYPE_NONANIM)
+			strFolderName = "Non" + strFolderName;
+		m_strDirectory = "../../../model_txt/" + strFolderName + strModelName + strTxt;
+	}
+	
 	m_InputFile.open(m_strDirectory.c_str(), ios::in | ios::binary);
 	if (!m_InputFile.is_open())
 	{
 		string tempstr = "Failed To Open : " + m_strDirectory;
-		MessageBoxA(nullptr, tempstr.c_str(), "error", MB_OK);
+		MB(tempstr);
 		return E_FAIL;
 	}
 
@@ -101,7 +105,7 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelFilePath,
 	if (FAILED(Ready_Meshes()))
 		return E_FAIL;
 
-	if (FAILED(Ready_Materials(strModelFilePath.c_str())))
+	if (FAILED(Ready_Materials(strModelName.c_str())))
 		return E_FAIL;
 
 	if (eType == TYPE_ANIM)
@@ -111,6 +115,10 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelFilePath,
 	}
 
 	m_InputFile.close();
+
+	if (eType == TYPE_ANIM)
+		Create_NonAnimVersion(strModelName);
+
 	return S_OK;
 }
 
@@ -149,6 +157,9 @@ HRESULT CModel::Bind_ShaderResource(CShader* pShader, const _char* pConstantName
 
 HRESULT CModel::Play_Animation(_float fTimeDelta)
 {
+	if (m_eModelType == TYPE_NONANIM)
+		return S_OK;
+
 	/* 현재 애니메이션에 맞는 뼈의 상태(m_TransformationMatrix)를 갱신해준다. */
 	m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrix(fTimeDelta, m_Bones, m_isLoop);
 
@@ -259,11 +270,21 @@ HRESULT CModel::Ready_Animations()
 	return S_OK;
 }
 
-CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelFilePath, _fmatrix TransformMatrix)
+void CModel::Create_NonAnimVersion(const string& strModelName)
+{
+	string strModelName_NonAnim = strModelName + "_NonAnim";
+	wstring_convert<codecvt_utf8<wchar_t>> converter;
+	wstring wstrModelName_NonAnim = converter.from_bytes(strModelName_NonAnim);
+	wstring wstrPrototypeTag = L"Prototype_Component_Model_" + wstrModelName_NonAnim;
+
+	m_pGameInstance->Add_Prototype(Level_MapTool, wstrPrototypeTag, Create(m_pDevice, m_pContext, TYPE_NONANIM, strModelName_NonAnim, XMLoadFloat4x4(&m_TransformMatrix)));
+}
+
+CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelName, _fmatrix TransformMatrix)
 {
 	CModel* pInstance = new CModel(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(eType, strModelFilePath, TransformMatrix)))
+	if (FAILED(pInstance->Initialize_Prototype(eType, strModelName, TransformMatrix)))
 	{
 		MSG_BOX(TEXT("Failed To Created : CModel"));
 

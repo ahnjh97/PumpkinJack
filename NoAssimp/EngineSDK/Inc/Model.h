@@ -30,7 +30,7 @@ public: // 바운딩박스
 	_float3 Check_Meshes(const class CTransform* pTransform) const;
 
 public:
-	virtual HRESULT Initialize_Prototype(TYPE eType, const string& strModelFilePath, _fmatrix TransformMatrix);
+	virtual HRESULT Initialize_Prototype(TYPE eType, const string& strModelName, _fmatrix TransformMatrix);
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
@@ -47,7 +47,7 @@ private:
 	vector<class CMesh*>		m_Meshes;
 
 	_uint						m_iNumMaterials = { 0 };
-	vector<MATERIAL_TEXTURE>		m_Materials;
+	vector<MATERIAL_TEXTURE>	m_Materials;
 
 	_float4x4					m_TransformMatrix;
 
@@ -64,14 +64,19 @@ private:
 	ifstream					m_InputFile;
 	BoundingBox					m_BoundingBox;
 
+	string						m_strNonAnimVersion;
+
 private:
 	HRESULT Ready_Meshes();
 	HRESULT Ready_Materials(const _char* pModelFilePath);
 	HRESULT Ready_Bones();
 	HRESULT Ready_Animations();
 
+	void Create_NonAnimVersion(const string& strModelName);
+
 public:
-	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelFilePath, _fmatrix TransformMatrix);
+	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelName, _fmatrix TransformMatrix);
+	
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

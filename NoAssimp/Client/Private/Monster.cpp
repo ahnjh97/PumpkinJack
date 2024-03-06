@@ -32,7 +32,7 @@ HRESULT CMonster::Initialize(void * pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;	
 
-	if (pArg)
+	if (pArg && m_pGameInstance->IsPicking())
 		m_pTransformCom->Set_WorldMatrix(GameObjectDesc.matWorld);
 
 	m_pModelCom->Set_Animation(rand()%10, true);
@@ -80,12 +80,12 @@ HRESULT CMonster::Render()
 HRESULT CMonster::Add_Components()
 {
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimModel"), 
+	if (FAILED(__super::Add_Component(m_pGameInstance->Get_CurrentLevelID(), TEXT("Prototype_Component_Shader_VtxModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_SkeletonBoss"),
+	if (FAILED(__super::Add_Component(m_pGameInstance->Get_CurrentLevelID(), TEXT("Prototype_Component_Model_SkeletonBoss_NonAnim"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 

@@ -66,7 +66,7 @@ public: /* For. Picking*/
 	void Transform_PickingToLocalSpace(const class CTransform* pTransform, _Out_ _float3* pRayDir, _Out_ _float3* pRayPos);
 
 public: /* For.ImGui_Manager*/
-	_float3 Get_PickPos() ;
+	_float3 Get_PickPos();
 	_bool IsPicking();
 
 private:

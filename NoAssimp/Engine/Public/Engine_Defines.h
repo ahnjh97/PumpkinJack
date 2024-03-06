@@ -26,6 +26,7 @@ namespace Engine
 //#include "assimp\postprocess.h"
 #define AI_TEXTURE_TYPE_MAX 21
 #define aiTextureType_DIFFUSE 1
+#define Level_MapTool 4
 
 using namespace DirectX;
 

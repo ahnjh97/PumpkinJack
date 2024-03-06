@@ -196,13 +196,13 @@ HRESULT CLoader::Loading_For_MapTool()
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 
 	/* Prototype_Component_Texture_Terrain */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Grid"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MAPTOOL, TEXT("Prototype_Component_Texture_Grid"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/White.png")))))
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("컴포넌트를(을) 로딩 중 입니다.");
 	/* Prototype_Component_VIBuffer_Terrain */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MAPTOOL, TEXT("Prototype_Component_VIBuffer_Grid"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 100, 100))))
 		return E_FAIL;
 
@@ -212,39 +212,39 @@ HRESULT CLoader::Loading_For_MapTool()
 
 	/* For.Prototype_Component_Model_Fiona */
 	TransformMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Resources/Models/Fiona/Fiona.fbx", TransformMatrix))))
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MAPTOOL, TEXT("Prototype_Component_Model_Fiona"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "Fiona", TransformMatrix))))
 		return E_FAIL;
 
 	/* Prototype_Component_Model_SkeletonBoss */
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_SkeletonBoss"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Resources/Models/SkeletonBoss/SkeletonBoss.fbx", TransformMatrix))))
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MAPTOOL, TEXT("Prototype_Component_Model_SkeletonBoss"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "SkeletonBoss", TransformMatrix))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Jack"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Resources/Models/Jack/Jack.fbx", TransformMatrix))))
-		return E_FAIL;
+	/*if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MAPTOOL, TEXT("Prototype_Component_Model_Jack"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "Jack", TransformMatrix))))
+		return E_FAIL;*/
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
 	/* For.Prototype_Component_Shader_VtxNorTex */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxNorTex"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MAPTOOL, TEXT("Prototype_Component_Shader_VtxNorTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Shader_VtxModel */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxModel"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MAPTOOL, TEXT("Prototype_Component_Shader_VtxModel"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Shader_VtxAnimModel */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimModel"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MAPTOOL, TEXT("Prototype_Component_Shader_VtxAnimModel"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimModel.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("객체를(을) 로딩 중 입니다.");
-	/* For.Prototype_GameObject_Terrain */
+	/* For.Prototype_GameObject_Grid */
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Grid"),
 		CGrid::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
