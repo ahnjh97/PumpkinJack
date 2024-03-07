@@ -45,6 +45,9 @@ private:
 	HRESULT Loading_For_GamePlay();
 	HRESULT Loading_For_MapTool();
 
+	HRESULT Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName, _float fScale, _float fDegree);
+	HRESULT Add_Shaders(LEVEL eLevel);
+
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID);
 	virtual void Free() override;

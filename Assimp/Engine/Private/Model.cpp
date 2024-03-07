@@ -1,11 +1,13 @@
 #include "Model.h"
 #include "Bone.h"
 #include "Mesh.h"
-
+#include "GameInstance.h"
 #include "Shader.h"
 #include "Texture.h"
 #include <fstream>
 #include <cstdio>
+#include <locale>
+#include <codecvt>
 
 CModel::CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent{ pDevice, pContext }
@@ -95,6 +97,9 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelFilePath,
 
 	if(FAILED(RenameBinaryFile())) // 파일 닫고, 임시파일-> 최종파일 이름
 		return E_FAIL;
+
+	if (eType == TYPE_ANIM)
+		Create_NonAnimVersion(strModelFilePath);
 
 	return S_OK;
 }
@@ -284,15 +289,15 @@ HRESULT CModel::RenameBinaryFile()
 		m_strDirectory = modelName;
 	}
 
-	string strTxt = ".txt";
-	if (m_eModelType == TYPE_ANIM)
-		strTxt = "_Anim" + strTxt;
+	string strFolderName = "Anim/";
+	if (m_eModelType == TYPE_NONANIM)
+		strFolderName = "Non" + strFolderName;
 
-	m_strDirectory = "../../../model_txt/" + m_strDirectory + strTxt;
+	m_strDirectory = "../../../model_txt/" + strFolderName + m_strDirectory + ".txt";
 	remove(m_strDirectory.c_str());
 
 	// 임시파일의 파일이름을 원본파일의 이름으로 변경
-	if (std::rename(tempFileName.c_str(), m_strDirectory.c_str()) != 0)
+	if (rename(tempFileName.c_str(), m_strDirectory.c_str()) != 0)
 	{
 		MSG_BOX(TEXT("Failed to rename : tempTXT.txt"));
 		remove(tempFileName.c_str()); // 임시파일 삭제
@@ -300,6 +305,16 @@ HRESULT CModel::RenameBinaryFile()
 	}
 
 	return S_OK;
+}
+
+void CModel::Create_NonAnimVersion(const string& strModelFilePath)
+{
+	string strModelName_NonAnim = m_strDirectory + "_NonAnim";
+	wstring_convert<codecvt_utf8<wchar_t>> converter;
+	wstring wstrModelName_NonAnim = converter.from_bytes(strModelName_NonAnim);
+	wstring wstrPrototypeTag = L"Prototype_Component_Model_" + wstrModelName_NonAnim;
+
+	m_pGameInstance->Add_Prototype(Level_MapTool, wstrPrototypeTag, Create(m_pDevice, m_pContext, TYPE_NONANIM, strModelFilePath, XMLoadFloat4x4(&m_TransformMatrix)));
 }
 
 CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelFilePath, _fmatrix TransformMatrix)

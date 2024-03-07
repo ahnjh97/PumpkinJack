@@ -1,12 +1,17 @@
 #include "stdafx.h"
-#include "..\Public\Loader.h"
+#include "Loader.h"
 #include <process.h>
+#include <locale>
+#include <codecvt>
 #include "GameInstance.h"
 #include "Camera_Free.h"
 #include "BackGround.h"
 #include "Terrain.h"
 #include "Monster.h"
 #include "Grid.h"
+#include "Tool_Anim.h"
+#include "Tool_NonAnim.h"
+
 //#include "Player.h"
 //#include "Effect.h"
 //#include "Sky.h"
@@ -122,19 +127,19 @@ HRESULT CLoader::Loading_For_GamePlay()
 	TransformMatrix = /*XMMatrixScaling(1.5f, 1.5f, 1.5f) **/ XMMatrixRotationY(XMConvertToRadians(180.0f));
 
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Resources/Models/Fiona/Fiona.fbx", TransformMatrix))))
+		CModel::Create(m_pDevice, m_pContext, TYPE_ANIM, "Fiona", TransformMatrix))))
 		return E_FAIL;
 
 	///* Prototype_Component_Model_SkeletonBoss */
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_SkeletonBoss"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Resources/Models/SkeletonBoss/SkeletonBoss.fbx", TransformMatrix))))
+		CModel::Create(m_pDevice, m_pContext, TYPE_ANIM, "SkeletonBoss", TransformMatrix))))
 		return E_FAIL;
 
 	/* Prototype_Component_Model_Jack */
-	TransformMatrix = XMMatrixScaling(0.003f, 0.003f, 0.003f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	TransformMatrix = XMMatrixScaling(0.0012f, 0.0012f, 0.0012f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Jack"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Resources/Models/Jack/Jack.fbx", TransformMatrix))))
+		CModel::Create(m_pDevice, m_pContext, TYPE_ANIM, "Jack", TransformMatrix))))
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
@@ -208,39 +213,19 @@ HRESULT CLoader::Loading_For_MapTool()
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 
-	_matrix		TransformMatrix = XMMatrixIdentity();
-
 	/* For.Prototype_Component_Model_Fiona */
-	TransformMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MAPTOOL, TEXT("Prototype_Component_Model_Fiona"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "Fiona", TransformMatrix))))
+	if(FAILED(Add_Model(LEVEL_MAPTOOL, TYPE_ANIM, "Fiona", 1.f, 180.f)))
 		return E_FAIL;
-
 	/* Prototype_Component_Model_SkeletonBoss */
-	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
-
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MAPTOOL, TEXT("Prototype_Component_Model_SkeletonBoss"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "SkeletonBoss", TransformMatrix))))
+	if (FAILED(Add_Model(LEVEL_MAPTOOL, TYPE_ANIM, "SkeletonBoss", 0.01f, 0.f)))
 		return E_FAIL;
-
-	/*if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MAPTOOL, TEXT("Prototype_Component_Model_Jack"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "Jack", TransformMatrix))))
-		return E_FAIL;*/
+	/* Prototype_Component_Model_Jack */
+	if (FAILED(Add_Model(LEVEL_MAPTOOL, TYPE_ANIM, "Jack", 0.0025f, 180.f)))
+		return E_FAIL;
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
-	/* For.Prototype_Component_Shader_VtxNorTex */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MAPTOOL, TEXT("Prototype_Component_Shader_VtxNorTex"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
-		return E_FAIL;
 
-	/* For.Prototype_Component_Shader_VtxModel */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MAPTOOL, TEXT("Prototype_Component_Shader_VtxModel"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
-		return E_FAIL;
-
-	/* For.Prototype_Component_Shader_VtxAnimModel */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MAPTOOL, TEXT("Prototype_Component_Shader_VtxAnimModel"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimModel.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
+	if(FAILED(Add_Shaders(LEVEL_MAPTOOL)))
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("객체를(을) 로딩 중 입니다.");
@@ -254,14 +239,52 @@ HRESULT CLoader::Loading_For_MapTool()
 		CCamera_Free::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	/* For.Prototype_GameObject_Monster */
-	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Monster"),
-		CMonster::Create(m_pDevice, m_pContext))))
+	/* For.Prototype_GameObject_Tool_Anim */
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Tool_Anim"),
+		CTool_Anim::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	/* For.Prototype_GameObject_Tool_NonAnim */
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Tool_NonAnim"),
+		CTool_NonAnim::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
-
 	m_isFinished = true;
+	return S_OK;
+}
+
+HRESULT CLoader::Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName, _float fScale, _float fDegree)
+{
+	_matrix		TransformMatrix = XMMatrixIdentity();
+	TransformMatrix = XMMatrixScaling(fScale, fScale, fScale) * XMMatrixRotationY(XMConvertToRadians(fDegree));
+
+	wstring_convert<codecvt_utf8<wchar_t>> converter;
+	wstring wstrModelName = converter.from_bytes(strModelName);
+	wstring wstrPrototypeTag = L"Prototype_Component_Model_" + wstrModelName;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag,
+		CModel::Create(m_pDevice, m_pContext, eModelType, strModelName, TransformMatrix))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLoader::Add_Shaders(LEVEL eLevel)
+{
+	/* For.Prototype_Component_Shader_VtxNorTex */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxNorTex"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_Shader_VtxModel */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_Shader_VtxAnimModel */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxAnimModel"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimModel.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
+		return E_FAIL;
 
 	return S_OK;
 }

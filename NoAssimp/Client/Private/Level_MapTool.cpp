@@ -19,9 +19,6 @@ HRESULT CLevel_MapTool::Initialize()
 	if (FAILED(Ready_Layer_Grid(TEXT("Layer_Grid"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_Object(TEXT("Layer_Monster"))))
-		return E_FAIL;
-
 	if (FAILED(m_pGameInstance->Initialize_ImGui(CImGui_Client::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 

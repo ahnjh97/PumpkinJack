@@ -16,6 +16,7 @@ CAnimation::CAnimation(const CAnimation& rhs)
 	, m_isFinished{ rhs.m_isFinished }
 
 {
+	strcpy_s(m_szName, rhs.m_szName);
 	for (auto& pChannel : m_Channels)
 		Safe_AddRef(pChannel);
 }

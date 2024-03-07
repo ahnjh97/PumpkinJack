@@ -18,6 +18,7 @@ private:
 
 public:
 	_bool isFinished() const { return m_isFinished; }
+	string Get_Name() { return string(m_szName); }
 
 public:
 	HRESULT Initialize(const vector<class CBone*>& Bones, ifstream& fileStream);

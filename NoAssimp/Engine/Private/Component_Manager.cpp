@@ -47,6 +47,26 @@ void CComponent_Manager::Clear(_uint iLevelIndex)
 	m_pPrototypes[iLevelIndex].clear();
 }
 
+void CComponent_Manager::PushBackPrototypes(vector<string>& vecAnim, vector<string>& vecNonAnim)
+{
+	for (auto mapIter : m_pPrototypes[Level_MapTool])
+	{
+		if (mapIter.first.find(L"_Model") == wstring::npos) // 문자열 찾기실패
+			continue;
+		CModel* pModel = dynamic_cast<CModel*>(mapIter.second);
+		if (pModel == nullptr)
+			continue;
+		TYPE eType = pModel->Get_ModelType();
+		string strModelName = pModel->Get_ModelName();
+		const char* charModelName = strModelName.c_str();
+		if (eType == TYPE_ANIM)
+			vecAnim.push_back(charModelName);
+		if (eType == TYPE_NONANIM)
+			vecNonAnim.push_back(charModelName);
+	}
+	return;
+}
+
 CComponent * CComponent_Manager::Find_Prototype(_uint iLevelIndex, const wstring & strPrototypeTag)
 {
 	if (iLevelIndex >= m_iNumLevels)

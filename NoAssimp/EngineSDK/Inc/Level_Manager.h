@@ -16,7 +16,7 @@ private:
 	virtual ~CLevel_Manager() = default;
 
 public:
-	_uint Get_CurrentLevelID() { return m_iCurrentLevelID; }
+	_uint Get_CurrentLevelID() { return m_iNewLevelID; }
 
 public:
 	HRESULT Initialize();
@@ -28,6 +28,7 @@ public:
 private:
 	_uint					m_iCurrentLevelID = { 0 };
 	class CLevel*			m_pCurrentLevel = { nullptr };
+	_uint					m_iNewLevelID = { 0 };
 
 public:
 	static CLevel_Manager* Create();

@@ -47,7 +47,7 @@ public: /* For.Object_Manager */
 public: /* For.Component_Manager */
 	HRESULT Add_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag, class CComponent* pPrototype);
 	class CComponent* Clone_Component(_uint iLevelIndex, const wstring& strPrototypeTag, void* pArg = nullptr);
-
+	class CComponent* Find_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag);
 
 public: /* For.Timer_Manager */
 	HRESULT Add_Timer(const wstring& strTimerTag);

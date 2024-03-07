@@ -23,6 +23,7 @@ CModel::CModel(const CModel& rhs)
 	, m_TransformMatrix{ rhs.m_TransformMatrix }
 	, m_iNumAnimations{ rhs.m_iNumAnimations }
 	, m_eModelType{ rhs.m_eModelType }
+	, m_strModelName { rhs.m_strModelName }
 {
 	for (auto& pPrototypeAnimation : rhs.m_Animations)
 		m_Animations.push_back(pPrototypeAnimation->Clone());
@@ -71,17 +72,14 @@ _float3 CModel::Check_Meshes(const CTransform* pTransform) const
 HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelName, _fmatrix TransformMatrix)
 {
 	m_eModelType = eType;
+	m_strModelName = strModelName;
 	string strFolderName = "Anim/";
 	string strTxt = ".txt";
-
-	//if (strModelName.find("NonAnim") != string::npos) // NonAnimVersion
-	//	m_strDirectory = "../../../model_txt/Non" + strFolderName + strModelName + strTxt;
-	//else
-	{
-		if (eType == TYPE_NONANIM)
-			strFolderName = "Non" + strFolderName;
-		m_strDirectory = "../../../model_txt/" + strFolderName + strModelName + strTxt;
-	}
+	
+	if (eType == TYPE_NONANIM)
+		strFolderName = "Non" + strFolderName;
+	m_strDirectory = "../../../model_txt/" + strFolderName + strModelName + strTxt;
+	
 	
 	m_InputFile.open(m_strDirectory.c_str(), ios::in | ios::binary);
 	if (!m_InputFile.is_open())
@@ -171,6 +169,9 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 
 HRESULT CModel::Render(_uint iMeshIndex)
 {
+	if (m_bHide)
+		return S_OK;
+
 	m_Meshes[iMeshIndex]->Bind_Buffers();
 	m_Meshes[iMeshIndex]->Render();
 
@@ -277,7 +278,7 @@ void CModel::Create_NonAnimVersion(const string& strModelName)
 	wstring wstrModelName_NonAnim = converter.from_bytes(strModelName_NonAnim);
 	wstring wstrPrototypeTag = L"Prototype_Component_Model_" + wstrModelName_NonAnim;
 
-	m_pGameInstance->Add_Prototype(Level_MapTool, wstrPrototypeTag, Create(m_pDevice, m_pContext, TYPE_NONANIM, strModelName_NonAnim, XMLoadFloat4x4(&m_TransformMatrix)));
+	m_pGameInstance->Add_Prototype(Level_MapTool, wstrPrototypeTag, Create(m_pDevice, m_pContext, TYPE_NONANIM, strModelName, XMLoadFloat4x4(&m_TransformMatrix)));
 }
 
 CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelName, _fmatrix TransformMatrix)

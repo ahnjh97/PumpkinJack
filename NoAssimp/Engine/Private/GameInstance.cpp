@@ -78,6 +78,15 @@ HRESULT CGameInstance::Initialize_ImGui(CMyImGui* pImGui)
 	if (nullptr == m_pImGui_Manager)
 		return E_FAIL;
 
+	// 컴포넌트 이름 imgui로 가져오기
+	vector<string> vecAnim;
+	vector<string> vecNonAnim;
+	if (nullptr == m_pComponent_Manager)
+		return E_FAIL;
+
+	m_pComponent_Manager->PushBackPrototypes(vecAnim, vecNonAnim);
+	m_pImGui_Manager->Set_Vectors(vecAnim, vecNonAnim);
+
 	return S_OK;
 }
 
@@ -283,6 +292,14 @@ CComponent * CGameInstance::Clone_Component(_uint iLevelIndex, const wstring & s
 		return nullptr;
 
 	return m_pComponent_Manager->Clone_Component(iLevelIndex, strPrototypeTag, pArg);
+}
+
+CComponent* CGameInstance::Find_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag)
+{
+	if (nullptr == m_pComponent_Manager)
+		return nullptr;
+
+	return m_pComponent_Manager->Find_Prototype(iLevelIndex, strPrototypeTag);
 }
 
 HRESULT CGameInstance::Add_Timer(const wstring & strTimerTag)

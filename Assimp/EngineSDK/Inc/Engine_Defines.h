@@ -24,7 +24,7 @@ namespace Engine
 #include "assimp\scene.h"
 #include "assimp\Importer.hpp"
 #include "assimp\postprocess.h"
-
+#define Level_MapTool 4
 
 using namespace DirectX;
 

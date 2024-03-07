@@ -14,6 +14,7 @@ namespace Engine
 {
 	enum MOUSEKEYSTATE { DIMKS_LBUTTON, DIMKS_RBUTTON, DIMKS_WHEEL, DIMKS_X, DIMKS_END };
 	enum MOUSEMOVESTATE { DIMMS_X, DIMMS_Y, DIMMS_WHEEL, DIMMS_END };
+	enum TYPE { TYPE_NONANIM, TYPE_ANIM, TYPE_END };
 }
 
 
@@ -26,7 +27,7 @@ namespace Engine
 //#include "assimp\postprocess.h"
 #define AI_TEXTURE_TYPE_MAX 21
 #define aiTextureType_DIFFUSE 1
-#define Level_MapTool 4
+#define Level_MapTool 3
 
 using namespace DirectX;
 

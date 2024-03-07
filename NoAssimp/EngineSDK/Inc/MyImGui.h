@@ -11,6 +11,7 @@ protected:
 	virtual ~CMyImGui() = default;
 
 public:
+	void Set_Vectors(vector<string> vecAnim, vector<string> vecNonAnim);
 	_float3 Get_PickPos() { return m_vPickPos; }
 	_bool IsPicking() { return m_bIsPicking; }
 
@@ -29,13 +30,16 @@ protected:
 	ID3D11DeviceContext* m_pContext = { nullptr };
 
 	map<const wstring, class CComponent*>		m_Components;
+	vector<const _char*>		vecAnimModels;
+	vector<const _char*>		vecNonAnimModels;
+	vector<const _char*>		vecAnimNames;
 
 	_float3						m_vPickPos = {};
 	_bool						m_bIsPicking = { false };
 	CGameObject*				m_pPickedObject = { nullptr };
 
 public:
-	virtual void								Free();
+	virtual void				Free();
 
 };
 

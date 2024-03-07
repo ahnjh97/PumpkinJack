@@ -32,7 +32,7 @@ HRESULT CMonster::Initialize(void * pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;	
 
-	if (pArg && m_pGameInstance->IsPicking())
+	if (pArg /*&& m_pGameInstance->IsPicking()*/)
 		m_pTransformCom->Set_WorldMatrix(GameObjectDesc.matWorld);
 
 	m_pModelCom->Set_Animation(rand()%10, true);
@@ -57,7 +57,6 @@ HRESULT CMonster::Render()
 		return E_FAIL;
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
-	//CModel::TYPE eModelType = m_pModelCom->Get_ModelType();
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
@@ -79,14 +78,13 @@ HRESULT CMonster::Render()
 
 HRESULT CMonster::Add_Components()
 {
-	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(m_pGameInstance->Get_CurrentLevelID(), TEXT("Prototype_Component_Shader_VtxModel"),
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(m_pGameInstance->Get_CurrentLevelID(), TEXT("Prototype_Component_Model_SkeletonBoss_NonAnim"),
-		TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
+	wstring wstrTag = TEXT("Prototype_Component_Model_Jack");
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, wstrTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
 	return S_OK;

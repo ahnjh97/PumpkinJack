@@ -20,7 +20,7 @@ public:
 	pair<_float3, _float3> Get_MinMax() { return m_MinMax; }
 
 public:
-	virtual HRESULT Initialize_Prototype(CModel::TYPE eModelType, string strDirectory, streampos filePtPos, const vector<CBone*>& Bones, _fmatrix TransformMatrix);
+	virtual HRESULT Initialize_Prototype(TYPE eModelType, string strDirectory, streampos filePtPos, const vector<CBone*>& Bones, _fmatrix TransformMatrix);
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
@@ -55,7 +55,7 @@ private:
 	HRESULT Ready_Vertices_For_AnimModel(const vector<CBone*>& Bones);
 
 public:
-	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CModel::TYPE eModelType, string strDirectory, ifstream& fileStream, streampos filePtPos, const vector<class CBone*>& Bones, _fmatrix TransformMatrix);
+	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, string strDirectory, ifstream& fileStream, streampos filePtPos, const vector<class CBone*>& Bones, _fmatrix TransformMatrix);
 	virtual CMesh* Clone(void* pArg);
 	virtual void Free() override;
 };

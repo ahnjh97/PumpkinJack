@@ -158,6 +158,8 @@ _bool CObject_Manager::Binarize_Objects(string strLevel)
 				pair<wstring, _float4x4> parsePair; // 프로토타입 이름, 월드행렬
 				parsePair = listIter->Get_ParsingData();
 
+				if (parsePair.first == L"Prototype_GameObject_Tool_Anim") // 애니메이션 재생용 객체
+					continue;
 				wchar_t wcharBuf[MAX_PATH];
 				wcscpy_s(wcharBuf, parsePair.first.c_str());
 				outputFile.write(reinterpret_cast<const char*>(&wcharBuf), sizeof(wcharBuf));

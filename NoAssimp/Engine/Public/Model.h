@@ -8,9 +8,6 @@ BEGIN(Engine)
 
 class ENGINE_DLL CModel final : public CComponent
 {
-public:
-	enum TYPE { TYPE_NONANIM, TYPE_ANIM, TYPE_END };
-
 private:
 	CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CModel(const CModel& rhs);
@@ -20,9 +17,11 @@ public:
 	_uint Get_NumMeshes() const { return m_iNumMeshes; }
 	_bool isFinished() { return m_Animations[m_iCurrentAnimIndex]->isFinished(); }
 	TYPE Get_ModelType() { return m_eModelType; }
+	string Get_ModelName() { return m_strModelName; }
 
-public:
 	void Set_Animation(_uint iAnimIndex, _bool isLoop) { m_iCurrentAnimIndex = iAnimIndex; m_isLoop = isLoop; }
+	void Set_Hide(_bool bHide) { m_bHide = bHide; }
+	void Copy_Animations(vector<CAnimation*>& vecAnims) { vecAnims = m_Animations; }
 
 
 public: // 바운딩박스
@@ -64,7 +63,10 @@ private:
 	ifstream					m_InputFile;
 	BoundingBox					m_BoundingBox;
 
+	string						m_strModelName;
 	string						m_strNonAnimVersion;
+
+	_bool						m_bHide = { false };
 
 private:
 	HRESULT Ready_Meshes();

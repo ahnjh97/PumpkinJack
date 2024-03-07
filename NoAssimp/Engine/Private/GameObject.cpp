@@ -110,6 +110,7 @@ HRESULT CGameObject::Add_Component(_uint iLevelIndex, const wstring & strPrototy
 	
 	*ppOut = pComponent;
 
+
 	Safe_AddRef(pComponent);
 
 	return S_OK;

@@ -14,6 +14,7 @@ HRESULT CLevel_Manager::Initialize()
 
 HRESULT CLevel_Manager::Open_Level(_uint iNewLevelID, CLevel * pNewLevel)
 {
+	m_iNewLevelID = iNewLevelID;
 	/* 최초레벨할당시에는 수행하지 않는다. */
 	if (nullptr != m_pCurrentLevel)
 	{

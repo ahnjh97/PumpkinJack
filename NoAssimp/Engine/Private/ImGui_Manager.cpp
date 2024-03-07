@@ -6,6 +6,14 @@ CImGui_Manager::CImGui_Manager()
 {
 }
 
+void CImGui_Manager::Set_Vectors(vector<string> vecAnim, vector<string> vecNonAnim)
+{
+	if (nullptr == m_pImGui)
+		return;
+
+	return m_pImGui->Set_Vectors(vecAnim, vecNonAnim);
+}
+
 _float3 CImGui_Manager::Get_PickPos()
 {
 	if (nullptr == m_pImGui)

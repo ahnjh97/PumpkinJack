@@ -3,11 +3,10 @@
 #include "GameInstance.h"
 #include "Monster.h"
 #include "GameObject.h"
-#include <locale>
-#include <codecvt>
 #include <fstream>
 #include "ImGuizmo.h"
-
+#include <locale>
+#include <codecvt>
 
 CImGui_Client::CImGui_Client(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMyImGui{ pDevice, pContext }
@@ -17,25 +16,11 @@ CImGui_Client::CImGui_Client(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 HRESULT CImGui_Client::Initialize()
 {
 	__super::Initialize(g_hWnd);
-
-
 	return S_OK;
 }
 
 void CImGui_Client::Tick(_float fTimeDelta)
 {
-	OnRightClick();
-	if (!ImGui::IsAnyItemHovered() && m_pGameInstance->MouseDown(DIMKS_LBUTTON)) // 모델선택: 
-	{
-		CGameObject* pObj = m_pGameInstance->Select_ModelByPicking(m_pGameInstance->Get_CurrentLevelID());
-		if (pObj != nullptr)
-			m_pPickedObject = pObj;
-	}
-		
-
-	if (m_pGameInstance->KeyDown(DIK_ESCAPE)) // esc누르면 선택 취소
-		m_pPickedObject = nullptr;
-
 	bCallNewFrame = false;
 	__super::Tick(fTimeDelta);
 	bCallNewFrame = true;
@@ -43,7 +28,7 @@ void CImGui_Client::Tick(_float fTimeDelta)
 	bool show_demo_window = true;
 	bool show_another_window = true;
 
-	static _bool Is_IMGUI_Switch = false;
+	static _bool Is_IMGUI_Switch = true;
 	static _bool IsMouseTrigger = false;
 
 	static _int iSettingTransformSelct = { 0 };	/* 위치, 회전, 크기 인덱스 :: Transform용 */
@@ -56,6 +41,59 @@ void CImGui_Client::Tick(_float fTimeDelta)
 	else
 		IsMouseTrigger = true;
 
+	OnRightClick();
+
+	if (!ImGui::IsAnyItemHovered() && m_pGameInstance->MouseDown(DIMKS_LBUTTON)) // 모델선택: 
+	{
+		CGameObject* pObj = m_pGameInstance->Select_ModelByPicking(m_pGameInstance->Get_CurrentLevelID());
+		if (pObj != nullptr)
+		{
+			if (pObj != m_pPickedObject)
+			{
+				bAnimWindow = false;
+				if (!vecAnimNames.empty())
+				{
+					for (const char* animName : vecAnimNames)
+						free(const_cast<char*>(animName));  // strdup으로 복사한 메모리를 free로 해제 
+					vecAnimNames.clear();
+				}
+
+				CModel* pModel = dynamic_cast<CModel*>(pObj->Get_Component(TEXT("Com_Model")));
+				string strModelName;
+				if (pModel != nullptr)
+					strModelName = pModel->Get_ModelName();
+
+				for (auto AnimModelsIter : vecAnimModels)
+				{
+					if (AnimModelsIter == strModelName)
+					{
+						bAnimWindow = true;
+						break;
+					}
+				}
+
+				if (bAnimWindow == true) // AnimModel이면
+				{
+					// 애님 버전의 
+					wstring_convert<codecvt_utf8<wchar_t>> converter;
+					wstring wstrModelName = converter.from_bytes(strModelName);
+					wstring wstrPrototypeTag = L"Prototype_Component_Model_" + wstrModelName;
+					CModel* pAnimModel = dynamic_cast<CModel*>(m_pGameInstance->Find_Prototype(LEVEL_MAPTOOL, wstrPrototypeTag));
+
+					pAnimModel->Copy_Animations(vecAnimations);
+					for (auto AnimationIter : vecAnimations)
+						vecAnimNames.push_back(_strdup(AnimationIter->Get_Name().c_str()));
+					
+				}
+			}
+
+			m_pPickedObject = pObj;
+		}
+	}
+
+	if (m_pGameInstance->KeyDown(DIK_ESCAPE)) // esc누르면 선택 취소
+		m_pPickedObject = nullptr;
+
 	if (m_pGameInstance->KeyDown(DIK_TAB))
 	{
 		Is_IMGUI_Switch = !Is_IMGUI_Switch;
@@ -63,17 +101,65 @@ void CImGui_Client::Tick(_float fTimeDelta)
 
 	if (true == Is_IMGUI_Switch)
 	{
-		ImGui::Begin(u8"Tool");
-		ImGui::Text("X: % .2f\tY:% .2f\tZ:% .2f", m_vPickPos.x, m_vPickPos.y, m_vPickPos.z);
+		ImGui::Begin(u8"Models");
+		ImGui::SeparatorText("Level");
+		static _int iLevelIndex = 0;
+		for (_int i = LEVEL_GAMEPLAY; i < LEVEL_END; i++)
+		{
+			if (ImGui::RadioButton(vecLevelName[i].c_str(), iLevelIndex == i - LEVEL_GAMEPLAY))
+			{
+				iLevelIndex = i - LEVEL_GAMEPLAY; // 선택 시 실행할 로직 추가
+			}
+			if (i % 2 == 0)
+				ImGui::SameLine();
+		}
+		ImGui::NewLine();
+
+		// ----------------------Anim---------------------------------
+		static int AnimModelIdx = -1;
+		static int NonAnimModelIdx = -1;
+		ImGui::SeparatorText("Anim");
+		ImGui::SetNextItemWidth(250.0f);
+		if(ImGui::ListBox("##Anim", &AnimModelIdx, vecAnimModels.data(), vecAnimModels.size(), 5))
+		{
+			strCurModel = vecAnimModels[AnimModelIdx];
+			NonAnimModelIdx = -1;
+		}
+		ImGui::NewLine();
+		// ----------------------NonAnim-------------------------------
+		ImGui::SeparatorText("NonAnim");
+		ImGui::SetNextItemWidth(250.0f);
+		if(ImGui::ListBox("##NonAnim", &NonAnimModelIdx, vecNonAnimModels.data(), vecNonAnimModels.size(), 9))
+		{
+			strCurModel = vecNonAnimModels[NonAnimModelIdx];
+			AnimModelIdx = -1;
+		}
+		// --------------------Animation-------------------------------
+		if (bAnimWindow && m_pPickedObject)
+		{
+			ImGui::Begin(u8"Animation");
+			static int AnimationIdx = -1;
+			ImGui::SetNextItemWidth(450.0f);
+			if (ImGui::ListBox("##Animation", &AnimationIdx, vecAnimNames.data(), vecAnimNames.size(), 9))
+			{
+				strCurModel = vecAnimNames[AnimationIdx];
+			}
+			ImGui::End();
+		}
+		
 		ImGui::End();
+	
+		//---------------------- ImGuizmo-------------------------------
+		Edit_Object(); // 선택한 객체 월드행렬 수정
 	}
 
-	Edit_Object(); // 선택한 객체 월드행렬 수정
 
-	string strLevel = "Level_GamePlay"; // 임시로 이렇게. 메뉴 만들어서 고를수 있도록 할것
 
-	if((m_pGameInstance->Get_DIKeyState(DIK_LCONTROL) & 0x80) && m_pGameInstance->KeyDown(DIK_S))
-		m_pGameInstance->Binarize_Objects(strLevel);
+	if ((m_pGameInstance->Get_DIKeyState(DIK_LCONTROL) & 0x80) && m_pGameInstance->KeyDown(DIK_S))
+	{
+		for (_uint i = LEVEL_GAMEPLAY; i < LEVEL_END; i++)
+			m_pGameInstance->Binarize_Objects(vecLevelName[i]);
+	}		
 }
 
 HRESULT CImGui_Client::Render()
@@ -111,11 +197,8 @@ void CImGui_Client::OnRightClick()
 			CGameObject::GAMEOBJECT_DESC tempDesc = {};
 			memcpy(&tempDesc.matWorld.m[CTransform::STATE_POSITION], &vTemp, sizeof(_float4));
 
-			// string을 wstring으로 변환
-			string narrowString = "Prototype_GameObject_Monster";
-			wstring_convert<codecvt_utf8<wchar_t>> converter;
-			wstring wstrPrototypeTag = converter.from_bytes(narrowString); // converter.from_bytes(charArray); -> char배열 변환
 			m_bIsPicking = true;
+			wstring wstrPrototypeTag = TEXT("Prototype_GameObject_Tool_NonAnim"); 
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Parse"), wstrPrototypeTag, &tempDesc)))
 				return;
 			m_bIsPicking = false;
@@ -128,17 +211,20 @@ void CImGui_Client::Edit_Object()
 	if (m_pPickedObject != nullptr)
 	{
 		CTransform* pTransform = dynamic_cast<CTransform*>(m_pPickedObject->Get_Component(g_strTransformTag));
-		if (pTransform == nullptr)
+		if (pTransform != nullptr)
 		{
-			EditGuizmo(_float4x4());
-			return;
+			_float4x4 tempMatrix = pTransform->Get_WorldFloat4x4();
+			EditGuizmo(tempMatrix); // 선택한 모델의 월드행렬을 수정 
+			pTransform->Set_WorldMatrix(tempMatrix);
 		}
-		_float4x4 tempMatrix = pTransform->Get_WorldFloat4x4();
-		EditGuizmo(tempMatrix); // 선택한 모델의 월드행렬을 수정 
-		pTransform->Set_WorldMatrix(tempMatrix);
 	}
 	else
 		EditGuizmo(_float4x4());
+}
+
+void CImGui_Client::See_Animation()
+{
+	
 }
 
 CImGui_Client* CImGui_Client::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

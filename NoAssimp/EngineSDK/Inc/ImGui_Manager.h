@@ -10,6 +10,7 @@ private:
 	virtual ~CImGui_Manager() = default;
 
 public:
+	void Set_Vectors(vector<string> vecAnim, vector<string> vecNonAnim);
 	_float3 Get_PickPos();
 	_bool IsPicking();
 public:

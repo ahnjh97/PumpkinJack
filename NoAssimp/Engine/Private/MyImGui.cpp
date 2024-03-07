@@ -12,6 +12,28 @@ CMyImGui::CMyImGui(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     Safe_AddRef(m_pGameInstance);
 }
 
+void CMyImGui::Set_Vectors(vector<string> vecAnim, vector<string> vecNonAnim)
+{
+    for (auto animIter : vecAnim) // _strdup: c_str()가 포인터를 반환하는데, 이는 iter의 생명주기만큼만 보존돼서, 데이터를 아예 동적할당후 복사해둠
+        vecAnimModels.push_back(_strdup(animIter.c_str())); 
+
+
+
+    for (auto nonAnimIter : vecNonAnim)
+    {
+        _bool bSameName = false;
+        for (auto animIter2 : vecAnim)
+        {
+            if (animIter2 == nonAnimIter)
+                bSameName = true;
+        }
+
+        if(!bSameName)
+            vecNonAnimModels.push_back(_strdup(nonAnimIter.c_str()));
+
+    }        
+}
+
 HRESULT CMyImGui::Initialize(HWND hWnd)
 {
     /* IMGUI 초기 세팅 */
@@ -153,6 +175,14 @@ void CMyImGui::Free()
     Safe_Release(m_pDevice);
     Safe_Release(m_pContext);
     Safe_Release(m_pGameInstance);
+
+   for (const char* animModel : vecAnimModels)
+       free(const_cast<char*>(animModel)); // strdup으로 복사한 메모리를 free로 해제
+   vecAnimModels.clear();
+
+   for (const char* nonAnimModel : vecNonAnimModels)
+       free(const_cast<char*>(nonAnimModel)); // strdup으로 복사한 메모리를 free로 해제 
+   vecNonAnimModels.clear();
 
     for (auto& Pair : m_Components)
         Safe_Release(Pair.second);
