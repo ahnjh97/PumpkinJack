@@ -26,6 +26,9 @@ public:
 	void Set_PrototypeTag(const wstring& _wstrPrototypeTag) { wstrPrototypeTag = _wstrPrototypeTag; }
 	pair<wstring, _float4x4> Get_ParsingData();
 
+	_bool Get_Dead() { return m_bDead; }
+	void Set_Dead() { m_bDead = true; }
+
 public:
 	class CComponent* Get_Component(const wstring& strComTag);
 	class CModel* Find_Model();
@@ -49,8 +52,10 @@ protected:
 
 protected:
 	HRESULT Add_Component(_uint iLevelIndex, const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut, void* pArg = nullptr);
+	
 
-private:
+protected:
+	_bool m_bDead = false;
 	wstring wstrPrototypeTag = {};
 
 public:

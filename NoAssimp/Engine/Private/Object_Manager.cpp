@@ -197,7 +197,7 @@ CGameObject* CObject_Manager::Select_ModelByPicking(_uint iLevelIndex)
 {
 	vector<CGameObject*> vecPickedObjects;
 
-	for (auto mapIter : m_pLayers[iLevelIndex])
+	for (auto& mapIter : m_pLayers[iLevelIndex])
 	{
 		if (mapIter.second == nullptr)
 			continue;
@@ -236,6 +236,33 @@ CGameObject* CObject_Manager::Select_ModelByPicking(_uint iLevelIndex)
 		// 가장 거리가 가까운 놈 찾기
 		return vecPickedObjects[0];
 	}
+}
+
+CGameObject* CObject_Manager::Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag)
+{
+	auto		iter = m_pLayers[iLevelIndex].find(strLayerTag);
+
+	if (iter == m_pLayers[iLevelIndex].end())
+		return nullptr;
+
+	CLayer* pLayer = iter->second;
+	if (pLayer == nullptr)
+		return nullptr;
+
+	list<CGameObject*>& tempList = pLayer->Get_ObjectList();
+	if (tempList.empty())
+		return nullptr;
+
+	for (auto& listIter : tempList)
+	{
+		if (listIter == nullptr)
+			continue;
+
+		pair<wstring, _float4x4> tempPair = listIter->Get_ParsingData();
+		if (tempPair.first == strPrototypeTag)
+			return listIter;
+	}
+	return nullptr;
 }
 
 CObject_Manager * CObject_Manager::Create(_uint iNumLevels)

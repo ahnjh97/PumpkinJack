@@ -45,7 +45,7 @@ CComponent * CGameObject::Get_Component(const wstring & strComTag)
 
 CModel* CGameObject::Find_Model()
 {
-	for (auto mapIter : m_Components)
+	for (auto& mapIter : m_Components)
 	{
 		size_t found = mapIter.first.find(TEXT("Model"));
 		if (found != wstring::npos) // 찾은 경우

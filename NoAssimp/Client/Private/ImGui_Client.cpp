@@ -41,6 +41,11 @@ void CImGui_Client::Tick(_float fTimeDelta)
 	else
 		IsMouseTrigger = true;
 
+	static _int AnimModelIdx = -1;
+	static _int NonAnimModelIdx = -1;
+	static _int iLevelIndex = 0;
+	static _int AnimationIdx = -1;
+
 	OnRightClick();
 
 	if (!ImGui::IsAnyItemHovered() && m_pGameInstance->MouseDown(DIMKS_LBUTTON)) // 모델선택: 
@@ -50,20 +55,15 @@ void CImGui_Client::Tick(_float fTimeDelta)
 		{
 			if (pObj != m_pPickedObject)
 			{
+				vecAnimNames.clear();
 				bAnimWindow = false;
-				if (!vecAnimNames.empty())
-				{
-					for (const char* animName : vecAnimNames)
-						free(const_cast<char*>(animName));  // strdup으로 복사한 메모리를 free로 해제 
-					vecAnimNames.clear();
-				}
 
 				CModel* pModel = dynamic_cast<CModel*>(pObj->Get_Component(TEXT("Com_Model")));
 				string strModelName;
 				if (pModel != nullptr)
 					strModelName = pModel->Get_ModelName();
 
-				for (auto AnimModelsIter : vecAnimModels)
+				for (auto& AnimModelsIter : vecAnimModels)
 				{
 					if (AnimModelsIter == strModelName)
 					{
@@ -81,9 +81,11 @@ void CImGui_Client::Tick(_float fTimeDelta)
 					CModel* pAnimModel = dynamic_cast<CModel*>(m_pGameInstance->Find_Prototype(LEVEL_MAPTOOL, wstrPrototypeTag));
 
 					pAnimModel->Copy_Animations(vecAnimations);
-					for (auto AnimationIter : vecAnimations)
-						vecAnimNames.push_back(_strdup(AnimationIter->Get_Name().c_str()));
-					
+					for (auto& AnimationIter : vecAnimations)
+					{
+						string strAnimName = AnimationIter->Get_Name();
+						vecAnimNames.push_back(strAnimName);
+					}
 				}
 			}
 
@@ -92,7 +94,17 @@ void CImGui_Client::Tick(_float fTimeDelta)
 	}
 
 	if (m_pGameInstance->KeyDown(DIK_ESCAPE)) // esc누르면 선택 취소
+	{
+		if (bSeeAnim)
+		{
+			pNonAnimModel->Set_Hide(false);
+			pNonAnimModel = nullptr;
+			bSeeAnim = false;
+			AnimationIdx = -1;
+		}
 		m_pPickedObject = nullptr;
+	}
+		
 
 	if (m_pGameInstance->KeyDown(DIK_TAB))
 	{
@@ -103,7 +115,7 @@ void CImGui_Client::Tick(_float fTimeDelta)
 	{
 		ImGui::Begin(u8"Models");
 		ImGui::SeparatorText("Level");
-		static _int iLevelIndex = 0;
+
 		for (_int i = LEVEL_GAMEPLAY; i < LEVEL_END; i++)
 		{
 			if (ImGui::RadioButton(vecLevelName[i].c_str(), iLevelIndex == i - LEVEL_GAMEPLAY))
@@ -116,34 +128,81 @@ void CImGui_Client::Tick(_float fTimeDelta)
 		ImGui::NewLine();
 
 		// ----------------------Anim---------------------------------
-		static int AnimModelIdx = -1;
-		static int NonAnimModelIdx = -1;
+
 		ImGui::SeparatorText("Anim");
 		ImGui::SetNextItemWidth(250.0f);
-		if(ImGui::ListBox("##Anim", &AnimModelIdx, vecAnimModels.data(), vecAnimModels.size(), 5))
+		const _char** items = new const char* [vecAnimModels.size()];
+		for (size_t i = 0; i < vecAnimModels.size(); ++i) 
+			items[i] = vecAnimModels[i].c_str(); 
+
+		if(ImGui::ListBox("##Anim", &AnimModelIdx, items, static_cast<int>(vecAnimModels.size()), 5))
 		{
 			strCurModel = vecAnimModels[AnimModelIdx];
 			NonAnimModelIdx = -1;
 		}
 		ImGui::NewLine();
+
 		// ----------------------NonAnim-------------------------------
 		ImGui::SeparatorText("NonAnim");
 		ImGui::SetNextItemWidth(250.0f);
-		if(ImGui::ListBox("##NonAnim", &NonAnimModelIdx, vecNonAnimModels.data(), vecNonAnimModels.size(), 9))
+		const _char** items2 = new const char* [vecNonAnimModels.size()];
+		for (size_t i = 0; i < vecNonAnimModels.size(); ++i) 
+			items2[i] = vecNonAnimModels[i].c_str();	
+
+		if(ImGui::ListBox("##NonAnim", &NonAnimModelIdx, items2, static_cast<int>(vecNonAnimModels.size()), 9))
 		{
 			strCurModel = vecNonAnimModels[NonAnimModelIdx];
 			AnimModelIdx = -1;
 		}
+
+		if (m_pPickedObject == nullptr)
+		{
+			bSeeAnim = false;
+			pAnimModel = nullptr;
+			if (pAnimObject != nullptr)
+			{
+				pAnimObject->Set_Dead();
+				pAnimObject = nullptr;
+			}
+		}
+
 		// --------------------Animation-------------------------------
 		if (bAnimWindow && m_pPickedObject)
 		{
 			ImGui::Begin(u8"Animation");
-			static int AnimationIdx = -1;
+
 			ImGui::SetNextItemWidth(450.0f);
-			if (ImGui::ListBox("##Animation", &AnimationIdx, vecAnimNames.data(), vecAnimNames.size(), 9))
+
+			const _char** items3 = new const char* [vecAnimNames.size()];
+			for (size_t i = 0; i < vecAnimNames.size(); ++i) 
+				items3[i] = vecAnimNames[i].c_str();	
+
+			if (ImGui::ListBox("##Animations", &AnimationIdx, items3, static_cast<int>(vecAnimNames.size()), 9))
 			{
-				strCurModel = vecAnimNames[AnimationIdx];
+				if (bSeeAnim == false)
+				{
+					bSeeAnim = true;
+
+					pair<wstring, _float4x4> tempPair = m_pPickedObject->Get_ParsingData();
+					CGameObject::GAMEOBJECT_DESC tempDesc = {};
+					tempDesc.matWorld = tempPair.second;
+
+					wstring wstrPrototypeTag = TEXT("Prototype_GameObject_Tool_Anim");
+					if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Temp"), wstrPrototypeTag, &tempDesc)))
+						return;
+					
+					pAnimObject = dynamic_cast<CTool_Anim*>(m_pGameInstance->Get_GameObject(LEVEL_MAPTOOL, TEXT("Layer_Temp"), wstrPrototypeTag));
+					pAnimModel = dynamic_cast<CModel*>(pAnimObject->Get_Component(TEXT("Com_Model")));
+					
+					pNonAnimModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
+					pNonAnimModel->Set_Hide(true);
+				}
+
+				if (pAnimModel != nullptr)					
+					pAnimModel->Set_Animation(AnimationIdx, true);				
 			}
+				
+
 			ImGui::End();
 		}
 		

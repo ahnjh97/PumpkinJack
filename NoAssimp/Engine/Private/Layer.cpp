@@ -36,8 +36,17 @@ void CLayer::Tick(_float fTimeDelta)
 	for (auto& pGameObject : m_GameObjects)
 	{
 		if (nullptr != pGameObject)
+		{
+			if (pGameObject->Get_Dead() == true)
+			{
+				Safe_Release(pGameObject);
+				return;
+			}
+				
 			pGameObject->Tick(fTimeDelta);
+		}
 	}
+	m_GameObjects.remove(nullptr);
 }
 
 void CLayer::Late_Tick(_float fTimeDelta)

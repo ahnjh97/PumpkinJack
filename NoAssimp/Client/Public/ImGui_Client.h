@@ -1,7 +1,7 @@
 #pragma once
 #include "Client_Defines.h"
 #include "MyImGui.h"
-
+#include "Tool_Anim.h"
 BEGIN(Client)
 
 class CImGui_Client : public CMyImGui
@@ -32,6 +32,11 @@ private:
 	vector<CAnimation*>			vecAnimations;
 	string						strCurLevel = {};
 	string						strCurModel = {};
+
+	CModel*						pNonAnimModel = { nullptr };
+
+	CTool_Anim*					pAnimObject = { nullptr };
+	CModel*						pAnimModel = { nullptr };
 
 public:
 	static CImGui_Client* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

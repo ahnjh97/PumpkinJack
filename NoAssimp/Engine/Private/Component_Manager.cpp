@@ -49,7 +49,7 @@ void CComponent_Manager::Clear(_uint iLevelIndex)
 
 void CComponent_Manager::PushBackPrototypes(vector<string>& vecAnim, vector<string>& vecNonAnim)
 {
-	for (auto mapIter : m_pPrototypes[Level_MapTool])
+	for (auto& mapIter : m_pPrototypes[Level_MapTool])
 	{
 		if (mapIter.first.find(L"_Model") == wstring::npos) // 문자열 찾기실패
 			continue;

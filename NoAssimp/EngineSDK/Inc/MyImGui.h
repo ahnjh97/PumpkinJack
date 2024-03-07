@@ -30,9 +30,9 @@ protected:
 	ID3D11DeviceContext* m_pContext = { nullptr };
 
 	map<const wstring, class CComponent*>		m_Components;
-	vector<const _char*>		vecAnimModels;
-	vector<const _char*>		vecNonAnimModels;
-	vector<const _char*>		vecAnimNames;
+	vector<string>		vecAnimModels;
+	vector<string>		vecNonAnimModels;
+	vector<string>		vecAnimNames;
 
 	_float3						m_vPickPos = {};
 	_bool						m_bIsPicking = { false };
