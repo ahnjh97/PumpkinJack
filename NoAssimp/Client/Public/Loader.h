@@ -48,6 +48,11 @@ private:
 	HRESULT Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName, _float fScale, _float fDegree);
 	HRESULT Add_Shaders(LEVEL eLevel);
 
+	template<typename T>
+	HRESULT Add_GameObject_Prototype(T& GameObjectChildClass);
+	template<typename T>
+	HRESULT Add_Component_Prototype(T& ComponentChildClass);
+
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID);
 	virtual void Free() override;

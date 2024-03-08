@@ -289,6 +289,17 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 	return S_OK;
 }
 
+template<typename T>
+HRESULT Add_GameObject_Prototype(T& GameObjectChildClass)
+{
+
+};
+template<typename T>
+HRESULT Add_Component_Prototype(T& ComponentChildClass) 
+{
+
+};
+
 CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)
 {
 	CLoader* pInstance = new CLoader(pDevice, pContext);

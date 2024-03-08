@@ -55,6 +55,18 @@ void CImGui_Client::Tick(_float fTimeDelta)
 		{
 			if (pObj != m_pPickedObject)
 			{
+				if (bSeeAnim)
+				{
+					pNonAnimModel->Set_Hide(false);
+					pNonAnimModel = nullptr;
+					if (pAnimObject != nullptr)
+					{
+						pAnimObject->Set_Dead();
+						pAnimObject = nullptr;
+					}
+					bSeeAnim = false;
+					AnimationIdx = -1;
+				}
 				vecAnimNames.clear();
 				bAnimWindow = false;
 
