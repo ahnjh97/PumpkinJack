@@ -11,6 +11,11 @@ public:
 	{
 		_float		fSpeedPerSec = { 0.0f };
 		_float		fRotationPerSec = { 0.0f };
+		_float4x4 matWorld = _float4x4(
+			1.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 1.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f);
 	}TRANSFORM_DESC;
 
 public:

@@ -41,7 +41,7 @@ void CImGui_Client::Tick(_float fTimeDelta)
 	else
 		IsMouseTrigger = true;
 
-	static _int AnimModelIdx = -1;
+	static _int AnimModelIdx = 0;
 	static _int NonAnimModelIdx = -1;
 	static _int iLevelIndex = 0;
 	static _int AnimationIdx = -1;
@@ -182,7 +182,6 @@ void CImGui_Client::Tick(_float fTimeDelta)
 		if (bAnimWindow && m_pPickedObject)
 		{
 			ImGui::Begin(u8"Animation");
-
 			ImGui::SetNextItemWidth(450.0f);
 
 			const _char** items3 = new const char* [vecAnimNames.size()];
@@ -195,10 +194,11 @@ void CImGui_Client::Tick(_float fTimeDelta)
 				{
 					bSeeAnim = true;
 
-					pair<wstring, _float4x4> tempPair = m_pPickedObject->Get_ParsingData();
+					PARSE_DATA tempParseData = {};
+					tempParseData = m_pPickedObject->Get_ParseData();
 					CGameObject::GAMEOBJECT_DESC tempDesc = {};
-					tempDesc.matWorld = tempPair.second;
-
+					tempDesc.matWorld = tempParseData.matWorld;
+					tempDesc.wstrModelTag = tempParseData.wstrModelTag;
 					wstring wstrPrototypeTag = TEXT("Prototype_GameObject_Tool_Anim");
 					if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Temp"), wstrPrototypeTag, &tempDesc)))
 						return;
@@ -213,11 +213,8 @@ void CImGui_Client::Tick(_float fTimeDelta)
 				if (pAnimModel != nullptr)					
 					pAnimModel->Set_Animation(AnimationIdx, true);				
 			}
-				
-
 			ImGui::End();
 		}
-		
 		ImGui::End();
 	
 		//---------------------- ImGuizmo-------------------------------
@@ -269,6 +266,18 @@ void CImGui_Client::OnRightClick()
 			memcpy(&tempDesc.matWorld.m[CTransform::STATE_POSITION], &vTemp, sizeof(_float4));
 
 			m_bIsPicking = true;
+			wstring_convert<codecvt_utf8<wchar_t>> converter;
+			wstring wstrModelTag = L"Prototype_Component_Model_" + converter.from_bytes(strCurModel);
+			for (auto& AnimModelIter : vecAnimModels)
+			{
+				if (AnimModelIter == strCurModel)
+				{
+					wstrModelTag = wstrModelTag + L"_NonAnim";
+					break;
+				}
+			}
+			tempDesc.wstrModelTag = wstrModelTag;
+
 			wstring wstrPrototypeTag = TEXT("Prototype_GameObject_Tool_NonAnim"); 
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Parse"), wstrPrototypeTag, &tempDesc)))
 				return;
@@ -291,11 +300,6 @@ void CImGui_Client::Edit_Object()
 	}
 	else
 		EditGuizmo(_float4x4());
-}
-
-void CImGui_Client::See_Animation()
-{
-	
 }
 
 CImGui_Client* CImGui_Client::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

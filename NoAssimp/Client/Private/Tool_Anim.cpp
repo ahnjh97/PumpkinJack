@@ -27,11 +27,8 @@ HRESULT CTool_Anim::Initialize(void* pArg)
 
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
-	if (FAILED(Add_Components()))
+	if (FAILED(Add_Components(GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
-	if (pArg /*&& m_pGameInstance->IsPicking()*/)
-		m_pTransformCom->Set_WorldMatrix(GameObjectDesc.matWorld);
-	m_pModelCom->Set_Animation(rand() % 10, true);
 
 	return S_OK;
 }
@@ -67,7 +64,7 @@ HRESULT CTool_Anim::Render()
 	return S_OK;
 }
 
-HRESULT CTool_Anim::Add_Components()
+HRESULT CTool_Anim::Add_Components(const wstring& _wstrModelTag)
 {
 	/* For.Com_Shader */
 	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxAnimModel");
@@ -75,7 +72,7 @@ HRESULT CTool_Anim::Add_Components()
 		return E_FAIL;
 
 	/* For.Com_Model */
-	wstring wstrModelTag = TEXT("Prototype_Component_Model_SkeletonBoss");
+	wstring wstrModelTag = _wstrModelTag;
 	if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 

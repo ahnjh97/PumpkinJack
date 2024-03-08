@@ -8,12 +8,8 @@ class ENGINE_DLL CGameObject abstract : public CBase
 {
 public:
 	typedef struct : public CTransform::TRANSFORM_DESC
-	{		
-		_float4x4 matWorld = _float4x4(
-			1.0f, 0.0f, 0.0f, 0.0f,
-			0.0f, 1.0f, 0.0f, 0.0f,
-			0.0f, 0.0f, 1.0f, 0.0f,
-			0.0f, 0.0f, 0.0f, 1.0f);
+	{	
+		wstring wstrModelTag = L"";
 	}GAMEOBJECT_DESC;
 
 
@@ -24,7 +20,7 @@ protected:
 
 public:
 	void Set_PrototypeTag(const wstring& _wstrPrototypeTag) { wstrPrototypeTag = _wstrPrototypeTag; }
-	pair<wstring, _float4x4> Get_ParsingData();
+	PARSE_DATA Get_ParseData();
 
 	_bool Get_Dead() { return m_bDead; }
 	void Set_Dead() { m_bDead = true; }

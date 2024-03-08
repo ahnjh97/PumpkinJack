@@ -30,6 +30,7 @@ void CMyImGui::Set_Vectors(vector<string> vecAnim, vector<string> vecNonAnim)
         if(!bSameName)
             vecNonAnimModels.push_back(string(nonAnimIter));
     }        
+    // curAnim 초기값 설정 
 }
 
 HRESULT CMyImGui::Initialize(HWND hWnd)

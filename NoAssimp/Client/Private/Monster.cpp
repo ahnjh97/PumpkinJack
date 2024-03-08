@@ -29,14 +29,10 @@ HRESULT CMonster::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components()))
+	if (FAILED(Add_Components(GameObjectDesc.wstrModelTag)))
 		return E_FAIL;	
 
-	if (pArg /*&& m_pGameInstance->IsPicking()*/)
-		m_pTransformCom->Set_WorldMatrix(GameObjectDesc.matWorld);
-
-	m_pModelCom->Set_Animation(rand()%10, true);
-	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(rand() % 20, 2.f, rand() % 20, 1.f));
+	m_pModelCom->Set_Animation(999, true); // 999: 랜덤 애니메이션
 	
 	return S_OK;
 }
@@ -76,15 +72,20 @@ HRESULT CMonster::Render()
 	return S_OK;
 }
 
-HRESULT CMonster::Add_Components()
+HRESULT CMonster::Add_Components(const wstring& _wstrModelTag)
 {
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimModel"),
-		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+	/* For.Com_Model */
+	wstring wstrModelTag = _wstrModelTag;
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
-	/* For.Com_Model */
-	wstring wstrTag = TEXT("Prototype_Component_Model_Jack");
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, wstrTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
+	wstring wstrShaderTag = {};
+	if (m_pModelCom->Get_ModelType() == TYPE_ANIM)
+		wstrShaderTag = TEXT("Prototype_Component_Shader_VtxAnimModel");
+	else
+		wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel");
+
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	return S_OK;

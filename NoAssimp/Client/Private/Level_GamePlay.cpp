@@ -119,7 +119,8 @@ HRESULT CLevel_GamePlay::Ready_LandObject()
 
 HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 {
-	wchar_t wcharBuf[MAX_PATH];
+	wchar_t wcharPrototypeTag[MAX_PATH];
+	wchar_t wcharModelTag[MAX_PATH];
 	_float4x4 matWorld{};
 
 	while (true)
@@ -127,13 +128,14 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 		if (m_InputFile.eof())
 			break;
 		
-		m_InputFile.read(reinterpret_cast<char*>(&wcharBuf), sizeof(wcharBuf));
+		m_InputFile.read(reinterpret_cast<char*>(&wcharPrototypeTag), sizeof(wcharPrototypeTag));
 		m_InputFile.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		m_InputFile.read(reinterpret_cast<char*>(&wcharModelTag), sizeof(wcharModelTag));
 
-		wstring wstrPrototypeTag = wcharBuf;
-
+		wstring wstrPrototypeTag = wcharPrototypeTag;
 		CGameObject::GAMEOBJECT_DESC tempDesc = {};
 		tempDesc.matWorld = matWorld;
+		tempDesc.wstrModelTag = wcharModelTag;
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, wstrPrototypeTag, &tempDesc)))
 			return E_FAIL;
 	}

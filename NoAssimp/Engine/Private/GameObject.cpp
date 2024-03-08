@@ -1,5 +1,7 @@
-#include "..\Public\GameObject.h"
+#include "GameObject.h"
 #include "GameInstance.h"
+#include <locale>
+#include <codecvt>
 
 CGameObject::CGameObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -21,15 +23,22 @@ CGameObject::CGameObject(const CGameObject & rhs)
 	Safe_AddRef(m_pContext);
 }
 
-pair<wstring, _float4x4> CGameObject::Get_ParsingData()
+PARSE_DATA CGameObject::Get_ParseData()
 {
-	pair<wstring, _float4x4> tempPair;
-	tempPair.first = wstrPrototypeTag;
-
+	PARSE_DATA parseData = {};
+	parseData.wstrPrototypeTag = wstrPrototypeTag;
+	CModel* pModel = dynamic_cast<CModel*>(Get_Component(TEXT("Com_Model")));
+	if (pModel != nullptr)
+	{
+		string strModelName = pModel->Get_ModelName();
+		wstring_convert<codecvt_utf8<wchar_t>> converter;
+		parseData.wstrModelTag = L"Prototype_Component_Model_" + converter.from_bytes(strModelName);
+	}
+		
 	if (m_pTransformCom != nullptr)
-		tempPair.second = m_pTransformCom->Get_WorldFloat4x4();
+		parseData.matWorld = m_pTransformCom->Get_WorldFloat4x4();
 
-	return tempPair;
+	return parseData;
 }
 
 
@@ -41,18 +50,6 @@ CComponent * CGameObject::Get_Component(const wstring & strComTag)
 		return nullptr;
 
 	return iter->second;	
-}
-
-CModel* CGameObject::Find_Model()
-{
-	for (auto& mapIter : m_Components)
-	{
-		size_t found = mapIter.first.find(TEXT("Model"));
-		if (found != wstring::npos) // 찾은 경우
-			return dynamic_cast<CModel*>(mapIter.second);
-	}
-
-	return nullptr;
 }
 
 HRESULT CGameObject::Initialize_Prototype()

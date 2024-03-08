@@ -33,10 +33,11 @@ protected:
 	vector<string>		vecAnimModels;
 	vector<string>		vecNonAnimModels;
 	vector<string>		vecAnimNames;
-
-	_float3						m_vPickPos = {};
-	_bool						m_bIsPicking = { false };
-	CGameObject*				m_pPickedObject = { nullptr };
+	string				strCurLevel = {};
+	string				strCurModel = {};
+	_float3				m_vPickPos = {};
+	_bool				m_bIsPicking = { false };
+	CGameObject*		m_pPickedObject = { nullptr };
 
 public:
 	virtual void				Free();

@@ -200,9 +200,8 @@ HRESULT CLoader::Loading_For_MapTool()
 {
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 
-	/* Prototype_Component_Texture_Terrain */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MAPTOOL, TEXT("Prototype_Component_Texture_Grid"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/White.png")))))
+	/* Prototype_Component_Texture_Grid */
+	if(FAILED(Add_Textures(LEVEL_MAPTOOL, "Grid", "Terrain/White.png")))
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("컴포넌트를(을) 로딩 중 입니다.");
@@ -229,24 +228,22 @@ HRESULT CLoader::Loading_For_MapTool()
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("객체를(을) 로딩 중 입니다.");
+
+
 	/* For.Prototype_GameObject_Grid */
-	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Grid"),
-		CGrid::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
 
 	///* For.Prototype_GameObject_Camera_Free */
-	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Free"),
-		CCamera_Free::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
 
 	/* For.Prototype_GameObject_Tool_Anim */
-	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Tool_Anim"),
-		CTool_Anim::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Tool_Anim"), CTool_Anim);
+
 	/* For.Prototype_GameObject_Tool_NonAnim */
-	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Tool_NonAnim"),
-		CTool_NonAnim::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Tool_NonAnim"), CTool_NonAnim);
+
+	//Add_GameObject_Prototype()
+
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 	m_isFinished = true;
@@ -289,16 +286,17 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 	return S_OK;
 }
 
-template<typename T>
-HRESULT Add_GameObject_Prototype(T& GameObjectChildClass)
+HRESULT CLoader::Add_Textures(LEVEL eLevel, string strPrototypeName, string strFolderAndFileName)
 {
+	wstring_convert<codecvt_utf8<wchar_t>> converter;
+	wstring wstrPrototypeTag = L"Prototype_Component_Texture_" + converter.from_bytes(strPrototypeName);
+	wstring wstrFullPath = L"../../../Resources/Textures/" + converter.from_bytes(strFolderAndFileName);
 
-};
-template<typename T>
-HRESULT Add_Component_Prototype(T& ComponentChildClass) 
-{
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag,	CTexture::Create(m_pDevice, m_pContext, wstrFullPath))))
+		return E_FAIL;
 
-};
+	return S_OK;
+}
 
 CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)
 {

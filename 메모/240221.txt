@@ -1,0 +1,55 @@
+DirectXTK은 디버그, 릴리즈 둘다 빌드하여, lib & dll을 우리 프레임워크의 ThirdParty 폴더로 복사해오면 됨.
+
+이 새로운 XMMatrix형태는 포인터로 사용하면 릴리즈모드에서 터진다. (&붙이면 터짐.)
+함수인자로 던지고 싶으면 &로 해서 레퍼런스로 던질것. 포인터로 던지지 말것.
+
+XMFLOAT와 XMMATRIX 변수는 함수 인자로 넘길때의 타입을 따로 지정해뒀음. FXMMATRIX, CXMATRIX등 
+
+
+[Transform]
+  - XMFLOAT3를 XMVECTOR로 변환하면 w값이 0으로 자동으로 채워지기 때문에, 위치벡터로 이런 변환을 수행할 경우에는 w값을 1로 변경해주는 작업이 필요함.
+
+  - 벡터의 값을 함수 내에서 변경하고싶을땐 float4형을 사용하고, 벡터의 값으로 연산만 할 경우엔 vector형으로 인자를 사용할것.
+
+  - XMVector3Normalize함수는 인자로 받은 벡터에 대입하는 작업은 수행하지 않음.
+  - XMVectorSet(0.f, 0.f, 0.f, 0.f) -> 벡터를 만들어 반환해주는함수
+
+[Input Device]
+  - 키보드 입력된상태 -> 음수.    KeyState[DIK_RETURN] & 0x80  으로 음수인지 체크 (lsb검사)
+  - DIMOUSESTATE 구조체는 lX, lY는 이전 상태와의 차이를 반환, lZ는 휠상태 반환
+
+[모델 로드 lib]
+  - assimp 5.2.4 ㄱㄱ cmake파일도 3.22.5 ㄱㄱ
+  - 설치하고 릴리즈 디버그모드 한번씩 빌드.
+  - lib파일은 thirdparty 폴더에 포함시켜줘야함, dll 파일을 exe있는폴더에 포함시켜줘야함.
+  - 엔진 public - assimp폴더에 config파일, 헤더파일 추가해줘야함.
+  - 구성 debug - 링커 입력에 assimp-vc에 d 있는 걸로 추가, 릴리즈에는 d없는걸로 추가.
+
+[CModel]
+  - const aiScene* 객체 선언, Assimp::Importer 객체 선언
+
+[Assimp]
+  - assimp 헤더를 추가하면 leak발생하므로, 따로 프로젝트 만들어서, assimp로 로드하고, 로드된 모델들을 파일입출력해서 할것
+
+[CMesh]
+  - float3과 aiMesh정점의 위치벡터는 자료형이 호환이 안되기 때문에, 대입할때 memcpy 사용.
+  - Texcoord는 8종류까지 가지고있을수있기때문에, mTextureCoords는 사실상 2차원배열 구조임
+  - NonAnim모델은 PreTransformVertices 옵션을 줘서 메쉬들의 행렬을 미리 곱해서 로딩함(로컬정점)
+  - Anim모델은 뼈들이 움직이기 때문에 이 곱하는 작업을 직접해줘야함
+
+  - mOffsetMatrix: 해당 mesh에 맞춰 뼈들의 상태를 보정하기위한 행렬 
+
+[CBone]
+  - m_TransformationMatrix는 원점 기준이 아니라, 부모 위치 기준에서의 변환임.
+  - m_TransformationMatrix은 행렬이 전치행렬이라, 이를 다시 전치 해주어야함. (행과 열을 바꿔줌)
+  - vBlendIndices: 이 메쉬에 영향을 주는 뼈들
+  - vBlendWeights: 뼈들의 가중치(어떤 뼈에게 얼마나 영향받는지)
+
+[쉐이더]
+  - 쉐이더파일에 선언하는 변수들은, 그래픽카드의 메모리를 사용하기때문에, 가상메모리를 사용하기 힘들기 때문에, 쉐이더파일에의 배열은 최대한 커지지 않게 하고, 한번 선언한 것은 계속 유지하기 때문에, 변수 선언도 네이밍을 되도록이면 항상 일정하게 하여, 변수 이름이 겹치도록 할것. (반복적인 작업을 할 경우)
+
+[CAnimation]
+  - 
+
+[CChannel]
+  - 

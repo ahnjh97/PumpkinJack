@@ -1,0 +1,29 @@
+[Anim Model]
+  - Anim모델 중에서 뼈가 없는경우, 쉐이더에서 bone 행렬과 곱해지기 때문에, 예외처리를 해주지 않으면 렌더링 되지 않는다.
+  - 그 메쉬 자체에는 뼈가 없지만, 그 메쉬를 붙여놓는 용도로 쓰여야 하는 뼈가 있을것. ex) sword mesh & sword bone
+  
+  - 같은 프로토타입을 가진 객체들에 대해 다른 애니메이션을 재생하려면, m_Bones를 깊은복사 해주어야 함
+  - Bone클래스는 멤버변수에 포인터가 없기때문에, 복사생성자를 통해 복제하지 않더라도 그냥 변수들이 복사됨. (주소복사가 아니라 값 복사이므로)
+  - Mesh를 깊은복사 하는것은 VB, IB가 너무 무거우므로 하지 말것
+
+★★★★★ 다음주 월요일: Tool 검사,      다음주 금요일: 플레이어 Animation제어 검사 ★★★★★
+
+[Animation 간 선형보간]  - ToDo
+  - 다른 Animation 간의 선형보간할때 Ratio 계산 문제, Channel 정보(갯수) or 싱크문제 발생
+
+
+[Root Animation 처리]  - ToDo
+    ->위치가 움직이는 Animation인 경우 Animation에게 Monster의 Transform을 넘겨주고,
+       Root Animation의 이동행렬을 MonsterTransform에게도 적용
+
+
+[AnimModel 파일입출력]
+  [Ready_Bones] 
+	->vector m_Bones 순회하면서 m_iParentBoneIndex, szName, m_TransformationMatrix 쓰기
+  [Ready_Meshes], [Ready_Materials] 
+	-> NonAnim과 동일 
+  [Ready_Animations]
+	->m_iNumAnimations 쓰기, 
+ [CAnimation] m_szName, m_fDuration, m_fTickPerSecond, m_iNumChannels 쓰기, m_iNumAnimations만큼 반복
+ [CChannel] 들어가서 m_szName, m_NumScalingKeys, m_NumRotationKeys, m_NumPositionKeys 쓰기
+		KEYFRAME구조체를 for문 안에서 쓰기, m_iNumKeyFrames만큼 반복

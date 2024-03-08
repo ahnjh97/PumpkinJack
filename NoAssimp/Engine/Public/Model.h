@@ -19,7 +19,11 @@ public:
 	TYPE Get_ModelType() { return m_eModelType; }
 	string Get_ModelName() { return m_strModelName; }
 
-	void Set_Animation(_uint iAnimIndex, _bool isLoop) { m_iCurrentAnimIndex = iAnimIndex; m_isLoop = isLoop; }
+	void Set_Animation(_uint iAnimIndex, _bool isLoop) {
+		m_iCurrentAnimIndex = iAnimIndex; m_isLoop = isLoop;
+		if (m_iCurrentAnimIndex >= m_iNumAnimations) {
+			m_iCurrentAnimIndex = rand() % m_iNumAnimations;}}
+
 	void Set_Hide(_bool bHide) { m_bHide = bHide; }
 	void Copy_Animations(vector<CAnimation*>& vecAnims) { vecAnims = m_Animations; }
 

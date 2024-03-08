@@ -28,7 +28,7 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 
 private:
-	HRESULT Add_Components();
+	HRESULT Add_Components(const wstring& _wstrModelTag);
 	HRESULT Bind_ShaderResources();
 
 public:

@@ -20,12 +20,8 @@ private:
 public:
 	HRESULT Initialize(LEVEL eNextLevelID);
 	HRESULT Start();
-	_bool isFinished() const {
-		return m_isFinished;
-	}
-	void Output() {
-		SetWindowText(g_hWnd, m_strLoadingText.c_str());
-	}
+	_bool isFinished() const { return m_isFinished; }
+	void Output() {	SetWindowText(g_hWnd, m_strLoadingText.c_str()); }
 	
 
 private:
@@ -47,11 +43,7 @@ private:
 
 	HRESULT Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName, _float fScale, _float fDegree);
 	HRESULT Add_Shaders(LEVEL eLevel);
-
-	template<typename T>
-	HRESULT Add_GameObject_Prototype(T& GameObjectChildClass);
-	template<typename T>
-	HRESULT Add_Component_Prototype(T& ComponentChildClass);
+	HRESULT Add_Textures(LEVEL eLevel, string strPrototypeName, string strFolderAndFileName);
 
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID);

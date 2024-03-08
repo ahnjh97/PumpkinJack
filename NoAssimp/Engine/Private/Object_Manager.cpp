@@ -155,15 +155,17 @@ _bool CObject_Manager::Binarize_Objects(string strLevel)
 
 			for (auto listIter : objectList)
 			{
-				pair<wstring, _float4x4> parsePair; // 프로토타입 이름, 월드행렬
-				parsePair = listIter->Get_ParsingData();
+				PARSE_DATA tempParseData = listIter->Get_ParseData();
 
-				if (parsePair.first == L"Prototype_GameObject_Tool_Anim") // 애니메이션 재생용 객체
-					continue;
-				wchar_t wcharBuf[MAX_PATH];
-				wcscpy_s(wcharBuf, parsePair.first.c_str());
-				outputFile.write(reinterpret_cast<const char*>(&wcharBuf), sizeof(wcharBuf));
-				outputFile.write(reinterpret_cast<const char*>(&parsePair.second), sizeof(parsePair.second));
+				wchar_t wcharPrototypeTag[MAX_PATH];
+				wcscpy_s(wcharPrototypeTag, tempParseData.wstrPrototypeTag.c_str());
+				outputFile.write(reinterpret_cast<const char*>(&wcharPrototypeTag), sizeof(wcharPrototypeTag));
+
+				outputFile.write(reinterpret_cast<const char*>(&tempParseData.matWorld), sizeof(tempParseData.matWorld));
+
+				wchar_t wcharModelTag[MAX_PATH];
+				wcscpy_s(wcharModelTag, tempParseData.wstrModelTag.c_str());
+				outputFile.write(reinterpret_cast<const char*>(&wcharModelTag), sizeof(wcharModelTag));
 			}
 		}
 	}
@@ -212,7 +214,7 @@ CGameObject* CObject_Manager::Select_ModelByPicking(_uint iLevelIndex)
 
 		for (auto objectListIter : objectList)
 		{
-			CModel* pModel = objectListIter->Find_Model();
+			CModel* pModel = dynamic_cast<CModel*>(objectListIter->Get_Component(TEXT("Com_Model")));
 			if (pModel == nullptr)
 				continue;
 
@@ -236,11 +238,12 @@ CGameObject* CObject_Manager::Select_ModelByPicking(_uint iLevelIndex)
 		// 가장 거리가 가까운 놈 찾기
 		return vecPickedObjects[0];
 	}
+	return nullptr;
 }
 
-CGameObject* CObject_Manager::Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag)
+CGameObject* CObject_Manager::Get_GameObject(_uint iLevelIndex, const wstring& wstrLayerTag, const wstring& wstrPrototypeTag)
 {
-	auto		iter = m_pLayers[iLevelIndex].find(strLayerTag);
+	auto		iter = m_pLayers[iLevelIndex].find(wstrLayerTag);
 
 	if (iter == m_pLayers[iLevelIndex].end())
 		return nullptr;
@@ -258,8 +261,8 @@ CGameObject* CObject_Manager::Get_GameObject(_uint iLevelIndex, const wstring& s
 		if (listIter == nullptr)
 			continue;
 
-		pair<wstring, _float4x4> tempPair = listIter->Get_ParsingData();
-		if (tempPair.first == strPrototypeTag)
+		PARSE_DATA tempParseData = listIter->Get_ParseData();
+		if (tempParseData.wstrPrototypeTag == wstrPrototypeTag)
 			return listIter;
 	}
 	return nullptr;

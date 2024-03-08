@@ -40,7 +40,6 @@ void CLayer::Tick(_float fTimeDelta)
 			if (pGameObject->Get_Dead() == true)
 			{
 				Safe_Release(pGameObject);
-				//m_GameObjects.erase(*pGameObject);
 				return;
 			}
 				

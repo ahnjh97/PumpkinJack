@@ -18,3 +18,18 @@ extern HINSTANCE g_hInst;
 
 using namespace std;
 using namespace Client;
+
+#define ADD_GAMEOBJECT_PROTOTYPE(tag, className) \
+    do { \
+        wstring wstrResult = L"Prototype_GameObject_" + wstring(tag); \
+        if (FAILED(m_pGameInstance->Add_Prototype(wstring(wstrResult), className::Create(m_pDevice, m_pContext)))) \
+            return E_FAIL; \
+    } while (0)
+
+//#define ADD_COMPONENT_PROTOTYPE(tag, className, filePath) \
+//    do { \
+//        wstring wstrResult = L"Prototype_Component_" + wstring(tag); \
+//        wstring wstrFullPath = L"../../../Resources/" + wstring(filePath);   \
+//        if (FAILED(m_pGameInstance->Add_Prototype(wstring(wstrResult), className::Create(m_pDevice, m_pContext, wstring(wstrFullPath))))) \
+//            return E_FAIL; \
+//    } while (0)
