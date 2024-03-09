@@ -191,7 +191,7 @@ _bool CObject_Manager::Binarize_Objects(string strLevel)
 		return false;
 	}
 
-	MSG_BOX(TEXT("Saved."));
+	//MSG_BOX(TEXT("Saved."));
 	return true;
 }
 

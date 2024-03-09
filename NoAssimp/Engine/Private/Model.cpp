@@ -161,6 +161,9 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 	/* 현재 애니메이션에 맞는 뼈의 상태(m_TransformationMatrix)를 갱신해준다. */
 	m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrix(fTimeDelta, m_Bones, m_isLoop);
 
+	_float4x4 RootLocalTransform = {};
+	_matrix RootWorldTransform = {};
+
 	for (auto& pBone : m_Bones)
 		pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
 
@@ -277,7 +280,6 @@ void CModel::Create_NonAnimVersion(const string& strModelName)
 	wstring_convert<codecvt_utf8<wchar_t>> converter;
 	wstring wstrModelName_NonAnim = converter.from_bytes(strModelName_NonAnim);
 	wstring wstrPrototypeTag = L"Prototype_Component_Model_" + wstrModelName_NonAnim;
-
 	m_pGameInstance->Add_Prototype(Level_MapTool, wstrPrototypeTag, Create(m_pDevice, m_pContext, TYPE_NONANIM, strModelName, XMLoadFloat4x4(&m_TransformMatrix)));
 }
 

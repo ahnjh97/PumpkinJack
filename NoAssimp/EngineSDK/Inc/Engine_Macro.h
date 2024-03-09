@@ -12,7 +12,7 @@
 #define MSG_BOX(message)										\
 ::MessageBox(nullptr, message, L"error", MB_OK)
 #define MB(strMessage)											\
-MessageBoxA(nullptr, tempstr.c_str(), "error", MB_OK);
+MessageBoxA(nullptr, string(strMessage).c_str(), "error", MB_OK);
 
 #define NO_COPY(ClassName)										\
 ClassName(const ClassName&) = delete;							\

@@ -116,7 +116,9 @@ void CImGui_Client::Tick(_float fTimeDelta)
 		}
 		m_pPickedObject = nullptr;
 	}
-		
+	
+	if (strCurModel == "")
+		strCurModel = vecAnimModels.front();
 
 	if (m_pGameInstance->KeyDown(DIK_TAB))
 	{
@@ -227,6 +229,7 @@ void CImGui_Client::Tick(_float fTimeDelta)
 	{
 		for (_uint i = LEVEL_GAMEPLAY; i < LEVEL_END; i++)
 			m_pGameInstance->Binarize_Objects(vecLevelName[i]);
+		MB("Saved");
 	}		
 }
 

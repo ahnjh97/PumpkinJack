@@ -38,19 +38,19 @@ void CCamera_Free::Tick(_float fTimeDelta)
 {
 	if (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80)
 	{
-		m_pTransformCom->Go_Left(fTimeDelta, 1);
+		m_pTransformCom->Go_Left(fTimeDelta);
 	}
 	if (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80)
 	{
-		m_pTransformCom->Go_Right(fTimeDelta, 1);
+		m_pTransformCom->Go_Right(fTimeDelta);
 	}
 	if (m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80)
 	{
-		m_pTransformCom->Go_Straight(fTimeDelta, 1);
+		m_pTransformCom->Go_Straight(fTimeDelta);
 	}
 	if (m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80)
 	{
-		m_pTransformCom->Go_Backward(fTimeDelta, 1);
+		m_pTransformCom->Go_Backward(fTimeDelta);
 	}
 
 	

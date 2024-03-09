@@ -111,73 +111,48 @@ HRESULT CLoader::Loading_For_Logo()
 HRESULT CLoader::Loading_For_GamePlay()
 {
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+
 	/* Prototype_Component_Texture_Terrain */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Terrain"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Tile0.jpg")))))
-		return E_FAIL;
+	Add_Textures(LEVEL_GAMEPLAY, "Terrain", "Terrain/Tile0.jpg");
+
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+
 	/* Prototype_Component_VIBuffer_Terrain */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 100, 100))))
 		return E_FAIL;
-	_matrix		TransformMatrix = XMMatrixIdentity();
 
-	/* Prototype_Component_Model_Fiona */
-	TransformMatrix = /*XMMatrixScaling(1.5f, 1.5f, 1.5f) **/ XMMatrixRotationY(XMConvertToRadians(180.0f));
-
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
-		CModel::Create(m_pDevice, m_pContext, TYPE_ANIM, "Fiona", TransformMatrix))))
+	/* For.Prototype_Component_Model_Fiona */
+	if (FAILED(Add_Model(LEVEL_GAMEPLAY, TYPE_ANIM, "Fiona", 1.f, 180.f)))
 		return E_FAIL;
-
-	///* Prototype_Component_Model_SkeletonBoss */
-	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_SkeletonBoss"),
-		CModel::Create(m_pDevice, m_pContext, TYPE_ANIM, "SkeletonBoss", TransformMatrix))))
+	/* Prototype_Component_Model_SkeletonBoss */
+	if (FAILED(Add_Model(LEVEL_GAMEPLAY, TYPE_ANIM, "SkeletonBoss", 0.01f, 0.f)))
 		return E_FAIL;
-
 	/* Prototype_Component_Model_Jack */
-	TransformMatrix = XMMatrixScaling(0.0012f, 0.0012f, 0.0012f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Jack"),
-		CModel::Create(m_pDevice, m_pContext, TYPE_ANIM, "Jack", TransformMatrix))))
+	if (FAILED(Add_Model(LEVEL_GAMEPLAY, TYPE_ANIM, "Jack", 0.0025f, 180.f)))
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
-	/* For.Prototype_Component_Shader_VtxNorTex */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxNorTex"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
-		return E_FAIL;
 
-	/* For.Prototype_Component_Shader_VtxModel */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxModel"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
-		return E_FAIL;
+	Add_Shaders(LEVEL_GAMEPLAY);
 
-	/* For.Prototype_Component_Shader_VtxAnimModel */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimModel"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimModel.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
-		return E_FAIL;
 
 	m_strLoadingText = TEXT("객체를(을) 로딩 중 입니다.");
 	/* For.Prototype_GameObject_Terrain */
-	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain"),
-		CTerrain::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Terrain"), CTerrain);
 
 	///* For.Prototype_GameObject_Camera_Free */
-	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Free"),
-		CCamera_Free::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
 
 	///* For.Prototype_GameObject_Player */
 	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
 	//	CPlayer::Create(m_pGraphic_Device))))
 	//	return E_FAIL;
 
-	/* For.Prototype_GameObject_Monster */
-	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Monster"),
-		CMonster::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+		/* For.Prototype_GameObject_Monster */
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Monster"), CMonster);
+
 
 	///* For.Prototype_GameObject_Effect */
 	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect"),
