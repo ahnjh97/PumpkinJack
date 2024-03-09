@@ -57,15 +57,16 @@ void CImGui_Client::Tick(_float fTimeDelta)
 			{
 				if (bSeeAnim)
 				{
-					/*pNonAnimModel->Set_Hide(false);
+					pNonAnimModel->Set_Hide(false);
 					pNonAnimModel = nullptr;
 					if (pAnimObject != nullptr)
 					{
 						pAnimObject->Set_Dead();
 						pAnimObject = nullptr;
+						pAnimModel = nullptr;
 					}
 					bSeeAnim = false;
-					AnimationIdx = -1;*/
+					AnimationIdx = -1;
 				}
 				vecAnimNames.clear();
 				bAnimWindow = false;
@@ -111,6 +112,12 @@ void CImGui_Client::Tick(_float fTimeDelta)
 		{
 			pNonAnimModel->Set_Hide(false);
 			pNonAnimModel = nullptr;
+			if (pAnimObject != nullptr)
+			{
+				pAnimObject->Set_Dead();
+				pAnimObject = nullptr;
+				pAnimModel = nullptr;
+			}
 			bSeeAnim = false;
 			AnimationIdx = -1;
 		}
@@ -170,15 +177,7 @@ void CImGui_Client::Tick(_float fTimeDelta)
 		}
 
 		if (m_pPickedObject == nullptr)
-		{
-			bSeeAnim = false;
 			pAnimModel = nullptr;
-			if (pAnimObject != nullptr)
-			{
-				pAnimObject->Set_Dead();
-				pAnimObject = nullptr;
-			}
-		}
 
 		// --------------------Animation-------------------------------
 		if (bAnimWindow && m_pPickedObject)
@@ -192,7 +191,7 @@ void CImGui_Client::Tick(_float fTimeDelta)
 
 			if (ImGui::ListBox("##Animations", &AnimationIdx, items3, static_cast<int>(vecAnimNames.size()), 9))
 			{
-				/*if (bSeeAnim == false)
+				if (bSeeAnim == false)
 				{
 					bSeeAnim = true;
 
@@ -202,19 +201,18 @@ void CImGui_Client::Tick(_float fTimeDelta)
 					tempDesc.matWorld = tempParseData.matWorld;
 					tempDesc.wstrModelTag = tempParseData.wstrModelTag;
 					wstring wstrPrototypeTag = TEXT("Prototype_GameObject_Tool_Anim");
-					if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Parse"), wstrPrototypeTag, &tempDesc)))
+					if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Temp"), wstrPrototypeTag, &tempDesc)))
 						return;
 					
-					pAnimObject = dynamic_cast<CTool_Anim*>(m_pGameInstance->Get_GameObject(LEVEL_MAPTOOL, TEXT("Layer_Parse"), wstrPrototypeTag));
+					pAnimObject = dynamic_cast<CTool_Anim*>(m_pGameInstance->Get_GameObject(LEVEL_MAPTOOL, TEXT("Layer_Temp"), wstrPrototypeTag));
 					pAnimModel = dynamic_cast<CModel*>(pAnimObject->Get_Component(TEXT("Com_Model")));
 					
 					pNonAnimModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
 					pNonAnimModel->Set_Hide(true);
-				}*/
+				}
 
 				if (m_pPickedObject != nullptr)
 				{
-					pAnimModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
 					pAnimModel->Set_Animation(AnimationIdx, true);
 				}
 								
@@ -280,15 +278,13 @@ void CImGui_Client::OnRightClick()
 			{
 				if (AnimModelIter == strCurModel)
 				{
-					IsAnim = true;
+					wstrModelTag = wstrModelTag + L"_NonAnim";
 					break;
 				}
 			}
 			tempDesc.wstrModelTag = wstrModelTag;
 
 			wstring wstrPrototypeTag = TEXT("Prototype_GameObject_Tool_NonAnim");
-			if (IsAnim == true)
-				wstrPrototypeTag = TEXT("Prototype_GameObject_Tool_Anim");
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Parse"), wstrPrototypeTag, &tempDesc)))
 				return;
 
@@ -309,7 +305,6 @@ void CImGui_Client::Edit_Object()
 				_float4x4 tempMatrix = pAnimTransform->Get_WorldFloat4x4();
 				EditGuizmo(tempMatrix); // 선택한 Anim모델의 월드행렬 위치만 보기
 				//pAnimTransform->Set_WorldMatrix(tempMatrix);
-				pAnimTransform->Set_WorldMatrix(tempMatrix);
 			}
 		}
 		else
@@ -322,7 +317,6 @@ void CImGui_Client::Edit_Object()
 				pTransform->Set_WorldMatrix(tempMatrix);
 			}
 		}
-		
 	}
 	else
 		EditGuizmo(_float4x4());

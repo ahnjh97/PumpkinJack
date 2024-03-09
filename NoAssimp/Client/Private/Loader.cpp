@@ -234,19 +234,19 @@ HRESULT CLoader::Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName, _
 		CModel::Create(m_pDevice, m_pContext, eModelType, strModelName, TransformMatrix))))
 		return E_FAIL;
 
-	//if (eModelType == TYPE_ANIM)
-	//{
-	//	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag + L"_NonAnim",
-	//		CModel::Create(m_pDevice, m_pContext, TYPE_NONANIM, strModelName, TransformMatrix))))
-	//		return E_FAIL;
-	//}
+	if (eModelType == TYPE_ANIM)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag + L"_NonAnim",
+			CModel::Create(m_pDevice, m_pContext, TYPE_NONANIM, strModelName, TransformMatrix))))
+			return E_FAIL;
+	}
 	return S_OK;
 }
 
 HRESULT CLoader::Add_Models(LEVEL eLevel)
 {
 	/* Prototype_Component_Model_Jack */
-	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Jack", 0.0025f, 180.f)))
+	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Jack", 0.0025f, 0.f)))
 		return E_FAIL;
 
 	/* Prototype_Component_Model_Ballista */
@@ -254,11 +254,11 @@ HRESULT CLoader::Add_Models(LEVEL eLevel)
 		return E_FAIL;
 
 	/* Prototype_Component_Model_Charon */
-	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Charon", 0.03f, 180.f)))
+	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Charon", 0.03f, 0.f)))
 		return E_FAIL;
 
 	/* Prototype_Component_Model_Crow */
-	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Crow", 0.0005f, 180.f)))
+	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Crow", 0.0005f, 0.f)))
 		return E_FAIL;
 
 	/* Prototype_Component_Model_Mummy */

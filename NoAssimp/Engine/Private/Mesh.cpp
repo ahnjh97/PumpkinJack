@@ -157,12 +157,14 @@ HRESULT CMesh::Ready_Vertices_For_NonAnimModel(_fmatrix TransformMatrix)
 	for (size_t i = 0; i < m_iNumVertices; i++)
 	{
 		m_InputFile.read(reinterpret_cast<char*>(&pVertices[i]), sizeof(VTXMESH));
-		/*_matrix matPos = XMMatrixTranslation(pVertices[i].vPosition.x, pVertices[i].vPosition.y, pVertices[i].vPosition.z);
+
+		_matrix matPos = XMMatrixTranslation(pVertices[i].vPosition.x, pVertices[i].vPosition.y, pVertices[i].vPosition.z);
 		_matrix newMat = TransformMatrix * matPos;
 		_vector scale, rotation, translation;
 		XMMatrixDecompose(&scale, &rotation, &translation, newMat);
 
-		XMStoreFloat3(&pVertices[i].vPosition, translation);*/
+		XMStoreFloat3(&pVertices[i].vPosition, translation);
+
 		m_pVerticesPos[i] = pVertices[i].vPosition;
 
 		m_MinMax.first = _float3(min(m_pVerticesPos[i].x, m_MinMax.first.x), min(m_pVerticesPos[i].y, m_MinMax.first.y), min(m_pVerticesPos[i].z, m_MinMax.first.z));

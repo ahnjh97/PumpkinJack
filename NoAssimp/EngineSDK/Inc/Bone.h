@@ -23,7 +23,7 @@ public:
 
 public:
 	HRESULT Initialize(ifstream& fileStream);
-	void Update_CombinedTransformationMatrix(const vector<CBone*>& Bones, _fmatrix TransformatrixMatrix);
+	void Update_CombinedTransformationMatrix(const vector<CBone*>& Bones, _fmatrix TransformatrixMatrix, _int _realRootIndex);
 	_bool Compare_Name(const _char* pBoneName) { return !strcmp(m_szName, pBoneName); }
 
 public:
