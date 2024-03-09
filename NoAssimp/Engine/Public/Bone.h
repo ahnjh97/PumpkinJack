@@ -19,10 +19,11 @@ public:
 
 public:
 	const _float4x4* Get_CombinedTransformationMatrix() const {	return &m_CombinedTransformationMatrix;	}
+	_float4x4* Get_TransformationMatrix() { return &m_TransformationMatrix; }
 
 public:
 	HRESULT Initialize(ifstream& fileStream);
-	void Update_CombinedTransformationMatrix(const vector<CBone*>& Bones, _fmatrix TransformatrixMatrix);
+	void Update_CombinedTransformationMatrix(const vector<CBone*>& Bones, _fmatrix TransformatrixMatrix, _int _realRootIndex);
 	_bool Compare_Name(const _char* pBoneName) { return !strcmp(m_szName, pBoneName); }
 
 public:

@@ -6,6 +6,9 @@
 #include "BackGround.h"
 #include "Terrain.h"
 #include "Monster.h"
+#include <locale>
+#include <codecvt>
+#include <iostream>
 //#include "Player.h"
 //#include "Effect.h"
 //#include "Sky.h"
@@ -118,31 +121,19 @@ HRESULT CLoader::Loading_For_GamePlay()
 	/* Prototype_Component_Model_Fiona */
 	TransformMatrix = XMMatrixScaling(1.5f, 1.5f, 1.5f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Resources/Models/Fiona/Fiona.fbx", TransformMatrix))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
+	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Resources/Models/Fiona/Fiona.fbx", TransformMatrix))))
+	//	return E_FAIL;
 	
-	/* Prototype_Component_Model_SkeletonBoss */
-	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
-
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_SkeletonBoss"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Resources/Models/SkeletonBoss/SkeletonBoss.fbx", TransformMatrix))))
-		return E_FAIL;
-
-	TransformMatrix = XMMatrixScaling(0.003f, 0.003f, 0.003f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	/* Prototype_Component_Model_Jack */
+	/*TransformMatrix = XMMatrixScaling(0.002f, 0.002f, 0.002f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Jack"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Resources/Models/Jack/Jack.fbx", TransformMatrix))))
-		return E_FAIL;
+		return E_FAIL;*/
+	
 
-
-	///* Prototype_Component_VIBuffer_Cube */
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Cube"),
-	//	CVIBuffer_Cube::Create(m_pGraphic_Device))))
-	//	return E_FAIL;
-
-	///*if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"),
-	//	CVIBuffer_Terrain::Create(m_pGraphic_Device, 1000, 1000))))
-	//	return E_FAIL;*/	
+	TraverseAnimModels(TEXT("../../../Resources/Models/"));
+	TraverseNonAnimModels(TEXT("../../../Resources/Models/NonAnimModels/"));
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
 	/* For.Prototype_Component_Shader_VtxNorTex */
@@ -171,32 +162,160 @@ HRESULT CLoader::Loading_For_GamePlay()
 		CCamera_Free::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	///* For.Prototype_GameObject_Player */
-	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
-	//	CPlayer::Create(m_pGraphic_Device))))
-	//	return E_FAIL;
-
 	/* For.Prototype_GameObject_Monster */
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Monster"),
 		CMonster::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	///* For.Prototype_GameObject_Effect */
-	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect"),
-	//	CEffect::Create(m_pGraphic_Device))))
-	//	return E_FAIL;
-
-	///* For.Prototype_GameObject_Sky */
-	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Sky"),
-	//	CSky::Create(m_pGraphic_Device))))
-	//	return E_FAIL;
-	//
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
 	m_isFinished = true;
 
 	return S_OK;
 }
+
+HRESULT CLoader::Add_AnimPrototype(wstring& ModelName)
+{
+	wstring_convert<codecvt_utf8<wchar_t>> converter;
+	string strModelName = converter.to_bytes(ModelName);
+	_matrix		TransformMatrix = XMMatrixIdentity();
+	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, L"Prototype_Component_Model_" + ModelName,
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Resources/Models/" + strModelName + "/" + strModelName + ".fbx", TransformMatrix))))
+		return E_FAIL;
+	return S_OK;
+}
+
+HRESULT CLoader::Add_NonAnimPrototype(wstring& ModelName)
+{
+	wstring_convert<codecvt_utf8<wchar_t>> converter;
+	string strModelName = converter.to_bytes(ModelName);
+	_matrix		TransformMatrix = XMMatrixIdentity();
+	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, L"Prototype_Component_Model_" + ModelName,
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Resources/Models/NonAnimModels/" + strModelName + "/" + strModelName + ".fbx", TransformMatrix))))
+		return E_FAIL;
+	return S_OK;
+}
+
+void CLoader::TraverseAnimModels(const wstring& rootFolderPath)
+{
+	WIN32_FIND_DATA findFileData;
+	HANDLE hFind = FindFirstFile((rootFolderPath + L"\\*").c_str(), &findFileData);
+
+	if (hFind == INVALID_HANDLE_VALUE) {
+		MSG_BOX(TEXT("폴더를 찾을수없습니다"));
+		return;
+	}
+
+	list<wstring> txtList;
+	TraverseDirectory(L"../../../model_txt/Anim/", txtList);
+
+	do {
+		if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+			if (wcscmp(findFileData.cFileName, L".") != 0 && wcscmp(findFileData.cFileName, L"..") != 0)
+			{
+				wstring temp = wstring(findFileData.cFileName);
+				if (wstring(findFileData.cFileName) == L"NonAnimModels")
+					continue;
+
+				_bool bExist = { false };
+				for (auto txt : txtList)
+				{
+					if (txt.find(temp) != wstring::npos)
+					{
+						bExist = true;
+						break;
+					}
+				}
+
+				if(bExist == false)
+					Add_AnimPrototype(temp);
+			}
+		}
+	} while (FindNextFile(hFind, &findFileData) != 0);
+
+	FindClose(hFind);
+}
+
+void CLoader::TraverseNonAnimModels(const wstring& rootFolderPath)
+{
+	WIN32_FIND_DATA findFileData;
+	HANDLE hFind = FindFirstFile((rootFolderPath + L"\\*").c_str(), &findFileData);
+
+	if (hFind == INVALID_HANDLE_VALUE) {
+		MSG_BOX(TEXT("폴더를 찾을수없습니다"));
+		return;
+	}
+
+	list<wstring> AnimtxtList;
+	TraverseDirectory(L"../../../model_txt/Anim/", AnimtxtList);
+	list<wstring> txtList;
+	TraverseDirectory(L"../../../model_txt/NonAnim/", txtList);
+
+	do {
+		if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+			if (wcscmp(findFileData.cFileName, L".") != 0 && wcscmp(findFileData.cFileName, L"..") != 0)
+			{
+				wstring temp = wstring(findFileData.cFileName);
+				_bool bNonAnimVersion = { false };
+				_bool bExist = { false };
+				for (auto Animtxt : AnimtxtList)
+				{
+					if (Animtxt.find(temp) != wstring::npos)
+					{
+						bNonAnimVersion = true;
+						break;
+					}
+				}
+
+				if (bNonAnimVersion == true)
+					continue;
+
+				for (auto txt : txtList)
+				{
+					if(txt.find(temp) != wstring::npos)
+					{
+						bExist = true;
+						break;
+					}
+				}
+
+				if(bExist == false)
+					Add_NonAnimPrototype(temp);
+			}
+		}
+	} while (FindNextFile(hFind, &findFileData) != 0);
+
+	FindClose(hFind);
+}
+
+void CLoader::TraverseDirectory(const wstring& rootFolderPath, list<wstring>& fileList)
+{
+	WIN32_FIND_DATA findFileData;
+	HANDLE hFind = FindFirstFile((rootFolderPath + L"\\*").c_str(), &findFileData);
+
+	if (hFind == INVALID_HANDLE_VALUE) {
+		MSG_BOX(TEXT("폴더를 찾을수없습니다"));
+		return;
+	}
+
+	do {
+		if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+			if (wcscmp(findFileData.cFileName, L".") != 0 && wcscmp(findFileData.cFileName, L"..") != 0) {
+				// 재귀적으로 하위 폴더도 순회
+				TraverseDirectory(rootFolderPath + L"\\" + findFileData.cFileName, fileList);
+			}
+		}
+		else {
+			// 파일이면 리스트에 추가
+			fileList.push_back(wstring(findFileData.cFileName));
+		}
+	} while (FindNextFile(hFind, &findFileData) != 0);
+
+	FindClose(hFind);
+}
+
 
 CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)
 {

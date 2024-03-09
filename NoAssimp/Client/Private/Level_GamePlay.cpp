@@ -123,14 +123,14 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 	wchar_t wcharModelTag[MAX_PATH];
 	_float4x4 matWorld{};
 
-	while (true)
+	while (!m_InputFile.eof())
 	{
-		if (m_InputFile.eof())
-			break;
-		
 		m_InputFile.read(reinterpret_cast<char*>(&wcharPrototypeTag), sizeof(wcharPrototypeTag));
 		m_InputFile.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
 		m_InputFile.read(reinterpret_cast<char*>(&wcharModelTag), sizeof(wcharModelTag));
+
+		if (m_InputFile.eof())
+			break;
 
 		wstring wstrPrototypeTag = wcharPrototypeTag;
 		CGameObject::GAMEOBJECT_DESC tempDesc = {};

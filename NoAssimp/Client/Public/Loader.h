@@ -38,10 +38,11 @@ private:
 
 private:
 	HRESULT Loading_For_Logo();
-	HRESULT Loading_For_GamePlay();
-	HRESULT Loading_For_MapTool();
+	HRESULT Loading_For_GamePlay(LEVEL eLevel);
+	HRESULT Loading_For_MapTool(LEVEL eLevel);
 
 	HRESULT Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName, _float fScale, _float fDegree);
+	HRESULT Add_Models(LEVEL eLevel);
 	HRESULT Add_Shaders(LEVEL eLevel);
 	HRESULT Add_Textures(LEVEL eLevel, string strPrototypeName, string strFolderAndFileName);
 

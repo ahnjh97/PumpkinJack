@@ -67,6 +67,7 @@ HRESULT CRenderer::Render_NonBlend()
 
 	return S_OK;
 }
+
 //
 //_bool Compare(CGameObject* pSour, CGameObject* pDest)
 //{

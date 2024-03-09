@@ -32,7 +32,8 @@ HRESULT CMonster::Initialize(void * pArg)
 	if (FAILED(Add_Components(GameObjectDesc.wstrModelTag)))
 		return E_FAIL;	
 
-	m_pModelCom->Set_Animation(999, true); // 999: 랜덤 애니메이션
+	m_pModelCom->Set_Animation(11, true); // 999: 랜덤 애니메이션
+	//m_pModelCom->Set_Animation(999, true); // 999: 랜덤 애니메이션
 	
 	return S_OK;
 }
@@ -43,7 +44,24 @@ void CMonster::Tick(_float fTimeDelta)
 
 void CMonster::Late_Tick(_float fTimeDelta)
 {
+	_float3 vPreHipTrans = m_pModelCom->Get_HipTranslation();
+	if ((vPreHipTrans.x < -5000.f) || (vPreHipTrans.y < -5000.f) || (vPreHipTrans.z < -5000.f))
+		vPreHipTrans = _float3{ 0.f, 0.f, 0.f };
+
 	m_pModelCom->Play_Animation(fTimeDelta);
+
+	_float3 vHipTrans = m_pModelCom->Get_HipTranslation();
+
+	_float3 vRelativeTranslation = {};
+	XMStoreFloat3(&vRelativeTranslation,  XMLoadFloat3(&vHipTrans) - XMLoadFloat3(&vPreHipTrans));
+
+
+	_matrix matTemp = XMMatrixTranslation(vRelativeTranslation.x, vRelativeTranslation.y, vRelativeTranslation.z);
+	_matrix matRelative = XMMatrixMultiply(m_pTransformCom->Get_WorldMatrix(), matTemp);
+	_float4x4 matWorld = {};
+	XMStoreFloat4x4(&matWorld, matRelative);
+	m_pTransformCom->Set_WorldMatrix(matWorld);
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 

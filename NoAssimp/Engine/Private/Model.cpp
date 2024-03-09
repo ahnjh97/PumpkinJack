@@ -21,6 +21,7 @@ CModel::CModel(const CModel& rhs)
 	, m_iNumMaterials{ rhs.m_iNumMaterials }
 	, m_Materials{ rhs.m_Materials }
 	, m_TransformMatrix{ rhs.m_TransformMatrix }
+	, m_fScale{ rhs.m_fScale }
 	, m_iNumAnimations{ rhs.m_iNumAnimations }
 	, m_eModelType{ rhs.m_eModelType }
 	, m_strModelName { rhs.m_strModelName }
@@ -90,6 +91,8 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelName, _fm
 	}
 
 	::XMStoreFloat4x4(&m_TransformMatrix, TransformMatrix);
+	m_fScale = XMVectorGetX(XMVector3Length((TransformMatrix.r[0])));
+
 
 	/* 읽은 정보를 바탕으로해서 내가 사용하기 좋게 정리한다.  */
 	if (eType == TYPE_ANIM)
@@ -113,9 +116,6 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelName, _fm
 	}
 
 	m_InputFile.close();
-
-	if (eType == TYPE_ANIM)
-		Create_NonAnimVersion(strModelName);
 
 	return S_OK;
 }
@@ -161,11 +161,23 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 	/* 현재 애니메이션에 맞는 뼈의 상태(m_TransformationMatrix)를 갱신해준다. */
 	m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrix(fTimeDelta, m_Bones, m_isLoop);
 
-	_float4x4 RootLocalTransform = {};
-	_matrix RootWorldTransform = {};
+	// Hip 의 변환행렬
+	_uint realRootIndex = 4;
+	_matrix HipLocalTransform = XMLoadFloat4x4(m_Bones[realRootIndex]->Get_TransformationMatrix());
+	_vector translation, scale, rotation;
+	XMMatrixDecompose(&scale, &rotation, &translation, HipLocalTransform);
+	XMStoreFloat3(&m_vHipTranslation, translation);
+
+	// 루트 노드의 변환행렬 
+	_matrix RootLocalTransform = XMLoadFloat4x4(m_Bones[0]->Get_TransformationMatrix());
+	//RootLocalTransform.r[3] = XMVectorSet(m_vHipTranslation.x, m_vHipTranslation.y, m_vHipTranslation.z, 1.0f);
+	RootLocalTransform.r[3] = XMVectorSet(0, 0, 0, 1.0f);
+
+	RootLocalTransform = XMMatrixScaling(m_fScale, m_fScale, m_fScale) * RootLocalTransform;
+	XMStoreFloat4x4(&m_TransformMatrix, RootLocalTransform);
 
 	for (auto& pBone : m_Bones)
-		pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
+		pBone->Update_CombinedTransformationMatrix(m_Bones, RootLocalTransform, realRootIndex);
 
 	return S_OK;
 }
@@ -272,15 +284,6 @@ HRESULT CModel::Ready_Animations()
 	}
 
 	return S_OK;
-}
-
-void CModel::Create_NonAnimVersion(const string& strModelName)
-{
-	string strModelName_NonAnim = strModelName + "_NonAnim";
-	wstring_convert<codecvt_utf8<wchar_t>> converter;
-	wstring wstrModelName_NonAnim = converter.from_bytes(strModelName_NonAnim);
-	wstring wstrPrototypeTag = L"Prototype_Component_Model_" + wstrModelName_NonAnim;
-	m_pGameInstance->Add_Prototype(Level_MapTool, wstrPrototypeTag, Create(m_pDevice, m_pContext, TYPE_NONANIM, strModelName, XMLoadFloat4x4(&m_TransformMatrix)));
 }
 
 CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelName, _fmatrix TransformMatrix)

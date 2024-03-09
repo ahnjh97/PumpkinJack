@@ -57,7 +57,7 @@ void CImGui_Client::Tick(_float fTimeDelta)
 			{
 				if (bSeeAnim)
 				{
-					pNonAnimModel->Set_Hide(false);
+					/*pNonAnimModel->Set_Hide(false);
 					pNonAnimModel = nullptr;
 					if (pAnimObject != nullptr)
 					{
@@ -65,7 +65,7 @@ void CImGui_Client::Tick(_float fTimeDelta)
 						pAnimObject = nullptr;
 					}
 					bSeeAnim = false;
-					AnimationIdx = -1;
+					AnimationIdx = -1;*/
 				}
 				vecAnimNames.clear();
 				bAnimWindow = false;
@@ -192,7 +192,7 @@ void CImGui_Client::Tick(_float fTimeDelta)
 
 			if (ImGui::ListBox("##Animations", &AnimationIdx, items3, static_cast<int>(vecAnimNames.size()), 9))
 			{
-				if (bSeeAnim == false)
+				/*if (bSeeAnim == false)
 				{
 					bSeeAnim = true;
 
@@ -202,18 +202,22 @@ void CImGui_Client::Tick(_float fTimeDelta)
 					tempDesc.matWorld = tempParseData.matWorld;
 					tempDesc.wstrModelTag = tempParseData.wstrModelTag;
 					wstring wstrPrototypeTag = TEXT("Prototype_GameObject_Tool_Anim");
-					if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Temp"), wstrPrototypeTag, &tempDesc)))
+					if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Parse"), wstrPrototypeTag, &tempDesc)))
 						return;
 					
-					pAnimObject = dynamic_cast<CTool_Anim*>(m_pGameInstance->Get_GameObject(LEVEL_MAPTOOL, TEXT("Layer_Temp"), wstrPrototypeTag));
+					pAnimObject = dynamic_cast<CTool_Anim*>(m_pGameInstance->Get_GameObject(LEVEL_MAPTOOL, TEXT("Layer_Parse"), wstrPrototypeTag));
 					pAnimModel = dynamic_cast<CModel*>(pAnimObject->Get_Component(TEXT("Com_Model")));
 					
 					pNonAnimModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
 					pNonAnimModel->Set_Hide(true);
-				}
+				}*/
 
-				if (pAnimModel != nullptr)					
-					pAnimModel->Set_Animation(AnimationIdx, true);				
+				if (m_pPickedObject != nullptr)
+				{
+					pAnimModel = dynamic_cast<CModel*>(m_pPickedObject->Get_Component(TEXT("Com_Model")));
+					pAnimModel->Set_Animation(AnimationIdx, true);
+				}
+								
 			}
 			ImGui::End();
 		}
@@ -271,19 +275,23 @@ void CImGui_Client::OnRightClick()
 			m_bIsPicking = true;
 			wstring_convert<codecvt_utf8<wchar_t>> converter;
 			wstring wstrModelTag = L"Prototype_Component_Model_" + converter.from_bytes(strCurModel);
+			_bool IsAnim = { false };
 			for (auto& AnimModelIter : vecAnimModels)
 			{
 				if (AnimModelIter == strCurModel)
 				{
-					wstrModelTag = wstrModelTag + L"_NonAnim";
+					IsAnim = true;
 					break;
 				}
 			}
 			tempDesc.wstrModelTag = wstrModelTag;
 
-			wstring wstrPrototypeTag = TEXT("Prototype_GameObject_Tool_NonAnim"); 
+			wstring wstrPrototypeTag = TEXT("Prototype_GameObject_Tool_NonAnim");
+			if (IsAnim == true)
+				wstrPrototypeTag = TEXT("Prototype_GameObject_Tool_Anim");
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Parse"), wstrPrototypeTag, &tempDesc)))
 				return;
+
 			m_bIsPicking = false;
 		}
 	}
@@ -293,13 +301,28 @@ void CImGui_Client::Edit_Object()
 {
 	if (m_pPickedObject != nullptr)
 	{
-		CTransform* pTransform = dynamic_cast<CTransform*>(m_pPickedObject->Get_Component(g_strTransformTag));
-		if (pTransform != nullptr)
+		if (bSeeAnim == true)
 		{
-			_float4x4 tempMatrix = pTransform->Get_WorldFloat4x4();
-			EditGuizmo(tempMatrix); // 선택한 모델의 월드행렬을 수정 
-			pTransform->Set_WorldMatrix(tempMatrix);
+			CTransform* pAnimTransform = dynamic_cast<CTransform*>(pAnimObject->Get_Component(g_strTransformTag));
+			if (pAnimTransform != nullptr)
+			{
+				_float4x4 tempMatrix = pAnimTransform->Get_WorldFloat4x4();
+				EditGuizmo(tempMatrix); // 선택한 Anim모델의 월드행렬 위치만 보기
+				//pAnimTransform->Set_WorldMatrix(tempMatrix);
+				pAnimTransform->Set_WorldMatrix(tempMatrix);
+			}
 		}
+		else
+		{
+			CTransform* pTransform = dynamic_cast<CTransform*>(m_pPickedObject->Get_Component(g_strTransformTag));
+			if (pTransform != nullptr)
+			{
+				_float4x4 tempMatrix = pTransform->Get_WorldFloat4x4();
+				EditGuizmo(tempMatrix); // 선택한 모델의 월드행렬을 수정 
+				pTransform->Set_WorldMatrix(tempMatrix);
+			}
+		}
+		
 	}
 	else
 		EditGuizmo(_float4x4());

@@ -65,10 +65,10 @@ HRESULT CLoader::Start()
 		hr = Loading_For_Logo();
 		break;
 	case LEVEL_GAMEPLAY:
-		hr = Loading_For_GamePlay();
+		hr = Loading_For_GamePlay(LEVEL_GAMEPLAY);
 		break;
 	case LEVEL_MAPTOOL:
-		hr = Loading_For_MapTool();
+		hr = Loading_For_MapTool(LEVEL_MAPTOOL);
 		break;
 	}
 
@@ -108,34 +108,31 @@ HRESULT CLoader::Loading_For_Logo()
 	return S_OK;
 }
 
-HRESULT CLoader::Loading_For_GamePlay()
+HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 {
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 
 	/* Prototype_Component_Texture_Terrain */
-	Add_Textures(LEVEL_GAMEPLAY, "Terrain", "Terrain/Tile0.jpg");
+	Add_Textures(eLevel, "Terrain", "Terrain/Tile0.jpg");
 
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 
 	/* Prototype_Component_VIBuffer_Terrain */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"),
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 100, 100))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Model_Fiona */
-	if (FAILED(Add_Model(LEVEL_GAMEPLAY, TYPE_ANIM, "Fiona", 1.f, 180.f)))
-		return E_FAIL;
-	/* Prototype_Component_Model_SkeletonBoss */
-	if (FAILED(Add_Model(LEVEL_GAMEPLAY, TYPE_ANIM, "SkeletonBoss", 0.01f, 0.f)))
-		return E_FAIL;
-	/* Prototype_Component_Model_Jack */
-	if (FAILED(Add_Model(LEVEL_GAMEPLAY, TYPE_ANIM, "Jack", 0.0025f, 180.f)))
+	//if (FAILED(Add_Model(LEVEL_GAMEPLAY, TYPE_ANIM, "Fiona", 1.f, 180.f)))
+	//	return E_FAIL;
+
+	if (Add_Models(eLevel)) // LEVEL_GAMEPLAY;
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
 
-	Add_Shaders(LEVEL_GAMEPLAY);
+	Add_Shaders(eLevel);
 
 
 	m_strLoadingText = TEXT("객체를(을) 로딩 중 입니다.");
@@ -171,13 +168,14 @@ HRESULT CLoader::Loading_For_GamePlay()
 	return S_OK;
 }
 
-HRESULT CLoader::Loading_For_MapTool()
+HRESULT CLoader::Loading_For_MapTool(LEVEL eLevel)
 {
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 
 	/* Prototype_Component_Texture_Grid */
-	if(FAILED(Add_Textures(LEVEL_MAPTOOL, "Grid", "Terrain/White.png")))
+	if(FAILED(Add_Textures(eLevel, "Grid", "Terrain/White.png")))
 		return E_FAIL;
+
 
 	m_strLoadingText = TEXT("컴포넌트를(을) 로딩 중 입니다.");
 	/* Prototype_Component_VIBuffer_Terrain */
@@ -185,25 +183,23 @@ HRESULT CLoader::Loading_For_MapTool()
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 100, 100))))
 		return E_FAIL;
 
+
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 
 	/* For.Prototype_Component_Model_Fiona */
-	if(FAILED(Add_Model(LEVEL_MAPTOOL, TYPE_ANIM, "Fiona", 1.f, 180.f)))
-		return E_FAIL;
-	/* Prototype_Component_Model_SkeletonBoss */
-	if (FAILED(Add_Model(LEVEL_MAPTOOL, TYPE_ANIM, "SkeletonBoss", 0.01f, 0.f)))
-		return E_FAIL;
-	/* Prototype_Component_Model_Jack */
-	if (FAILED(Add_Model(LEVEL_MAPTOOL, TYPE_ANIM, "Jack", 0.0025f, 180.f)))
+	//if(FAILED(Add_Model(LEVEL_MAPTOOL, TYPE_ANIM, "Fiona", 1.f, 180.f)))
+	//	return E_FAIL;
+
+	if (Add_Models(eLevel)) // LEVEL_MAPTOOL;
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
 
-	if(FAILED(Add_Shaders(LEVEL_MAPTOOL)))
+	if(FAILED(Add_Shaders(eLevel)))
 		return E_FAIL;
 
-	m_strLoadingText = TEXT("객체를(을) 로딩 중 입니다.");
 
+	m_strLoadingText = TEXT("객체를(을) 로딩 중 입니다.");
 
 	/* For.Prototype_GameObject_Grid */
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
@@ -236,6 +232,53 @@ HRESULT CLoader::Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName, _
 
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag,
 		CModel::Create(m_pDevice, m_pContext, eModelType, strModelName, TransformMatrix))))
+		return E_FAIL;
+
+	//if (eModelType == TYPE_ANIM)
+	//{
+	//	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag + L"_NonAnim",
+	//		CModel::Create(m_pDevice, m_pContext, TYPE_NONANIM, strModelName, TransformMatrix))))
+	//		return E_FAIL;
+	//}
+	return S_OK;
+}
+
+HRESULT CLoader::Add_Models(LEVEL eLevel)
+{
+	/* Prototype_Component_Model_Jack */
+	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Jack", 0.0025f, 180.f)))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_Ballista */
+	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Ballista", 0.03f, 180.f)))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_Charon */
+	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Charon", 0.03f, 180.f)))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_Crow */
+	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Crow", 0.0005f, 180.f)))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_Mummy */
+	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Mummy", 0.03f, 180.f)))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_Owl */
+	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Owl", 0.03f, 180.f)))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_SkeletonBoss */
+	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "SkeletonBoss", 0.01f, 0.f)))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_SlimeBoss */
+	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "SlimeBoss", 0.01f, 0.f)))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_Trabuchet */
+	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Trabuchet", 0.01f, 0.f)))
 		return E_FAIL;
 
 	return S_OK;

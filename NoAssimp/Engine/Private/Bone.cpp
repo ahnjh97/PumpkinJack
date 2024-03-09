@@ -16,10 +16,19 @@ HRESULT CBone::Initialize(ifstream& fileStream)
 	return S_OK;
 }
 
-void CBone::Update_CombinedTransformationMatrix(const vector<CBone*>& Bones, _fmatrix TransformatrixMatrix)
+void CBone::Update_CombinedTransformationMatrix(const vector<CBone*>& Bones, _fmatrix TransformatrixMatrix, _int _realRootIndex)
 {
 	if (-1 == m_iParentBoneIndex)
 		XMStoreFloat4x4(&m_CombinedTransformationMatrix, XMLoadFloat4x4(&m_TransformationMatrix) * TransformatrixMatrix);
+	else if (m_iParentBoneIndex == (_realRootIndex - 1)) // 드디어 찾았다 루트노드 d
+	{
+		m_TransformationMatrix._41 = 0.f;
+		m_TransformationMatrix._42 = 0.f;
+		m_TransformationMatrix._43 = 0.f;
+		
+		XMStoreFloat4x4(&m_CombinedTransformationMatrix,
+			XMLoadFloat4x4(&m_TransformationMatrix) * XMLoadFloat4x4(&Bones[m_iParentBoneIndex]->m_CombinedTransformationMatrix));
+	}
 	else
 	{
 		XMStoreFloat4x4(&m_CombinedTransformationMatrix,

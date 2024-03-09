@@ -19,6 +19,7 @@ public:
 
 public:
 	const _float4x4* Get_CombinedTransformationMatrix() const {	return &m_CombinedTransformationMatrix;	}
+	_float4x4* Get_TransformationMatrix() { return &m_TransformationMatrix; }
 
 public:
 	HRESULT Initialize(ifstream& fileStream);

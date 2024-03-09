@@ -18,6 +18,7 @@ public:
 	_bool isFinished() { return m_Animations[m_iCurrentAnimIndex]->isFinished(); }
 	TYPE Get_ModelType() { return m_eModelType; }
 	string Get_ModelName() { return m_strModelName; }
+	_float3 Get_HipTranslation(){ return m_vHipTranslation; }
 
 	void Set_Animation(_uint iAnimIndex, _bool isLoop) {
 		m_iCurrentAnimIndex = iAnimIndex; m_isLoop = isLoop;
@@ -53,6 +54,8 @@ private:
 	vector<MATERIAL_TEXTURE>	m_Materials;
 
 	_float4x4					m_TransformMatrix;
+	_float						m_fScale = {};
+	_float3						m_vHipTranslation = {};
 
 	vector<class CBone*>		m_Bones;
 	_uint						m_iNumAnimations = { 0 };
@@ -71,14 +74,13 @@ private:
 	string						m_strNonAnimVersion;
 
 	_bool						m_bHide = { false };
+				
 
 private:
 	HRESULT Ready_Meshes();
 	HRESULT Ready_Materials(const _char* pModelFilePath);
 	HRESULT Ready_Bones();
 	HRESULT Ready_Animations();
-
-	void Create_NonAnimVersion(const string& strModelName);
 
 public:
 	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelName, _fmatrix TransformMatrix);

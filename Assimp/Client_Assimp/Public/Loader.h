@@ -10,7 +10,6 @@ class CGameInstance;
 END
 
 BEGIN(Client)
-
 class CLoader final : public CBase
 {
 private:
@@ -39,6 +38,13 @@ private:
 private:
 	HRESULT Loading_For_Logo();
 	HRESULT Loading_For_GamePlay();
+
+	HRESULT Add_AnimPrototype(wstring& ModelName);
+	HRESULT Add_NonAnimPrototype(wstring& ModelName);
+
+	void TraverseAnimModels(const wstring& rootFolderPath); 
+	void TraverseNonAnimModels(const wstring& rootFolderPath);
+	void TraverseDirectory(const wstring& rootFolderPath, list<wstring>& fileList);
 
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID);
