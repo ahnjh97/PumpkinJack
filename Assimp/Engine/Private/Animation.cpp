@@ -74,6 +74,13 @@ void CAnimation::Update_TransformationMatrix(_float fTimeDelta, const vector<CBo
 
 void CAnimation::Write_AnimationData(ofstream& fileStream)
 {
+	string strName = m_szName;
+	size_t pos = strName.find_last_of('|');
+	if (pos != string::npos) {
+		string result = strName.substr(pos + 1);
+		strcpy_s(m_szName, result.c_str());
+	}
+
 	fileStream.write(reinterpret_cast<const char*>(&m_szName), sizeof(m_szName));
 	fileStream.write(reinterpret_cast<const char*>(&m_fDuration), sizeof(m_fDuration));
 	fileStream.write(reinterpret_cast<const char*>(&m_fTickPerSecond), sizeof(m_fTickPerSecond));

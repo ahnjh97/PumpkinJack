@@ -270,12 +270,12 @@ _bool CGameInstance::Binarize_Objects(string strLevel)
 	return m_pObject_Manager->Binarize_Objects(strLevel);
 }
 
-CGameObject* CGameInstance::Select_ModelByPicking(_uint iLevelIndex)
+CGameObject* CGameInstance::Select_ModelByPicking(_uint iLevelIndex, const wstring& wstrLayerTag)
 {
 	if (nullptr == m_pObject_Manager)
 		return false;
 
-	return m_pObject_Manager->Select_ModelByPicking(iLevelIndex);
+	return m_pObject_Manager->Select_ModelByPicking(iLevelIndex, wstrLayerTag);
 }
 
 CGameObject* CGameInstance::Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag)
@@ -284,6 +284,14 @@ CGameObject* CGameInstance::Get_GameObject(_uint iLevelIndex, const wstring& str
 		return false;
 
 	return m_pObject_Manager->Get_GameObject(iLevelIndex, strLayerTag, strPrototypeTag);
+}
+
+CGameObject* CGameInstance::Get_LastGameObject(_uint iLevelIndex, const wstring& wstrLayerTag)
+{
+	if (nullptr == m_pObject_Manager)
+		return false;
+
+	return m_pObject_Manager->Get_LastGameObject(iLevelIndex, wstrLayerTag);
 }
 
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const wstring & strPrototypeTag, CComponent * pPrototype)
@@ -403,6 +411,17 @@ _bool CGameInstance::IsPicking()
 	return m_pImGui_Manager->IsPicking();
 }
 
+string CGameInstance::WstrToStr(const wstring& wstr)
+{
+	wstring_convert<codecvt_utf8<wchar_t>> cnvt;
+	return cnvt.to_bytes(wstr);
+}
+
+wstring CGameInstance::StrToWstr(const string& str)
+{
+	wstring_convert<codecvt_utf8<wchar_t>> cnvt;
+	return cnvt.from_bytes(str);
+}
 
 
 void CGameInstance::Release_Engine()

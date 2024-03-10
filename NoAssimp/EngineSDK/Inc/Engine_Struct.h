@@ -79,6 +79,15 @@ namespace Engine
 			0.0f, 0.0f, 0.0f, 1.0f);
 		wstring wstrModelTag = L"";
 	}PARSE_DATA;
+
+	typedef struct
+	{
+		_float fScale = { 0.01f };
+		_float fDegree = { 0.f };
+		_float fNewScale = { 1.f };
+		_uint iRealRoot = { 4 };
+	}MODEL_CONFIG;
+
 	// MODEL_NONANIM.mNumMeshes 만큼 반복: MESH_NONANIM. { mName, mMaterialIndex, mNumVertices,	mNumFaces } -> VTXMESH * mNumVertices -> _uint * m_iNumIndices
 	// MODEL_NONANIM.mNumMaterials * 20번 만큼 반복: _tchar szPerfectPath[MAX_PATH]
 	// NoAssimp Client에서는 CMesh에 Get_MeshInfo함수 만들어서 mNumVertices, mNumFaces를 가져와서 파일읽기 시작위치 지정해줄것

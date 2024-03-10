@@ -59,10 +59,12 @@ void CComponent_Manager::PushBackPrototypes(vector<string>& vecAnim, vector<stri
 		TYPE eType = pModel->Get_ModelType();
 		string strModelName = pModel->Get_ModelName();
 		const char* charModelName = strModelName.c_str();
-		if (eType == TYPE_ANIM)
-			vecAnim.push_back(charModelName);
 		if (eType == TYPE_NONANIM)
 			vecNonAnim.push_back(charModelName);
+		else if(pModel->IsNonAnimVersion())
+			vecNonAnim.push_back(charModelName);
+		else if (eType == TYPE_ANIM)
+			vecAnim.push_back(charModelName);
 	}
 	return;
 }

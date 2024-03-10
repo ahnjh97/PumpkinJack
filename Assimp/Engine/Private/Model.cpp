@@ -99,7 +99,7 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelFilePath,
 		return E_FAIL;
 
 	if (eType == TYPE_ANIM)
-		Create_NonAnimVersion(strModelFilePath);
+		Create_NonAnimVersion(strModelFilePath , TransformMatrix);
 
 	return S_OK;
 }
@@ -307,14 +307,14 @@ HRESULT CModel::RenameBinaryFile()
 	return S_OK;
 }
 
-void CModel::Create_NonAnimVersion(const string& strModelFilePath)
+void CModel::Create_NonAnimVersion(const string& strModelFilePath, _fmatrix TransformMatrix)
 {
 	string strModelName_NonAnim = m_strDirectory + "_NonAnim";
 	wstring_convert<codecvt_utf8<wchar_t>> converter;
 	wstring wstrModelName_NonAnim = converter.from_bytes(strModelName_NonAnim);
 	wstring wstrPrototypeTag = L"Prototype_Component_Model_" + wstrModelName_NonAnim;
 
-	m_pGameInstance->Add_Prototype(Level_MapTool, wstrPrototypeTag, Create(m_pDevice, m_pContext, TYPE_NONANIM, strModelFilePath, XMLoadFloat4x4(&m_TransformMatrix)));
+	m_pGameInstance->Add_Prototype(Level_MapTool, wstrPrototypeTag, Create(m_pDevice, m_pContext, TYPE_NONANIM, strModelFilePath, TransformMatrix));
 }
 
 CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelFilePath, _fmatrix TransformMatrix)

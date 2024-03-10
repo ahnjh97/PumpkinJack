@@ -50,6 +50,7 @@ HRESULT CLoader::Initialize(LEVEL eNextLevelID)
 	if (0 == m_hThread)
 		return E_FAIL;
 
+	Insert_ScaleRotationData();
 	return S_OK;
 }
 
@@ -127,8 +128,10 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	//if (FAILED(Add_Model(LEVEL_GAMEPLAY, TYPE_ANIM, "Fiona", 1.f, 180.f)))
 	//	return E_FAIL;
 
-	if (Add_Models(eLevel)) // LEVEL_GAMEPLAY;
-		return E_FAIL;
+	//if (Add_Models(eLevel)) // LEVEL_GAMEPLAY;
+	//	return E_FAIL;
+	TraverseAnimModels(eLevel, L"../../../model_txt/Anim/");
+	TraverseNonAnimModels(eLevel, L"../../../model_txt/NonAnim/");
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
 
@@ -190,8 +193,10 @@ HRESULT CLoader::Loading_For_MapTool(LEVEL eLevel)
 	//if(FAILED(Add_Model(LEVEL_MAPTOOL, TYPE_ANIM, "Fiona", 1.f, 180.f)))
 	//	return E_FAIL;
 
-	if (Add_Models(eLevel)) // LEVEL_MAPTOOL;
-		return E_FAIL;
+	//if (Add_Models(eLevel)) // LEVEL_MAPTOOL;
+	//	return E_FAIL;
+	TraverseAnimModels(eLevel, L"../../../model_txt/Anim/");
+	TraverseNonAnimModels(eLevel, L"../../../model_txt/NonAnim/");
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
 
@@ -221,8 +226,21 @@ HRESULT CLoader::Loading_For_MapTool(LEVEL eLevel)
 	return S_OK;
 }
 
-HRESULT CLoader::Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName, _float fScale, _float fDegree)
+HRESULT CLoader::Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName)
 {
+	_float fScale = 1.f;
+	MODEL_CONFIG tConfig{};
+	auto ScaleIter = m_ModelConfigs.find(strModelName);
+	if (ScaleIter != m_ModelConfigs.end())
+	{
+		fScale = ScaleIter->second.fScale;
+		tConfig = ScaleIter->second;
+	}
+
+		
+
+	_float fDegree = 0.f;
+
 	_matrix		TransformMatrix = XMMatrixIdentity();
 	TransformMatrix = XMMatrixScaling(fScale, fScale, fScale) * XMMatrixRotationY(XMConvertToRadians(fDegree));
 
@@ -231,55 +249,28 @@ HRESULT CLoader::Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName, _
 	wstring wstrPrototypeTag = L"Prototype_Component_Model_" + wstrModelName;
 
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag,
-		CModel::Create(m_pDevice, m_pContext, eModelType, strModelName, TransformMatrix))))
+		CModel::Create(m_pDevice, m_pContext, eModelType, strModelName, TransformMatrix, tConfig))))
 		return E_FAIL;
+
 
 	if (eModelType == TYPE_ANIM)
 	{
+		_float fNewScale = 1.f;
+		auto NewScaleIter = m_ModelConfigs.find(strModelName);
+		if (NewScaleIter != m_ModelConfigs.end())
+			fNewScale = NewScaleIter->second.fNewScale;
+
+		TransformMatrix = XMMatrixScaling(fNewScale, fNewScale, fNewScale) * XMMatrixRotationY(XMConvertToRadians(fDegree));
 		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag + L"_NonAnim",
-			CModel::Create(m_pDevice, m_pContext, TYPE_NONANIM, strModelName, TransformMatrix))))
+			CModel::Create(m_pDevice, m_pContext, TYPE_NONANIM, strModelName, TransformMatrix, tConfig, true))))
 			return E_FAIL;
 	}
 	return S_OK;
 }
 
-HRESULT CLoader::Add_Models(LEVEL eLevel)
+HRESULT CLoader::Add_Models_GamePlay()
 {
 	/* Prototype_Component_Model_Jack */
-	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Jack", 0.0025f, 0.f)))
-		return E_FAIL;
-
-	/* Prototype_Component_Model_Ballista */
-	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Ballista", 0.03f, 180.f)))
-		return E_FAIL;
-
-	/* Prototype_Component_Model_Charon */
-	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Charon", 0.03f, 0.f)))
-		return E_FAIL;
-
-	/* Prototype_Component_Model_Crow */
-	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Crow", 0.0005f, 0.f)))
-		return E_FAIL;
-
-	/* Prototype_Component_Model_Mummy */
-	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Mummy", 0.03f, 180.f)))
-		return E_FAIL;
-
-	/* Prototype_Component_Model_Owl */
-	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Owl", 0.03f, 180.f)))
-		return E_FAIL;
-
-	/* Prototype_Component_Model_SkeletonBoss */
-	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "SkeletonBoss", 0.01f, 0.f)))
-		return E_FAIL;
-
-	/* Prototype_Component_Model_SlimeBoss */
-	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "SlimeBoss", 0.01f, 0.f)))
-		return E_FAIL;
-
-	/* Prototype_Component_Model_Trabuchet */
-	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Trabuchet", 0.01f, 0.f)))
-		return E_FAIL;
 
 	return S_OK;
 }
@@ -314,6 +305,121 @@ HRESULT CLoader::Add_Textures(LEVEL eLevel, string strPrototypeName, string strF
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CLoader::Insert_ScaleRotationData()
+{
+	m_ModelConfigs.emplace("Ballista", MODEL_CONFIG{ 0.03f, 0.f, 2.6f, 4 });
+	m_ModelConfigs.emplace("Bat", MODEL_CONFIG{ 0.005f, 0.f, 0.5f, 4 });
+	m_ModelConfigs.emplace("Charon", MODEL_CONFIG{ 0.03f, 180.f, 2.6f, 4 });
+	m_ModelConfigs.emplace("Crow", MODEL_CONFIG{ 0.0003f, 180.f, 0.03f, 1 });
+	m_ModelConfigs.emplace("Dummy", MODEL_CONFIG{ 0.003f, 0.f, 0.3f, 3 });
+	m_ModelConfigs.emplace("Jack", MODEL_CONFIG{ 0.0025f, 180.f, 0.25f, 5 }); // 여기부터 루트노드 모름
+	m_ModelConfigs.emplace("Mummy", MODEL_CONFIG{ 0.03f, 0.f, 2.2f, 4 });
+	m_ModelConfigs.emplace("Owl", MODEL_CONFIG{ 0.03f, 0.f, 1.f, 4 });
+	m_ModelConfigs.emplace("SkeletonBoss", MODEL_CONFIG{ 0.02f, 0.f, 0.6f, 4 });
+	m_ModelConfigs.emplace("SlimeBoss", MODEL_CONFIG{ 0.01f, 0.f, 1.f, 4 });
+	m_ModelConfigs.emplace("Trabuchet", MODEL_CONFIG{ 0.01f, 0.f, 1.f, 4 });
+	m_ModelConfigs.emplace("Horse", MODEL_CONFIG{ 0.02f, 180.f, 1.5f, 4 });
+}
+
+void CLoader::TraverseAnimModels(LEVEL eLevel, const wstring& rootFolderPath)
+{
+	WIN32_FIND_DATA findFileData;
+	HANDLE hFind = FindFirstFile((rootFolderPath + L"\\*").c_str(), &findFileData);
+
+	if (hFind == INVALID_HANDLE_VALUE) {
+		MSG_BOX(TEXT("폴더를 찾을수없습니다"));
+		return;
+	}
+
+	list<wstring> txtList;
+	TraverseDirectory(rootFolderPath, txtList);
+
+	for (auto listIter : txtList)
+	{
+		wstring temp = listIter.substr(0, listIter.length() - 4);
+		wstring_convert<codecvt_utf8<wchar_t>> converter;
+		string strModelName = converter.to_bytes(temp);
+
+		if (FAILED(Add_Model(eLevel, TYPE_ANIM, strModelName)))
+		{
+			wstring wstrError = L"Failed to Add: " + temp;
+			MSG_BOX(wstrError.c_str());
+		}
+	}
+
+	FindClose(hFind);
+}
+
+void CLoader::TraverseNonAnimModels(LEVEL eLevel, const wstring& rootFolderPath)
+{
+	WIN32_FIND_DATA findFileData;
+	HANDLE hFind = FindFirstFile((rootFolderPath + L"\\*").c_str(), &findFileData);
+
+	if (hFind == INVALID_HANDLE_VALUE) {
+		MSG_BOX(TEXT("폴더를 찾을수없습니다"));
+		return;
+	}
+
+	list<wstring> AnimtxtList;
+	TraverseDirectory(L"../../../model_txt/Anim/", AnimtxtList);
+	list<wstring> txtList;
+	TraverseDirectory(L"../../../model_txt/NonAnim/", txtList);
+
+	for (auto listIter : txtList)
+	{
+		_bool bNonAnimVersion = { false };
+		wstring temp = listIter.substr(0, listIter.length() - 4);
+		wstring_convert<codecvt_utf8<wchar_t>> converter;
+		string strModelName = converter.to_bytes(temp);
+
+		for (auto Animtxt : AnimtxtList)
+		{
+			if (Animtxt.find(temp) != wstring::npos)
+			{
+				bNonAnimVersion = true;
+				break;
+			}
+		}
+
+		if (bNonAnimVersion == false)
+		{
+			if (FAILED(Add_Model(eLevel, TYPE_NONANIM, strModelName)))
+			{
+				wstring wstrError = L"Failed to Add: " + temp;
+				MSG_BOX(wstrError.c_str());
+			}
+		}
+	}
+
+	FindClose(hFind);
+}
+
+void CLoader::TraverseDirectory(const wstring& rootFolderPath, list<wstring>& fileList)
+{
+	WIN32_FIND_DATA findFileData;
+	HANDLE hFind = FindFirstFile((rootFolderPath + L"\\*").c_str(), &findFileData);
+
+	if (hFind == INVALID_HANDLE_VALUE) {
+		MSG_BOX(TEXT("폴더를 찾을수없습니다"));
+		return;
+	}
+
+	do {
+		if (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+			if (wcscmp(findFileData.cFileName, L".") != 0 && wcscmp(findFileData.cFileName, L"..") != 0) {
+				// 재귀적으로 하위 폴더도 순회
+				TraverseDirectory(rootFolderPath + L"\\" + findFileData.cFileName, fileList);
+			}
+		}
+		else {
+			// 파일이면 리스트에 추가
+			fileList.push_back(wstring(findFileData.cFileName));
+		}
+	} while (FindNextFile(hFind, &findFileData) != 0);
+
+	FindClose(hFind);
 }
 
 CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)

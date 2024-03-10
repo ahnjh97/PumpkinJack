@@ -32,7 +32,15 @@ HRESULT CTool_NonAnim::Initialize(void* pArg)
 	if (FAILED(Add_Components(GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
 
-
+	//_float4x4 matModelTransform = m_pModelCom->Get_ModelTransformMat();
+	//_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	//matModelTransform._41 = vPos.x;
+	//matModelTransform._42 = vPos.y;
+	//matModelTransform._43 = vPos.z;
+	////_matrix matTemp = XMMatrixMultiply(XMLoadFloat4x4(&matModelTransform), m_pTransformCom->Get_WorldMatrix());
+	////_float4x4 matResult = {};
+	////XMStoreFloat4x4(&matResult, matTemp);
+	//m_pTransformCom->Set_WorldMatrix(matModelTransform);
 	return S_OK;
 }
 

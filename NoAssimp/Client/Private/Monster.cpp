@@ -25,7 +25,7 @@ HRESULT CMonster::Initialize(void * pArg)
 	
 	GameObjectDesc.fSpeedPerSec = 10.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-
+	
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
@@ -33,7 +33,8 @@ HRESULT CMonster::Initialize(void * pArg)
 		return E_FAIL;	
 
 	//m_pModelCom->Set_Animation(11, true); // 999: 랜덤 애니메이션
-	m_pModelCom->Set_Animation(999, true); // 999: 랜덤 애니메이션
+	if(!m_pModelCom->IsNonAnimVersion())
+		m_pModelCom->Set_Animation(999, true); // 999: 랜덤 애니메이션
 	
 	return S_OK;
 }

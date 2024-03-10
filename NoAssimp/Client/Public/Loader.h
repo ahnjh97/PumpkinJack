@@ -35,16 +35,23 @@ private:
 
 	CGameInstance*				m_pGameInstance = { nullptr };
 
+	map<string, MODEL_CONFIG>	m_ModelConfigs;
 
 private:
 	HRESULT Loading_For_Logo();
 	HRESULT Loading_For_GamePlay(LEVEL eLevel);
 	HRESULT Loading_For_MapTool(LEVEL eLevel);
 
-	HRESULT Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName, _float fScale, _float fDegree);
-	HRESULT Add_Models(LEVEL eLevel);
+	HRESULT Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName);
+	HRESULT Add_Models_GamePlay();
 	HRESULT Add_Shaders(LEVEL eLevel);
 	HRESULT Add_Textures(LEVEL eLevel, string strPrototypeName, string strFolderAndFileName);
+
+	void Insert_ScaleRotationData();
+
+	void TraverseAnimModels(LEVEL eLevel, const wstring& rootFolderPath);
+	void TraverseNonAnimModels(LEVEL eLevel, const wstring& rootFolderPath);
+	void TraverseDirectory(const wstring& rootFolderPath, list<wstring>& fileList);
 
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID);

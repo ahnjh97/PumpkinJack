@@ -50,7 +50,7 @@ void CImGui_Client::Tick(_float fTimeDelta)
 
 	if (!ImGui::IsAnyItemHovered() && m_pGameInstance->MouseDown(DIMKS_LBUTTON)) // ¸ðµ¨¼±ÅÃ: 
 	{
-		CGameObject* pObj = m_pGameInstance->Select_ModelByPicking(m_pGameInstance->Get_CurrentLevelID());
+		CGameObject* pObj = m_pGameInstance->Select_ModelByPicking(m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Parse"));
 		if (pObj != nullptr)
 		{
 			if (pObj != m_pPickedObject)
@@ -63,7 +63,6 @@ void CImGui_Client::Tick(_float fTimeDelta)
 					{
 						pAnimObject->Set_Dead();
 						pAnimObject = nullptr;
-						pAnimModel = nullptr;
 					}
 					bSeeAnim = false;
 					AnimationIdx = -1;
@@ -116,7 +115,6 @@ void CImGui_Client::Tick(_float fTimeDelta)
 			{
 				pAnimObject->Set_Dead();
 				pAnimObject = nullptr;
-				pAnimModel = nullptr;
 			}
 			bSeeAnim = false;
 			AnimationIdx = -1;
@@ -287,7 +285,7 @@ void CImGui_Client::OnRightClick()
 			wstring wstrPrototypeTag = TEXT("Prototype_GameObject_Tool_NonAnim");
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Parse"), wstrPrototypeTag, &tempDesc)))
 				return;
-
+	
 			m_bIsPicking = false;
 		}
 	}

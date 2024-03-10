@@ -18,8 +18,9 @@ private:
 public:
 	const class CComponent* Get_Component(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strComTag, _uint iIndex);
 	_bool Binarize_Objects(string strLevel);
-	class CGameObject* Select_ModelByPicking(_uint iLevelIndex); // MapTool에서의 모델선택
+	class CGameObject* Select_ModelByPicking(_uint iLevelIndex, const wstring& wstrLayerTag); // MapTool에서의 모델선택
 	CGameObject* Get_GameObject(_uint iLevelIndex, const wstring& wstrLayerTag, const wstring& wstrPrototypeTag);
+	CGameObject* Get_LastGameObject(_uint iLevelIndex, const wstring& wstrLayerTag); // MapTool용
 
 public:
 	HRESULT Initialize(_uint iNumLevels);

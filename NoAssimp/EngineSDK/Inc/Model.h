@@ -19,14 +19,18 @@ public:
 	TYPE Get_ModelType() { return m_eModelType; }
 	string Get_ModelName() { return m_strModelName; }
 	_float3 Get_HipTranslation(){ return m_vHipTranslation; }
+	_bool IsNonAnimVersion() { return m_bIsNonAnimVersion; }
+	_float4x4 Get_ModelTransformMat() { return m_TransformMatrix; }
 
 	void Set_Animation(_uint iAnimIndex, _bool isLoop) {
+		if (m_bIsNonAnimVersion) return;
 		m_iCurrentAnimIndex = iAnimIndex; m_isLoop = isLoop;
 		if (m_iCurrentAnimIndex >= m_iNumAnimations) {
 			m_iCurrentAnimIndex = rand() % m_iNumAnimations;}}
 
 	void Set_Hide(_bool bHide) { m_bHide = bHide; }
 	void Copy_Animations(vector<CAnimation*>& vecAnims) { vecAnims = m_Animations; }
+	void Set_RealRoot(_uint iRealRoot) { m_tConfig.iRealRoot = iRealRoot; }
 
 
 public: // 바운딩박스
@@ -34,7 +38,7 @@ public: // 바운딩박스
 	_float3 Check_Meshes(const class CTransform* pTransform) const;
 
 public:
-	virtual HRESULT Initialize_Prototype(TYPE eType, const string& strModelName, _fmatrix TransformMatrix);
+	virtual HRESULT Initialize_Prototype(TYPE eType, const string& strModelName, _fmatrix TransformMatrix, MODEL_CONFIG tConfig, _bool bNonAnimVersion);
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
@@ -54,8 +58,9 @@ private:
 	vector<MATERIAL_TEXTURE>	m_Materials;
 
 	_float4x4					m_TransformMatrix;
-	_float						m_fScale = {};
 	_float3						m_vHipTranslation = {};
+	_float4						m_vScale = {};
+	_float4						m_vRotation = {};
 
 	vector<class CBone*>		m_Bones;
 	_uint						m_iNumAnimations = { 0 };
@@ -63,6 +68,7 @@ private:
 	_bool						m_isLoop = { false };
 	vector<CAnimation*>			m_Animations;
 	_float4x4					m_MeshBoneMatrices[512];
+	MODEL_CONFIG				m_tConfig = {};
 
 	// 파일입출력 변수
 	string						m_strDirectory;
@@ -71,10 +77,10 @@ private:
 	BoundingBox					m_BoundingBox;
 
 	string						m_strModelName;
-	string						m_strNonAnimVersion;
-
+	
+	_bool						m_bIsNonAnimVersion = { false };
 	_bool						m_bHide = { false };
-				
+
 
 private:
 	HRESULT Ready_Meshes();
@@ -83,7 +89,7 @@ private:
 	HRESULT Ready_Animations();
 
 public:
-	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelName, _fmatrix TransformMatrix);
+	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelName, _fmatrix TransformMatrix, MODEL_CONFIG tConfig, _bool bNonAnimVersion = false);
 	
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;

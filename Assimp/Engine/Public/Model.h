@@ -66,7 +66,7 @@ private:
 	HRESULT Ready_Animations();
 
 	HRESULT RenameBinaryFile();
-	void Create_NonAnimVersion(const string& strModelName);
+	void Create_NonAnimVersion(const string& strModelName, _fmatrix TransformMatrix);
 
 public:
 	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelFilePath, _fmatrix TransformMatrix);

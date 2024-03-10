@@ -4,6 +4,8 @@
 #include "Renderer.h"
 #include "Component_Manager.h"
 #include "PipeLine.h"
+#include <locale>
+#include <codecvt>
 
 BEGIN(Engine)
 
@@ -42,8 +44,9 @@ public: /* For.Object_Manager */
 	HRESULT Add_Clone(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg = nullptr);
 	const CComponent* Get_Component(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strComTag, _uint iIndex = 0);
 	_bool Binarize_Objects(string strLevel);
-	CGameObject* Select_ModelByPicking(_uint iLevelIndex); // MapTool에서의 모델선택
+	CGameObject* Select_ModelByPicking(_uint iLevelIndex, const wstring& wstrLayerTag); // MapTool에서의 모델선택
 	CGameObject* Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag);
+	CGameObject* Get_LastGameObject(_uint iLevelIndex, const wstring& wstrLayerTag); // MapTool용
 
 public: /* For.Component_Manager */
 	HRESULT Add_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag, class CComponent* pPrototype);
@@ -69,6 +72,9 @@ public: /* For. Picking*/
 public: /* For.ImGui_Manager*/
 	_float3 Get_PickPos();
 	_bool IsPicking();
+
+	string WstrToStr(const wstring& wstr);
+	wstring StrToWstr(const string& str);
 
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };

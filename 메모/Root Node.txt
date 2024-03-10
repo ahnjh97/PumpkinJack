@@ -1,0 +1,5 @@
+Ballista / 4 / Bone_001
+Bat / 4 / body2
+Charon / 4 / pelvis
+Crow / 1 / 
+Dummy / 3 / Armature

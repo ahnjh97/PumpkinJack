@@ -176,10 +176,13 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 HRESULT CLoader::Add_AnimPrototype(wstring& ModelName)
 {
+	m_strLoadingText = TEXT("../../../Resources/Models/") + ModelName + TEXT("/") + ModelName + TEXT(".fbx");
+
 	wstring_convert<codecvt_utf8<wchar_t>> converter;
 	string strModelName = converter.to_bytes(ModelName);
 	_matrix		TransformMatrix = XMMatrixIdentity();
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, L"Prototype_Component_Model_" + ModelName,
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Resources/Models/" + strModelName + "/" + strModelName + ".fbx", TransformMatrix))))
 		return E_FAIL;
@@ -188,10 +191,13 @@ HRESULT CLoader::Add_AnimPrototype(wstring& ModelName)
 
 HRESULT CLoader::Add_NonAnimPrototype(wstring& ModelName)
 {
+	m_strLoadingText = TEXT("../../../Resources/Models/") + ModelName + TEXT("/") + ModelName + TEXT(".fbx");
+
 	wstring_convert<codecvt_utf8<wchar_t>> converter;
 	string strModelName = converter.to_bytes(ModelName);
 	_matrix		TransformMatrix = XMMatrixIdentity();
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, L"Prototype_Component_Model_" + ModelName,
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Resources/Models/NonAnimModels/" + strModelName + "/" + strModelName + ".fbx", TransformMatrix))))
 		return E_FAIL;

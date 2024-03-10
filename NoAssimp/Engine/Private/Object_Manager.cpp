@@ -195,7 +195,7 @@ _bool CObject_Manager::Binarize_Objects(string strLevel)
 	return true;
 }
 
-CGameObject* CObject_Manager::Select_ModelByPicking(_uint iLevelIndex)
+CGameObject* CObject_Manager::Select_ModelByPicking(_uint iLevelIndex, const wstring& wstrLayerTag)
 {
 	vector<CGameObject*> vecPickedObjects;
 
@@ -204,7 +204,7 @@ CGameObject* CObject_Manager::Select_ModelByPicking(_uint iLevelIndex)
 		if (mapIter.second == nullptr)
 			continue;
 
-		size_t found = mapIter.first.find(TEXT("Layer_Parse")); // 일단 임시로 Layer_Parse
+		size_t found = mapIter.first.find(wstrLayerTag); // 일단 임시로 Layer_Parse
 		if (found == wstring::npos) // 찾지못한경우
 			continue;
 
@@ -238,6 +238,29 @@ CGameObject* CObject_Manager::Select_ModelByPicking(_uint iLevelIndex)
 		// 가장 거리가 가까운 놈 찾기
 		return vecPickedObjects[0];
 	}
+	return nullptr;
+}
+
+CGameObject* CObject_Manager::Get_LastGameObject(_uint iLevelIndex, const wstring& wstrLayerTag)
+{
+	vector<CGameObject*> vecPickedObjects;
+
+	for (auto& mapIter : m_pLayers[iLevelIndex])
+	{
+		if (mapIter.second == nullptr)
+			continue;
+
+		size_t found = mapIter.first.find(TEXT("Layer_Parse")); // 일단 임시로 Layer_Parse
+		if (found == wstring::npos) // 찾지못한경우
+			continue;
+
+		list<CGameObject*>& objectList = mapIter.second->Get_ObjectList();
+		if (objectList.empty())
+			continue;
+
+		return objectList.back();
+	}
+
 	return nullptr;
 }
 

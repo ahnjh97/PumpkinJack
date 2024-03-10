@@ -21,7 +21,9 @@ CModel::CModel(const CModel& rhs)
 	, m_iNumMaterials{ rhs.m_iNumMaterials }
 	, m_Materials{ rhs.m_Materials }
 	, m_TransformMatrix{ rhs.m_TransformMatrix }
-	, m_fScale{ rhs.m_fScale }
+	, m_vScale{rhs.m_vScale}
+	, m_vRotation{rhs.m_vRotation}
+	, m_tConfig{ rhs.m_tConfig }
 	, m_iNumAnimations{ rhs.m_iNumAnimations }
 	, m_eModelType{ rhs.m_eModelType }
 	, m_strModelName { rhs.m_strModelName }
@@ -70,10 +72,12 @@ _float3 CModel::Check_Meshes(const CTransform* pTransform) const
 	return vecPickPos[0];
 }
 
-HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelName, _fmatrix TransformMatrix)
+HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelName, _fmatrix TransformMatrix, MODEL_CONFIG tConfig, _bool bNonAnimVersion)
 {
 	m_eModelType = eType;
 	m_strModelName = strModelName;
+	m_bIsNonAnimVersion = bNonAnimVersion;
+	m_tConfig = tConfig;
 	string strFolderName = "Anim/";
 	string strTxt = ".txt";
 	
@@ -91,7 +95,11 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelName, _fm
 	}
 
 	::XMStoreFloat4x4(&m_TransformMatrix, TransformMatrix);
-	m_fScale = XMVectorGetX(XMVector3Length((TransformMatrix.r[0])));
+	_vector scale, rotation, position;
+	// 기존 행렬에서 성분 분해
+	XMMatrixDecompose(&scale, &rotation, &position, TransformMatrix);
+	XMStoreFloat4(&m_vScale, scale);
+	XMStoreFloat4(&m_vRotation, rotation);
 
 
 	/* 읽은 정보를 바탕으로해서 내가 사용하기 좋게 정리한다.  */
@@ -160,10 +168,11 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 
 	/* 현재 애니메이션에 맞는 뼈의 상태(m_TransformationMatrix)를 갱신해준다. */
 	m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrix(fTimeDelta, m_Bones, m_isLoop);
+	if (m_Animations.empty())
+		return S_OK;
 
 	// Hip 의 변환행렬
-	_uint realRootIndex = 4;
-	_matrix HipLocalTransform = XMLoadFloat4x4(m_Bones[realRootIndex]->Get_TransformationMatrix());
+	_matrix HipLocalTransform = XMLoadFloat4x4(m_Bones[m_tConfig.iRealRoot]->Get_TransformationMatrix());
 	_vector translation, scale, rotation;
 	XMMatrixDecompose(&scale, &rotation, &translation, HipLocalTransform);
 	XMStoreFloat3(&m_vHipTranslation, translation);
@@ -172,12 +181,13 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 	_matrix RootLocalTransform = XMLoadFloat4x4(m_Bones[0]->Get_TransformationMatrix());
 	//RootLocalTransform.r[3] = XMVectorSet(m_vHipTranslation.x, m_vHipTranslation.y, m_vHipTranslation.z, 1.0f);
 	RootLocalTransform.r[3] = XMVectorSet(0, 0, 0, 1.0f);
-
-	RootLocalTransform = XMMatrixScaling(m_fScale, m_fScale, m_fScale) * RootLocalTransform;
+	_vector vRotation = XMLoadFloat4(&m_vRotation);
+	_vector vScale = XMLoadFloat4(&m_vScale);
+	RootLocalTransform = XMMatrixScalingFromVector(vScale) * XMMatrixRotationQuaternion(vRotation) * RootLocalTransform;
 	XMStoreFloat4x4(&m_TransformMatrix, RootLocalTransform);
 
 	for (auto& pBone : m_Bones)
-		pBone->Update_CombinedTransformationMatrix(m_Bones, RootLocalTransform, realRootIndex);
+		pBone->Update_CombinedTransformationMatrix(m_Bones, RootLocalTransform, m_tConfig.iRealRoot);
 
 	return S_OK;
 }
@@ -282,15 +292,14 @@ HRESULT CModel::Ready_Animations()
 
 		m_Animations.push_back(pAnimation);
 	}
-
 	return S_OK;
 }
 
-CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelName, _fmatrix TransformMatrix)
+CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelName, _fmatrix TransformMatrix, MODEL_CONFIG tConfig, _bool bNonAnimVersion)
 {
 	CModel* pInstance = new CModel(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(eType, strModelName, TransformMatrix)))
+	if (FAILED(pInstance->Initialize_Prototype(eType, strModelName, TransformMatrix, tConfig, bNonAnimVersion)))
 	{
 		MSG_BOX(TEXT("Failed To Created : CModel"));
 
