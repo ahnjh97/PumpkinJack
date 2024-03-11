@@ -1,0 +1,5 @@
+Diffuse=DefaultDiffuse
+Other[0]=Good64x64TilingNoiseHighFreq
+Other[1]=voronoiNoiseBlur
+Other[2]=groundBrick
+Other[3]=rockPackTileTex

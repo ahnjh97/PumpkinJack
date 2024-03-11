@@ -308,7 +308,7 @@ HRESULT CLoader::Add_Texture(LEVEL eLevel, string strPrototypeName, string strFo
 	return S_OK;
 }
 
-void CLoader::Insert_ScaleRotationData()
+void CLoader::Insert_ScaleRotationData() // Scale, Degree, NewScale, RootIndex
 {
 	m_ModelConfigs.emplace("Ballista", MODEL_CONFIG{ 0.03f, 0.f, 2.6f });
 	m_ModelConfigs.emplace("Bat", MODEL_CONFIG{ 0.005f, 0.f, 0.5f, 4 });
@@ -320,15 +320,24 @@ void CLoader::Insert_ScaleRotationData()
 	m_ModelConfigs.emplace("Jack", MODEL_CONFIG{ 0.0025f, 180.f, 0.25f, 4 });
 	m_ModelConfigs.emplace("Mummy", MODEL_CONFIG{ 0.03f, 0.f, 2.2f, 4 });
 	m_ModelConfigs.emplace("Owl", MODEL_CONFIG{ 0.03f, 0.f, 1.f, 4 });
-	m_ModelConfigs.emplace("SkeletonBoss", MODEL_CONFIG{ 0.02f, 0.f, 1.f, 3 });
+	m_ModelConfigs.emplace("SkeletonBoss", MODEL_CONFIG{ 0.03f, 0.f, 2.6f, 3 });
 	m_ModelConfigs.emplace("Slime", MODEL_CONFIG{ 0.01f, 0.f, 1.f, 4 });
 	m_ModelConfigs.emplace("SlimeBoss", MODEL_CONFIG{ 0.01f, 0.f, 1.f, 4 });
 	m_ModelConfigs.emplace("Sniper", MODEL_CONFIG{ 0.025f, 0.f, 2.6f, 3 });
 	m_ModelConfigs.emplace("Soldier", MODEL_CONFIG{ 0.025f, 0.f, 2.6f, 5 });
-	m_ModelConfigs.emplace("Trabuchet", MODEL_CONFIG{ 0.01f, 0.f, 1.f, 2 });
+	m_ModelConfigs.emplace("Trabuchet", MODEL_CONFIG{ 0.03f, 0.f, 2.6f, 2 });
 
 
 	m_ModelConfigs.emplace("DestroyedBarn", MODEL_CONFIG{ 3.f, 0.f, 3.f });
+	m_ModelConfigs.emplace("bone", MODEL_CONFIG{ 3.f, 0.f, 3.f });
+	m_ModelConfigs.emplace("fence1", MODEL_CONFIG{ 3.f, 0.f, 3.f });
+	m_ModelConfigs.emplace("fence2", MODEL_CONFIG{ 3.f, 0.f, 3.f });
+	m_ModelConfigs.emplace("fence3", MODEL_CONFIG{ 3.f, 0.f, 3.f });
+	m_ModelConfigs.emplace("fence4", MODEL_CONFIG{ 3.f, 0.f, 3.f });
+	m_ModelConfigs.emplace("fenceClose", MODEL_CONFIG{ 3.f, 0.f, 3.f });
+	m_ModelConfigs.emplace("fenceStack", MODEL_CONFIG{ 3.f, 0.f, 3.f });
+	m_ModelConfigs.emplace("fenceStackSmall", MODEL_CONFIG{ 3.f, 0.f, 3.f });
+	m_ModelConfigs.emplace("grassMeshYellow", MODEL_CONFIG{ 3.f, 0.f, 3.f });
 }
 
 void CLoader::TraverseAnimModels(LEVEL eLevel, const wstring& rootFolderPath)

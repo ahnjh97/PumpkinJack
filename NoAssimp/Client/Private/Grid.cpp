@@ -48,15 +48,15 @@ HRESULT CGrid::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	//Wireframe 모드
-	ID3D11RasterizerState* wireframeState;
-	D3D11_RASTERIZER_DESC rasterizerDesc;
-	ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
-	rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME; // Wireframe으로 설정
-	rasterizerDesc.FrontCounterClockwise = FALSE;
-	if (FAILED(m_pDevice->CreateRasterizerState(&rasterizerDesc, &wireframeState)))
-		return E_FAIL;
-	m_pContext->RSSetState(wireframeState);
+	////Wireframe 모드
+	//ID3D11RasterizerState* wireframeState;
+	//D3D11_RASTERIZER_DESC rasterizerDesc;
+	//ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
+	//rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME; // Wireframe으로 설정
+	//rasterizerDesc.FrontCounterClockwise = FALSE;
+	//if (FAILED(m_pDevice->CreateRasterizerState(&rasterizerDesc, &wireframeState)))
+	//	return E_FAIL;
+	//m_pContext->RSSetState(wireframeState);
 
 	/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
 	if (FAILED(m_pShaderCom->Begin(0)))
@@ -80,15 +80,26 @@ HRESULT CGrid::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	/* For.Com_Texture */
-	if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_Texture_Grid"),
-		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
+	/* For.Com_Texture_Diffuse */
+	if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_Texture_Ground"),
+		TEXT("Com_Texture_Diffuse"), (CComponent**)&m_pTextureCom[TYPE_DIFFUSE])))
+		return E_FAIL;
+
+	/* For.Com_Texture_Mask */
+	if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_Texture_Mask"),
+		TEXT("Com_Texture_Mask"), (CComponent**)&m_pTextureCom[TYPE_MASK])))
+		return E_FAIL;
+
+	/* For.Com_Texture_Brush */
+	if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_Texture_Brush"),
+		TEXT("Com_Texture_Brush"), (CComponent**)&m_pTextureCom[TYPE_BRUSH])))
 		return E_FAIL;
 
 	/* For.Com_VIBuffer */
 	if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_VIBuffer_Grid"),
 		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -106,7 +117,17 @@ HRESULT CGrid::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0);
+	if (FAILED(m_pTextureCom[TYPE_DIFFUSE]->Bind_ShaderResources(m_pShaderCom, "g_DiffuseTexture")))
+		return E_FAIL;
+
+	if (FAILED(m_pTextureCom[TYPE_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0)))
+		return E_FAIL;
+
+	if (FAILED(m_pTextureCom[TYPE_BRUSH]->Bind_ShaderResource(m_pShaderCom, "g_BrushTexture", 0)))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -145,6 +166,7 @@ void CGrid::Free()
 	__super::Free();
 
 	Safe_Release(m_pShaderCom);
-	Safe_Release(m_pTextureCom);
+	for (size_t i = 0; i < TYPE_END; i++)
+		Safe_Release(m_pTextureCom[i]);
 	Safe_Release(m_pVIBufferCom);
 }
