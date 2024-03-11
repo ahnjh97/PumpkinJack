@@ -338,6 +338,7 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degree, NewScale, RootIndex
 	m_ModelConfigs.emplace("fenceStack", MODEL_CONFIG{ 3.f, 0.f, 3.f });
 	m_ModelConfigs.emplace("fenceStackSmall", MODEL_CONFIG{ 3.f, 0.f, 3.f });
 	m_ModelConfigs.emplace("grassMeshYellow", MODEL_CONFIG{ 3.f, 0.f, 3.f });
+	m_ModelConfigs.emplace("shroom", MODEL_CONFIG{ 3.f, 0.f, 3.f });
 }
 
 void CLoader::TraverseAnimModels(LEVEL eLevel, const wstring& rootFolderPath)
