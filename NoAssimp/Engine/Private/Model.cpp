@@ -189,7 +189,7 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 	for (auto& pBone : m_Bones)
 		pBone->Update_CombinedTransformationMatrix(m_Bones, RootLocalTransform, m_tConfig.iRealRoot);
 
-	return S_OK;
+ 	return S_OK;
 }
 
 HRESULT CModel::Render(_uint iMeshIndex)

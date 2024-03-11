@@ -45,7 +45,7 @@ private:
 	HRESULT Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName);
 	HRESULT Add_Models_GamePlay();
 	HRESULT Add_Shaders(LEVEL eLevel);
-	HRESULT Add_Textures(LEVEL eLevel, string strPrototypeName, string strFolderAndFileName);
+	HRESULT Add_Texture(LEVEL eLevel, string strPrototypeName, string strFolderAndFileName, _uint iNumTextures = 1);
 
 	void Insert_ScaleRotationData();
 

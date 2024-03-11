@@ -29,14 +29,14 @@ HRESULT CMonster::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components(GameObjectDesc.wstrModelTag)))
+	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel), GameObjectDesc.wstrModelTag)))
 		return E_FAIL;	
 
 	//m_pModelCom->Set_Animation(11, true); // 999: 랜덤 애니메이션
-	if(!m_pModelCom->IsNonAnimVersion())
+	if(!m_pModelCom->IsNonAnimVersion() && m_pModelCom->Get_ModelType() == TYPE_ANIM)
 		m_pModelCom->Set_Animation(999, true); // 999: 랜덤 애니메이션
 	
-	return S_OK;
+ 	return S_OK;
 }
 
 void CMonster::Tick(_float fTimeDelta)
@@ -70,6 +70,12 @@ HRESULT CMonster::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
+	if (m_pModelCom->Get_ModelName() == "Crow")
+	{
+		if (FAILED(Deactivate_BackFaceCulling()))
+			return E_FAIL;
+	}
+		
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
@@ -91,11 +97,11 @@ HRESULT CMonster::Render()
 	return S_OK;
 }
 
-HRESULT CMonster::Add_Components(const wstring& _wstrModelTag)
+HRESULT CMonster::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 {
 	/* For.Com_Model */
 	wstring wstrModelTag = _wstrModelTag;
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
+	if (FAILED(__super::Add_Component(eLevel, wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
 	wstring wstrShaderTag = {};
@@ -104,7 +110,7 @@ HRESULT CMonster::Add_Components(const wstring& _wstrModelTag)
 	else
 		wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel");
 
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+	if (FAILED(__super::Add_Component(eLevel, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	return S_OK;

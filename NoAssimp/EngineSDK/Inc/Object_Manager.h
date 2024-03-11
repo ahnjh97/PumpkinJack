@@ -17,7 +17,7 @@ private:
 
 public:
 	const class CComponent* Get_Component(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strComTag, _uint iIndex);
-	_bool Binarize_Objects(string strLevel);
+	_bool Binarize_Objects(_uint iLevel, string strLevel);
 	class CGameObject* Select_ModelByPicking(_uint iLevelIndex, const wstring& wstrLayerTag); // MapTool에서의 모델선택
 	CGameObject* Get_GameObject(_uint iLevelIndex, const wstring& wstrLayerTag, const wstring& wstrPrototypeTag);
 	CGameObject* Get_LastGameObject(_uint iLevelIndex, const wstring& wstrLayerTag); // MapTool용
@@ -29,7 +29,7 @@ public:
 	void Tick(_float fTimeDelta);
 	void Late_Tick(_float fTimeDelta);
 	void Clear(_uint iLevelIndex);
-
+	void Clear_Layer(_uint iLevelIndex, const wstring& strLayerTag);
 
 private:	
 	map<const wstring, class CGameObject*>				m_Prototypes;

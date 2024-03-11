@@ -4,14 +4,23 @@
     <Filter Include="00.Device">
       <UniqueIdentifier>{575691c0-c00a-4e06-9e0e-e515e6ce0651}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility">
-      <UniqueIdentifier>{93c87700-aab2-4322-b256-360fd86c44c7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00.Device\Graphic">
       <UniqueIdentifier>{88ff69e6-1cc6-4911-b17b-958907cf28b0}</UniqueIdentifier>
     </Filter>
     <Filter Include="00.Device\Input">
       <UniqueIdentifier>{1ffb29ea-fcd5-4929-9fdd-76d2898bec70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99.Defines">
+      <UniqueIdentifier>{5316adfe-c8f3-42a2-a7dd-f7bb55fde1d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00.Device\Timers">
+      <UniqueIdentifier>{2276b046-b4ba-44b9-bee5-454bd47d9596}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00.Device\Timers\Manager">
+      <UniqueIdentifier>{2396b3ce-bf2e-4910-bb35-d6b5f6434bee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility">
+      <UniqueIdentifier>{93c87700-aab2-4322-b256-360fd86c44c7}</UniqueIdentifier>
     </Filter>
     <Filter Include="01.Utility\99.SuperClass">
       <UniqueIdentifier>{18cd71f3-16be-4d21-849d-93d659719eda}</UniqueIdentifier>
@@ -37,29 +46,14 @@
     <Filter Include="01.Utility\02.Components\Manager">
       <UniqueIdentifier>{9a25d0bd-b87d-44f6-bfce-fb32c1047b59}</UniqueIdentifier>
     </Filter>
-    <Filter Include="99.Defines">
-      <UniqueIdentifier>{5316adfe-c8f3-42a2-a7dd-f7bb55fde1d2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Utility\03.Levels">
-      <UniqueIdentifier>{e1b5e4f5-524e-4d5d-a97f-dda8f3b6fbee}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Utility\03.Levels\Manager">
-      <UniqueIdentifier>{733be629-237a-48c5-a212-b47528d35f6c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00.Device\Timers">
-      <UniqueIdentifier>{2276b046-b4ba-44b9-bee5-454bd47d9596}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00.Device\Timers\Manager">
-      <UniqueIdentifier>{2396b3ce-bf2e-4910-bb35-d6b5f6434bee}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Utility\04.Renderer">
-      <UniqueIdentifier>{8f95be06-5b9d-4c53-ad7c-8df949da1544}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\02.Components\VIBuffer">
       <UniqueIdentifier>{1940cc1c-6655-4f3c-a49a-2193d5054bb3}</UniqueIdentifier>
     </Filter>
     <Filter Include="01.Utility\02.Components\VIBuffer\Rect">
       <UniqueIdentifier>{6dde1500-565b-4a82-a05d-b8d03aba94d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\02.Components\VIBuffer\Terrain">
+      <UniqueIdentifier>{7849580d-0515-48c1-b638-b2029d9185a5}</UniqueIdentifier>
     </Filter>
     <Filter Include="01.Utility\02.Components\Shader">
       <UniqueIdentifier>{d829722f-8a2c-45ef-aa1f-2e16eaeab6e4}</UniqueIdentifier>
@@ -70,12 +64,6 @@
     <Filter Include="01.Utility\02.Components\Transform">
       <UniqueIdentifier>{c0e4caf3-d75a-4438-99c6-913f975cb2bf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\02.Components\VIBuffer\Terrain">
-      <UniqueIdentifier>{7849580d-0515-48c1-b638-b2029d9185a5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Utility\05.PipeLine">
-      <UniqueIdentifier>{23b21ddb-503d-42d4-bae8-b0956eb5e403}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\02.Components\Model">
       <UniqueIdentifier>{407495a7-d76b-4b20-8594-913fb044fac1}</UniqueIdentifier>
     </Filter>
@@ -85,8 +73,23 @@
     <Filter Include="01.Utility\02.Components\Model\Animation">
       <UniqueIdentifier>{9d0c1107-fd55-4ad5-9c31-fd4a31def24d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\02.Components\Model\Animation\Channel">
+      <UniqueIdentifier>{56b82bfa-4522-46f1-896f-a5cf19848c1f}</UniqueIdentifier>
+    </Filter>
     <Filter Include="01.Utility\02.Components\Model\Bone">
       <UniqueIdentifier>{7e8c8169-8671-4f07-b0b0-565b0d1d2a00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Levels">
+      <UniqueIdentifier>{e1b5e4f5-524e-4d5d-a97f-dda8f3b6fbee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Levels\Manager">
+      <UniqueIdentifier>{733be629-237a-48c5-a212-b47528d35f6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Renderer">
+      <UniqueIdentifier>{8f95be06-5b9d-4c53-ad7c-8df949da1544}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\05.PipeLine">
+      <UniqueIdentifier>{23b21ddb-503d-42d4-bae8-b0956eb5e403}</UniqueIdentifier>
     </Filter>
     <Filter Include="01.Utility\06. Picking">
       <UniqueIdentifier>{08ea044e-f871-4785-a1d2-3c17e916c139}</UniqueIdentifier>
@@ -99,9 +102,6 @@
     </Filter>
     <Filter Include="01.Utility\07. MyImGui\Manager">
       <UniqueIdentifier>{33a0aa5e-6144-4d54-8dcc-fa7c857c6232}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Utility\02.Components\Model\Animation\Channel">
-      <UniqueIdentifier>{56b82bfa-4522-46f1-896f-a5cf19848c1f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -51,7 +51,7 @@ HRESULT CLevel_MapTool::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fFar = 1000.0f;
 	CameraDesc.vEye = _float4(0.f, 10.f, -7.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
-	CameraDesc.fSpeedPerSec = 10.f;
+	CameraDesc.fSpeedPerSec = 20.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))

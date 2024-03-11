@@ -57,7 +57,10 @@ HRESULT CLevel_GamePlay::Render()
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
-	SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
+	_int iFps = m_pGameInstance->Get_FPS();
+	wstring wstrFPS = to_wstring(iFps);
+	wstring wstrLevelFPS = wstring(L"Level_GamePlay  FPS: ") + wstrFPS;
+	SetWindowText(g_hWnd, wstrLevelFPS.c_str());
 
 	return S_OK;
 }
@@ -81,7 +84,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 	CameraDesc.fFar = 1000.0f;
 	CameraDesc.vEye = _float4(0.f, 10.f, -7.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
-	CameraDesc.fSpeedPerSec = 10.f;
+	CameraDesc.fSpeedPerSec = 20.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))

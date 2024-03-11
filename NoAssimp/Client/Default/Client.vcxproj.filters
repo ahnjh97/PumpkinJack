@@ -55,6 +55,9 @@
     <Filter Include="02.GameObjects\ToolObject">
       <UniqueIdentifier>{2ddeb38d-0b13-45a4-aa51-6b443ee19fc5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\StaticMesh">
+      <UniqueIdentifier>{e884518c-7c31-4559-9aae-c53a81aebf2d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

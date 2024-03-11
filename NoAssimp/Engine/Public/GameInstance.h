@@ -43,10 +43,11 @@ public: /* For.Object_Manager */
 	HRESULT Add_Prototype(const wstring& strPrototypeTag, class CGameObject* pPrototype);
 	HRESULT Add_Clone(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg = nullptr);
 	const CComponent* Get_Component(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strComTag, _uint iIndex = 0);
-	_bool Binarize_Objects(string strLevel);
+	_bool Binarize_Objects(_uint iLevel, string strLevel);
 	CGameObject* Select_ModelByPicking(_uint iLevelIndex, const wstring& wstrLayerTag); // MapTool에서의 모델선택
 	CGameObject* Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag);
 	CGameObject* Get_LastGameObject(_uint iLevelIndex, const wstring& wstrLayerTag); // MapTool용
+	void Clear_Layer(_uint iLevelIndex, const wstring& wstrLayerTag);
 
 public: /* For.Component_Manager */
 	HRESULT Add_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag, class CComponent* pPrototype);
@@ -66,15 +67,18 @@ public: /* For.PipeLine */
 	_vector Get_CamPosition_Vector() const;
 	_float4 Get_CamPosition_Float4() const;
 
-public: /* For. Picking*/
+public: /* For. Picking */
 	void Transform_PickingToLocalSpace(const class CTransform* pTransform, _Out_ _float3* pRayDir, _Out_ _float3* pRayPos);
 
-public: /* For.ImGui_Manager*/
+public: /* For.ImGui_Manager */
 	_float3 Get_PickPos();
 	_bool IsPicking();
 
+	/* For.GameInstance */
 	string WstrToStr(const wstring& wstr);
 	wstring StrToWstr(const string& str);
+	void CalculateFPS(_float fTimeDelta);
+	_int Get_FPS() { return iFps; }
 
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };
@@ -88,6 +92,12 @@ private:
 	class CImGui_Manager*			m_pImGui_Manager = { nullptr };
 	class CPicking*					m_pPicking = { nullptr };
 
+
+
+private:
+	_uint iFrameCount = { 0 };
+	_float fElapsedTime = { 0.f };
+	_int iFps = { 0 };
 
 public:		
 	static void Release_Engine();

@@ -26,6 +26,7 @@ CGameObject::CGameObject(const CGameObject & rhs)
 PARSE_DATA CGameObject::Get_ParseData()
 {
 	PARSE_DATA parseData = {};
+	parseData.iLevel = m_iLevel;
 	parseData.wstrPrototypeTag = wstrPrototypeTag;
 	CModel* pModel = dynamic_cast<CModel*>(Get_Component(TEXT("Com_Model")));
 	if (pModel != nullptr)
@@ -60,10 +61,9 @@ HRESULT CGameObject::Initialize_Prototype()
 /* 실제 게임내엣 사용되는 객체가 호출하는 함수다. */
 HRESULT CGameObject::Initialize(void* pArg)
 {
+	GAMEOBJECT_DESC GameObjectDesc = {};
 	if(nullptr != pArg)
-	{
-		GAMEOBJECT_DESC*		pGameObjectDesc = (GAMEOBJECT_DESC*)pArg;		
-	}
+		GAMEOBJECT_DESC		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;		
 
 	m_pTransformCom = CTransform::Create(m_pDevice, m_pContext);
 	if (nullptr == m_pTransformCom)
@@ -73,9 +73,9 @@ HRESULT CGameObject::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_Components.emplace(g_strTransformTag, m_pTransformCom);
-
-	Safe_AddRef(m_pTransformCom);
+	Safe_AddRef(m_pTransformCom);	
 	
+	m_iLevel = GameObjectDesc.iLevel;
 	return S_OK;
 }
 
@@ -110,6 +110,21 @@ HRESULT CGameObject::Add_Component(_uint iLevelIndex, const wstring & strPrototy
 
 	Safe_AddRef(pComponent);
 
+	return S_OK;
+}
+
+HRESULT CGameObject::Deactivate_BackFaceCulling()
+{
+	// 후면컬링 끄기
+	ID3D11RasterizerState* raterizerState;
+	D3D11_RASTERIZER_DESC rasterizerDesc;
+	ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
+	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+	rasterizerDesc.CullMode = D3D11_CULL_NONE;
+	rasterizerDesc.FrontCounterClockwise = FALSE;
+	if (FAILED(m_pDevice->CreateRasterizerState(&rasterizerDesc, &raterizerState)))
+		return E_FAIL;
+	m_pContext->RSSetState(raterizerState);
 	return S_OK;
 }
 

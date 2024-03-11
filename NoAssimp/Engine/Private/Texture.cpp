@@ -84,6 +84,11 @@ HRESULT CTexture::Bind_ShaderResource(CShader * pShader, const _char * pConstant
 	return pShader->Bind_Texture(pConstantName, m_Textures[iTextureIndex]);	
 }
 
+HRESULT CTexture::Bind_ShaderResources(CShader* pShader, const _char* pConstantName)
+{
+	return pShader->Bind_Textures(pConstantName, &m_Textures.front(), m_iNumTextures);
+}
+
 CTexture * CTexture::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const wstring & strTextureFilePath, _uint iNumTexture)
 {
 	CTexture*		pInstance = new CTexture(pDevice, pContext);

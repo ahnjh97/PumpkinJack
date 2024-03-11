@@ -114,8 +114,11 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 
 	/* Prototype_Component_Texture_Terrain */
-	Add_Textures(eLevel, "Terrain", "Terrain/Tile0.jpg");
-
+	Add_Texture(eLevel, "Terrain", "Terrain/Tile0.jpg");
+	Add_Texture(eLevel, "Ground", "Terrain/groundTile%d.dds", 4);
+	Add_Texture(eLevel, "Grass", "Terrain/grassTile%d.dds", 2);
+	Add_Texture(eLevel, "Mask", "Terrain/Mask.png");
+	Add_Texture(eLevel, "Brush", "Terrain/Brush.png");
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 
@@ -176,9 +179,13 @@ HRESULT CLoader::Loading_For_MapTool(LEVEL eLevel)
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 
 	/* Prototype_Component_Texture_Grid */
-	if(FAILED(Add_Textures(eLevel, "Grid", "Terrain/White.png")))
+	if(FAILED(Add_Texture(eLevel, "Grid", "Terrain/White.png")))
 		return E_FAIL;
-
+	Add_Texture(eLevel, "Terrain", "Terrain/Tile0.jpg");
+	Add_Texture(eLevel, "Ground", "Terrain/groundTile%d.dds", 4);
+	Add_Texture(eLevel, "Grass", "Terrain/grassTile%d.dds", 2);
+	Add_Texture(eLevel, "Mask", "Terrain/Mask.png");
+	Add_Texture(eLevel, "Brush", "Terrain/Brush.png");
 
 	m_strLoadingText = TEXT("컴포넌트를(을) 로딩 중 입니다.");
 	/* Prototype_Component_VIBuffer_Terrain */
@@ -228,21 +235,16 @@ HRESULT CLoader::Loading_For_MapTool(LEVEL eLevel)
 
 HRESULT CLoader::Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName)
 {
-	_float fScale = 1.f;
+	_float fScale = 10.f;
 	MODEL_CONFIG tConfig{};
 	auto ScaleIter = m_ModelConfigs.find(strModelName);
 	if (ScaleIter != m_ModelConfigs.end())
-	{
-		fScale = ScaleIter->second.fScale;
 		tConfig = ScaleIter->second;
-	}
-
-		
 
 	_float fDegree = 0.f;
 
 	_matrix		TransformMatrix = XMMatrixIdentity();
-	TransformMatrix = XMMatrixScaling(fScale, fScale, fScale) * XMMatrixRotationY(XMConvertToRadians(fDegree));
+	TransformMatrix = XMMatrixScaling(tConfig.fScale, tConfig.fScale, tConfig.fScale) * XMMatrixRotationY(XMConvertToRadians(tConfig.fDegree));
 
 	wstring_convert<codecvt_utf8<wchar_t>> converter;
 	wstring wstrModelName = converter.from_bytes(strModelName);
@@ -256,9 +258,8 @@ HRESULT CLoader::Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName)
 	if (eModelType == TYPE_ANIM)
 	{
 		_float fNewScale = 1.f;
-		auto NewScaleIter = m_ModelConfigs.find(strModelName);
-		if (NewScaleIter != m_ModelConfigs.end())
-			fNewScale = NewScaleIter->second.fNewScale;
+		if(ScaleIter != m_ModelConfigs.end())
+			fNewScale = tConfig.fNewScale;
 
 		TransformMatrix = XMMatrixScaling(fNewScale, fNewScale, fNewScale) * XMMatrixRotationY(XMConvertToRadians(fDegree));
 		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag + L"_NonAnim",
@@ -295,13 +296,13 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 	return S_OK;
 }
 
-HRESULT CLoader::Add_Textures(LEVEL eLevel, string strPrototypeName, string strFolderAndFileName)
+HRESULT CLoader::Add_Texture(LEVEL eLevel, string strPrototypeName, string strFolderAndFileName, _uint iNumTextures)
 {
 	wstring_convert<codecvt_utf8<wchar_t>> converter;
 	wstring wstrPrototypeTag = L"Prototype_Component_Texture_" + converter.from_bytes(strPrototypeName);
 	wstring wstrFullPath = L"../../../Resources/Textures/" + converter.from_bytes(strFolderAndFileName);
 
-	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag,	CTexture::Create(m_pDevice, m_pContext, wstrFullPath))))
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag,	CTexture::Create(m_pDevice, m_pContext, wstrFullPath, iNumTextures))))
 		return E_FAIL;
 
 	return S_OK;
@@ -309,18 +310,25 @@ HRESULT CLoader::Add_Textures(LEVEL eLevel, string strPrototypeName, string strF
 
 void CLoader::Insert_ScaleRotationData()
 {
-	m_ModelConfigs.emplace("Ballista", MODEL_CONFIG{ 0.03f, 0.f, 2.6f, 4 });
+	m_ModelConfigs.emplace("Ballista", MODEL_CONFIG{ 0.03f, 0.f, 2.6f });
 	m_ModelConfigs.emplace("Bat", MODEL_CONFIG{ 0.005f, 0.f, 0.5f, 4 });
 	m_ModelConfigs.emplace("Charon", MODEL_CONFIG{ 0.03f, 180.f, 2.6f, 4 });
 	m_ModelConfigs.emplace("Crow", MODEL_CONFIG{ 0.0003f, 180.f, 0.03f, 1 });
 	m_ModelConfigs.emplace("Dummy", MODEL_CONFIG{ 0.003f, 0.f, 0.3f, 3 });
-	m_ModelConfigs.emplace("Jack", MODEL_CONFIG{ 0.0025f, 180.f, 0.25f, 5 }); // 여기부터 루트노드 모름
+	m_ModelConfigs.emplace("GarGoyle", MODEL_CONFIG{ 0.01f, 0.f, 1.f, 4 });
+	m_ModelConfigs.emplace("Horse", MODEL_CONFIG{ 0.03f, 180.f, 2.6f, 3 });
+	m_ModelConfigs.emplace("Jack", MODEL_CONFIG{ 0.0025f, 180.f, 0.25f, 4 });
 	m_ModelConfigs.emplace("Mummy", MODEL_CONFIG{ 0.03f, 0.f, 2.2f, 4 });
 	m_ModelConfigs.emplace("Owl", MODEL_CONFIG{ 0.03f, 0.f, 1.f, 4 });
-	m_ModelConfigs.emplace("SkeletonBoss", MODEL_CONFIG{ 0.02f, 0.f, 0.6f, 4 });
+	m_ModelConfigs.emplace("SkeletonBoss", MODEL_CONFIG{ 0.02f, 0.f, 1.f, 3 });
+	m_ModelConfigs.emplace("Slime", MODEL_CONFIG{ 0.01f, 0.f, 1.f, 4 });
 	m_ModelConfigs.emplace("SlimeBoss", MODEL_CONFIG{ 0.01f, 0.f, 1.f, 4 });
-	m_ModelConfigs.emplace("Trabuchet", MODEL_CONFIG{ 0.01f, 0.f, 1.f, 4 });
-	m_ModelConfigs.emplace("Horse", MODEL_CONFIG{ 0.02f, 180.f, 1.5f, 4 });
+	m_ModelConfigs.emplace("Sniper", MODEL_CONFIG{ 0.025f, 0.f, 2.6f, 3 });
+	m_ModelConfigs.emplace("Soldier", MODEL_CONFIG{ 0.025f, 0.f, 2.6f, 5 });
+	m_ModelConfigs.emplace("Trabuchet", MODEL_CONFIG{ 0.01f, 0.f, 1.f, 2 });
+
+
+	m_ModelConfigs.emplace("DestroyedBarn", MODEL_CONFIG{ 3.f, 0.f, 3.f });
 }
 
 void CLoader::TraverseAnimModels(LEVEL eLevel, const wstring& rootFolderPath)

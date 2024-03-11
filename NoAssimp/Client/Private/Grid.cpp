@@ -48,12 +48,11 @@ HRESULT CGrid::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	// 레스터라이제이션 스테이트 설정 (Wireframe 모드)
+	//Wireframe 모드
 	ID3D11RasterizerState* wireframeState;
 	D3D11_RASTERIZER_DESC rasterizerDesc;
 	ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
 	rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME; // Wireframe으로 설정
-	rasterizerDesc.CullMode = D3D11_CULL_BACK; // 배경 면 제거
 	rasterizerDesc.FrontCounterClockwise = FALSE;
 	if (FAILED(m_pDevice->CreateRasterizerState(&rasterizerDesc, &wireframeState)))
 		return E_FAIL;

@@ -3,6 +3,8 @@
 #include "Layer.h"
 #include <fstream>
 #include "Model.h"
+#include <chrono>
+#include <ctime>
 
 CObject_Manager::CObject_Manager()
 {
@@ -103,6 +105,22 @@ void CObject_Manager::Clear(_uint iLevelIndex)
 	m_pLayers[iLevelIndex].clear();
 }
 
+void CObject_Manager::Clear_Layer(_uint iLevelIndex, const wstring& strLayerTag)
+{
+	CLayer* pLayer = Find_Layer(iLevelIndex, strLayerTag);
+	if (pLayer == nullptr)
+		return;
+	list<CGameObject*> objList = pLayer->Get_ObjectList();
+	if (objList.empty())
+		return;
+	for (auto& obj : objList)
+	{
+		if (obj == nullptr)
+			continue;
+		obj->Set_Dead();
+	}		
+}
+
 CGameObject * CObject_Manager::Find_Prototype(const wstring & strPrototypeTag)
 {
 	auto		iter = m_Prototypes.find(strPrototypeTag);
@@ -126,7 +144,7 @@ CLayer * CObject_Manager::Find_Layer(_uint iLevelIndex, const wstring & strLayer
 	return iter->second;
 }
 
-_bool CObject_Manager::Binarize_Objects(string strLevel)
+_bool CObject_Manager::Binarize_Objects(_uint iLevel, string strLevel)
 {
 	string tempFileName = "temp_" + strLevel + ".txt";
 
@@ -155,7 +173,12 @@ _bool CObject_Manager::Binarize_Objects(string strLevel)
 
 			for (auto listIter : objectList)
 			{
+				if (listIter == nullptr)
+					continue;
+
 				PARSE_DATA tempParseData = listIter->Get_ParseData();
+				if (iLevel != tempParseData.iLevel)
+					continue;
 
 				wchar_t wcharPrototypeTag[MAX_PATH];
 				wcscpy_s(wcharPrototypeTag, tempParseData.wstrPrototypeTag.c_str());
@@ -180,8 +203,25 @@ _bool CObject_Manager::Binarize_Objects(string strLevel)
 		return false;
 	}
 
+	// 현재시간 받아오기
+	auto now = chrono::system_clock::now();
+	time_t currentTime = chrono::system_clock::to_time_t(now);
+
+	struct tm timeinfo;
+	localtime_s(&timeinfo, &currentTime);
+
+	// 현재 시간을 문자열로 변환
+	char buffer[80];
+	strftime(buffer, sizeof(buffer), "%H%M%S", &timeinfo);
+
+	string fileName_Time = "../../../objects_txt/" + string(buffer) + "_" + strLevel + ".txt";
 	string fileName = "../../../objects_txt/" + strLevel + ".txt";
-	remove(fileName.c_str());
+	if (rename(fileName.c_str(), fileName_Time.c_str()) != 0)
+	{
+		MB("Failed to rename original file.");
+		return false;
+	}
+		
 
 	if (rename(tempFileName.c_str(), fileName.c_str()) != 0) // 임시파일 이름을 level 이름으로 변경
 	{
@@ -214,6 +254,9 @@ CGameObject* CObject_Manager::Select_ModelByPicking(_uint iLevelIndex, const wst
 
 		for (auto objectListIter : objectList)
 		{
+			if (objectListIter == nullptr)
+				continue;
+
 			CModel* pModel = dynamic_cast<CModel*>(objectListIter->Get_Component(TEXT("Com_Model")));
 			if (pModel == nullptr)
 				continue;

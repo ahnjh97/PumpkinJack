@@ -112,7 +112,7 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 	
 	if (m_pImGui_Manager)
 		m_pImGui_Manager->Tick(fTimeDelta);
-
+	CalculateFPS(fTimeDelta);
 }
 
 HRESULT CGameInstance::Draw(const _float4& vClearColor)
@@ -262,12 +262,12 @@ const CComponent * CGameInstance::Get_Component(_uint iLevelIndex, const wstring
 	return m_pObject_Manager->Get_Component(iLevelIndex, strLayerTag, strComTag, iIndex);
 }
 
-_bool CGameInstance::Binarize_Objects(string strLevel)
+_bool CGameInstance::Binarize_Objects(_uint iLevel, string strLevel)
 {
 	if (nullptr == m_pObject_Manager)
 		return false;
 
-	return m_pObject_Manager->Binarize_Objects(strLevel);
+	return m_pObject_Manager->Binarize_Objects(iLevel, strLevel);
 }
 
 CGameObject* CGameInstance::Select_ModelByPicking(_uint iLevelIndex, const wstring& wstrLayerTag)
@@ -292,6 +292,14 @@ CGameObject* CGameInstance::Get_LastGameObject(_uint iLevelIndex, const wstring&
 		return false;
 
 	return m_pObject_Manager->Get_LastGameObject(iLevelIndex, wstrLayerTag);
+}
+
+void CGameInstance::Clear_Layer(_uint iLevelIndex, const wstring& wstrLayerTag)
+{
+	if (nullptr == m_pObject_Manager)
+		return;
+
+	return m_pObject_Manager->Clear_Layer(iLevelIndex, wstrLayerTag);
 }
 
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const wstring & strPrototypeTag, CComponent * pPrototype)
@@ -421,6 +429,20 @@ wstring CGameInstance::StrToWstr(const string& str)
 {
 	wstring_convert<codecvt_utf8<wchar_t>> cnvt;
 	return cnvt.from_bytes(str);
+}
+
+void CGameInstance::CalculateFPS(_float fTimeDelta)
+{
+	iFrameCount++;
+	fElapsedTime += fTimeDelta;
+
+	if (fElapsedTime >= 1.0)  // fps
+	{
+		iFps = iFrameCount / fElapsedTime;
+
+		iFrameCount = 0;
+		fElapsedTime = 0.f;
+	}
 }
 
 

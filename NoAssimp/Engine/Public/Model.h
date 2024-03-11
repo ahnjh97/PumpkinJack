@@ -61,6 +61,7 @@ private:
 	_float3						m_vHipTranslation = {};
 	_float4						m_vScale = {};
 	_float4						m_vRotation = {};
+	MODEL_CONFIG				m_tConfig = {};
 
 	vector<class CBone*>		m_Bones;
 	_uint						m_iNumAnimations = { 0 };
@@ -68,7 +69,7 @@ private:
 	_bool						m_isLoop = { false };
 	vector<CAnimation*>			m_Animations;
 	_float4x4					m_MeshBoneMatrices[512];
-	MODEL_CONFIG				m_tConfig = {};
+
 
 	// 파일입출력 변수
 	string						m_strDirectory;

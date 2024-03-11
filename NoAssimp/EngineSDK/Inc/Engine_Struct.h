@@ -71,6 +71,7 @@ namespace Engine
 	
 	typedef struct
 	{
+		_uint iLevel = {};
 		wstring wstrPrototypeTag = L"";
 		_float4x4 matWorld = _float4x4(
 			1.0f, 0.0f, 0.0f, 0.0f,
@@ -80,13 +81,17 @@ namespace Engine
 		wstring wstrModelTag = L"";
 	}PARSE_DATA;
 
-	typedef struct
+	struct MODEL_CONFIG
 	{
-		_float fScale = { 0.01f };
+		_float fScale = { 1.f };
 		_float fDegree = { 0.f };
 		_float fNewScale = { 1.f };
 		_uint iRealRoot = { 4 };
-	}MODEL_CONFIG;
+		MODEL_CONFIG(_float _fScale = { 1.f },
+			_float _fDegree = { 0.f },
+			_float _fNewScale = { 1.f },
+			_uint _iRealRoot = { 4 }) : fScale(_fScale), fDegree(_fDegree), fNewScale(_fNewScale), iRealRoot(_iRealRoot) {}
+	};
 
 	// MODEL_NONANIM.mNumMeshes 만큼 반복: MESH_NONANIM. { mName, mMaterialIndex, mNumVertices,	mNumFaces } -> VTXMESH * mNumVertices -> _uint * m_iNumIndices
 	// MODEL_NONANIM.mNumMaterials * 20번 만큼 반복: _tchar szPerfectPath[MAX_PATH]
