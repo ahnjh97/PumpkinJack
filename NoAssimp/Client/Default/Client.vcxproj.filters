@@ -58,6 +58,9 @@
     <Filter Include="02.GameObjects\StaticMesh">
       <UniqueIdentifier>{e884518c-7c31-4559-9aae-c53a81aebf2d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Player">
+      <UniqueIdentifier>{f536d6a1-b841-49e8-9585-b965b6f55737}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -120,6 +123,12 @@
     <ClInclude Include="..\Public\Tool_Anim.h">
       <Filter>02.GameObjects\ToolObject</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Camera_Jack.h">
+      <Filter>02.GameObjects\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player.h">
+      <Filter>02.GameObjects\Player</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -169,6 +178,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Tool_Anim.cpp">
       <Filter>02.GameObjects\ToolObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Camera_Jack.cpp">
+      <Filter>02.GameObjects\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player.cpp">
+      <Filter>02.GameObjects\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

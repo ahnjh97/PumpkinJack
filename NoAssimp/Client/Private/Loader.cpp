@@ -5,9 +5,11 @@
 #include <codecvt>
 #include "GameInstance.h"
 #include "Camera_Free.h"
+#include "Camera_Jack.h"
 #include "BackGround.h"
 #include "Terrain.h"
 #include "Monster.h"
+#include "Player.h"
 #include "Grid.h"
 #include "Tool_Anim.h"
 #include "Tool_NonAnim.h"
@@ -85,9 +87,7 @@ HRESULT CLoader::Loading_For_Logo()
 {
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 	/* For.Prototype_Component_Texture_Logo */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_LOGO, TEXT("Prototype_Component_Texture_Logo"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Default%d.jpg"), 2))))
-		return E_FAIL;
+	Add_Texture(LEVEL_LOGO, "Logo", "Logo/wallpaper.jpg");
 
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
@@ -127,12 +127,6 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 100, 100))))
 		return E_FAIL;
 
-	/* For.Prototype_Component_Model_Fiona */
-	//if (FAILED(Add_Model(LEVEL_GAMEPLAY, TYPE_ANIM, "Fiona", 1.f, 180.f)))
-	//	return E_FAIL;
-
-	//if (Add_Models(eLevel)) // LEVEL_GAMEPLAY;
-	//	return E_FAIL;
 	TraverseAnimModels(eLevel, L"../../../model_txt/Anim/");
 	TraverseNonAnimModels(eLevel, L"../../../model_txt/NonAnim/");
 
@@ -147,7 +141,7 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 
 	///* For.Prototype_GameObject_Camera_Free */
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
-
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Jack"), CCamera_Jack);
 	///* For.Prototype_GameObject_Player */
 	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
 	//	CPlayer::Create(m_pGraphic_Device))))
@@ -155,7 +149,7 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 
 		/* For.Prototype_GameObject_Monster */
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Monster"), CMonster);
-
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Player"), CPlayer);
 
 	///* For.Prototype_GameObject_Effect */
 	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect"),
@@ -224,9 +218,6 @@ HRESULT CLoader::Loading_For_MapTool(LEVEL eLevel)
 
 	/* For.Prototype_GameObject_Tool_NonAnim */
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Tool_NonAnim"), CTool_NonAnim);
-
-	//Add_GameObject_Prototype()
-
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 	m_isFinished = true;
@@ -317,7 +308,7 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degree, NewScale, RootIndex
 	m_ModelConfigs.emplace("Dummy", MODEL_CONFIG{ 0.003f, 0.f, 0.3f, 3 });
 	m_ModelConfigs.emplace("GarGoyle", MODEL_CONFIG{ 0.01f, 0.f, 1.f, 4 });
 	m_ModelConfigs.emplace("Horse", MODEL_CONFIG{ 0.03f, 180.f, 2.6f, 3 });
-	m_ModelConfigs.emplace("Jack", MODEL_CONFIG{ 0.0025f, 180.f, 0.25f, 4 });
+	m_ModelConfigs.emplace("Jack", MODEL_CONFIG{ 0.0025f, 180.f, 0.25f, 3 });
 	m_ModelConfigs.emplace("Mummy", MODEL_CONFIG{ 0.03f, 0.f, 2.2f, 4 });
 	m_ModelConfigs.emplace("Owl", MODEL_CONFIG{ 0.03f, 0.f, 1.f, 4 });
 	m_ModelConfigs.emplace("SkeletonBoss", MODEL_CONFIG{ 0.03f, 0.f, 2.6f, 3 });

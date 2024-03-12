@@ -109,10 +109,14 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 	
 	/* 반복적인 갱신이 필요한 객체들의 Tick함수를 호출한다. */
 	m_pLevel_Manager->Tick(fTimeDelta);
-	
+
+	if ((Get_CurrentLevelID() != Level_MapTool) && (Get_DIKeyState(DIK_ESCAPE) & 0x80))
+		PostQuitMessage(0);
+
 	if (m_pImGui_Manager)
 		m_pImGui_Manager->Tick(fTimeDelta);
 	CalculateFPS(fTimeDelta);
+
 }
 
 HRESULT CGameInstance::Draw(const _float4& vClearColor)

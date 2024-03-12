@@ -19,6 +19,7 @@ public:
 		_float	fAspect = { 0.0f };
 		_float	fNear = { 0.0f };
 		_float	fFar = { 0.0f };
+		_float	fMouseSensor = { 0.0f };
 	}CAMERA_DESC;
 
 protected:
@@ -37,6 +38,7 @@ protected:
 	_float			m_fAspect = { 0.0f };
 	_float			m_fNear = { 0.0f };
 	_float			m_fFar = { 0.0f };
+	_float			m_fMouseSensor = { 0.0f };
 
 protected:
 	_float4x4		m_ProjMatrix;

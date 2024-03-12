@@ -203,6 +203,20 @@ HRESULT CModel::Render(_uint iMeshIndex)
 	return S_OK;
 }
 
+void CModel::Find_Animation(string& strAnimName, _bool isLoop)
+{
+	for (_uint i = 0; i < m_Animations.size(); i++)
+	{
+		string strName =  string(m_Animations[i]->Get_Name());
+		if (strName == strAnimName)
+		{
+			if(m_iCurrentAnimIndex != i)
+				Set_Animation(i, isLoop);
+			return;
+		}
+	}
+}
+
 HRESULT CModel::Ready_Meshes()
 {
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumMeshes), sizeof(m_iNumMeshes));

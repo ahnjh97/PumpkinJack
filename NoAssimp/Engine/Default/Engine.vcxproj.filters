@@ -43,9 +43,6 @@
     <Filter Include="01.Utility\02.Components">
       <UniqueIdentifier>{48c7c65c-7362-41ea-a460-905ff511629f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\02.Components\Manager">
-      <UniqueIdentifier>{9a25d0bd-b87d-44f6-bfce-fb32c1047b59}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\02.Components\VIBuffer">
       <UniqueIdentifier>{1940cc1c-6655-4f3c-a49a-2193d5054bb3}</UniqueIdentifier>
     </Filter>
@@ -102,6 +99,9 @@
     </Filter>
     <Filter Include="01.Utility\07. MyImGui\Manager">
       <UniqueIdentifier>{33a0aa5e-6144-4d54-8dcc-fa7c857c6232}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\02.Components\Manager">
+      <UniqueIdentifier>{9a25d0bd-b87d-44f6-bfce-fb32c1047b59}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

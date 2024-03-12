@@ -77,10 +77,10 @@ public:
 	HRESULT Bind_ShaderResource(class CShader* pShader, const _char* pConstantName);
 
 public:
-	void Go_Straight(_float fTimeDelta, _uint iNum = 0);
-	void Go_Backward(_float fTimeDelta, _uint iNum = 0);
-	void Go_Left(_float fTimeDelta, _uint iNum = 0);
-	void Go_Right(_float fTimeDelta, _uint iNum = 0);
+	void Go_Straight(_float fTimeDelta, _uint iNum = 0, _fvector vCamLook = _vector());
+	void Go_Backward(_float fTimeDelta, _uint iNum = 0, _fvector vCamLook = _vector());
+	void Go_Left(_float fTimeDelta, _uint iNum = 0, _fvector vCamRight = _vector());
+	void Go_Right(_float fTimeDelta, _uint iNum = 0, _fvector vCamRight = _vector());
 
 	void Look_At(_fvector vPosition);
 	void Look_At_ForLandObject(_fvector vPosition);
@@ -88,11 +88,11 @@ public:
 	void Turn(_fvector vAxis, _float fTimeDelta);
 	void Rotation(_fvector vAxis, _float fRadian);
 
-	
 private:
 	_float4x4				m_WorldMatrix;
 	_float					m_fSpeedPerSec = { 0.0f };
 	_float					m_fRotationPerSec = { 0.0f };
+
 
 public:
 	static CTransform* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

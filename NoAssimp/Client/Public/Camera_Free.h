@@ -10,7 +10,7 @@ class CCamera_Free final : public CCamera
 public:
 	typedef struct : public CCamera::CAMERA_DESC
 	{
-		_float		fMouseSensor = { 0.0f };
+
 	}CAMERA_FREE_DESC;
 
 private:
@@ -26,7 +26,7 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	_float			m_fMouseSensor = { 0.0f };
+	
 
 public:
 	static CCamera_Free* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

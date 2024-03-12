@@ -77,9 +77,18 @@ void CAnimation::Write_AnimationData(ofstream& fileStream)
 	string strName = m_szName;
 	size_t pos = strName.find_last_of('|');
 	if (pos != string::npos) {
-		string result = strName.substr(pos + 1);
-		strcpy_s(m_szName, result.c_str());
+		strName = strName.substr(pos + 1);
+		{
+			size_t lastUnderscore = strName.rfind('_');
+			if (lastUnderscore != string::npos && lastUnderscore > 0) {
+				// 뒤에서 두번째 UnderBar 및 뒷부분 삭제
+				strName = strName.substr(0, lastUnderscore);
+			}
+		}
+		strcpy_s(m_szName, strName.c_str());
 	}
+
+
 
 	fileStream.write(reinterpret_cast<const char*>(&m_szName), sizeof(m_szName));
 	fileStream.write(reinterpret_cast<const char*>(&m_fDuration), sizeof(m_fDuration));

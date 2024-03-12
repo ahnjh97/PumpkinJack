@@ -87,7 +87,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 	CameraDesc.fSpeedPerSec = 20.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Camera_Jack"), &CameraDesc)))
 		return E_FAIL;
 	
 	return S_OK;
@@ -139,8 +139,17 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 		CGameObject::GAMEOBJECT_DESC tempDesc = {};
 		tempDesc.matWorld = matWorld;
 		tempDesc.wstrModelTag = wcharModelTag;
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Monster"), &tempDesc)))
-			return E_FAIL;
+
+		if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Jack"))
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Player"), &tempDesc)))
+				return E_FAIL;
+		}
+		else
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Monster"), &tempDesc)))
+				return E_FAIL;
+		}
 	}
 	
 	return S_OK;

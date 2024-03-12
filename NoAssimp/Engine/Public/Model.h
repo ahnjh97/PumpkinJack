@@ -21,6 +21,7 @@ public:
 	_float3 Get_HipTranslation(){ return m_vHipTranslation; }
 	_bool IsNonAnimVersion() { return m_bIsNonAnimVersion; }
 	_float4x4 Get_ModelTransformMat() { return m_TransformMatrix; }
+	MODEL_CONFIG Get_ModelConfig() { return m_tConfig; }
 
 	void Set_Animation(_uint iAnimIndex, _bool isLoop) {
 		if (m_bIsNonAnimVersion) return;
@@ -46,6 +47,9 @@ public:
 	HRESULT Bind_ShaderResource(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, _uint eTextureType);
 	HRESULT Play_Animation(_float fTimeDelta);
 	HRESULT Render(_uint iMeshIndex);
+
+public:
+	void Find_Animation(string& strAnimName, _bool isLoop);
 
 private:
 	TYPE						m_eModelType = { TYPE_END };
