@@ -156,7 +156,10 @@ HRESULT CModel::Bind_ShaderResource(CShader* pShader, const _char* pConstantName
 		return E_FAIL;
 
 	if (nullptr != m_Materials[iMeshMaterialIndex].MaterialTextures[eTextureType])
-		m_Materials[iMeshMaterialIndex].MaterialTextures[eTextureType]->Bind_ShaderResource(pShader, pConstantName);
+	{
+		if (FAILED(m_Materials[iMeshMaterialIndex].MaterialTextures[eTextureType]->Bind_ShaderResource(pShader, pConstantName)))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -214,6 +217,16 @@ void CModel::Find_Animation(string& strAnimName, _bool isLoop)
 				Set_Animation(i, isLoop);
 			return;
 		}
+	}
+}
+
+void CModel::Reset_Animation()
+{
+	if (isFinished() == true)
+	{
+		m_Animations[m_iCurrentAnimIndex]->Reset(m_Bones);
+		if(m_Animations[m_iCurrentAnimIndex]->Get_Name() == "Jack_Spear_AirAttack_End_Anim")
+			m_Animations[m_iCurrentAnimIndex - 1]->Reset(m_Bones); // 
 	}
 }
 
@@ -303,9 +316,14 @@ HRESULT CModel::Ready_Animations()
 		CAnimation* pAnimation = CAnimation::Create(m_Bones, m_InputFile);
 		if (nullptr == pAnimation)
 			return E_FAIL;
-
+		string strName = pAnimation->Get_Name();
+		if ((strName.find("magic") != string::npos) || (strName.find("Scythe") != string::npos) || (strName.find("MAGIC") != string::npos)
+			|| (strName.find("FlyingMage") != string::npos) || (strName.find("groundversion") != string::npos) || (strName.find("Shovel") != string::npos)
+			|| (strName.find("Sword") != string::npos))
+			continue;
 		m_Animations.push_back(pAnimation);
 	}
+	m_iNumAnimations = m_Animations.size();
 	return S_OK;
 }
 
@@ -349,6 +367,10 @@ void CModel::Free()
 
 	m_Materials.clear();
 
+	for (auto& pAnimations : m_Animations)
+		Safe_Release(pAnimations);
+	for (auto& pBones : m_Bones)
+		Safe_Release(pBones);
 	for (auto& pMesh : m_Meshes)
 		Safe_Release(pMesh);
 

@@ -23,6 +23,7 @@ public:
 public:
 	HRESULT Initialize(const vector<class CBone*>& Bones, ifstream& fileStream);
 	void Update_TransformationMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, _bool isLoop);
+	void Reset(const vector<class CBone*>& Bones);
 
 public:
 	void Read_AnimationData(ifstream& fileStream);

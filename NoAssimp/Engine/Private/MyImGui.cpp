@@ -14,7 +14,7 @@ CMyImGui::CMyImGui(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 void CMyImGui::Set_Vectors(vector<string> vecAnim, vector<string> vecNonAnim)
 {
-    for (auto& animIter : vecAnim) // _strdup: c_str()가 포인터를 반환하는데, 이는 iter의 생명주기만큼만 보존돼서, 데이터를 아예 동적할당후 복사해둠
+    for (auto& animIter : vecAnim) 
         vecAnimModels.push_back(string(animIter)); 
 
 
@@ -170,7 +170,7 @@ void CMyImGui::EditGuizmo(_float4x4& worldMatrix)
 void CMyImGui::Free()
 {
     __super::Free();
-
+    Safe_Release(m_pPickedObject);
     Safe_Release(m_pDevice);
     Safe_Release(m_pContext);
     Safe_Release(m_pGameInstance);

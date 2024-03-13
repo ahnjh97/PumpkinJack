@@ -3,7 +3,7 @@
 #include "Loader.h"
 
 #include "GameInstance.h"
-
+#include "GameObject.h"
 #include "Level_Logo.h"
 #include "Level_GamePlay.h"
 #include "Level_MapTool.h"
@@ -24,7 +24,7 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
 	m_pLoader = CLoader::Create(m_pDevice, m_pContext, eNextLevelID);
 	if (nullptr == m_pLoader)
 		return E_FAIL;		
-
+	Ready_Layer_BackGround();
 	return S_OK;
 }
 
@@ -74,12 +74,19 @@ HRESULT CLevel_Loading::Render()
 
 HRESULT CLevel_Loading::Ready_Layer_BackGround()
 {
-	return E_NOTIMPL;
+	CGameObject::GAMEOBJECT_DESC tDesc = {};
+	tDesc.matWorld._43 = 0.5f;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_LOADING, TEXT("Layer_LoadingScreen"), TEXT("Prototype_GameObject_LoadingScreen"), &tDesc)))
+		return E_FAIL;
+	/*tDesc.matWorld._43 = 0.4f;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_LOADING, TEXT("Layer_LoadingScreen"), TEXT("Prototype_GameObject_LoadingScreen"), &tDesc)))
+		return E_FAIL;*/
+	return S_OK;
 }
 
 HRESULT CLevel_Loading::Ready_Layer_UI()
 {
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 CLevel_Loading * CLevel_Loading::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)

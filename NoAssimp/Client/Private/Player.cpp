@@ -55,12 +55,14 @@ void CPlayer::Tick(_float fTimeDelta)
 		m_pCamera = dynamic_cast<CCamera_Jack*>(m_pGameInstance->Get_GameObject(m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Jack")));
 		Safe_AddRef(m_pCamera);
 	}
-		
+	if (m_pModelCom == nullptr)
+		return;
+	m_pModelCom->Reset_Animation();
+	Link_Animation();
 	OnKeyInput(fTimeDelta);
 	StateToAnimation();
-	Update_CamPos();
-	_float fAngle = Calculate_Angle();
-	Turn_Body(fAngle);
+	Update_PositionToCam();
+	Turn_Body(fTimeDelta);
 }
 
 void CPlayer::Late_Tick(_float fTimeDelta)
@@ -75,9 +77,8 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 
 	_float3 vRelativeTranslation = {};
 	XMStoreFloat3(&vRelativeTranslation, XMLoadFloat3(&vHipTrans) - XMLoadFloat3(&vPreHipTrans));
-	_float fNewScale = m_pModelCom->Get_ModelConfig().fNewScale;
-	/*fNewScale = 1.f;*/
-
+	_float fNewScale = m_pModelCom->Get_ModelConfig().fNewScale * 0.9f;
+	
 	_matrix matTemp = ::XMMatrixTranslation(vRelativeTranslation.x * fNewScale, vRelativeTranslation.y * fNewScale, vRelativeTranslation.z * fNewScale);
 	_matrix matRelative = ::XMMatrixMultiply(m_pTransformCom->Get_WorldMatrix(), matTemp);
 	_float4x4 matWorld = {};
@@ -125,45 +126,32 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 	_vector vCamLook = pCamTransform->Get_State_Vector(CTransform::STATE_LOOK);
 	_vector vCamRight = pCamTransform->Get_State_Vector(CTransform::STATE_RIGHT);
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80)
+	Update_Direction(vCamLook, vCamRight);
+
+	if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) || (m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80)
+		|| (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80) || (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80))
 	{
-		m_pTransformCom->Go_Straight(fTimeDelta, 1, vCamLook);
-		if(!m_bIsJumping)
+		m_pTransformCom->Move(fTimeDelta, XMLoadFloat3(&m_vTargetDir));
+		if(!m_bIsJumping && !m_bIsAttacking)
 			m_eState = RUN;
-		XMStoreFloat3(&m_vTargetDir, vCamLook);
 	}
-	if (m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80)
-	{
-		m_pTransformCom->Go_Backward(fTimeDelta, 1, vCamLook);
-		if (!m_bIsJumping)
-			m_eState = RUN;
-		XMStoreFloat3(&m_vTargetDir, -vCamLook);
-	}
-	if (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80)
-	{
-		m_pTransformCom->Go_Left(fTimeDelta, 1, vCamRight);
-		if (!m_bIsJumping)
-			m_eState = RUN;
-		XMStoreFloat3(&m_vTargetDir, -vCamRight);
-	}
-	if (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80)
-	{
-		m_pTransformCom->Go_Right(fTimeDelta, 1, vCamRight);
-		if (!m_bIsJumping)
-			m_eState = RUN;
-		XMStoreFloat3(&m_vTargetDir, vCamRight);
-	}
-	if (m_pGameInstance->KeyDown(DIK_SPACE))
+
+	if (m_pGameInstance->KeyDown(DIK_SPACE) && !m_bIsAttacking)
 	{
 		m_pTransformCom->Go_Right(fTimeDelta, 1, vCamRight);
 		m_eState = JUMP;
 		m_bIsJumping = true;
 	}
-	if (m_pGameInstance->MouseDown(DIMKS_LBUTTON)) // 傍加 可记 持绢具窃
+
+	if (m_pGameInstance->MouseDown(DIMKS_LBUTTON) && !m_bIsAttacking)
 	{
+		m_bIsAttacking = true;
 		if (m_bIsJumping == true)
 		{
-			m_eState = AIR_ATTACK;
+			if (m_eWeapon == WPN_SPEAR)
+				m_eState = AIR_ATTACK;
+			else
+				m_eState = AIR_ATTACK_END;
 			m_iLastAttack = 0;
 		}
 		else if (m_iLastAttack == 0 || m_iLastAttack == 3)
@@ -186,55 +174,98 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 	if (!(m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) && !(m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80) &&
 		!(m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80) && !(m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80) && 
 		!(m_pGameInstance->Get_DIKeyState(DIK_SPACE) & 0x80) && !(m_pGameInstance->MouseDown(DIMKS_LBUTTON)) && 
-		!(m_pGameInstance->MouseDown(DIMKS_RBUTTON)))
+		!(m_pGameInstance->MouseDown(DIMKS_RBUTTON)) && !m_bIsJumping && !m_bIsAttacking)
 	{
 		m_eState = IDLE;
 	}
 }
+
+void CPlayer::Update_Direction(_fvector vCamLook, _fvector vCamRight)
+{
+	_vector vLook = vCamLook;
+	vLook = XMVectorSetY(vLook, 0.f);
+	_vector vRight = vCamRight;
+	vRight = XMVectorSetY(vRight, 0.f);
+
+	if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) && (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80))
+	{
+		XMStoreFloat3(&m_vTargetDir, XMVector3Normalize(vLook - vRight));
+	}
+	else if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) && (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80))
+	{
+		XMStoreFloat3(&m_vTargetDir, XMVector3Normalize(vLook + vRight));
+	}
+	else if ((m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80) && (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80))
+	{
+		XMStoreFloat3(&m_vTargetDir, XMVector3Normalize(-vLook - vRight));
+	}
+	else if ((m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80) && (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80))
+	{
+		XMStoreFloat3(&m_vTargetDir, XMVector3Normalize(-vLook + vRight));
+	}
+	else if (m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80)
+	{
+		XMStoreFloat3(&m_vTargetDir, XMVector3Normalize(vLook));
+	}
+	else if (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80)
+	{
+		XMStoreFloat3(&m_vTargetDir, XMVector3Normalize(-vRight));
+	}
+	else if (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80)
+	{
+		XMStoreFloat3(&m_vTargetDir, XMVector3Normalize(vRight));
+	}
+	else if (m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80)
+	{
+		XMStoreFloat3(&m_vTargetDir, XMVector3Normalize(-vLook));
+	}
+}
+
 void CPlayer::StateToAnimation()
 {
-	if (m_pModelCom == nullptr)
-		return;
 	string Jack_ = "Jack_";
 	string _Anim = "_Anim";
 	string _Jack = "_Jack";
 
-	string Spear_Run2 = Jack_ + "Spear_Run2" + _Anim + _Jack;
-	string Spear_Idle = Jack_ + "Spear_Idle" + _Anim + _Jack;
-	string Spear_Jump = Jack_ + "Spear_Jump" + _Anim + _Jack;
-	string Spear_Atk2 = Jack_ + "Spear_Atk2" + _Anim + _Jack;
-	string Spear_Atk3 = Jack_ + "Spear_Atk3" + _Anim + _Jack;
-	string Spear_Atk5 = Jack_ + "Spear_Atk5" + _Anim + _Jack;
 	if (m_eWeapon == WPN_SPEAR)
 	{
 		if (m_eState == IDLE)
-		{
-			m_pModelCom->Find_Animation(Spear_Idle, true);
-		}
+			m_pModelCom->Find_Animation(Jack_ + "Spear_Idle" + _Anim + _Jack, true);
 		if (m_eState == RUN)
-		{
-			m_pModelCom->Find_Animation(Spear_Run2, true);
-		}
+			m_pModelCom->Find_Animation(Jack_ + "Spear_Run2" + _Anim + _Jack, true);
 		if (m_eState == JUMP)
-		{
-			m_pModelCom->Find_Animation(Spear_Jump, true);
-		}
+			m_pModelCom->Find_Animation(Jack_ + "Spear_Jump" + _Anim + _Jack, false);
 		if (m_eState == ATTACK1)
-		{
-			m_pModelCom->Find_Animation(Spear_Atk2, true);
-		}
+			m_pModelCom->Find_Animation(Jack_ + "Spear_Atk2" + _Anim + _Jack, false);
 		if (m_eState == ATTACK2)
-		{
-			m_pModelCom->Find_Animation(Spear_Atk3, true);
-		}
+			m_pModelCom->Find_Animation(Jack_ + "Spear_Atk5" + _Anim + _Jack, false);
 		if (m_eState == ATTACK3)
-		{
-			m_pModelCom->Find_Animation(Spear_Atk5, true);
-		}
+			m_pModelCom->Find_Animation(Jack_ + "Spear_Atk3" + _Anim + _Jack, false);
+		if (m_eState == AIR_ATTACK)
+			m_pModelCom->Find_Animation(Jack_ + "Spear_AirAttack" + _Anim + _Jack, false);
+		if (m_eState == AIR_ATTACK_END)
+			m_pModelCom->Find_Animation(Jack_ + "Spear_AirAttack_End" + _Anim, false);
+	}
+	if (m_eWeapon == WPN_RIFLE)
+	{
+		if (m_eState == IDLE)
+			m_pModelCom->Find_Animation(Jack_ + "Rifle_Idle" + _Anim + _Jack, true);
+		if (m_eState == RUN)
+			m_pModelCom->Find_Animation(Jack_ + "Rifle_Run" + _Anim + _Jack, true);
+		if (m_eState == JUMP)
+			m_pModelCom->Find_Animation(Jack_ + "Rifle_Jump" + _Anim + _Jack, false);
+		if (m_eState == ATTACK1)
+			m_pModelCom->Find_Animation(Jack_ + "Rifle_Shoot_1" + _Anim + _Jack, false);
+		if (m_eState == ATTACK2)
+			m_pModelCom->Find_Animation(Jack_ + "Rifle_Shoot_2" + _Anim + _Jack, false);
+		if (m_eState == ATTACK3)
+			m_pModelCom->Find_Animation(Jack_ + "Rifle_Shoot_3" + _Anim + _Jack, false);
+		if (m_eState == AIR_ATTACK_END)
+			m_pModelCom->Find_Animation(Jack_ + "Rifle_AirAttackShort" + _Anim, false);
 	}
 }
 
-void CPlayer::Update_CamPos()
+void CPlayer::Update_PositionToCam()
 {
 	if (m_pTransformCom != nullptr)
 	{
@@ -243,34 +274,25 @@ void CPlayer::Update_CamPos()
 	}
 }
 
-_float CPlayer::Calculate_Angle()
+void CPlayer::Turn_Body(_float fTimeDelta)
 {
-	_float dotProduct = XMVectorGetX(XMVector3Dot(XMLoadFloat3(&m_vPreTargetDir), XMLoadFloat3(&m_vTargetDir)));
-	_float magnitudeA = XMVectorGetX(XMVector3Length(XMLoadFloat3(&m_vPreTargetDir)));
-	_float magnitudeB = XMVectorGetX(XMVector3Length(XMLoadFloat3(&m_vTargetDir)));
-	if (magnitudeA == 0.0f || magnitudeB == 0.0f)
-		return _float();
-		
-	_float cosine = dotProduct / (magnitudeA * magnitudeB);
-	return acos(cosine);
+	if (m_vPreTargetDir.x == 0 && m_vPreTargetDir.y == 0 && m_vPreTargetDir.z == 0)
+		return;
+	_float fAngle = XMVectorGetX(XMVector3AngleBetweenVectors(XMLoadFloat3(&m_vPreTargetDir), XMLoadFloat3(&m_vTargetDir)));
+	if (abs(fAngle) >= XMConvertToRadians(2.f))
+		m_pTransformCom->Turn(XMVectorSet(0, 1, 0, 0), fTimeDelta * 500.f * fAngle);
 }
 
-void CPlayer::Turn_Body(_float fAngle)
+void CPlayer::Link_Animation()
 {
-	/*if (abs(fAngle) < XMConvertToRadians(2.f))
-		return;
-	_vector quaternion = XMQuaternionRotationAxis(XMVectorSet(0,1,0,0), fAngle);
-
-	_float t = 0.5f;
-	_vector lerpedQuaternion = XMQuaternionSlerp(XMQuaternionIdentity(), quaternion, t);
-
-	_float4 lerpedResult;
-	XMStoreFloat4(&lerpedResult, lerpedQuaternion);
-	_matrix matWorld = m_pTransformCom->Get_WorldMatrix();
-	matWorld = XMMatrixRotationQuaternion(lerpedQuaternion) * matWorld;
-	_float4x4 matResult = {};
-	XMStoreFloat4x4(&matResult, matWorld);
-	m_pTransformCom->Set_WorldMatrix(matResult);*/
+	if (m_eState == AIR_ATTACK && !m_bIsJumping)
+	{
+		m_eState = AIR_ATTACK_END;
+	}
+	else if ((m_eState == AIR_ATTACK_END || m_eState == ATTACK1 || m_eState == ATTACK2 || m_eState == ATTACK3) && m_pModelCom->isFinished())
+	{
+		m_bIsAttacking = false;
+	}
 }
 
 HRESULT CPlayer::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)

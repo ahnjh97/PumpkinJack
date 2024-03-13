@@ -75,6 +75,8 @@ void CAnimation::Update_TransformationMatrix(_float fTimeDelta, const vector<CBo
 void CAnimation::Write_AnimationData(ofstream& fileStream)
 {
 	string strName = m_szName;
+	
+
 	size_t pos = strName.find_last_of('|');
 	if (pos != string::npos) {
 		strName = strName.substr(pos + 1);

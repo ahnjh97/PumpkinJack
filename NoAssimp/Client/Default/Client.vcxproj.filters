@@ -63,9 +63,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Client.h">
       <Filter>98.Default</Filter>
     </ClInclude>
@@ -108,7 +105,7 @@
     <ClInclude Include="..\Public\Monster.h">
       <Filter>02.GameObjects\Monster</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\ImGui_Client.h">
+    <ClInclude Include="..\Public\ImGui_MapTool.h">
       <Filter>_MyImGui</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_MapTool.h">
@@ -128,6 +125,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Player.h">
       <Filter>02.GameObjects\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ImGui_Client.h">
+      <Filter>_MyImGui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -164,7 +164,7 @@
     <ClCompile Include="..\private\Monster.cpp">
       <Filter>02.GameObjects\Monster</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\ImGui_Client.cpp">
+    <ClCompile Include="..\Private\ImGui_MapTool.cpp">
       <Filter>_MyImGui</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_MapTool.cpp">
@@ -184,6 +184,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Player.cpp">
       <Filter>02.GameObjects\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ImGui_Client.cpp">
+      <Filter>_MyImGui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

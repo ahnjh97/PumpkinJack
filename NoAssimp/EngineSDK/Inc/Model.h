@@ -22,6 +22,7 @@ public:
 	_bool IsNonAnimVersion() { return m_bIsNonAnimVersion; }
 	_float4x4 Get_ModelTransformMat() { return m_TransformMatrix; }
 	MODEL_CONFIG Get_ModelConfig() { return m_tConfig; }
+	string Get_AnimationName() { return m_Animations[m_iCurrentAnimIndex]->Get_Name(); }
 
 	void Set_Animation(_uint iAnimIndex, _bool isLoop) {
 		if (m_bIsNonAnimVersion) return;
@@ -50,6 +51,7 @@ public:
 
 public:
 	void Find_Animation(string& strAnimName, _bool isLoop);
+	void Reset_Animation();
 
 private:
 	TYPE						m_eModelType = { TYPE_END };

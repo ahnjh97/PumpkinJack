@@ -18,7 +18,7 @@ private:
 
 public:
 	HRESULT Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, const ENGINE_DESC& EngineDesc, _Inout_ ID3D11Device** ppDevice, _Inout_ ID3D11DeviceContext** ppContext);
-	HRESULT	Initialize_ImGui(class CMyImGui* pImGui);
+	HRESULT	Initialize_ImGui(_uint iLevelIndex, class CMyImGui* pImGui);
 	void Tick_Engine(_float fTimeDelta);
 	HRESULT Draw(const _float4& vClearColor = _float4(0.f, 0.f, 1.f, 1.f));
 	HRESULT Clear(_uint iClearLevelIndex);

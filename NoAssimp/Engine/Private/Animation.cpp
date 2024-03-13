@@ -45,19 +45,28 @@ void CAnimation::Update_TransformationMatrix(_float fTimeDelta, const vector<cla
 
 	if (m_fDuration <= m_fTrackPosition)
 	{
+		m_fTrackPosition = 0.f;
+
 		if (false == isLoop)
 		{
 			m_isFinished = true;
 			return;
 		}
-
-		m_fTrackPosition = 0.f;
 	}
 
 	for (_uint i = 0; i < m_iNumChannels; ++i)
 	{
 		/* 이 뼈의 상태행렬을 만들어서 CBone의 TransformationMatrix를 바꿔라. */
 		m_Channels[i]->Update_TransformationMatrix(Bones, m_fTrackPosition, &m_CurrentKeyFrameIndices[i]);
+	}
+}
+
+void CAnimation::Reset(const vector<class CBone*>& Bones)
+{
+	for (_uint i = 0; i < m_iNumChannels; ++i)
+	{
+		/* 이 뼈의 상태행렬을 만들어서 CBone의 TransformationMatrix를 바꿔라. */
+		m_Channels[i]->Update_TransformationMatrix(Bones, 0, &m_CurrentKeyFrameIndices[i]);
 	}
 }
 

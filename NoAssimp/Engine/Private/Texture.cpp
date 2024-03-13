@@ -41,7 +41,7 @@ HRESULT CTexture::Initialize_Prototype(const wstring & strTextureFilePath, _uint
 			hr = CreateDDSTextureFromFile(m_pDevice, szFileName, nullptr, &pSRV);
 
 			if (FAILED(hr))
-				return E_FAIL;
+ 				return E_FAIL;
 
 			m_Textures.push_back(pSRV);
 		}

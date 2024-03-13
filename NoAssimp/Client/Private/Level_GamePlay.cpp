@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "..\Public\Level_GamePlay.h"
-
+#include "Level_GamePlay.h"
+#include "ImGui_Client.h"
 #include "Camera_Free.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -41,7 +41,8 @@ HRESULT CLevel_GamePlay::Initialize()
 		return E_FAIL;
 
 	*/
-
+	if (FAILED(m_pGameInstance->Initialize_ImGui(LEVEL_GAMEPLAY, CImGui_Client::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 	
 	m_InputFile.close();
 	return S_OK;

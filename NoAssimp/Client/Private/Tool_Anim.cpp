@@ -50,7 +50,7 @@ void CTool_Anim::Late_Tick(_float fTimeDelta)
 
 	_float3 vRelativeTranslation = {};
 	XMStoreFloat3(&vRelativeTranslation, XMLoadFloat3(&vHipTrans) - XMLoadFloat3(&vPreHipTrans));
-	_float fNewScale = m_pModelCom->Get_ModelConfig().fNewScale;
+	_float fNewScale = m_pModelCom->Get_ModelConfig().fNewScale * 0.9f;
 	/*fNewScale = 1.f;*/
 
 	_matrix matTemp = XMMatrixTranslation(vRelativeTranslation.x * fNewScale, vRelativeTranslation.y * fNewScale, vRelativeTranslation.z * fNewScale);

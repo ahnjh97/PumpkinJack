@@ -14,7 +14,7 @@ BEGIN(Client)
 class CBackGround final : public CGameObject
 {
 private:
-	CBackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CBackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _bool bLoadingScreen);
 	CBackGround(const CBackGround& rhs);
 	virtual ~CBackGround() = default;
 
@@ -33,7 +33,8 @@ private:
 private:
 	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
 	_float4x4				m_WorldMatrix, m_ViewMatrix, m_ProjMatrix;
-
+	_bool					m_bLoadingScreen = { false };
+	_float					m_fZ = {};
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
@@ -41,7 +42,7 @@ private:
 
 
 public:
-	static CBackGround* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CBackGround* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _bool bLoadingScreen = false);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };

@@ -71,12 +71,15 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	return S_OK;
 }
 
-HRESULT CGameInstance::Initialize_ImGui(CMyImGui* pImGui)
+HRESULT CGameInstance::Initialize_ImGui(_uint iLevelIndex, CMyImGui* pImGui)
 {
 	m_pImGui_Manager = CImGui_Manager::Create(pImGui);
 
 	if (nullptr == m_pImGui_Manager)
 		return E_FAIL;
+
+	if (iLevelIndex != Level_MapTool)
+		return S_OK;
 
 	// 컴포넌트 이름 imgui로 가져오기
 	vector<string> vecAnim;
@@ -459,6 +462,8 @@ void CGameInstance::Release_Engine()
 
 void CGameInstance::Free()
 {
+	Safe_Release(m_pPicking);
+	Safe_Release(m_pImGui_Manager);
 	Safe_Release(m_pPipeLine);
 	Safe_Release(m_pTimer_Manager);
 	Safe_Release(m_pRenderer);	

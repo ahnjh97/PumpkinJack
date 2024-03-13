@@ -1,13 +1,13 @@
 #include "stdafx.h"
 #include "..\Public\BackGround.h"
 
-CBackGround::CBackGround(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	: CGameObject{ pDevice, pContext }
+CBackGround::CBackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _bool bLoadingScreen)
+	: CGameObject{ pDevice, pContext }, m_bLoadingScreen{ bLoadingScreen }
 {
 }
 
 CBackGround::CBackGround(const CBackGround & rhs)
-	: CGameObject{ rhs }
+	: CGameObject{ rhs }, m_bLoadingScreen{ rhs.m_bLoadingScreen }, m_fZ{ rhs.m_fZ }
 {
 
 }
@@ -20,6 +20,8 @@ HRESULT CBackGround::Initialize_Prototype()
 HRESULT CBackGround::Initialize(void * pArg)
 {
 	GAMEOBJECT_DESC		GameObjectDesc{};
+	if(pArg)
+		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
 
 	GameObjectDesc.fSpeedPerSec = 10.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
@@ -27,6 +29,7 @@ HRESULT CBackGround::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
+	m_fZ = GameObjectDesc.matWorld._43;
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
@@ -34,12 +37,12 @@ HRESULT CBackGround::Initialize(void * pArg)
 	m_fSizeY = g_iWinSizeY;
 	m_fX = g_iWinSizeX * 0.5f;
 	m_fY = g_iWinSizeY * 0.5f;
-
+	
 	m_pTransformCom->Set_Scaled(m_fSizeX, m_fSizeY, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(
 		m_fX - g_iWinSizeX * 0.5f,
 		-m_fY + g_iWinSizeY * 0.5f,
-		0.f, 
+		m_fZ,
 		1.f
 	));
 
@@ -84,10 +87,29 @@ HRESULT CBackGround::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	/* For.Com_Texture */
-	if (FAILED(__super::Add_Component(LEVEL_LOGO, TEXT("Prototype_Component_Texture_Logo"),
-		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
-		return E_FAIL;
+	if (m_bLoadingScreen == false)
+	{
+		/* For.Com_Texture */
+		if (FAILED(__super::Add_Component(LEVEL_LOGO, TEXT("Prototype_Component_Texture_Logo"),
+			TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
+			return E_FAIL;
+	}
+	else
+	{
+		if (m_fZ == 0.5f)
+		{
+			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreens"),
+				TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
+				return E_FAIL;
+		}
+		if (m_fZ == 0.4f)
+		{
+			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreens_Jack"),
+				TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
+				return E_FAIL;
+		}
+	}
+
 
 	/* For.Com_VIBuffer */
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
@@ -111,14 +133,15 @@ HRESULT CBackGround::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0);
+	if (m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0))
+		return E_FAIL;
 
 	return S_OK;
 }
 
-CBackGround * CBackGround::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CBackGround* CBackGround::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _bool bLoadingScreen)
 {
-	CBackGround*		pInstance = new CBackGround(pDevice, pContext);
+	CBackGround* pInstance = new CBackGround(pDevice, pContext, bLoadingScreen);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
@@ -128,7 +151,6 @@ CBackGround * CBackGround::Create(ID3D11Device * pDevice, ID3D11DeviceContext * 
 	}
 
 	return pInstance;
-
 }
 
 CGameObject * CBackGround::Clone(void * pArg)

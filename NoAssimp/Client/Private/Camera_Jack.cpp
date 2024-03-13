@@ -61,8 +61,7 @@ void CCamera_Jack::OnMouseInput(_float fTimeDelta)
 	_long	MouseMove = { 0 };
 	if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_X))
 	{	
-
-		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * MouseMove * m_fMouseSensor);
+		 m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * MouseMove * m_fMouseSensor);
 	}
 		
 	if (MouseMove = m_pGameInstance->Get_DIMouseMove(DIMMS_Y))
@@ -71,19 +70,13 @@ void CCamera_Jack::OnMouseInput(_float fTimeDelta)
 
 void CCamera_Jack::RevolveAroundPlayer(_float fAngle)
 {
-	//_vector vCamPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	_vector vPlayerPos = XMLoadFloat3(&m_vPlayerPos) + XMVectorSet(0, 20.f, -20.f, 1.f);
-
-	//
-	////vRelativePos = XMVector3Transform(vRelativePos, matRotation);
-
-	//_matrix matView = XMMatrixLookToLH(vCamPos, vPlayerPos, XMVectorSet(0, 1, 0, 0));
-	//_matrix matViewInverse = XMMatrixInverse(nullptr, matView);
-	//_float4x4 matResult = {};
-	//XMStoreFloat4x4(&matResult, matViewInverse);
-	//m_pTransformCom->Set_WorldMatrix(matResult);
-
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPlayerPos);
+	_vector vCamLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+	vCamLook = XMVectorSetY(vCamLook, 0.f);
+	vCamLook = XMVector3Normalize(vCamLook);
+	_vector vHeight = XMVectorSet(0, 30, 0, 0);
+	_vector vResult = XMLoadFloat3(&m_vPlayerPos) - (vCamLook * 30.f) + vHeight;
+	vResult = XMVectorSetW(vResult, 1.f);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vResult); 
 }
 
 CCamera_Jack* CCamera_Jack::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Level_MapTool.h"
 #include "Camera_Free.h"
-#include "ImGui_Client.h"
+#include "ImGui_MapTool.h"
 
 CLevel_MapTool::CLevel_MapTool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -19,7 +19,7 @@ HRESULT CLevel_MapTool::Initialize()
 	if (FAILED(Ready_Layer_Grid(TEXT("Layer_Grid"))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Initialize_ImGui(CImGui_Client::Create(m_pDevice, m_pContext))))
+	if (FAILED(m_pGameInstance->Initialize_ImGui(LEVEL_MAPTOOL, CImGui_MapTool::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	return S_OK;

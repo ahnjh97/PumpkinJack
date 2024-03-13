@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "..\Public\MainApp.h"
-
+#include "MainApp.h"
+#include "BackGround.h"
 #include "GameInstance.h"
 #include "Level_Loading.h"
 
@@ -73,6 +73,24 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreens"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Logo/T_LoadingScreens.dds")))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreens_GameLogo"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Logo/T_LoadingScreens_GameLogo.dds")))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreens_Holder"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Logo/T_LoadingScreens_Holder.dds")))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreens_Jack"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Logo/T_LoadingScreens_Jack.dds")))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Spinner"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Logo/spinner.dds")))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_LoadingScreen"),
+		CBackGround::Create(m_pDevice, m_pContext, true))))
+		return E_FAIL;
 	return	S_OK;
 }
 
