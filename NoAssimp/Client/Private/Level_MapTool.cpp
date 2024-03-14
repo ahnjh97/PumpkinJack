@@ -13,6 +13,9 @@ HRESULT CLevel_MapTool::Initialize()
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
+	if(FAILED(Ready_Lights()))
+		return E_FAIL;
+
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
 
@@ -36,6 +39,24 @@ HRESULT CLevel_MapTool::Render()
 		return E_FAIL;
 
 	SetWindowText(g_hWnd, TEXT("Level_MapTool"));
+
+	return S_OK;
+}
+
+HRESULT CLevel_MapTool::Ready_Lights()
+{
+	LIGHT_DESC			LightDesc{};
+
+	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
+	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
+	LightDesc.vPosition = _float4(0.f, 0.f, 0.f, 1.f);
+	LightDesc.vRange = 100.f;
+	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vSpecular = _float4(0.1f, 0.1f, 0.1f, 1.f);
+
+	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
+		return E_FAIL;
 
 	return S_OK;
 }

@@ -44,6 +44,16 @@ CModel::CModel(const CModel& rhs)
 	}
 }
 
+CBone* CModel::Get_BonePtr(const _char* pBoneName) const
+{
+	auto	iter = find_if(m_Bones.begin(), m_Bones.end(), [&](CBone* pBone)->_bool
+		{
+			return pBone->Compare_Name(pBoneName);
+		});
+
+	return *iter;
+}
+
 _bool CModel::Check_BoundingBox(const CTransform* pTransform) const
 {
 	_float3 vRayDir{}, vRayPos{};

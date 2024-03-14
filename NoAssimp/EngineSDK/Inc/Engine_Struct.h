@@ -11,6 +11,21 @@ namespace Engine
 
 	typedef struct
 	{
+		enum TYPE { TYPE_DIRECTIONAL, TYPE_POINT, TYPE_END };
+		TYPE		eType;
+
+		XMFLOAT4	vDirection;
+		XMFLOAT4	vPosition;
+		float		vRange;
+
+		XMFLOAT4	vDiffuse;
+		XMFLOAT4	vAmbient;
+		XMFLOAT4	vSpecular;
+
+	}LIGHT_DESC;
+
+	typedef struct
+	{
 		XMFLOAT3	vScale;
 		XMFLOAT4	vRotation;
 		XMFLOAT3	vTranslation;

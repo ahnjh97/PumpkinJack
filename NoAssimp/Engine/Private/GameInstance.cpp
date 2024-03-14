@@ -6,8 +6,8 @@
 #include "Level_Manager.h"
 #include "Timer_Manager.h"
 #include "ImGui_Manager.h"
+#include "Light_Manager.h"
 #include "Picking.h"
-
 #include "Renderer.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
@@ -30,6 +30,10 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 
 	m_pPipeLine = CPipeLine::Create();
 	if (nullptr == m_pPipeLine)
+		return E_FAIL;
+
+	m_pLight_Manager = CLight_Manager::Create();
+	if (nullptr == m_pLight_Manager)
 		return E_FAIL;
 
 	/*m_pFont_Manager = CFont_Manager::Create(*ppGraphic_Device);
@@ -261,6 +265,14 @@ HRESULT CGameInstance::Add_Clone(_uint iLevelIndex, const wstring & strLayerTag,
 	return m_pObject_Manager->Add_Clone(iLevelIndex, strLayerTag, strPrototypeTag, pArg);
 }
 
+CGameObject* CGameInstance::Clone_GameObject(const wstring& strPrototypeTag, void* pArg)
+{
+	if (nullptr == m_pObject_Manager)
+		return nullptr;
+
+	return m_pObject_Manager->Clone_GameObject(strPrototypeTag, pArg);
+}
+
 const CComponent * CGameInstance::Get_Component(_uint iLevelIndex, const wstring & strLayerTag, const wstring & strComTag, _uint iIndex)
 {
 	if (nullptr == m_pObject_Manager)
@@ -426,6 +438,16 @@ _bool CGameInstance::IsPicking()
 	return m_pImGui_Manager->IsPicking();
 }
 
+const LIGHT_DESC* CGameInstance::Get_LightDesc(_uint iIndex)
+{
+	return m_pLight_Manager->Get_LightDesc(iIndex);
+}
+
+HRESULT CGameInstance::Add_Light(const LIGHT_DESC& LightDesc)
+{
+	return m_pLight_Manager->Add_Light(LightDesc);
+}
+
 string CGameInstance::WstrToStr(const wstring& wstr)
 {
 	wstring_convert<codecvt_utf8<wchar_t>> cnvt;
@@ -462,6 +484,7 @@ void CGameInstance::Release_Engine()
 
 void CGameInstance::Free()
 {
+	Safe_Release(m_pLight_Manager);
 	Safe_Release(m_pPicking);
 	Safe_Release(m_pImGui_Manager);
 	Safe_Release(m_pPipeLine);

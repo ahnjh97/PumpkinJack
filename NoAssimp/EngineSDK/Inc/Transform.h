@@ -67,6 +67,9 @@ public:
 		::XMStoreFloat4x4(&WorldMatrixInverse, XMMatrixInverse(nullptr, ::XMLoadFloat4x4(&m_WorldMatrix)));
 		return WorldMatrixInverse;
 	}
+	const _float4x4* Get_WorldFloat4x4_Ptr() const {
+		return &m_WorldMatrix;
+	}
 	_matrix Get_WorldMatrix_Inverse() const { return XMMatrixInverse(nullptr, ::XMLoadFloat4x4(&m_WorldMatrix)); }
 
 public:

@@ -21,7 +21,7 @@ private:
 	_bool				bCallNewFrame = { false };
 	CPlayer*			m_pPlayer = { nullptr };
 	vector<string>		m_vecState = { "IDLE", "RUN", "JUMP", "ATTACK1", "ATTACK2", "ATTACK3", "AIR_ATTACK","AIR_ATTACK_END", "STATE_END" };
-	vector<string>		m_vecWeapon = { "WPN_SPEAR", "WPN_RIFLE", "WPN_END" };
+	vector<string>		m_vecWeapon = { "WPN_SPEAR", "WPN_RIFLE", "WPN_SCYTHE", "WPN_END" };
 
 public:
 	static CImGui_Client* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

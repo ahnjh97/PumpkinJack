@@ -13,8 +13,8 @@
 #include "Grid.h"
 #include "Tool_Anim.h"
 #include "Tool_NonAnim.h"
-
-//#include "Player.h"
+#include "Body.h"
+#include "Weapon.h"
 //#include "Effect.h"
 //#include "Sky.h"
 
@@ -138,19 +138,14 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	m_strLoadingText = TEXT("객체를(을) 로딩 중 입니다.");
 	/* For.Prototype_GameObject_Terrain */
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Terrain"), CTerrain);
-
-	///* For.Prototype_GameObject_Camera_Free */
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Jack"), CCamera_Jack);
-	///* For.Prototype_GameObject_Player */
-	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Player"),
-	//	CPlayer::Create(m_pGraphic_Device))))
-	//	return E_FAIL;
-
-		/* For.Prototype_GameObject_Monster */
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Monster"), CMonster);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Player"), CPlayer);
-
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Player"), CPlayer); 
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Body"), CBody);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Spear"), CWeapon);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Rifle"), CWeapon);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Scythe"), CWeapon);
 	///* For.Prototype_GameObject_Effect */
 	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect"),
 	//	CEffect::Create(m_pGraphic_Device))))
@@ -305,7 +300,7 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degree, NewScale, RootIndex
 	m_ModelConfigs.emplace("Bat", MODEL_CONFIG{ 0.005f, 0.f, 0.5f, 4 });
 	m_ModelConfigs.emplace("Charon", MODEL_CONFIG{ 0.03f, 180.f, 2.6f, 4 });
 	m_ModelConfigs.emplace("Crow", MODEL_CONFIG{ 0.0003f, 180.f, 0.03f, 1 });
-	m_ModelConfigs.emplace("Dummy", MODEL_CONFIG{ 0.003f, 0.f, 0.3f, 3 });
+	m_ModelConfigs.emplace("Dummy", MODEL_CONFIG{ 0.005f, 0.f, 0.5f, 3 });
 	m_ModelConfigs.emplace("GarGoyle", MODEL_CONFIG{ 0.01f, 0.f, 1.f, 4 });
 	m_ModelConfigs.emplace("Horse", MODEL_CONFIG{ 0.03f, 180.f, 2.6f, 3 });
 	m_ModelConfigs.emplace("Jack", MODEL_CONFIG{ 0.0025f, 180.f, 0.25f, 3 });
@@ -318,7 +313,6 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degree, NewScale, RootIndex
 	m_ModelConfigs.emplace("Soldier", MODEL_CONFIG{ 0.025f, 0.f, 2.6f, 5 });
 	m_ModelConfigs.emplace("Trabuchet", MODEL_CONFIG{ 0.03f, 0.f, 2.6f, 2 });
 
-
 	m_ModelConfigs.emplace("DestroyedBarn", MODEL_CONFIG{ 3.f, 0.f, 3.f });
 	m_ModelConfigs.emplace("bone", MODEL_CONFIG{ 3.f, 0.f, 3.f });
 	m_ModelConfigs.emplace("fence1", MODEL_CONFIG{ 3.f, 0.f, 3.f });
@@ -330,6 +324,10 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degree, NewScale, RootIndex
 	m_ModelConfigs.emplace("fenceStackSmall", MODEL_CONFIG{ 3.f, 0.f, 3.f });
 	m_ModelConfigs.emplace("grassMeshYellow", MODEL_CONFIG{ 3.f, 0.f, 3.f });
 	m_ModelConfigs.emplace("shroom", MODEL_CONFIG{ 3.f, 0.f, 3.f });
+
+	m_ModelConfigs.emplace("Rifle", MODEL_CONFIG{ 3.f, 0.f, 3.f });
+	m_ModelConfigs.emplace("Scythe", MODEL_CONFIG{ 0.3f, 0.f, 0.3f });
+	m_ModelConfigs.emplace("Spear", MODEL_CONFIG{ 8.f, 0.f, 8.f });
 }
 
 void CLoader::TraverseAnimModels(LEVEL eLevel, const wstring& rootFolderPath)

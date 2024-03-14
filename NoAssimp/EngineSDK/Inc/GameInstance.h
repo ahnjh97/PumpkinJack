@@ -42,6 +42,7 @@ public: /* For.Level_Manager */
 public: /* For.Object_Manager */
 	HRESULT Add_Prototype(const wstring& strPrototypeTag, class CGameObject* pPrototype);
 	HRESULT Add_Clone(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg = nullptr);
+	class CGameObject* Clone_GameObject(const wstring& strPrototypeTag, void* pArg = nullptr);
 	const CComponent* Get_Component(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strComTag, _uint iIndex = 0);
 	_bool Binarize_Objects(_uint iLevel, string strLevel);
 	CGameObject* Select_ModelByPicking(_uint iLevelIndex, const wstring& wstrLayerTag); // MapTool에서의 모델선택
@@ -74,11 +75,17 @@ public: /* For.ImGui_Manager */
 	_float3 Get_PickPos();
 	_bool IsPicking();
 
+public: /* For.Light_Manager */
+	const LIGHT_DESC* Get_LightDesc(_uint iIndex);
+	HRESULT Add_Light(const LIGHT_DESC& LightDesc);
+
 	/* For.GameInstance */
 	string WstrToStr(const wstring& wstr);
 	wstring StrToWstr(const string& str);
 	void CalculateFPS(_float fTimeDelta);
 	_int Get_FPS() { return iFps; }
+
+
 
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };
@@ -91,7 +98,7 @@ private:
 	class CPipeLine*				m_pPipeLine = { nullptr };
 	class CImGui_Manager*			m_pImGui_Manager = { nullptr };
 	class CPicking*					m_pPicking = { nullptr };
-
+	class CLight_Manager*			m_pLight_Manager = { nullptr };
 
 
 private:

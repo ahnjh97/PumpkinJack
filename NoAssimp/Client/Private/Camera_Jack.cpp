@@ -42,7 +42,7 @@ HRESULT CCamera_Jack::Initialize(void* pArg)
 void CCamera_Jack::Tick(_float fTimeDelta)
 {
 	OnMouseInput(fTimeDelta);
-	RevolveAroundPlayer(0);
+	RevolveAroundPlayer();
 	__super::Bind_PipeLines();
 }
 
@@ -68,13 +68,13 @@ void CCamera_Jack::OnMouseInput(_float fTimeDelta)
 		m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), fTimeDelta * MouseMove * m_fMouseSensor);
 }
 
-void CCamera_Jack::RevolveAroundPlayer(_float fAngle)
+void CCamera_Jack::RevolveAroundPlayer()
 {
 	_vector vCamLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-	vCamLook = XMVectorSetY(vCamLook, 0.f);
+	/*vCamLook = XMVectorSetY(vCamLook, 0.f);*/
 	vCamLook = XMVector3Normalize(vCamLook);
-	_vector vHeight = XMVectorSet(0, 30, 0, 0);
-	_vector vResult = XMLoadFloat3(&m_vPlayerPos) - (vCamLook * 30.f) + vHeight;
+	_vector vHeight = XMVectorSet(0, 5, 0, 0);
+	_vector vResult = XMLoadFloat3(&m_vPlayerPos) - (vCamLook * 35.f) + vHeight;
 	vResult = XMVectorSetW(vResult, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vResult); 
 }

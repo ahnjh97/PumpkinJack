@@ -103,6 +103,15 @@
     <Filter Include="01.Utility\02.Components\Manager">
       <UniqueIdentifier>{9a25d0bd-b87d-44f6-bfce-fb32c1047b59}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\01.GameObjects\Part">
+      <UniqueIdentifier>{e46ea894-5fe9-4534-889b-7003e25216e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\08. Light">
+      <UniqueIdentifier>{ad99a769-60a9-416f-8edf-005a358d609e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\08. Light\Manager">
+      <UniqueIdentifier>{2f5d39cd-05d8-406e-900f-429d6e4b243e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -221,6 +230,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Channel.cpp">
       <Filter>01.Utility\02.Components\Model\Animation\Channel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Part.cpp">
+      <Filter>01.Utility\01.GameObjects\Part</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Light.cpp">
+      <Filter>01.Utility\08. Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Light_Manager.cpp">
+      <Filter>01.Utility\08. Light\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -355,6 +373,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\Channel.h">
       <Filter>01.Utility\02.Components\Model\Animation\Channel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Part.h">
+      <Filter>01.Utility\01.GameObjects\Part</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Light.h">
+      <Filter>01.Utility\08. Light</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Light_Manager.h">
+      <Filter>01.Utility\08. Light\Manager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

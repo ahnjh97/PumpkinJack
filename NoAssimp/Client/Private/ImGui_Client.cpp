@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "GameInstance.h"
 #include "ImGui_Client.h"
+#include "Body.h"
 
 CImGui_Client::CImGui_Client(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMyImGui{ pDevice, pContext }
@@ -72,9 +73,10 @@ void CImGui_Client::ConvertToString()
 	_float3 vDir = m_pPlayer->Get_TargetDir();
 	string strDir = "Direction : " + to_string(vDir.x).erase(to_string(vDir.x).size() - 4) + ", "
 		+ to_string(vDir.y).erase(to_string(vDir.y).size() - 4) + ", " + to_string(vDir.z).erase(to_string(vDir.z).size() - 4);
-	CModel* pPlayerModel = dynamic_cast<CModel*>(m_pPlayer->Get_Component(TEXT("Com_Model")));
+	CBody* pBody = dynamic_cast<CBody*>((m_pPlayer->Get_Part(TEXT("Part_Body"))));
+	CModel* pPlayerModel = dynamic_cast<CModel*>(pBody->Get_Component(TEXT("Com_Model")));
 	string strAnimName = "Anim : "  + pPlayerModel->Get_AnimationName();
-	PLAYER_STATE eState = m_pPlayer->Get_State();
+	STATE eState = m_pPlayer->Get_State();
 	string strState = "State : " + m_vecState[eState];
 	WEAPON eWeapon = m_pPlayer->Get_Weapon();
 	string strWeapon = "Weapon : " + m_vecWeapon[eWeapon];

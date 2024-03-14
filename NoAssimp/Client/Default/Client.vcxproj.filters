@@ -61,6 +61,12 @@
     <Filter Include="02.GameObjects\Player">
       <UniqueIdentifier>{f536d6a1-b841-49e8-9585-b965b6f55737}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Player\Body">
+      <UniqueIdentifier>{48b8254c-1435-4716-b1d6-f21b638a2498}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Player\Weapon">
+      <UniqueIdentifier>{4569359c-bf45-4398-b9d7-4dd78585945f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -129,6 +135,12 @@
     <ClInclude Include="..\Public\ImGui_Client.h">
       <Filter>_MyImGui</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Weapon.h">
+      <Filter>02.GameObjects\Player\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Body.h">
+      <Filter>02.GameObjects\Player\Body</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -187,6 +199,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\ImGui_Client.cpp">
       <Filter>_MyImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Weapon.cpp">
+      <Filter>02.GameObjects\Player\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Body.cpp">
+      <Filter>02.GameObjects\Player\Body</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

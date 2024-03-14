@@ -23,6 +23,7 @@ public:
 	_float4x4 Get_ModelTransformMat() { return m_TransformMatrix; }
 	MODEL_CONFIG Get_ModelConfig() { return m_tConfig; }
 	string Get_AnimationName() { return m_Animations[m_iCurrentAnimIndex]->Get_Name(); }
+	class CBone* Get_BonePtr(const _char* pBoneName) const;
 
 	void Set_Animation(_uint iAnimIndex, _bool isLoop) {
 		if (m_bIsNonAnimVersion) return;

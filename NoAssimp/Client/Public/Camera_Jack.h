@@ -20,7 +20,7 @@ public:
 
 private:
 	void OnMouseInput(_float fTimeDelta);
-	void RevolveAroundPlayer(_float fAngle);
+	void RevolveAroundPlayer();
 
 	_float3 m_vPlayerPos = {};
 	_float3 m_vOffset = {};

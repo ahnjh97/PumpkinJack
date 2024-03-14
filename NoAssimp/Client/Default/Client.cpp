@@ -66,19 +66,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // 기본 메시지 루프입니다.
 	while (true)
 	{
-
-            
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 		{
 			if (WM_QUIT == msg.message)
 				break;
             if (WM_MOUSEMOVE == msg.message)
             {
-                RECT rect;
-                GetClientRect(msg.hwnd, &rect); // hwnd는 윈도우 핸들입니다.
-                ClientToScreen(msg.hwnd, (POINT*)&rect.left); // 클라이언트 영역의 좌측 상단을 스크린 좌표로 변환
-                ClientToScreen(msg.hwnd, (POINT*)&rect.right); // 클라이언트 영역의 우측 하단을 스크린 좌표로 변환
-                ClipCursor(&rect); // 마우스 커서가 이동할 수 있는 영역을 rect로 제한
+                if (pGameInstance->Get_CurrentLevelID() == LEVEL_GAMEPLAY)
+                {
+                    RECT rect;
+                    GetClientRect(msg.hwnd, &rect); // hwnd는 윈도우 핸들입니다.
+                    ClientToScreen(msg.hwnd, (POINT*)&rect.left); // 클라이언트 영역의 좌측 상단을 스크린 좌표로 변환
+                    ClientToScreen(msg.hwnd, (POINT*)&rect.right); // 클라이언트 영역의 우측 하단을 스크린 좌표로 변환
+                    ClipCursor(&rect); // 마우스 커서가 이동할 수 있는 영역을 rect로 제한
+                    ShowCursor(FALSE);
+                }              
             }
             if (WM_DESTROY == msg.message)
             {

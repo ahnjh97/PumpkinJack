@@ -5,7 +5,16 @@ matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 matrix g_BoneMatrices[512];
 
-texture2D g_Texture;
+vector g_vLightDir = vector(1.f, -1.f, 1.f, 0.f);
+vector g_vLightDiffuse = vector(1.f, 1.f, 1.f, 1.f);
+vector g_vLightAmbient = vector(1.f, 1.f, 1.f, 1.f);
+vector g_vLightSpecular = vector(1.f, 1.f, 1.f, 1.f);
+
+texture2D g_DiffuseTexture;
+vector g_vMtrlAmbient = vector(0.4f, 0.4f, 0.4f, 1.f);
+vector g_vMtrlSpecular = vector(1.f, 1.f, 1.f, 1.f);
+
+vector g_vCamPosition;
 
 sampler LinearSampler = sampler_state
 {
@@ -27,7 +36,9 @@ struct VS_IN
 struct VS_OUT
 {
     float4 vPosition : SV_POSITION;
+    float4 vNormal : NORMAL;
     float2 vTexcoord : TEXCOORD0;
+    float4 vWorldPos : TEXCOORD1;
 };
 
 /* Á¤Á¡ ½¦ÀÌ´õ */
@@ -43,14 +54,17 @@ VS_OUT VS_MAIN(VS_IN In)
 		g_BoneMatrices[In.vBlendIndices.w] * fWeightW;
 
     vector vPosition = mul(vector(In.vPosition, 1.f), BoneMatrix);
-
+    vector vNormal = mul(vector(In.vNormal, 0.f), BoneMatrix);
+    
     matrix matWV, matWVP;
 
     matWV = mul(g_WorldMatrix, g_ViewMatrix);
     matWVP = mul(matWV, g_ProjMatrix);
 
     Out.vPosition = mul(vPosition, matWVP);
+    Out.vNormal = normalize(mul(vNormal, g_WorldMatrix));
     Out.vTexcoord = In.vTexcoord;
+    Out.vWorldPos = mul(vPosition, g_WorldMatrix);
 
     return Out;
 }
@@ -58,7 +72,9 @@ VS_OUT VS_MAIN(VS_IN In)
 struct PS_IN
 {
     float4 vPosition : SV_POSITION;
+    float4 vNormal : NORMAL;
     float2 vTexcoord : TEXCOORD0;
+    float4 vWorldPos : TEXCOORD1;
 };
 
 struct PS_OUT
@@ -70,10 +86,19 @@ PS_OUT PS_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
-    Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
-
-    if (0.3f >= Out.vColor.a)
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (0.3f >= vMtrlDiffuse.a)
         discard;
+
+    vector vShade = saturate(dot(normalize(g_vLightDir) * -1.f, In.vNormal)) + (g_vLightAmbient * g_vMtrlAmbient);
+
+    vector vReflect = reflect(normalize(g_vLightDir), In.vNormal);
+    vector vLook = normalize(In.vWorldPos - g_vCamPosition);
+
+    float fSpecular = pow(saturate(dot(normalize(vReflect) * -1.f, vLook)), 30.f);
+
+    Out.vColor = (vMtrlDiffuse * g_vLightDiffuse) * saturate(vShade) +
+		(g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
 	
     return Out;
 }
