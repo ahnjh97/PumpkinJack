@@ -327,9 +327,9 @@ HRESULT CModel::Ready_Animations()
 		if (nullptr == pAnimation)
 			return E_FAIL;
 		string strName = pAnimation->Get_Name();
-		if ((strName.find("magic") != string::npos) || (strName.find("Scythe") != string::npos) || (strName.find("MAGIC") != string::npos)
-			|| (strName.find("FlyingMage") != string::npos) || (strName.find("groundversion") != string::npos) || (strName.find("Shovel") != string::npos)
-			|| (strName.find("Sword") != string::npos))
+		if ((strName.find("magic") != string::npos) || (strName.find("MAGIC") != string::npos)
+			|| (strName.find("FlyingMage") != string::npos) || (strName.find("groundversion") != string::npos) 
+			|| (strName.find("Shovel") != string::npos)	|| (strName.find("Sword") != string::npos))
 			continue;
 		m_Animations.push_back(pAnimation);
 	}

@@ -268,18 +268,16 @@ HRESULT CPlayer::Add_PartObjects(LEVEL eLevel)
 	CWeapon::WEAPON_DESC	RifleDesc{};
 
 	CModel* pModel = (CModel*)pBodyObject->Get_Component(TEXT("Com_Model"));
-
 	RifleDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	RifleDesc.pSocket = pModel->Get_BonePtr("RightHandIndex1");
 	RifleDesc.pWeapon = &m_eWeapon;
 	RifleDesc.iLevel = eLevel;
 	RifleDesc.wstrModelTag = TEXT("Prototype_Component_Model_Rifle");
-
-	pRifle = dynamic_cast<CPart*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Part_Spear"), &RifleDesc));
+	pRifle = dynamic_cast<CPart*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Part_Rifle"), &RifleDesc));
 	if (nullptr == pRifle)
 		return E_FAIL;
-
 	m_Parts.emplace(TEXT("Part_Rifle"), pRifle);
+
 
 	/* For.Part_Spear */
 	CPart* pSpear = { nullptr };
@@ -289,12 +287,11 @@ HRESULT CPlayer::Add_PartObjects(LEVEL eLevel)
 	SpearDesc.pWeapon = &m_eWeapon;
 	SpearDesc.iLevel = eLevel;
 	SpearDesc.wstrModelTag = TEXT("Prototype_Component_Model_Spear");
-
 	pSpear = dynamic_cast<CPart*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Part_Spear"), &SpearDesc));
 	if (nullptr == pSpear)
 		return E_FAIL;
-
 	m_Parts.emplace(TEXT("Part_Spear"), pSpear);
+
 
 	/* For.Part_Scythe */
 	CPart* pScythe = { nullptr };
@@ -304,11 +301,9 @@ HRESULT CPlayer::Add_PartObjects(LEVEL eLevel)
 	ScytheDesc.pWeapon = &m_eWeapon;
 	ScytheDesc.iLevel = eLevel;
 	ScytheDesc.wstrModelTag = TEXT("Prototype_Component_Model_Scythe");
-
 	pScythe = dynamic_cast<CPart*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Part_Scythe"), &ScytheDesc));
 	if (nullptr == pScythe)
 		return E_FAIL;
-
 	m_Parts.emplace(TEXT("Part_Scythe"), pScythe);
 	return S_OK;
 }

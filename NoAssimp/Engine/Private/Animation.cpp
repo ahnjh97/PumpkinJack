@@ -42,8 +42,8 @@ void CAnimation::Update_TransformationMatrix(_float fTimeDelta, const vector<cla
 	m_isFinished = false;
 	string strName = m_szName;
 	if ((strName.find("attack") != string::npos) || (strName.find("Air") != string::npos) 
-		|| (strName.find("Shoot") != string::npos) || (strName.find("atk") != string::npos))
-		fTimeDelta = fTimeDelta * 1.4f;
+		|| (strName.find("Shoot") != string::npos) || (strName.find("Atk") != string::npos))
+		fTimeDelta = fTimeDelta * 1.55f;
 
 	m_fTrackPosition += m_fTickPerSecond * fTimeDelta;
 

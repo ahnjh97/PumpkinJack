@@ -51,8 +51,8 @@ void CWeapon::Late_Tick(_float fTimeDelta)
 
     _vector vNewScale = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
     _matrix matNewCombined = XMMatrixRotationZ(-XM_PIDIV2) * XMMatrixAffineTransformation(vNewScale, XMVectorZero(), vRot, vTrans);
-    if (m_pModelCom->Get_ModelName() == "Spear")
-        matNewCombined = XMMatrixRotationX(0.2f) * matNewCombined;
+   /* if (m_pModelCom->Get_ModelName() == "Spear")
+        matNewCombined = XMMatrixRotationX(0.2f) * matNewCombined;*/
     XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * matNewCombined * XMLoadFloat4x4(m_pParentMatrix));
 
     m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);

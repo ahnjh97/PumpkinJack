@@ -135,7 +135,7 @@ void CBody::StateToAnimation()
 		if (*m_pState == ATTACK3)
 			m_pModelCom->Find_Animation(Jack_ + "Rifle_Shoot_3" + _Anim + _Jack, false);
 		if (*m_pState == AIR_ATTACK_END)
-			m_pModelCom->Find_Animation(Jack_ + "Rifle_AirAttackShort" + _Anim, false);
+			m_pModelCom->Find_Animation(Jack_ + "Rifle_AirAttack" + _Anim + _Jack, false);
 	}
 	
 }
