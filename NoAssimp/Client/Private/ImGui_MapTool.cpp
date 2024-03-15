@@ -345,6 +345,7 @@ void CImGui_MapTool::Menu_Animation()
 			if (m_pPickedObject != nullptr)
 				pAnimModel->Set_Animation(AnimationIdx, true);
 		}
+		Safe_Delete_Array(items3);
 		ImGui::End();
 	}
 }

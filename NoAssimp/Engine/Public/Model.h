@@ -76,7 +76,7 @@ private:
 	_bool						m_isLoop = { false };
 	vector<CAnimation*>			m_Animations;
 	_float4x4					m_MeshBoneMatrices[512];
-
+	map<const string, _uint>	m_AnimIndex;
 
 	// 파일입출력 변수
 	string						m_strDirectory;

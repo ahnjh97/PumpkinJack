@@ -97,47 +97,62 @@ HRESULT CBody::Render()
 
 void CBody::StateToAnimation()
 {
-	string Jack_ = "Jack_";
-	string _Anim = "_Anim";
-	string _Jack = "_Jack";
+	string strWeapon, strState;
 
-	if (*m_pWeapon == WPN_SPEAR)
+	switch (*m_pWeapon)
 	{
-		if (*m_pState == IDLE)
-			m_pModelCom->Find_Animation(Jack_ + "Spear_Idle" + _Anim + _Jack, true);
-		if (*m_pState == RUN)
-			m_pModelCom->Find_Animation(Jack_ + "Spear_Run2" + _Anim + _Jack, true);
-		if (*m_pState == JUMP)
-			m_pModelCom->Find_Animation(Jack_ + "Spear_Jump" + _Anim + _Jack, false);
-		if (*m_pState == ATTACK1)
-			m_pModelCom->Find_Animation(Jack_ + "Spear_Atk2" + _Anim + _Jack, false);
-		if (*m_pState == ATTACK2)
-			m_pModelCom->Find_Animation(Jack_ + "Spear_Atk5" + _Anim + _Jack, false);
-		if (*m_pState == ATTACK3)
-			m_pModelCom->Find_Animation(Jack_ + "Spear_Atk3" + _Anim + _Jack, false);
-		if (*m_pState == AIR_ATTACK)
-			m_pModelCom->Find_Animation(Jack_ + "Spear_AirAttack" + _Anim + _Jack, false);
-		if (*m_pState == AIR_ATTACK_END)
-			m_pModelCom->Find_Animation(Jack_ + "Spear_AirAttack_End" + _Anim, false);
-	}
-	if (*m_pWeapon == WPN_RIFLE)
-	{
-		if (*m_pState == IDLE)
-			m_pModelCom->Find_Animation(Jack_ + "Rifle_Idle" + _Anim + _Jack, true);
-		if (*m_pState == RUN)
-			m_pModelCom->Find_Animation(Jack_ + "Rifle_Run" + _Anim + _Jack, true);
-		if (*m_pState == JUMP)
-			m_pModelCom->Find_Animation(Jack_ + "Rifle_Jump" + _Anim + _Jack, false);
-		if (*m_pState == ATTACK1)
-			m_pModelCom->Find_Animation(Jack_ + "Rifle_Shoot_1" + _Anim + _Jack, false);
-		if (*m_pState == ATTACK2)
-			m_pModelCom->Find_Animation(Jack_ + "Rifle_Shoot_2" + _Anim + _Jack, false);
-		if (*m_pState == ATTACK3)
-			m_pModelCom->Find_Animation(Jack_ + "Rifle_Shoot_3" + _Anim + _Jack, false);
-		if (*m_pState == AIR_ATTACK_END)
-			m_pModelCom->Find_Animation(Jack_ + "Rifle_AirAttack" + _Anim + _Jack, false);
+	case WPN_SPEAR:
+		strWeapon = "Spear_";
+		break;
+	case WPN_RIFLE:
+		strWeapon = "Rifle_";
+		break;
+	case WPN_SCYTHE:
+		strWeapon = "Scythe_";
+		break;
 	}
 	
+	switch (*m_pState)
+	{
+	case IDLE:
+		strState = "Idle";
+		break;
+	case RUN:
+		strState = "Run";
+		break;
+	case JUMP:
+		strState = "Jump";
+		break;
+	case ATTACK1:
+		strState = "Atk1";
+		break;
+	case ATTACK2:
+		strState = "Atk2";
+		break;
+	case ATTACK3:
+		strState = "Atk3";
+		break;
+	case AIR_ATTACK:
+		strState = "AirAttack";
+		break;
+	case AIR_ATTACK_END:
+		strState = "AirAttack_End";
+		break;
+	case ROLL:
+		strState = "Roll";
+		break;
+	}
+
+	_bool bLoop;
+	if ((*m_pState == IDLE) || (*m_pState == RUN))
+		bLoop = true;
+	else
+		bLoop = false;
+
+	if(*m_pState == ROLL)
+		m_pModelCom->Find_Animation(strState, bLoop);
+	else
+		m_pModelCom->Find_Animation(strWeapon + strState, bLoop);
 }
 
 HRESULT CBody::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)

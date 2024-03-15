@@ -49,13 +49,17 @@ void CAnimation::Update_TransformationMatrix(_float fTimeDelta, const vector<cla
 
 	if (m_fDuration <= m_fTrackPosition)
 	{
-		m_fTrackPosition = 0.f;
-
 		if (false == isLoop)
 		{
 			m_isFinished = true;
+			for (_uint i = 0; i < m_iNumChannels; ++i)
+			{
+				/* 이 뼈의 상태행렬을 만들어서 CBone의 TransformationMatrix를 바꿔라. */
+				m_Channels[i]->Update_TransformationMatrix(Bones, m_fTrackPosition, &m_CurrentKeyFrameIndices[i]);
+			}
 			return;
 		}
+		m_fTrackPosition = 0.f;
 	}
 
 	for (_uint i = 0; i < m_iNumChannels; ++i)
@@ -67,16 +71,25 @@ void CAnimation::Update_TransformationMatrix(_float fTimeDelta, const vector<cla
 
 void CAnimation::Reset(const vector<class CBone*>& Bones)
 {
+	m_fTrackPosition = 0.f;
 	for (_uint i = 0; i < m_iNumChannels; ++i)
 	{
 		/* 이 뼈의 상태행렬을 만들어서 CBone의 TransformationMatrix를 바꿔라. */
-		m_Channels[i]->Update_TransformationMatrix(Bones, 0, &m_CurrentKeyFrameIndices[i]);
+		m_Channels[i]->Update_TransformationMatrix(Bones, m_fTrackPosition, &m_CurrentKeyFrameIndices[i]);
 	}
 }
 
 void CAnimation::Read_AnimationData(ifstream& fileStream)
 {
 	fileStream.read(reinterpret_cast<char*>(&m_szName), sizeof(m_szName));
+	string strName = m_szName;
+	size_t pos = strName.find('|');
+	if (pos != string::npos)
+	{
+		strName = strName.substr(pos + 1);
+		strcpy_s(m_szName, strName.c_str());
+	}
+		
 	fileStream.read(reinterpret_cast<char*>(&m_fDuration), sizeof(m_fDuration));
 	fileStream.read(reinterpret_cast<char*>(&m_fTickPerSecond), sizeof(m_fTickPerSecond));
 	fileStream.read(reinterpret_cast<char*>(&m_iNumChannels), sizeof(m_iNumChannels));

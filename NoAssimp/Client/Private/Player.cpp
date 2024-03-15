@@ -101,6 +101,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 	if (m_pGameInstance->KeyDown(DIK_TAB))
 	{
 		m_eWeapon = (WEAPON)((_uint)(m_eWeapon)+1);
+		m_iLastAttack = 0;
 		if (m_eWeapon == WPN_END)
 			m_eWeapon = (WEAPON)0;
 	} 
@@ -126,11 +127,11 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 		m_bIsAttacking = true;
 		if (m_bIsJumping == true)
 		{
-			if (m_eWeapon == WPN_SPEAR)
+		/*	if (m_eWeapon == WPN_SPEAR || m_eWeapon == WPN_SPEAR)*/
 				m_eState = AIR_ATTACK;
-			else
-				m_eState = AIR_ATTACK_END;
-			m_iLastAttack = 0;
+			/*else
+				m_eState = AIR_ATTACK_END;*/
+			//m_iLastAttack = 0;
 		}
 		else if (m_iLastAttack == 0 || m_iLastAttack == 3)
 		{
@@ -199,8 +200,6 @@ void CPlayer::Update_Direction(_fvector vCamLook, _fvector vCamRight)
 	}
 }
 
-
-
 void CPlayer::Update_PositionToCam()
 {
 	if (m_pTransformCom != nullptr)
@@ -256,7 +255,6 @@ HRESULT CPlayer::Add_PartObjects(LEVEL eLevel)
 	BodyDesc.pLastAttack = &m_iLastAttack;
 	BodyDesc.iLevel = eLevel;
 	BodyDesc.wstrModelTag = TEXT("Prototype_Component_Model_Jack");
-
 	pBodyObject = dynamic_cast<CPart*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Part_Body"), &BodyDesc));
 	if (nullptr == pBodyObject)
 		return E_FAIL;
@@ -278,7 +276,6 @@ HRESULT CPlayer::Add_PartObjects(LEVEL eLevel)
 		return E_FAIL;
 	m_Parts.emplace(TEXT("Part_Rifle"), pRifle);
 
-
 	/* For.Part_Spear */
 	CPart* pSpear = { nullptr };
 	CWeapon::WEAPON_DESC	SpearDesc{};
@@ -291,7 +288,6 @@ HRESULT CPlayer::Add_PartObjects(LEVEL eLevel)
 	if (nullptr == pSpear)
 		return E_FAIL;
 	m_Parts.emplace(TEXT("Part_Spear"), pSpear);
-
 
 	/* For.Part_Scythe */
 	CPart* pScythe = { nullptr };
@@ -341,4 +337,7 @@ void CPlayer::Free()
 {
 	__super::Free();
 	Safe_Release(m_pCamera);
+	for (auto& Pair : m_Parts)
+		Safe_Release(Pair.second);
+	m_Parts.clear();
 }

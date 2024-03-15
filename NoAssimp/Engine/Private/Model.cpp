@@ -27,6 +27,7 @@ CModel::CModel(const CModel& rhs)
 	, m_iNumAnimations{ rhs.m_iNumAnimations }
 	, m_eModelType{ rhs.m_eModelType }
 	, m_strModelName { rhs.m_strModelName }
+	, m_AnimIndex{ rhs.m_AnimIndex }
 {
 	for (auto& pPrototypeAnimation : rhs.m_Animations)
 		m_Animations.push_back(pPrototypeAnimation->Clone());
@@ -193,7 +194,7 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 	// 루트 노드의 변환행렬 
 	_matrix RootLocalTransform = XMLoadFloat4x4(m_Bones[0]->Get_TransformationMatrix());
 	//RootLocalTransform.r[3] = XMVectorSet(m_vHipTranslation.x, m_vHipTranslation.y, m_vHipTranslation.z, 1.0f);
-	RootLocalTransform.r[3] = XMVectorSet(0, 0, 0, 1.0f);
+	//RootLocalTransform.r[3] = XMVectorSet(0, 0, 0, 1.0f);
 	_vector vRotation = XMLoadFloat4(&m_vRotation);
 	_vector vScale = XMLoadFloat4(&m_vScale);
 	RootLocalTransform = XMMatrixScalingFromVector(vScale) * XMMatrixRotationQuaternion(vRotation) * RootLocalTransform;
@@ -218,26 +219,25 @@ HRESULT CModel::Render(_uint iMeshIndex)
 
 void CModel::Find_Animation(string& strAnimName, _bool isLoop)
 {
-	for (_uint i = 0; i < m_Animations.size(); i++)
+	auto iter = m_AnimIndex.find(strAnimName);
+	if (iter == m_AnimIndex.end())
+		return;
+
+	if (m_iCurrentAnimIndex != iter->second)
 	{
-		string strName =  string(m_Animations[i]->Get_Name());
-		if (strName == strAnimName)
-		{
-			if(m_iCurrentAnimIndex != i)
-				Set_Animation(i, isLoop);
-			return;
-		}
+		m_Animations[iter->second]->Reset(m_Bones);
+		Set_Animation(iter->second, isLoop);
 	}
 }
 
 void CModel::Reset_Animation()
 {
-	if (isFinished() == true)
-	{
-		m_Animations[m_iCurrentAnimIndex]->Reset(m_Bones);
-		if(m_Animations[m_iCurrentAnimIndex]->Get_Name() == "Jack_Spear_AirAttack_End_Anim")
-			m_Animations[m_iCurrentAnimIndex - 1]->Reset(m_Bones); // 
-	}
+	//if (isFinished() == true)
+	//{
+	//	m_Animations[m_iCurrentAnimIndex]->Reset(m_Bones);
+	//	if(m_Animations[m_iCurrentAnimIndex]->Get_Name() == "Jack_Spear_AirAttack_End_Anim")
+	//		m_Animations[m_iCurrentAnimIndex - 1]->Reset(m_Bones); // 
+	//}
 }
 
 HRESULT CModel::Ready_Meshes()
@@ -326,14 +326,32 @@ HRESULT CModel::Ready_Animations()
 		CAnimation* pAnimation = CAnimation::Create(m_Bones, m_InputFile);
 		if (nullptr == pAnimation)
 			return E_FAIL;
-		string strName = pAnimation->Get_Name();
-		if ((strName.find("magic") != string::npos) || (strName.find("MAGIC") != string::npos)
-			|| (strName.find("FlyingMage") != string::npos) || (strName.find("groundversion") != string::npos) 
-			|| (strName.find("Shovel") != string::npos)	|| (strName.find("Sword") != string::npos))
-			continue;
+
+		if (m_strModelName == "Jack")
+		{
+			string strName = pAnimation->Get_Name();
+			if ((strName.find("magic") != string::npos) || (strName.find("MAGIC") != string::npos)
+				|| (strName.find("FlyingMage") != string::npos) || (strName.find("groundversion") != string::npos)
+				|| (strName.find("Shovel") != string::npos) || (strName.find("Sword") != string::npos))
+			{
+				Safe_Release(pAnimation);
+				continue;
+			}
+				
+		}
+
 		m_Animations.push_back(pAnimation);
 	}
 	m_iNumAnimations = m_Animations.size();
+
+	if (m_strModelName == "Jack")
+	{
+		for (size_t i = 0; i < m_iNumAnimations; i++)
+		{
+			string strName = m_Animations[i]->Get_Name();
+			m_AnimIndex.emplace(strName, i);
+		}
+	}
 	return S_OK;
 }
 
@@ -379,10 +397,11 @@ void CModel::Free()
 
 	for (auto& pAnimations : m_Animations)
 		Safe_Release(pAnimations);
+	m_Animations.clear();
 	for (auto& pBones : m_Bones)
 		Safe_Release(pBones);
+	m_Bones.clear();
 	for (auto& pMesh : m_Meshes)
 		Safe_Release(pMesh);
-
 	m_Meshes.clear();
 }

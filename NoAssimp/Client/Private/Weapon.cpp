@@ -3,35 +3,35 @@
 #include "Bone.h"
 
 CWeapon::CWeapon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    :CPart{ pDevice, pContext }
+	:CPart{ pDevice, pContext }
 {
 }
 
 CWeapon::CWeapon(const CWeapon& rhs)
-    : CPart{ rhs }
+	: CPart{ rhs }
 {
 }
 
 HRESULT CWeapon::Initialize_Prototype()
 {
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CWeapon::Initialize(void* pArg)
 {
-    WEAPON_DESC* pWeaponDesc = (WEAPON_DESC*)pArg;
+	WEAPON_DESC* pWeaponDesc = (WEAPON_DESC*)pArg;
 
-    m_pSocket = pWeaponDesc->pSocket;
-    m_pWeapon = pWeaponDesc->pWeapon;
-    Safe_AddRef(m_pSocket);
+	m_pSocket = pWeaponDesc->pSocket;
+	m_pWeapon = pWeaponDesc->pWeapon;
+	Safe_AddRef(m_pSocket);
 
-    if (FAILED(__super::Initialize(pArg)))
-        return E_FAIL;
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
 
-    if (FAILED(Add_Components((LEVEL)pWeaponDesc->iLevel, pWeaponDesc->wstrModelTag)))
-        return E_FAIL;
+	if (FAILED(Add_Components((LEVEL)pWeaponDesc->iLevel, pWeaponDesc->wstrModelTag)))
+		return E_FAIL;
 
-    return S_OK;
+	return S_OK;
 }
 
 void CWeapon::Tick(_float fTimeDelta)
@@ -41,122 +41,124 @@ void CWeapon::Tick(_float fTimeDelta)
 
 void CWeapon::Late_Tick(_float fTimeDelta)
 {
-    _matrix matCombined = XMLoadFloat4x4(m_pSocket->Get_CombinedTransformationMatrix());
-    _vector vScale, vRot, vTrans;
-    XMMatrixDecompose(&vScale, &vRot, &vTrans, matCombined);
-    if (m_pModelCom->Get_ModelName() == "Rifle")
-        vTrans += XMVectorSet(0, 5.4f, 0, 0);
-    if(m_pModelCom->Get_ModelName() == "Spear")
-        vTrans += XMVectorSet(0, 4.1f, 0, 0);
+	_matrix matCombined = XMLoadFloat4x4(m_pSocket->Get_CombinedTransformationMatrix());
+	_vector vScale, vRot, vTrans;
+	XMMatrixDecompose(&vScale, &vRot, &vTrans, matCombined);
+	if (m_pModelCom->Get_ModelName() == "Rifle")
+		vTrans += XMVectorSet(0, 5.4f, 0, 0);
+	if (m_pModelCom->Get_ModelName() == "Spear")
+	{
+		vTrans += XMVectorSet(-0.5f, 4.1f, 0, 0);
+	}
 
-    _vector vNewScale = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
-    _matrix matNewCombined = XMMatrixRotationZ(-XM_PIDIV2) * XMMatrixAffineTransformation(vNewScale, XMVectorZero(), vRot, vTrans);
-   /* if (m_pModelCom->Get_ModelName() == "Spear")
-        matNewCombined = XMMatrixRotationX(0.2f) * matNewCombined;*/
-    XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * matNewCombined * XMLoadFloat4x4(m_pParentMatrix));
 
-    m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	_vector vNewScale = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
+	_matrix matNewCombined = XMMatrixRotationZ(-XM_PIDIV2) * XMMatrixAffineTransformation(vNewScale, XMVectorZero(), vRot, vTrans);
+
+	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * matNewCombined * XMLoadFloat4x4(m_pParentMatrix));
+
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
 HRESULT CWeapon::Render()
 {
-    if (FAILED(Bind_ShaderResources()))
-        return E_FAIL;
+	if (FAILED(Bind_ShaderResources()))
+		return E_FAIL;
 
-    _bool bCorrectWeapon = { false };
-    if (m_pModelCom != nullptr)
-    {
-        if (*m_pWeapon == WPN_SPEAR && m_pModelCom->Get_ModelName() == "Spear")
-            bCorrectWeapon = true;
-        if (*m_pWeapon == WPN_SCYTHE && m_pModelCom->Get_ModelName() == "Scythe")
-            bCorrectWeapon = true;
-        if (*m_pWeapon == WPN_RIFLE && m_pModelCom->Get_ModelName() == "Rifle")
-            bCorrectWeapon = true;
-    }
-   
- 
-    if (bCorrectWeapon)
-    {
-        _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+	_bool bCorrectWeapon = { false };
+	if (m_pModelCom != nullptr)
+	{
+		if (*m_pWeapon == WPN_SPEAR && m_pModelCom->Get_ModelName() == "Spear")
+			bCorrectWeapon = true;
+		if (*m_pWeapon == WPN_SCYTHE && m_pModelCom->Get_ModelName() == "Scythe")
+			bCorrectWeapon = true;
+		if (*m_pWeapon == WPN_RIFLE && m_pModelCom->Get_ModelName() == "Rifle")
+			bCorrectWeapon = true;
+	}
 
-        for (size_t i = 0; i < iNumMeshes; i++)
-        {
-            if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", i, aiTextureType_DIFFUSE)))
-                return E_FAIL;
 
-            /* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-            if (FAILED(m_pShaderCom->Begin(0)))
-                return E_FAIL;
+	if (bCorrectWeapon)
+	{
+		_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
-            m_pModelCom->Render(i);
-        }
-    }
- 
-    return S_OK;
+		for (size_t i = 0; i < iNumMeshes; i++)
+		{
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", i, aiTextureType_DIFFUSE)))
+				return E_FAIL;
+
+			/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
+			if (FAILED(m_pShaderCom->Begin(0)))
+				return E_FAIL;
+
+			m_pModelCom->Render(i);
+		}
+	}
+
+	return S_OK;
 }
 
 HRESULT CWeapon::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 {
-    /* For.Com_Model */
-    wstring wstrModelTag = _wstrModelTag;
-    if (FAILED(__super::Add_Component(eLevel, wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
-        return E_FAIL;
+	/* For.Com_Model */
+	wstring wstrModelTag = _wstrModelTag;
+	if (FAILED(__super::Add_Component(eLevel, wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
+		return E_FAIL;
 
-    /* For.Com_Shader */
-    if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Shader_VtxModel"),
-        TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
-        return E_FAIL;
+	/* For.Com_Shader */
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Shader_VtxModel"),
+		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+		return E_FAIL;
 
-    return S_OK;
+	return S_OK;
 }
 
 HRESULT CWeapon::Bind_ShaderResources()
 {
-    if (nullptr == m_pShaderCom)
-        return E_FAIL;
+	if (nullptr == m_pShaderCom)
+		return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
-        return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+		return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
-        return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
 }
 
 CWeapon* CWeapon::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CWeapon* pInstance = new CWeapon(pDevice, pContext);
+	CWeapon* pInstance = new CWeapon(pDevice, pContext);
 
-    if (FAILED(pInstance->Initialize_Prototype()))
-    {
-        MSG_BOX(TEXT("Failed To Created : CWeapon"));
+	if (FAILED(pInstance->Initialize_Prototype()))
+	{
+		MSG_BOX(TEXT("Failed To Created : CWeapon"));
 
-        Safe_Release(pInstance);
-    }
+		Safe_Release(pInstance);
+	}
 
-    return pInstance;
+	return pInstance;
 }
 
 CGameObject* CWeapon::Clone(void* pArg)
 {
-    CWeapon* pInstance = new CWeapon(*this);
+	CWeapon* pInstance = new CWeapon(*this);
 
-    if (FAILED(pInstance->Initialize(pArg)))
-    {
-        MSG_BOX(TEXT("Failed To Created : CWeapon"));
+	if (FAILED(pInstance->Initialize(pArg)))
+	{
+		MSG_BOX(TEXT("Failed To Created : CWeapon"));
 
-        Safe_Release(pInstance);
-    }
+		Safe_Release(pInstance);
+	}
 
-    return pInstance;
+	return pInstance;
 }
 
 void CWeapon::Free()
 {
-    __super::Free();
+	__super::Free();
 
-    Safe_Release(m_pSocket);
-    Safe_Release(m_pShaderCom);
-    Safe_Release(m_pModelCom);
+	Safe_Release(m_pSocket);
+	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pModelCom);
 }
