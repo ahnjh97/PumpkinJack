@@ -22,7 +22,10 @@ HRESULT CWeapon::Initialize(void* pArg)
 	WEAPON_DESC* pWeaponDesc = (WEAPON_DESC*)pArg;
 
 	m_pSocket = pWeaponDesc->pSocket;
+	m_pRelative = pWeaponDesc->pRelative;
+	m_pState = pWeaponDesc->pState;
 	m_pWeapon = pWeaponDesc->pWeapon;
+
 	Safe_AddRef(m_pSocket);
 
 	if (FAILED(__super::Initialize(pArg)))
@@ -31,6 +34,26 @@ HRESULT CWeapon::Initialize(void* pArg)
 	if (FAILED(Add_Components((LEVEL)pWeaponDesc->iLevel, pWeaponDesc->wstrModelTag)))
 		return E_FAIL;
 
+	
+	if (m_pModelCom->Get_ModelName() == "Spear")
+	{
+		m_pTransformCom->Rotation(XMVectorSet(0, 0, 1, 0), -XM_PIDIV2 + 0.15f);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0, 0, 0, 1));
+	}
+		
+	if (m_pModelCom->Get_ModelName() == "Rifle")
+	{
+		m_pTransformCom->Rotation(XMVectorSet(0, 0, 1, 0), -XM_PIDIV2);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0, 0, -1, 1));
+	}
+		
+	if (m_pModelCom->Get_ModelName() == "Scythe")
+	{
+		m_pTransformCom->Rotation(XMVectorSet(0, 0, 1, 0), -XM_PIDIV2);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(-3.5f, -0.25f, 0.3f, 1));
+	}
+		
+		
 	return S_OK;
 }
 
@@ -44,19 +67,22 @@ void CWeapon::Late_Tick(_float fTimeDelta)
 	_matrix matCombined = XMLoadFloat4x4(m_pSocket->Get_CombinedTransformationMatrix());
 	_vector vScale, vRot, vTrans;
 	XMMatrixDecompose(&vScale, &vRot, &vTrans, matCombined);
-	if (m_pModelCom->Get_ModelName() == "Rifle")
-		vTrans += XMVectorSet(0, 5.4f, 0, 0);
+	
+	_vector vNewScale = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
+	_matrix matNew = XMMatrixAffineTransformation(vNewScale, XMVectorZero(), vRot, vTrans);
+
+	_matrix matRot = XMMatrixRotationY(0.f);
 	if (m_pModelCom->Get_ModelName() == "Spear")
 	{
-		vTrans += XMVectorSet(-0.5f, 4.1f, 0, 0);
+		if(*m_pState == IDLE || *m_pState == JUMP || *m_pState == ATTACK3)
+			matRot = XMMatrixRotationZ(XMConvertToRadians(-3.f)) * XMMatrixRotationY(XMConvertToRadians(-10.f));
+		
 	}
-
-
-	_vector vNewScale = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
-	_matrix matNewCombined = XMMatrixRotationZ(-XM_PIDIV2) * XMMatrixAffineTransformation(vNewScale, XMVectorZero(), vRot, vTrans);
-
-	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * matNewCombined * XMLoadFloat4x4(m_pParentMatrix));
-
+	if (m_pModelCom->Get_ModelName() == "Scythe")
+		matRot = XMMatrixRotationX(XMConvertToRadians(-65.f));
+		
+	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * matRot * matNew * XMLoadFloat4x4(m_pParentMatrix));
+	
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
@@ -124,6 +150,7 @@ HRESULT CWeapon::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
+	return S_OK;
 }
 
 CWeapon* CWeapon::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Body.h"
+#include "Bone.h"
 
 CBody::CBody(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPart{ pDevice, pContext }
@@ -33,8 +34,8 @@ HRESULT CBody::Initialize(void* pArg)
 	if (FAILED(Add_Components(LEVEL(BodyDesc.iLevel), BodyDesc.wstrModelTag)))
 		return E_FAIL;
 
-	if (!m_pModelCom->IsNonAnimVersion() && m_pModelCom->Get_ModelType() == TYPE_ANIM)
-		m_pModelCom->Set_Animation(999, true); // 999: 랜덤 애니메이션
+	if(m_pModelCom!=nullptr)
+		Initialize_AnimSpeed();
 
 	return S_OK;
 }
@@ -48,27 +49,13 @@ void CBody::Tick(_float fTimeDelta)
 
 void CBody::Late_Tick(_float fTimeDelta)
 {
-	_float3 vPreHipTrans = m_pModelCom->Get_HipTranslation();
-	if ((vPreHipTrans.x < -5000.f) || (vPreHipTrans.y < -5000.f) || (vPreHipTrans.z < -5000.f))
-		vPreHipTrans = _float3{ 0.f, 0.f, 0.f };
 
 	m_pModelCom->Play_Animation(fTimeDelta);
 
-	_float3 vHipTrans = m_pModelCom->Get_HipTranslation();
 
-	_float3 vRelativeTranslation = {};
-	XMStoreFloat3(&vRelativeTranslation, XMLoadFloat3(&vHipTrans) - XMLoadFloat3(&vPreHipTrans));
-	_float fNewScale = m_pModelCom->Get_ModelConfig().fNewScale * 0.9f;
-
-	_matrix matTemp = ::XMMatrixTranslation(vRelativeTranslation.x * fNewScale, vRelativeTranslation.y * fNewScale, vRelativeTranslation.z * fNewScale);
-	_matrix matRelative = ::XMMatrixMultiply(m_pTransformCom->Get_WorldMatrix(), matTemp);
-	_float4x4 matWorld = {};
-	XMStoreFloat4x4(&matWorld, matRelative);
-	m_pTransformCom->Set_WorldMatrix(matWorld);
 	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * XMLoadFloat4x4(m_pParentMatrix));
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
-	m_pModelCom->Reset_Animation();
 }
 
 HRESULT CBody::Render()
@@ -123,6 +110,9 @@ void CBody::StateToAnimation()
 	case JUMP:
 		strState = "Jump";
 		break;
+	case ROLL:
+		strState = "Roll";
+		break;
 	case ATTACK1:
 		strState = "Atk1";
 		break;
@@ -138,7 +128,7 @@ void CBody::StateToAnimation()
 	case AIR_ATTACK_END:
 		strState = "AirAttack_End";
 		break;
-	case ROLL:
+	case ROLL_ATTACK:
 		strState = "Roll";
 		break;
 	}
@@ -150,9 +140,32 @@ void CBody::StateToAnimation()
 		bLoop = false;
 
 	if(*m_pState == ROLL)
-		m_pModelCom->Find_Animation(strState, bLoop);
+		m_pModelCom->Change_Animation(strState, false);
 	else
-		m_pModelCom->Find_Animation(strWeapon + strState, bLoop);
+		m_pModelCom->Change_Animation(strWeapon + strState, bLoop);
+}
+
+void CBody::Initialize_AnimSpeed()
+{
+	string strWeapon, strState;
+	
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_AirAttack"), 1.85f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_AirAttack"), 2.f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_AirAttack"), 1.8f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_Roll"), 1.8f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_Roll"), 2.6f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Roll"), 2.4f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Roll"), 2.7f);
+	
+	for(int i = 1; i< 4; i++)
+		m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_Atk" + to_string(i)), 1.85f);
+
+	for (int i = 1; i < 4; i++)
+		m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_Atk" + to_string(i)), 2.f);
+
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Atk1"), 3.8f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Atk2"), 3.1f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Atk3"), 2.85f);
 }
 
 HRESULT CBody::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)

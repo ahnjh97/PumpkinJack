@@ -40,12 +40,8 @@ HRESULT CAnimation::Initialize(const vector<class CBone*>& Bones, ifstream& file
 void CAnimation::Update_TransformationMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, _bool isLoop)
 {
 	m_isFinished = false;
-	string strName = m_szName;
-	if ((strName.find("attack") != string::npos) || (strName.find("Air") != string::npos) 
-		|| (strName.find("Shoot") != string::npos) || (strName.find("Atk") != string::npos))
-		fTimeDelta = fTimeDelta * 1.55f;
 
-	m_fTrackPosition += m_fTickPerSecond * fTimeDelta;
+	m_fTrackPosition += m_fTickPerSecond * fTimeDelta * m_fCoefficient;
 
 	if (m_fDuration <= m_fTrackPosition)
 	{
@@ -54,7 +50,6 @@ void CAnimation::Update_TransformationMatrix(_float fTimeDelta, const vector<cla
 			m_isFinished = true;
 			for (_uint i = 0; i < m_iNumChannels; ++i)
 			{
-				/* 이 뼈의 상태행렬을 만들어서 CBone의 TransformationMatrix를 바꿔라. */
 				m_Channels[i]->Update_TransformationMatrix(Bones, m_fTrackPosition, &m_CurrentKeyFrameIndices[i]);
 			}
 			return;
@@ -76,7 +71,14 @@ void CAnimation::Reset(const vector<class CBone*>& Bones)
 	{
 		/* 이 뼈의 상태행렬을 만들어서 CBone의 TransformationMatrix를 바꿔라. */
 		m_Channels[i]->Update_TransformationMatrix(Bones, m_fTrackPosition, &m_CurrentKeyFrameIndices[i]);
+		m_Channels[i]->Reset_Channel();
 	}
+}
+
+void CAnimation::Lerp_Animation(const vector<class CBone*>& Bones, vector<KEYFRAME>& vecKeyFrame, _float fRatio)
+{
+	for (auto& iter : m_Channels)
+		iter->Lerp_Channel(Bones, vecKeyFrame, fRatio);
 }
 
 void CAnimation::Read_AnimationData(ifstream& fileStream)

@@ -74,7 +74,7 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreens"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Logo/T_LoadingScreens.dds")))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Logo/T_LoadingScreens%d.dds"), 6))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreens_GameLogo"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Logo/T_LoadingScreens_GameLogo.dds")))))

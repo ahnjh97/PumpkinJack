@@ -45,13 +45,13 @@ void CMonster::Tick(_float fTimeDelta)
 
 void CMonster::Late_Tick(_float fTimeDelta)
 {
-	_float3 vPreHipTrans = m_pModelCom->Get_HipTranslation();
+	_float3 vPreHipTrans = m_pModelCom->Get_RootTranslation();
 	if ((vPreHipTrans.x < -5000.f) || (vPreHipTrans.y < -5000.f) || (vPreHipTrans.z < -5000.f))
 		vPreHipTrans = _float3{ 0.f, 0.f, 0.f };
 
 	m_pModelCom->Play_Animation(fTimeDelta);
 
-	_float3 vHipTrans = m_pModelCom->Get_HipTranslation();
+	_float3 vHipTrans = m_pModelCom->Get_RootTranslation();
 
 	_float3 vRelativeTranslation = {};
 	XMStoreFloat3(&vRelativeTranslation,  XMLoadFloat3(&vHipTrans) - XMLoadFloat3(&vPreHipTrans));
@@ -160,8 +160,6 @@ HRESULT CMonster::Bind_ShaderResources()
 
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))
 			return E_FAIL;
-
-		return S_OK;
 	}
 	return S_OK;
 }

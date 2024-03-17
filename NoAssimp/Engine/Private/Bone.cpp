@@ -12,6 +12,7 @@ HRESULT CBone::Initialize(ifstream& fileStream)
 
 	XMStoreFloat4x4(&m_TransformationMatrix, XMMatrixTranspose(XMLoadFloat4x4(&m_TransformationMatrix)));
 	XMStoreFloat4x4(&m_CombinedTransformationMatrix, XMMatrixIdentity());
+	XMStoreFloat4x4(&m_matNewCombined, XMMatrixIdentity());
 
 	return S_OK;
 }
@@ -22,9 +23,9 @@ void CBone::Update_CombinedTransformationMatrix(const vector<CBone*>& Bones, _fm
 		XMStoreFloat4x4(&m_CombinedTransformationMatrix, XMLoadFloat4x4(&m_TransformationMatrix) * TransformatrixMatrix);
 	else if (m_iParentBoneIndex == (_realRootIndex - 1)) // 드디어 찾았다 루트노드
 	{
-		m_TransformationMatrix._41 = 0.f;
+		/*m_TransformationMatrix._41 = 0.f;
 		m_TransformationMatrix._42 = 0.f;
-		m_TransformationMatrix._43 = 0.f;
+		m_TransformationMatrix._43 = 0.f;*/
 		
 		XMStoreFloat4x4(&m_CombinedTransformationMatrix,
 			XMLoadFloat4x4(&m_TransformationMatrix) * XMLoadFloat4x4(&Bones[m_iParentBoneIndex]->m_CombinedTransformationMatrix));
@@ -33,6 +34,17 @@ void CBone::Update_CombinedTransformationMatrix(const vector<CBone*>& Bones, _fm
 	{
 		XMStoreFloat4x4(&m_CombinedTransformationMatrix,
 			XMLoadFloat4x4(&m_TransformationMatrix) * XMLoadFloat4x4(&Bones[m_iParentBoneIndex]->m_CombinedTransformationMatrix));
+	}
+}
+
+void CBone::Update_NewCombinedMatrix(const vector<CBone*>& Bones, _fmatrix TransformatrixMatrix)
+{
+	if (-1 == m_iParentBoneIndex)
+		XMStoreFloat4x4(&m_matNewCombined, XMLoadFloat4x4(&m_TransformationMatrix) * TransformatrixMatrix);
+	else
+	{
+		XMStoreFloat4x4(&m_matNewCombined,
+			XMLoadFloat4x4(&m_TransformationMatrix) * XMLoadFloat4x4(&Bones[m_iParentBoneIndex]->m_matNewCombined));
 	}
 }
 

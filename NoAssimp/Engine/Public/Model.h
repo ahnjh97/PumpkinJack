@@ -18,12 +18,15 @@ public:
 	_bool isFinished() { return m_Animations[m_iCurrentAnimIndex]->isFinished(); }
 	TYPE Get_ModelType() { return m_eModelType; }
 	string Get_ModelName() { return m_strModelName; }
-	_float3 Get_HipTranslation(){ return m_vHipTranslation; }
+	_float3 Get_RootTranslation(){ return m_vRootTranslation; }
+	_float3 Get_HandTranslation() { return m_vHandTranslation; }
 	_bool IsNonAnimVersion() { return m_bIsNonAnimVersion; }
 	_float4x4 Get_ModelTransformMat() { return m_TransformMatrix; }
 	MODEL_CONFIG Get_ModelConfig() { return m_tConfig; }
 	string Get_AnimationName() { return m_Animations[m_iCurrentAnimIndex]->Get_Name(); }
 	class CBone* Get_BonePtr(const _char* pBoneName) const;
+	_int Get_AnimIndex(const string& strAnimName);
+	_bool Get_IsLerping() { return m_bIsLerping; }
 
 	void Set_Animation(_uint iAnimIndex, _bool isLoop) {
 		if (m_bIsNonAnimVersion) return;
@@ -34,7 +37,8 @@ public:
 	void Set_Hide(_bool bHide) { m_bHide = bHide; }
 	void Copy_Animations(vector<CAnimation*>& vecAnims) { vecAnims = m_Animations; }
 	void Set_RealRoot(_uint iRealRoot) { m_tConfig.iRealRoot = iRealRoot; }
-
+	void Set_AnimSpeed(_uint iAnimIndex, _float fCoefficient) { m_Animations[iAnimIndex]->Set_Coefficient(fCoefficient); }
+	void Save_FinalKeyFrames();
 
 public: // 바운딩박스
 	_bool Check_BoundingBox(const class CTransform* pTransform) const;
@@ -51,8 +55,7 @@ public:
 	HRESULT Render(_uint iMeshIndex);
 
 public:
-	void Find_Animation(string& strAnimName, _bool isLoop);
-	void Reset_Animation();
+	void Change_Animation(string& strAnimName, _bool isLoop);
 
 private:
 	TYPE						m_eModelType = { TYPE_END };
@@ -65,7 +68,8 @@ private:
 	vector<MATERIAL_TEXTURE>	m_Materials;
 
 	_float4x4					m_TransformMatrix;
-	_float3						m_vHipTranslation = {};
+	_float3						m_vRootTranslation = {};
+	_float3						m_vHandTranslation = {};
 	_float4						m_vScale = {};
 	_float4						m_vRotation = {};
 	MODEL_CONFIG				m_tConfig = {};
@@ -77,6 +81,9 @@ private:
 	vector<CAnimation*>			m_Animations;
 	_float4x4					m_MeshBoneMatrices[512];
 	map<const string, _uint>	m_AnimIndex;
+	_float						m_fLerpRatio = {};
+	_bool						m_bIsLerping = { false };
+	vector<KEYFRAME>			m_FinalKeyFrames;
 
 	// 파일입출력 변수
 	string						m_strDirectory;

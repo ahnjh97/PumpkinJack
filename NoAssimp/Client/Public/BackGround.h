@@ -35,6 +35,8 @@ private:
 	_float4x4				m_WorldMatrix, m_ViewMatrix, m_ProjMatrix;
 	_bool					m_bLoadingScreen = { false };
 	_float					m_fZ = {};
+	_uint					m_iTextureIndex = {};
+
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();

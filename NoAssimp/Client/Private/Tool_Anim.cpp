@@ -40,20 +40,20 @@ void CTool_Anim::Tick(_float fTimeDelta)
 
 void CTool_Anim::Late_Tick(_float fTimeDelta)
 {
-	_float3 vPreHipTrans = m_pModelCom->Get_HipTranslation();
+	_float3 vPreHipTrans = m_pModelCom->Get_RootTranslation();
 	if ((vPreHipTrans.x < -5000.f) || (vPreHipTrans.y < -5000.f) || (vPreHipTrans.z < -5000.f))
 		vPreHipTrans = _float3{ 0.f, 0.f, 0.f };
 
 	m_pModelCom->Play_Animation(fTimeDelta);
 
-	_float3 vHipTrans = m_pModelCom->Get_HipTranslation();
+	_float3 vHipTrans = m_pModelCom->Get_RootTranslation();
 
 	_float3 vRelativeTranslation = {};
 	XMStoreFloat3(&vRelativeTranslation, XMLoadFloat3(&vHipTrans) - XMLoadFloat3(&vPreHipTrans));
 	_float fNewScale = m_pModelCom->Get_ModelConfig().fNewScale * 0.9f;
-	/*fNewScale = 1.f;*/
+	_float fDegree = m_pModelCom->Get_ModelConfig().fDegree;
+	_matrix matTemp = ::XMMatrixTranslation(vRelativeTranslation.x * fNewScale, vRelativeTranslation.y * fNewScale, vRelativeTranslation.z * fNewScale);
 
-	_matrix matTemp = XMMatrixTranslation(vRelativeTranslation.x * fNewScale, vRelativeTranslation.y * fNewScale, vRelativeTranslation.z * fNewScale);
 	_matrix matRelative = XMMatrixMultiply(m_pTransformCom->Get_WorldMatrix(), matTemp);
 	_float4x4 matWorld = {};
 	XMStoreFloat4x4(&matWorld, matRelative);
@@ -126,8 +126,6 @@ HRESULT CTool_Anim::Bind_ShaderResources()
 
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))
 		return E_FAIL;
-
-	return S_OK;
 
 	return S_OK;
 }

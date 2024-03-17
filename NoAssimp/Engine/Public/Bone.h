@@ -19,11 +19,13 @@ public:
 
 public:
 	const _float4x4* Get_CombinedTransformationMatrix() const {	return &m_CombinedTransformationMatrix;	}
+	const _float4x4* Get_NewCombinedTransformationMatrix() const{ return &m_matNewCombined; }
 	_float4x4* Get_TransformationMatrix() { return &m_TransformationMatrix; }
 
 public:
 	HRESULT Initialize(ifstream& fileStream);
 	void Update_CombinedTransformationMatrix(const vector<CBone*>& Bones, _fmatrix TransformatrixMatrix, _int _realRootIndex);
+	void Update_NewCombinedMatrix(const vector<CBone*>& Bones, _fmatrix TransformatrixMatrix);
 	_bool Compare_Name(const _char* pBoneName) { return !strcmp(m_szName, pBoneName); }
 
 public:
@@ -36,6 +38,7 @@ private:
 
 	/* 최종 상태행렬. */
 	_float4x4			m_CombinedTransformationMatrix;
+	_float4x4			m_matNewCombined;
 
 	_int				m_iParentBoneIndex = { -1 };
 

@@ -8,6 +8,7 @@
 #include "GameInstance.h"
 #include <locale>
 #include <codecvt>
+#include "Channel.h"
 
 CModel::CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent{ pDevice, pContext }
@@ -43,6 +44,7 @@ CModel::CModel(const CModel& rhs)
 		for (size_t i = 0; i < AI_TEXTURE_TYPE_MAX; i++)
 			Safe_AddRef(Material.MaterialTextures[i]);
 	}
+	m_FinalKeyFrames.resize(m_Bones.size());
 }
 
 CBone* CModel::Get_BonePtr(const _char* pBoneName) const
@@ -53,6 +55,28 @@ CBone* CModel::Get_BonePtr(const _char* pBoneName) const
 		});
 
 	return *iter;
+}
+
+_int CModel::Get_AnimIndex(const string& strAnimName)
+{
+	auto iter = m_AnimIndex.find(strAnimName);
+	if (iter == m_AnimIndex.end())
+		return -1;
+
+	return iter->second;
+}
+
+void CModel::Save_FinalKeyFrames()
+{
+	_vector vScale, vRot, vTrans;
+	for (_uint i = 0; i < m_Bones.size(); ++i)
+	{
+		_matrix matTransformation =  XMLoadFloat4x4(m_Bones[i]->Get_TransformationMatrix());
+		XMMatrixDecompose(&vScale, &vRot, &vTrans, matTransformation);
+		XMStoreFloat3(&m_FinalKeyFrames[i].vScale, vScale);
+		XMStoreFloat4(&m_FinalKeyFrames[i].vRotation, vRot);
+		XMStoreFloat3(&m_FinalKeyFrames[i].vTranslation, vTrans);
+	}
 }
 
 _bool CModel::Check_BoundingBox(const CTransform* pTransform) const
@@ -180,21 +204,39 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 	if (m_eModelType == TYPE_NONANIM)
 		return S_OK;
 
-	/* 현재 애니메이션에 맞는 뼈의 상태(m_TransformationMatrix)를 갱신해준다. */
-	m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrix(fTimeDelta, m_Bones, m_isLoop);
 	if (m_Animations.empty())
 		return S_OK;
 
-	// Hip 의 변환행렬
-	_matrix HipLocalTransform = XMLoadFloat4x4(m_Bones[m_tConfig.iRealRoot]->Get_TransformationMatrix());
-	_vector translation, scale, rotation;
-	XMMatrixDecompose(&scale, &rotation, &translation, HipLocalTransform);
-	XMStoreFloat3(&m_vHipTranslation, translation);
+	if (m_bIsLerping == false) /* 현재 애니메이션에 맞는 뼈의 상태(m_TransformationMatrix)를 갱신해준다. */
+		m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrix(fTimeDelta, m_Bones, m_isLoop);
 
-	// 루트 노드의 변환행렬 
+	else // Anim간 선형보간
+	{
+		_float fLerpTime = 0.2f;
+		m_fLerpRatio += fTimeDelta / fLerpTime;
+
+		if (m_fLerpRatio < 1.f)
+		{
+			m_Animations[m_iCurrentAnimIndex]->Lerp_Animation(m_Bones, m_FinalKeyFrames, m_fLerpRatio);
+		}
+		else
+			m_bIsLerping = false;
+	}
+
+	//// 진짜 Root의 변환행렬
+	//_matrix HipLocalTransform = XMLoadFloat4x4(m_Bones[m_tConfig.iRealRoot]->Get_TransformationMatrix());
+	//_vector scale, rotation, translation;
+	//XMMatrixDecompose(&scale, &rotation, &translation, HipLocalTransform);
+	//XMStoreFloat3(&m_vRootTranslation, translation);
+
+	////무기 장착을 위한 이동값 저장
+	//_matrix matLocalTransform_forHand = XMLoadFloat4x4(m_Bones[0]->Get_TransformationMatrix());
+	//_vector scale_forHand, rotation_forHand, translation_forHand;
+	//XMMatrixDecompose(&scale_forHand, &rotation_forHand, &translation_forHand, matLocalTransform_forHand);
+	//XMStoreFloat3(&m_vHandTranslation, translation_forHand);
+
+	// 0번 노드의 변환행렬 
 	_matrix RootLocalTransform = XMLoadFloat4x4(m_Bones[0]->Get_TransformationMatrix());
-	//RootLocalTransform.r[3] = XMVectorSet(m_vHipTranslation.x, m_vHipTranslation.y, m_vHipTranslation.z, 1.0f);
-	//RootLocalTransform.r[3] = XMVectorSet(0, 0, 0, 1.0f);
 	_vector vRotation = XMLoadFloat4(&m_vRotation);
 	_vector vScale = XMLoadFloat4(&m_vScale);
 	RootLocalTransform = XMMatrixScalingFromVector(vScale) * XMMatrixRotationQuaternion(vRotation) * RootLocalTransform;
@@ -202,7 +244,8 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 
 	for (auto& pBone : m_Bones)
 		pBone->Update_CombinedTransformationMatrix(m_Bones, RootLocalTransform, m_tConfig.iRealRoot);
-
+	
+	Save_FinalKeyFrames();
  	return S_OK;
 }
 
@@ -217,7 +260,7 @@ HRESULT CModel::Render(_uint iMeshIndex)
 	return S_OK;
 }
 
-void CModel::Find_Animation(string& strAnimName, _bool isLoop)
+void CModel::Change_Animation(string& strAnimName, _bool isLoop)
 {
 	auto iter = m_AnimIndex.find(strAnimName);
 	if (iter == m_AnimIndex.end())
@@ -225,19 +268,11 @@ void CModel::Find_Animation(string& strAnimName, _bool isLoop)
 
 	if (m_iCurrentAnimIndex != iter->second)
 	{
+		m_bIsLerping = true;
+		m_fLerpRatio = 0.f;
 		m_Animations[iter->second]->Reset(m_Bones);
 		Set_Animation(iter->second, isLoop);
 	}
-}
-
-void CModel::Reset_Animation()
-{
-	//if (isFinished() == true)
-	//{
-	//	m_Animations[m_iCurrentAnimIndex]->Reset(m_Bones);
-	//	if(m_Animations[m_iCurrentAnimIndex]->Get_Name() == "Jack_Spear_AirAttack_End_Anim")
-	//		m_Animations[m_iCurrentAnimIndex - 1]->Reset(m_Bones); // 
-	//}
 }
 
 HRESULT CModel::Ready_Meshes()
@@ -332,7 +367,7 @@ HRESULT CModel::Ready_Animations()
 			string strName = pAnimation->Get_Name();
 			if ((strName.find("magic") != string::npos) || (strName.find("MAGIC") != string::npos)
 				|| (strName.find("FlyingMage") != string::npos) || (strName.find("groundversion") != string::npos)
-				|| (strName.find("Shovel") != string::npos) || (strName.find("Sword") != string::npos))
+				/*|| (strName.find("Shovel") != string::npos)*/ || (strName.find("Sword") != string::npos))
 			{
 				Safe_Release(pAnimation);
 				continue;

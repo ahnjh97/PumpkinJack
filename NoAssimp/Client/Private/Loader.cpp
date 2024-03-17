@@ -227,8 +227,6 @@ HRESULT CLoader::Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName)
 	if (ScaleIter != m_ModelConfigs.end())
 		tConfig = ScaleIter->second;
 
-	_float fDegree = 0.f;
-
 	_matrix		TransformMatrix = XMMatrixIdentity();
 	TransformMatrix = XMMatrixScaling(tConfig.fScale, tConfig.fScale, tConfig.fScale) * XMMatrixRotationY(XMConvertToRadians(tConfig.fDegree));
 
@@ -247,7 +245,7 @@ HRESULT CLoader::Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName)
 		if(ScaleIter != m_ModelConfigs.end())
 			fNewScale = tConfig.fNewScale;
 
-		TransformMatrix = XMMatrixScaling(fNewScale, fNewScale, fNewScale) * XMMatrixRotationY(XMConvertToRadians(fDegree));
+		TransformMatrix = XMMatrixScaling(fNewScale, fNewScale, fNewScale) * XMMatrixRotationY(XMConvertToRadians(tConfig.fDegree));
 		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag + L"_NonAnim",
 			CModel::Create(m_pDevice, m_pContext, TYPE_NONANIM, strModelName, TransformMatrix, tConfig, true))))
 			return E_FAIL;
@@ -327,7 +325,7 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degree, NewScale, RootIndex
 
 	m_ModelConfigs.emplace("Rifle", MODEL_CONFIG{ 3.f, 0.f, 3.f });
 	m_ModelConfigs.emplace("Scythe", MODEL_CONFIG{ 0.3f, 0.f, 0.3f });
-	m_ModelConfigs.emplace("Spear", MODEL_CONFIG{ 8.f, 0.f, 8.f });
+	m_ModelConfigs.emplace("Spear", MODEL_CONFIG{ 7.f, 0.f, 7.f });
 }
 
 void CLoader::TraverseAnimModels(LEVEL eLevel, const wstring& rootFolderPath)

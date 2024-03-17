@@ -21,8 +21,9 @@ public:
 	WEAPON Get_Weapon() { return m_eWeapon; }
 	_uint Get_Attack() { return m_iLastAttack; }
 	_bool Get_IsJumping() { return m_bIsJumping; }
-	_float3 Get_TargetDir() { return m_vTargetDir; }
+	_float3 Get_TargetDir() { return m_vDirection; }
 	CPart* Get_Part(const wstring& wstrPart);
+	_float4 Get_WeaponPos(WEAPON eWeapon);
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -49,8 +50,12 @@ private:
 
 	_bool m_bIsJumping = { false };
 	_bool m_bIsAttacking = { false };
+	_bool m_bIsRolling = { false };
+
 	_float m_fTempJumpTime = { 0.f };
-	_float3	m_vTargetDir = {};
+	_float m_fRollEndTime = { 0.f };
+
+	_float3	m_vDirection = {};
 
 private:
 	HRESULT Add_Components(LEVEL eLevel, const wstring& _wstrModelTag);

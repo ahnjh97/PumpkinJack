@@ -9,6 +9,7 @@
 #include "Light_Manager.h"
 #include "Picking.h"
 #include "Renderer.h"
+#include <random>
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -472,6 +473,16 @@ void CGameInstance::CalculateFPS(_float fTimeDelta)
 		iFrameCount = 0;
 		fElapsedTime = 0.f;
 	}
+}
+
+_int CGameInstance::RandomNumber(_int iMin, _int iMax)
+{
+	random_device rd;  
+	mt19937 gen(rd()); 
+
+	uniform_int_distribution<> dis(iMin, iMax);
+
+	return dis(gen);
 }
 
 

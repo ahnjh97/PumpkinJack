@@ -7,6 +7,7 @@
 #include <locale>
 #include <codecvt>
 
+
 BEGIN(Engine)
 
 class ENGINE_DLL CGameInstance final : public CBase
@@ -84,8 +85,7 @@ public: /* For.Light_Manager */
 	wstring StrToWstr(const string& str);
 	void CalculateFPS(_float fTimeDelta);
 	_int Get_FPS() { return iFps; }
-
-
+	_int RandomNumber(_int iMin, _int iMax);
 
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };

@@ -78,9 +78,18 @@ HRESULT CLevel_Loading::Ready_Layer_BackGround()
 	tDesc.matWorld._43 = 0.5f;
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_LOADING, TEXT("Layer_LoadingScreen"), TEXT("Prototype_GameObject_LoadingScreen"), &tDesc)))
 		return E_FAIL;
-	/*tDesc.matWorld._43 = 0.4f;
+	tDesc.matWorld._43 = 0.4f;
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_LOADING, TEXT("Layer_LoadingScreen"), TEXT("Prototype_GameObject_LoadingScreen"), &tDesc)))
-		return E_FAIL;*/
+		return E_FAIL;
+	tDesc.matWorld._43 = 0.3f;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_LOADING, TEXT("Layer_LoadingScreen"), TEXT("Prototype_GameObject_LoadingScreen"), &tDesc)))
+		return E_FAIL;
+	tDesc.matWorld._43 = 0.2f;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_LOADING, TEXT("Layer_LoadingScreen"), TEXT("Prototype_GameObject_LoadingScreen"), &tDesc)))
+		return E_FAIL;
+	tDesc.matWorld._43 = 0.1f;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_LOADING, TEXT("Layer_LoadingScreen"), TEXT("Prototype_GameObject_LoadingScreen"), &tDesc)))
+		return E_FAIL;
 	return S_OK;
 }
 

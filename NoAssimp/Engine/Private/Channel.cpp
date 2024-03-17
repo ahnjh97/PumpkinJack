@@ -65,6 +65,21 @@ void CChannel::Update_TransformationMatrix(const vector<class CBone*>& Bones, _f
 	Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformationMatrix);
 }
 
+void CChannel::Lerp_Channel(const vector<class CBone*>& Bones, vector<KEYFRAME>& vecKeyFrame, _float fRatio)
+{
+	_float3			vScale;
+	_float4			vRotation;
+	_float3			vTranslation;
+
+	XMStoreFloat3(&vScale, XMVectorLerp(XMLoadFloat3(&vecKeyFrame[m_iBoneIndex].vScale), XMLoadFloat3(&m_KeyFrames[0].vScale), fRatio));
+	XMStoreFloat4(&vRotation, XMQuaternionSlerp(XMLoadFloat4(&vecKeyFrame[m_iBoneIndex].vRotation), XMLoadFloat4(&m_KeyFrames[0].vRotation), fRatio));
+	XMStoreFloat3(&vTranslation, XMVectorLerp(XMLoadFloat3(&vecKeyFrame[m_iBoneIndex].vTranslation), XMLoadFloat3(&m_KeyFrames[0].vTranslation), fRatio));
+
+	_matrix		TransformationMatrix = XMMatrixAffineTransformation(XMLoadFloat3(&vScale), XMVectorSet(0.f, 0.f, 0.f, 1.f), XMLoadFloat4(&vRotation), XMVectorSetW(XMLoadFloat3(&vTranslation), 1.f));
+
+	Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformationMatrix);
+}
+
 CChannel* CChannel::Create(const vector<class CBone*>& Bones, ifstream& fileStream)
 {
 	CChannel* pInstance = new CChannel();

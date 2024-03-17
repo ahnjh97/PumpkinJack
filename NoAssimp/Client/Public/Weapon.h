@@ -16,6 +16,8 @@ public:
 	typedef struct : public CPart::PART_DESC
 	{
 		CBone* pSocket = { nullptr };
+		_float4x4* pRelative = { nullptr };
+		const STATE* pState;
 		const WEAPON* pWeapon;
 	}WEAPON_DESC;
 
@@ -23,6 +25,9 @@ private:
 	CWeapon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CWeapon(const CWeapon& rhs);
 	virtual ~CWeapon() = default;
+
+public:
+	_float4 Get_Pos() { return _float4(m_WorldMatrix._41, m_WorldMatrix._42, m_WorldMatrix._43, 1); }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -35,7 +40,9 @@ private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 	CBone* m_pSocket = { nullptr };
+	_float4x4* m_pRelative = { nullptr };
 	const WEAPON* m_pWeapon = {};
+	const STATE* m_pState = {};
 
 private:
 	HRESULT Add_Components(LEVEL eLevel, const wstring& _wstrModelTag);

@@ -37,7 +37,13 @@ HRESULT CBackGround::Initialize(void * pArg)
 	m_fSizeY = g_iWinSizeY;
 	m_fX = g_iWinSizeX * 0.5f;
 	m_fY = g_iWinSizeY * 0.5f;
-	
+	if (m_fZ == 0.1f)
+	{
+		m_fSizeX = m_fSizeY = 90;
+		m_fX += 520;
+		m_fY += 308;
+	}
+		
 	m_pTransformCom->Set_Scaled(m_fSizeX, m_fSizeY, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(
 		m_fX - g_iWinSizeX * 0.5f,
@@ -46,9 +52,12 @@ HRESULT CBackGround::Initialize(void * pArg)
 		1.f
 	));
 
-	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
+	if (m_fZ == 0.5f)
+		m_iTextureIndex = m_pGameInstance->RandomNumber(0,5);
 
-	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
+	::XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
+
+	::XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
 	return S_OK;
 }
@@ -59,11 +68,42 @@ void CBackGround::Tick(_float fTimeDelta)
 
 void CBackGround::Late_Tick(_float fTimeDelta)
 {
+	if (m_fZ == 0.1f)
+	{
+		_int iSpeed = m_pGameInstance->RandomNumber(1, 10);
+		if (iSpeed > 4)
+			iSpeed = 0;
+		m_pTransformCom->Turn(XMVectorSet(0, 0, 1, 0), -fTimeDelta);
+	}
+		
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);
 }
 
 HRESULT CBackGround::Render()
 {
+	D3D11_BLEND_DESC blendDesc = {};
+	blendDesc.AlphaToCoverageEnable = FALSE;
+	blendDesc.IndependentBlendEnable = FALSE; // 또는 TRUE, 필요에 따라 설정
+
+	// 렌더 타겟에 대한 블렌드 설정 구조체 생성 및 초기화
+	D3D11_RENDER_TARGET_BLEND_DESC rtBlendDesc = {};
+	rtBlendDesc.BlendEnable = TRUE; // 블렌딩 활성화
+	rtBlendDesc.SrcBlend = D3D11_BLEND_SRC_ALPHA; // 소스 블렌드 팩터
+	rtBlendDesc.DestBlend = D3D11_BLEND_INV_SRC_ALPHA; // 대상 블렌드 팩터
+	rtBlendDesc.BlendOp = D3D11_BLEND_OP_ADD; // 블렌드 연산
+	rtBlendDesc.SrcBlendAlpha = D3D11_BLEND_ONE; // 알파 소스 블렌드 팩터
+	rtBlendDesc.DestBlendAlpha = D3D11_BLEND_ZERO; // 알파 대상 블렌드 팩터
+	rtBlendDesc.BlendOpAlpha = D3D11_BLEND_OP_ADD; // 알파 블렌드 연산
+	rtBlendDesc.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL; // 색상 쓰기 마스크
+
+	// 렌더 타겟에 블렌드 설정 적용
+	blendDesc.RenderTarget[0] = rtBlendDesc; // 여러 렌더 타겟에 대한 설정이 필요한 경우 배열에 추가
+
+	ID3D11BlendState* pBlendState = {};
+	m_pDevice->CreateBlendState(&blendDesc, &pBlendState);
+	_float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	m_pContext->OMSetBlendState(pBlendState, blendFactor, 0xffffffff);
+
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -104,7 +144,25 @@ HRESULT CBackGround::Add_Components()
 		}
 		if (m_fZ == 0.4f)
 		{
+			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreens_Holder"),
+				TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
+				return E_FAIL;
+		}
+		if (m_fZ == 0.3f)
+		{
 			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreens_Jack"),
+				TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
+				return E_FAIL;
+		}
+		if (m_fZ == 0.2f)
+		{
+			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreens_GameLogo"),
+				TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
+				return E_FAIL;
+		}
+		if (m_fZ == 0.1f)
+		{
+			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Spinner"),
 				TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 				return E_FAIL;
 		}
@@ -133,7 +191,7 @@ HRESULT CBackGround::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	if (m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0))
+	if (m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_iTextureIndex))
 		return E_FAIL;
 
 	return S_OK;

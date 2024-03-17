@@ -88,9 +88,13 @@ void CImGui_Client::ConvertToString()
 		strIsJumping += "TRUE";
 	else
 		strIsJumping += "FALSE";
+	_float4 vWeaponPos = m_pPlayer->Get_WeaponPos(eWeapon);
+	string strWeaponPos = "WeaponPos : " + to_string(vWeaponPos.x).erase(to_string(vWeaponPos.x).size() - 4) + ", "
+		+ to_string(vWeaponPos.y).erase(to_string(vWeaponPos.y).size() - 4) + ", " + to_string(vWeaponPos.z).erase(to_string(vWeaponPos.z).size() - 4);
 
 	ImGui::Text(strPlayerPos.c_str());
 	ImGui::Text(strCamPos.c_str());
+	ImGui::Text(strWeaponPos.c_str());
 	ImGui::Text(strAnimName.c_str());
 	ImGui::Text(strDir.c_str());
 	ImGui::Text(strState.c_str());

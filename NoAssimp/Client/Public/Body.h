@@ -34,6 +34,7 @@ public:
 
 private:
 	void StateToAnimation();
+	void Initialize_AnimSpeed();
 
 private:
 	CModel* m_pModelCom = { nullptr };
@@ -41,6 +42,7 @@ private:
 	const STATE* m_pState;
 	const WEAPON* m_pWeapon;
 	const _uint* m_pLastAttack;
+
 
 private:
 	HRESULT Add_Components(LEVEL eLevel, const wstring& _wstrModelTag);
