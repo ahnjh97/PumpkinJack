@@ -220,7 +220,7 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 			m_Animations[m_iCurrentAnimIndex]->Lerp_Animation(m_Bones, m_FinalKeyFrames, m_fLerpRatio);
 		}
 		else
-			m_bIsLerping = false;
+			m_bIsLerping = false;		
 	}
 
 	//// 진짜 Root의 변환행렬
@@ -245,7 +245,8 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 	for (auto& pBone : m_Bones)
 		pBone->Update_CombinedTransformationMatrix(m_Bones, RootLocalTransform, m_tConfig.iRealRoot);
 	
-	Save_FinalKeyFrames();
+	if(!m_bIsLerping)
+		Save_FinalKeyFrames();
  	return S_OK;
 }
 
@@ -268,10 +269,15 @@ void CModel::Change_Animation(string& strAnimName, _bool isLoop)
 
 	if (m_iCurrentAnimIndex != iter->second)
 	{
-		m_bIsLerping = true;
+		if (iter->first == "Roll")
+			m_bIsLerping = false;
+		else
+			m_bIsLerping = true;
 		m_fLerpRatio = 0.f;
 		m_Animations[iter->second]->Reset(m_Bones);
 		Set_Animation(iter->second, isLoop);
+		if (isLoop == false)
+			m_Animations[iter->second]->Set_IsFinished(false);
 	}
 }
 

@@ -28,6 +28,7 @@ private:
 	HRESULT Ready_Layer_Player(const wstring& strLayerTag);
 	HRESULT Ready_Layer_Monster(const wstring& strLayerTag);
 	HRESULT Ready_Layer_Effect(const wstring& strLayerTag);
+	HRESULT Ready_UI(const wstring& strLayerTag);
 	
 private:
 	ifstream m_InputFile;

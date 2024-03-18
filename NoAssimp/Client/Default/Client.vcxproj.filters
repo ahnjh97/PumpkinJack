@@ -55,9 +55,6 @@
     <Filter Include="02.GameObjects\ToolObject">
       <UniqueIdentifier>{2ddeb38d-0b13-45a4-aa51-6b443ee19fc5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\StaticMesh">
-      <UniqueIdentifier>{e884518c-7c31-4559-9aae-c53a81aebf2d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Player">
       <UniqueIdentifier>{f536d6a1-b841-49e8-9585-b965b6f55737}</UniqueIdentifier>
     </Filter>
@@ -66,6 +63,9 @@
     </Filter>
     <Filter Include="02.GameObjects\Player\Weapon">
       <UniqueIdentifier>{4569359c-bf45-4398-b9d7-4dd78585945f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\LifeBar">
+      <UniqueIdentifier>{d7004d9d-b6cf-45f3-9007-dc0fc86a9a14}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -141,6 +141,9 @@
     <ClInclude Include="..\Public\Body.h">
       <Filter>02.GameObjects\Player\Body</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LifeBar.h">
+      <Filter>02.GameObjects\LifeBar</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -206,6 +209,9 @@
     <ClCompile Include="..\Private\Body.cpp">
       <Filter>02.GameObjects\Player\Body</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\LifeBar.cpp">
+      <Filter>02.GameObjects\LifeBar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -231,6 +237,12 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex_CrowLifeBar.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex_LifeBar.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

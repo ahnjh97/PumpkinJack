@@ -36,6 +36,8 @@ HRESULT CBody::Initialize(void* pArg)
 
 	if(m_pModelCom!=nullptr)
 		Initialize_AnimSpeed();
+	
+	m_pModelCom->Set_Animation(m_pModelCom->Get_AnimIndex("Spear_Idle"), true);
 
 	return S_OK;
 }
@@ -147,13 +149,11 @@ void CBody::StateToAnimation()
 
 void CBody::Initialize_AnimSpeed()
 {
-	string strWeapon, strState;
-	
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_AirAttack"), 1.85f);
-	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_AirAttack"), 2.f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_AirAttack"), 2.3f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_AirAttack"), 1.8f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_Roll"), 1.8f);
-	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_Roll"), 2.6f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_Roll"), 3.f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Roll"), 2.4f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Roll"), 2.7f);
 	
@@ -161,7 +161,7 @@ void CBody::Initialize_AnimSpeed()
 		m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_Atk" + to_string(i)), 1.85f);
 
 	for (int i = 1; i < 4; i++)
-		m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_Atk" + to_string(i)), 2.f);
+		m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_Atk" + to_string(i)), 2.2f);
 
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Atk1"), 3.8f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Atk2"), 3.1f);

@@ -42,7 +42,6 @@ namespace Engine
 		if (nullptr != pInstance)
 		{
 			iRefCnt = pInstance->Release();
-
 			if(0 == iRefCnt)
 				pInstance = nullptr;
 		}

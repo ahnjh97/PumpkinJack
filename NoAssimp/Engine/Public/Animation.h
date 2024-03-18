@@ -23,6 +23,7 @@ public:
 	vector<class CChannel*> Get_Channels() { return m_Channels; }
 
 	void Set_Coefficient(_float fCoefficient) { m_fCoefficient = fCoefficient; }
+	void Set_IsFinished(_bool bIsFinished) { m_isFinished = bIsFinished; }
 
 public:
 	HRESULT Initialize(const vector<class CBone*>& Bones, ifstream& fileStream);

@@ -1,5 +1,10 @@
 #include "stdafx.h"
 #include "..\Public\BackGround.h"
+#define fZ_LoadingScreen 0.9f
+#define fZ_Holder 0.8f
+#define fZ_Jack 0.7f
+#define fZ_GameLogo 0.6f
+#define fZ_Spinner 0.5f
 
 CBackGround::CBackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _bool bLoadingScreen)
 	: CGameObject{ pDevice, pContext }, m_bLoadingScreen{ bLoadingScreen }
@@ -37,7 +42,7 @@ HRESULT CBackGround::Initialize(void * pArg)
 	m_fSizeY = g_iWinSizeY;
 	m_fX = g_iWinSizeX * 0.5f;
 	m_fY = g_iWinSizeY * 0.5f;
-	if (m_fZ == 0.1f)
+	if (m_fZ == fZ_Spinner)
 	{
 		m_fSizeX = m_fSizeY = 90;
 		m_fX += 520;
@@ -52,7 +57,7 @@ HRESULT CBackGround::Initialize(void * pArg)
 		1.f
 	));
 
-	if (m_fZ == 0.5f)
+	if (m_fZ == fZ_LoadingScreen)
 		m_iTextureIndex = m_pGameInstance->RandomNumber(0,5);
 
 	::XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
@@ -68,14 +73,15 @@ void CBackGround::Tick(_float fTimeDelta)
 
 void CBackGround::Late_Tick(_float fTimeDelta)
 {
-	if (m_fZ == 0.1f)
-	{
-		_int iSpeed = m_pGameInstance->RandomNumber(1, 10);
-		if (iSpeed > 4)
-			iSpeed = 0;
+	m_fTime += fTimeDelta;
+	float currentSpeed = 1.f / (log(m_fTime + 1) * 1.f + 1) / 30;
+	if (m_fZ == fZ_Jack)
+		m_pTransformCom->Go_Right(currentSpeed);
+	else if (m_fZ == fZ_GameLogo)
+		m_pTransformCom->Go_Left(currentSpeed);
+	else if (m_fZ == fZ_Spinner)
 		m_pTransformCom->Turn(XMVectorSet(0, 0, 1, 0), -fTimeDelta);
-	}
-		
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);
 }
 
@@ -117,6 +123,7 @@ HRESULT CBackGround::Render()
 	if (FAILED(m_pVIBufferCom->Render()))
 		return E_FAIL;
 
+	Safe_Release(pBlendState);
 	return S_OK;
 }
 
@@ -136,38 +143,37 @@ HRESULT CBackGround::Add_Components()
 	}
 	else
 	{
-		if (m_fZ == 0.5f)
+		if (m_fZ == fZ_LoadingScreen)
 		{
 			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreens"),
 				TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 				return E_FAIL;
 		}
-		if (m_fZ == 0.4f)
+		else if (m_fZ == fZ_Holder)
 		{
 			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreens_Holder"),
 				TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 				return E_FAIL;
 		}
-		if (m_fZ == 0.3f)
+		else if (m_fZ == fZ_Jack)
 		{
 			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreens_Jack"),
 				TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 				return E_FAIL;
 		}
-		if (m_fZ == 0.2f)
+		else if (m_fZ == fZ_GameLogo)
 		{
 			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreens_GameLogo"),
 				TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 				return E_FAIL;
 		}
-		if (m_fZ == 0.1f)
+		else if (m_fZ == fZ_Spinner)
 		{
 			if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Spinner"),
 				TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 				return E_FAIL;
 		}
 	}
-
 
 	/* For.Com_VIBuffer */
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),

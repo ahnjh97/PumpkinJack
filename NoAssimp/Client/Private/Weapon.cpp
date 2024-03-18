@@ -22,7 +22,6 @@ HRESULT CWeapon::Initialize(void* pArg)
 	WEAPON_DESC* pWeaponDesc = (WEAPON_DESC*)pArg;
 
 	m_pSocket = pWeaponDesc->pSocket;
-	m_pRelative = pWeaponDesc->pRelative;
 	m_pState = pWeaponDesc->pState;
 	m_pWeapon = pWeaponDesc->pWeapon;
 

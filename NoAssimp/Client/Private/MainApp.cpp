@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "MainApp.h"
+#include "LifeBar.h"
 #include "BackGround.h"
 #include "GameInstance.h"
 #include "Level_Loading.h"
+
 
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::Get_Instance())
@@ -72,26 +74,51 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex_LifeBar"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex_LifeBar.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex_CrowLifeBar"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex_CrowLifeBar.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreens"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Logo/T_LoadingScreens%d.dds"), 6))))
+	if(FAILED(Add_Texture(LEVEL_STATIC, "LoadingScreens", "Logo/T_LoadingScreens%d.dds", 6)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreens_GameLogo"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Logo/T_LoadingScreens_GameLogo.dds")))))
+	if (FAILED(Add_Texture(LEVEL_STATIC, "LoadingScreens_GameLogo", "Logo/T_LoadingScreens_GameLogo.dds")))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreens_Holder"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Logo/T_LoadingScreens_Holder.dds")))))
+	if (FAILED(Add_Texture(LEVEL_STATIC, "LoadingScreens_Holder", "Logo/T_LoadingScreens_Holder.dds")))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_LoadingScreens_Jack"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Logo/T_LoadingScreens_Jack.dds")))))
+	if (FAILED(Add_Texture(LEVEL_STATIC, "LoadingScreens_Jack", "Logo/T_LoadingScreens_Jack.dds")))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Spinner"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Logo/spinner.dds")))))
+	if (FAILED(Add_Texture(LEVEL_STATIC, "Spinner", "Logo/Spinner.dds")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(LEVEL_STATIC, "LifeBarMaskHolder", "Logo/T_LifebarMaskHolder.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(LEVEL_STATIC, "LifeBarMask", "Logo/T_LifebarMask.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(LEVEL_STATIC, "CrowLifeBar", "Logo/UI_CrowLifebar2.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(LEVEL_STATIC, "LifeBar", "Logo/T_LifeBar%d.dds", 2)))
+		return E_FAIL;
+
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_LoadingScreen"),
 		CBackGround::Create(m_pDevice, m_pContext, true))))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_LifeBar"),
+		CLifeBar::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 	return	S_OK;
+}
+
+HRESULT CMainApp::Add_Texture(LEVEL eLevel, string strPrototypeName, string strFolderAndFileName, _uint iNumTextures)
+{
+	wstring_convert<codecvt_utf8<wchar_t>> converter;
+	wstring wstrPrototypeTag = L"Prototype_Component_Texture_" + converter.from_bytes(strPrototypeName);
+	wstring wstrFullPath = L"../../../Resources/Textures/" + converter.from_bytes(strFolderAndFileName);
+
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CTexture::Create(m_pDevice, m_pContext, wstrFullPath, iNumTextures))))
+		return E_FAIL;
+
+	return S_OK;
 }
 
 CMainApp * CMainApp::Create()

@@ -18,7 +18,6 @@ public:
 	HRESULT Initialize(const vector<class CBone*>& Bones, ifstream& fileStream);
 	void Update_TransformationMatrix(const vector<class CBone*>& Bones, _float fTrackPosition, _uint* pCurrentKeyFrameIndex);
 	void Lerp_Channel(const vector<class CBone*>& Bones, vector<KEYFRAME>& vecKeyFrame, _float fRatio);
-	void Reset_Channel() { }
 
 private:
 	_char				m_szName[MAX_PATH] = { "" };

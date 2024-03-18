@@ -29,6 +29,7 @@ private:
 	HRESULT Ready_Default_Setting();
 	HRESULT Open_Level(LEVEL eLevelID);
 	HRESULT Ready_Prototype_Component_For_Static();
+	HRESULT Add_Texture(LEVEL eLevel, string strPrototypeName, string strFolderAndFileName, _uint iNumTextures = 1);
 
 public:	
 	static CMainApp* Create();

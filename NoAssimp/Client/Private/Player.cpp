@@ -133,7 +133,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 	}
 
 	if(m_eState == ROLL)
-		m_pTransformCom->Move(fTimeDelta * 1.6f, XMLoadFloat3(&m_vDirection));
+		m_pTransformCom->Move(fTimeDelta * 1.4f, XMLoadFloat3(&m_vDirection));
 
 	if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) || (m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80)
 		|| (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80) || (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80))
@@ -153,7 +153,6 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 
 	if (m_pGameInstance->MouseDown(DIMKS_LBUTTON) && !m_bIsAttacking && !m_bIsRolling)
 	{
-		m_bIsAttacking = true;
 		if (m_fRollEndTime < 0.5f && !m_bIsJumping)
 			m_eState = ROLL_ATTACK;
 		else if (m_bIsJumping == true)
@@ -175,6 +174,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 			m_eState = ATTACK3;
 			m_iLastAttack = 3;
 		}
+		m_bIsAttacking = true;
 	}
 
 	if (!(m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) && !(m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80) &&
@@ -258,7 +258,7 @@ void CPlayer::Link_Animation()
 		return;
 	CBody* pBody = dynamic_cast<CBody*>(iter->second);
 
-	if (m_eState == ROLL && pBody->Get_IsFinished())
+	if (m_eState == ROLL && (pBody->Get_IsFinished()))
 	{
 		m_bIsRolling = false;
 		m_fRollEndTime = 0;

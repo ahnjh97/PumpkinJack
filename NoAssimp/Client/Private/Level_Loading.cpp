@@ -7,6 +7,11 @@
 #include "Level_Logo.h"
 #include "Level_GamePlay.h"
 #include "Level_MapTool.h"
+#define fZ_LoadingScreen 0.9f
+#define fZ_Holder 0.8f
+#define fZ_Jack 0.7f
+#define fZ_GameLogo 0.6f
+#define fZ_Spinner 0.5f
 
 CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -75,19 +80,19 @@ HRESULT CLevel_Loading::Render()
 HRESULT CLevel_Loading::Ready_Layer_BackGround()
 {
 	CGameObject::GAMEOBJECT_DESC tDesc = {};
-	tDesc.matWorld._43 = 0.5f;
+	tDesc.matWorld._43 = fZ_LoadingScreen;
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_LOADING, TEXT("Layer_LoadingScreen"), TEXT("Prototype_GameObject_LoadingScreen"), &tDesc)))
 		return E_FAIL;
-	tDesc.matWorld._43 = 0.4f;
+	tDesc.matWorld._43 = fZ_Holder;
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_LOADING, TEXT("Layer_LoadingScreen"), TEXT("Prototype_GameObject_LoadingScreen"), &tDesc)))
 		return E_FAIL;
-	tDesc.matWorld._43 = 0.3f;
+	tDesc.matWorld._43 = fZ_Jack;
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_LOADING, TEXT("Layer_LoadingScreen"), TEXT("Prototype_GameObject_LoadingScreen"), &tDesc)))
 		return E_FAIL;
-	tDesc.matWorld._43 = 0.2f;
+	tDesc.matWorld._43 = fZ_GameLogo;
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_LOADING, TEXT("Layer_LoadingScreen"), TEXT("Prototype_GameObject_LoadingScreen"), &tDesc)))
 		return E_FAIL;
-	tDesc.matWorld._43 = 0.1f;
+	tDesc.matWorld._43 = fZ_Spinner;
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_LOADING, TEXT("Layer_LoadingScreen"), TEXT("Prototype_GameObject_LoadingScreen"), &tDesc)))
 		return E_FAIL;
 	return S_OK;

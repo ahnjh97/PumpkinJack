@@ -16,7 +16,6 @@ public:
 	typedef struct : public CPart::PART_DESC
 	{
 		CBone* pSocket = { nullptr };
-		_float4x4* pRelative = { nullptr };
 		const STATE* pState;
 		const WEAPON* pWeapon;
 	}WEAPON_DESC;
@@ -40,7 +39,6 @@ private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 	CBone* m_pSocket = { nullptr };
-	_float4x4* m_pRelative = { nullptr };
 	const WEAPON* m_pWeapon = {};
 	const STATE* m_pState = {};
 

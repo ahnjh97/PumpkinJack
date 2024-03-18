@@ -27,10 +27,5 @@ using namespace Client;
             return E_FAIL; \
     } while (0)
 
-//#define ADD_COMPONENT_PROTOTYPE(tag, className, filePath) \
-//    do { \
-//        wstring wstrResult = L"Prototype_Component_" + wstring(tag); \
-//        wstring wstrFullPath = L"../../../Resources/" + wstring(filePath);   \
-//        if (FAILED(m_pGameInstance->Add_Prototype(wstring(wstrResult), className::Create(m_pDevice, m_pContext, wstring(wstrFullPath))))) \
-//            return E_FAIL; \
-//    } while (0)
+#define fZ_LifeBarMask 0.8f
+#define fZ_CrowLifeBar 0.7f

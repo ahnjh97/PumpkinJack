@@ -26,6 +26,8 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Lights()))
 		return E_FAIL;
 	
+	if (FAILED(Ready_UI(TEXT("Layer_UI"))))
+		return E_FAIL;
 	if(FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
 
@@ -43,6 +45,8 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(m_pGameInstance->Initialize_ImGui(LEVEL_GAMEPLAY, CImGui_Client::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 	
+	
+
 	m_InputFile.close();
 	return S_OK;
 }
@@ -180,6 +184,19 @@ HRESULT CLevel_GamePlay::Ready_Layer_Effect(const wstring & strLayerTag)
 			return E_FAIL;
 	}
 */
+
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_UI(const wstring& strLayerTag)
+{
+	CGameObject::GAMEOBJECT_DESC tDesc = {};
+	tDesc.matWorld._43 = fZ_LifeBarMask;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_LifeBar"), &tDesc)))
+		return E_FAIL;
+	tDesc.matWorld._43 = fZ_CrowLifeBar;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_LifeBar"), &tDesc)))
+		return E_FAIL;
 
 	return S_OK;
 }

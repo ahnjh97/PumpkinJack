@@ -31,17 +31,15 @@ private:
 	CVIBuffer_Rect*			m_pVIBufferCom = { nullptr };
 
 private:
-	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
+	_float					m_fX, m_fY, m_fZ, m_fSizeX, m_fSizeY;
 	_float4x4				m_WorldMatrix, m_ViewMatrix, m_ProjMatrix;
 	_bool					m_bLoadingScreen = { false };
-	_float					m_fZ = {};
 	_uint					m_iTextureIndex = {};
+	_float					m_fTime = {};
 
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
-
-
 
 public:
 	static CBackGround* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _bool bLoadingScreen = false);

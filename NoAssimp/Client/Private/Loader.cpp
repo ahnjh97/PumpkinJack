@@ -87,7 +87,8 @@ HRESULT CLoader::Loading_For_Logo()
 {
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 	/* For.Prototype_Component_Texture_Logo */
-	Add_Texture(LEVEL_LOGO, "Logo", "Logo/wallpaper.jpg");
+	if(FAILED(Add_Texture(LEVEL_LOGO, "Logo", "Logo/wallpaper.jpg")))
+		return E_FAIL;
 
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
@@ -114,11 +115,16 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 
 	/* Prototype_Component_Texture_Terrain */
-	Add_Texture(eLevel, "Terrain", "Terrain/Tile0.jpg");
-	Add_Texture(eLevel, "Ground", "Terrain/groundTile%d.dds", 4);
-	Add_Texture(eLevel, "Grass", "Terrain/grassTile%d.dds", 2);
-	Add_Texture(eLevel, "Mask", "Terrain/Mask.png");
-	Add_Texture(eLevel, "Brush", "Terrain/Brush.png");
+	if (FAILED(Add_Texture(eLevel, "Terrain", "Terrain/Tile0.jpg")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Ground", "Terrain/groundTile%d.dds", 4)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Grass", "Terrain/grassTile%d.dds", 2)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Mask", "Terrain/Mask.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Brush", "Terrain/Brush.png")))
+		return E_FAIL;
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 
@@ -170,11 +176,16 @@ HRESULT CLoader::Loading_For_MapTool(LEVEL eLevel)
 	/* Prototype_Component_Texture_Grid */
 	if(FAILED(Add_Texture(eLevel, "Grid", "Terrain/White.png")))
 		return E_FAIL;
-	Add_Texture(eLevel, "Terrain", "Terrain/Tile0.jpg");
-	Add_Texture(eLevel, "Ground", "Terrain/groundTile%d.dds", 4);
-	Add_Texture(eLevel, "Grass", "Terrain/grassTile%d.dds", 2);
-	Add_Texture(eLevel, "Mask", "Terrain/Mask.png");
-	Add_Texture(eLevel, "Brush", "Terrain/Brush.png");
+	if (FAILED(Add_Texture(eLevel, "Terrain", "Terrain/Tile0.jpg")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Ground", "Terrain/groundTile%d.dds", 4)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Grass", "Terrain/grassTile%d.dds", 2)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Mask", "Terrain/Mask.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Brush", "Terrain/Brush.png")))
+		return E_FAIL;
 
 	m_strLoadingText = TEXT("컴포넌트를(을) 로딩 중 입니다.");
 	/* Prototype_Component_VIBuffer_Terrain */
@@ -185,12 +196,6 @@ HRESULT CLoader::Loading_For_MapTool(LEVEL eLevel)
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 
-	/* For.Prototype_Component_Model_Fiona */
-	//if(FAILED(Add_Model(LEVEL_MAPTOOL, TYPE_ANIM, "Fiona", 1.f, 180.f)))
-	//	return E_FAIL;
-
-	//if (Add_Models(eLevel)) // LEVEL_MAPTOOL;
-	//	return E_FAIL;
 	TraverseAnimModels(eLevel, L"../../../model_txt/Anim/");
 	TraverseNonAnimModels(eLevel, L"../../../model_txt/NonAnim/");
 
