@@ -111,4 +111,5 @@ CLevel_MapTool* CLevel_MapTool::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 void CLevel_MapTool::Free()
 {
 	__super::Free();
+	m_pGameInstance->Release_ImGui();
 }

@@ -67,6 +67,9 @@
     <Filter Include="02.GameObjects\LifeBar">
       <UniqueIdentifier>{d7004d9d-b6cf-45f3-9007-dc0fc86a9a14}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Levels\SlimeBoss">
+      <UniqueIdentifier>{94e6e0d5-20a5-469f-9fc1-b657d034cb3a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -144,6 +147,9 @@
     <ClInclude Include="..\Public\LifeBar.h">
       <Filter>02.GameObjects\LifeBar</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Level_SlimeBoss.h">
+      <Filter>01.Levels\SlimeBoss</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -211,6 +217,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\LifeBar.cpp">
       <Filter>02.GameObjects\LifeBar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_SlimeBoss.cpp">
+      <Filter>01.Levels\SlimeBoss</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

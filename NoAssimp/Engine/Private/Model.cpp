@@ -79,14 +79,23 @@ void CModel::Save_FinalKeyFrames()
 	}
 }
 
+void CModel::Rotate_NonAnimVersion()
+{
+	_matrix rotatedMatrix = XMMatrixRotationY(XM_PI);
+	_matrix matTransformation = XMLoadFloat4x4(&m_TransformMatrix);
+
+	XMStoreFloat4x4(&m_TransformMatrix, matTransformation * rotatedMatrix);
+}
+
 _bool CModel::Check_BoundingBox(const CTransform* pTransform) const
 {
-	_float3 vRayDir{}, vRayPos{};
-	_float fDis;
-	m_pGameInstance->Transform_PickingToLocalSpace(pTransform, &vRayDir, &vRayPos);
-	_vector vecRayDir = ::XMVector3Normalize(::XMLoadFloat3(&vRayDir));
-	_vector vecRayPos = ::XMLoadFloat3(&vRayPos);
-	return m_BoundingBox.Intersects(vecRayPos, vecRayDir, fDis);
+	//_float3 vRayDir{}, vRayPos{};
+	//_float fDis;
+	//m_pGameInstance->Transform_PickingToLocalSpace(pTransform, &vRayDir, &vRayPos);
+	//_vector vecRayDir = ::XMVector3Normalize(::XMLoadFloat3(&vRayDir));
+	//_vector vecRayPos = ::XMLoadFloat3(&vRayPos);
+	//return m_BoundingBox.Intersects(vecRayPos, vecRayDir, fDis);
+	return false;
 }
 
 _float3 CModel::Check_Meshes(const CTransform* pTransform) const
@@ -295,14 +304,8 @@ HRESULT CModel::Ready_Meshes()
 		m_Meshes.push_back(pMesh);
 		m_filePointerPos = pMesh->Get_IncreasedFilePtPos(); // 파일포인터 위치 갱신
 
-		pair<_float3, _float3> pairMinMax = pMesh->Get_MinMax();
-
-		vMin = _float3(min(pairMinMax.first.x, vMin.x), min(pairMinMax.first.y, vMin.y), min(pairMinMax.first.z, vMin.z));
-		vMax = _float3(max(pairMinMax.second.x, vMax.x), max(pairMinMax.second.y, vMax.y), max(pairMinMax.second.z, vMax.z));
 	}
 
-	BoundingBox tempBox(vMin, vMax);
-	m_BoundingBox = tempBox;
 	return S_OK;
 }
 

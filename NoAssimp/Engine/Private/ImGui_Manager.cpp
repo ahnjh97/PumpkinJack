@@ -54,6 +54,13 @@ HRESULT CImGui_Manager::Render()
 	return S_OK;
 }
 
+HRESULT CImGui_Manager::Release_ImGui()
+{
+	Safe_Release<CMyImGui*>(m_pImGui);
+
+	return S_OK;
+}
+
 CImGui_Manager* CImGui_Manager::Create(CMyImGui* pImGui)
 {
 	CImGui_Manager* pInstance = new CImGui_Manager();

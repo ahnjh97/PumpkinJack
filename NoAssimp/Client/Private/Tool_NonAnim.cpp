@@ -33,6 +33,8 @@ HRESULT CTool_NonAnim::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_iLevel = GameObjectDesc.iLevel;
+	if (m_pModelCom->IsNonAnimVersion())
+		m_pModelCom->Rotate_NonAnimVersion();
 	return S_OK;
 }
 

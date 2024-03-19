@@ -33,7 +33,7 @@ private:
 	CVIBuffer_Terrain*		m_pVIBufferCom = { nullptr };
 	
 private:
-	HRESULT Add_Components();
+	HRESULT Add_Components(LEVEL eLevel);
 	HRESULT Bind_ShaderResources();
 
 

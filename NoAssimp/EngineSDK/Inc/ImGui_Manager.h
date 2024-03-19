@@ -17,6 +17,7 @@ public:
 	HRESULT					Initiailize(class CMyImGui* pImGui);
 	void					Tick(_float fTimeDelta);
 	HRESULT					Render();
+	HRESULT					Release_ImGui();
 
 public:
 	static CImGui_Manager* Create(class CMyImGui* pImGui);

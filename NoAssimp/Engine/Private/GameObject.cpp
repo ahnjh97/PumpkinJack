@@ -95,7 +95,7 @@ HRESULT CGameObject::Render()
 
 HRESULT CGameObject::Add_Component(_uint iLevelIndex, const wstring & strPrototypeTag, const wstring & strComponentTag, CComponent** ppOut, void * pArg)
 {
-	CComponent*		pComponent = m_pGameInstance->Clone_Component(iLevelIndex, strPrototypeTag);
+	CComponent*		pComponent = m_pGameInstance->Clone_Component(iLevelIndex, strPrototypeTag, pArg);
 	if (nullptr == pComponent)
 		return E_FAIL;
 

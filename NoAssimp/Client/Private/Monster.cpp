@@ -70,12 +70,6 @@ HRESULT CMonster::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
-	/*if (m_pModelCom->Get_ModelName() == "Crow")
-	{
-		if (FAILED(Deactivate_BackFaceCulling()))
-			return E_FAIL;
-	}*/
-		
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
@@ -96,7 +90,7 @@ HRESULT CMonster::Render()
 
 		m_pModelCom->Render(i);
 	}
-
+	
 	return S_OK;
 }
 

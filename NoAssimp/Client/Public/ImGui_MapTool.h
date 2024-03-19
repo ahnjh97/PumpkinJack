@@ -37,7 +37,7 @@ private:
 	_bool						bAnimWindow = { false };
 	_bool						bIsLevelOpen = { false };
 	vector<string>				vecLevelName = {"Level_Static", "Level_Loading", "Level_Logo", "Level_MapTool", 
-		"Level_GamePlay", "Level_GamePlay2","Level_GamePlay3", "Level_GamePlay4", "Level_End"};
+		"Level_GamePlay", "Level_GamePlay2","Level_GamePlay3", "Level_SlimeBoss", "Level_End"};
 	vector<CAnimation*>			vecAnimations;
 
 

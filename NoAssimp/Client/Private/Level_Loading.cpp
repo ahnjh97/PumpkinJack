@@ -7,6 +7,7 @@
 #include "Level_Logo.h"
 #include "Level_GamePlay.h"
 #include "Level_MapTool.h"
+#include "Level_SlimeBoss.h"
 #define fZ_LoadingScreen 0.9f
 #define fZ_Holder 0.8f
 #define fZ_Jack 0.7f
@@ -55,6 +56,9 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 				break;
 			case LEVEL_MAPTOOL:
 				pLevel = CLevel_MapTool::Create(m_pDevice, m_pContext);
+				break;
+			case LEVEL_SLIMEBOSS:
+				pLevel = CLevel_SlimeBoss::Create(m_pDevice, m_pContext);
 				break;
 			}
 

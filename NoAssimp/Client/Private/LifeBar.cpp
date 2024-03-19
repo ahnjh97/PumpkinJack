@@ -85,28 +85,8 @@ void CLifeBar::Late_Tick(_float fTimeDelta)
 
 HRESULT CLifeBar::Render()
 {
-	D3D11_BLEND_DESC blendDesc = {};
-	blendDesc.AlphaToCoverageEnable = FALSE;
-	blendDesc.IndependentBlendEnable = FALSE; // 또는 TRUE, 필요에 따라 설정
-
-	// 렌더 타겟에 대한 블렌드 설정 구조체 생성 및 초기화
-	D3D11_RENDER_TARGET_BLEND_DESC rtBlendDesc = {};
-	rtBlendDesc.BlendEnable = TRUE; // 블렌딩 활성화
-	rtBlendDesc.SrcBlend = D3D11_BLEND_SRC_ALPHA; // 소스 블렌드 팩터
-	rtBlendDesc.DestBlend = D3D11_BLEND_INV_SRC_ALPHA; // 대상 블렌드 팩터
-	rtBlendDesc.BlendOp = D3D11_BLEND_OP_ADD; // 블렌드 연산
-	rtBlendDesc.SrcBlendAlpha = D3D11_BLEND_ONE; // 알파 소스 블렌드 팩터
-	rtBlendDesc.DestBlendAlpha = D3D11_BLEND_ZERO; // 알파 대상 블렌드 팩터
-	rtBlendDesc.BlendOpAlpha = D3D11_BLEND_OP_ADD; // 알파 블렌드 연산
-	rtBlendDesc.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL; // 색상 쓰기 마스크
-
-	// 렌더 타겟에 블렌드 설정 적용
-	blendDesc.RenderTarget[0] = rtBlendDesc; // 여러 렌더 타겟에 대한 설정이 필요한 경우 배열에 추가
-
-	ID3D11BlendState* pBlendState = {};
-	m_pDevice->CreateBlendState(&blendDesc, &pBlendState);
 	_float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	m_pContext->OMSetBlendState(pBlendState, blendFactor, 0xffffffff);
+	m_pContext->OMSetBlendState(m_pGameInstance->Get_BlendState(), blendFactor, 0xffffffff);
 
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -120,7 +100,7 @@ HRESULT CLifeBar::Render()
 
 	if (FAILED(m_pVIBufferCom->Render()))
 		return E_FAIL;
-	Safe_Release(pBlendState);
+
 	return S_OK;
 }
 

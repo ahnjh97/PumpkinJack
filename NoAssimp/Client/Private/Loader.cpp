@@ -73,6 +73,9 @@ HRESULT CLoader::Start()
 	case LEVEL_MAPTOOL:
 		hr = Loading_For_MapTool(LEVEL_MAPTOOL);
 		break;
+	case LEVEL_SLIMEBOSS:
+		hr = Loading_For_SlimeBoss(LEVEL_SLIMEBOSS);
+		break;
 	}
 
 	if (FAILED(hr))
@@ -224,6 +227,65 @@ HRESULT CLoader::Loading_For_MapTool(LEVEL eLevel)
 	return S_OK;
 }
 
+HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
+{
+	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+
+	/* Prototype_Component_Texture_Terrain */
+	if (FAILED(Add_Texture(eLevel, "Terrain", "Terrain/Tile0.jpg")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Ground", "Terrain/groundTile%d.dds", 4)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Grass", "Terrain/grassTile%d.dds", 2)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Mask", "Terrain/Mask.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Brush", "Terrain/Brush.png")))
+		return E_FAIL;
+
+	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+
+	/* Prototype_Component_VIBuffer_Terrain */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain"),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 100, 100))))
+		return E_FAIL;
+
+	TraverseAnimModels(eLevel, L"../../../model_txt/Anim/");
+	TraverseNonAnimModels(eLevel, L"../../../model_txt/NonAnim/");
+
+	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
+
+	Add_Shaders(eLevel);
+
+
+	m_strLoadingText = TEXT("객체를(을) 로딩 중 입니다.");
+	/* For.Prototype_GameObject_Terrain */
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Terrain"), CTerrain);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Jack"), CCamera_Jack);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Monster"), CMonster);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Player"), CPlayer);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Body"), CBody);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Spear"), CWeapon);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Rifle"), CWeapon);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Scythe"), CWeapon);
+	///* For.Prototype_GameObject_Effect */
+	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect"),
+	//	CEffect::Create(m_pGraphic_Device))))
+	//	return E_FAIL;
+
+	///* For.Prototype_GameObject_Sky */
+	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Sky"),
+	//	CSky::Create(m_pGraphic_Device))))
+	//	return E_FAIL;
+	//
+	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
+
+	m_isFinished = true;
+
+	return S_OK;
+}
+
 HRESULT CLoader::Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName)
 {
 	_float fScale = 10.f;
@@ -250,7 +312,7 @@ HRESULT CLoader::Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName)
 		if(ScaleIter != m_ModelConfigs.end())
 			fNewScale = tConfig.fNewScale;
 
-		TransformMatrix = XMMatrixScaling(fNewScale, fNewScale, fNewScale) * XMMatrixRotationY(XMConvertToRadians(tConfig.fDegree));
+		TransformMatrix = XMMatrixScaling(fNewScale, fNewScale, fNewScale) * XMMatrixRotationY(XMConvertToRadians(tConfig.fDegree - 180.f));
 		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag + L"_NonAnim",
 			CModel::Create(m_pDevice, m_pContext, TYPE_NONANIM, strModelName, TransformMatrix, tConfig, true))))
 			return E_FAIL;

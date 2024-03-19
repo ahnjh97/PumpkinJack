@@ -75,6 +75,7 @@ public: /* For. Picking */
 public: /* For.ImGui_Manager */
 	_float3 Get_PickPos();
 	_bool IsPicking();
+	HRESULT	Release_ImGui();
 
 public: /* For.Light_Manager */
 	const LIGHT_DESC* Get_LightDesc(_uint iIndex);
@@ -86,6 +87,8 @@ public: /* For.Light_Manager */
 	void CalculateFPS(_float fTimeDelta);
 	_int Get_FPS() { return iFps; }
 	_int RandomNumber(_int iMin, _int iMax);
+	void Set_BlendState(ID3D11Device* pDevice);
+	ID3D11BlendState* Get_BlendState() { return m_pBlendState; }
 
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };
@@ -105,6 +108,7 @@ private:
 	_uint iFrameCount = { 0 };
 	_float fElapsedTime = { 0.f };
 	_int iFps = { 0 };
+	ID3D11BlendState* m_pBlendState = { nullptr };
 
 public:		
 	static void Release_Engine();

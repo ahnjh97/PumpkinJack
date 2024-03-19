@@ -20,14 +20,15 @@ HRESULT CTerrain::Initialize_Prototype()
 HRESULT CTerrain::Initialize(void * pArg)
 {
 	GAMEOBJECT_DESC		GameObjectDesc{};
-
+	if (pArg != nullptr)
+		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
 	GameObjectDesc.fSpeedPerSec = 10.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components()))
+	if (FAILED(Add_Components((LEVEL)GameObjectDesc.iLevel)))
 		return E_FAIL;	
 	
 	return S_OK;
@@ -60,30 +61,30 @@ HRESULT CTerrain::Render()
 	return S_OK;
 }
 
-HRESULT CTerrain::Add_Components()
+HRESULT CTerrain::Add_Components(LEVEL eLevel)
 {
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxNorTex"), 
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Shader_VtxNorTex"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	/* For.Com_Texture_Diffuse */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Ground"),
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_Ground"),
 		TEXT("Com_Texture_Diffuse"), (CComponent**)&m_pTextureCom[TYPE_DIFFUSE])))
 		return E_FAIL;
 
 	/* For.Com_Texture_Mask */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Mask"),
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_Mask"),
 		TEXT("Com_Texture_Mask"), (CComponent**)&m_pTextureCom[TYPE_MASK])))
 		return E_FAIL;
 
 	/* For.Com_Texture_Brush */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Brush"),
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_Brush"),
 		TEXT("Com_Texture_Brush"), (CComponent**)&m_pTextureCom[TYPE_BRUSH])))
 		return E_FAIL;
 
 	/* For.Com_VIBuffer */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"),
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain"),
 		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
 

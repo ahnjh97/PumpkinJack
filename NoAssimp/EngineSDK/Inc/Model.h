@@ -39,6 +39,7 @@ public:
 	void Set_RealRoot(_uint iRealRoot) { m_tConfig.iRealRoot = iRealRoot; }
 	void Set_AnimSpeed(_uint iAnimIndex, _float fCoefficient) { m_Animations[iAnimIndex]->Set_Coefficient(fCoefficient); }
 	void Save_FinalKeyFrames();
+	void Rotate_NonAnimVersion();
 
 public: // 바운딩박스
 	_bool Check_BoundingBox(const class CTransform* pTransform) const;
@@ -89,7 +90,6 @@ private:
 	string						m_strDirectory;
 	streampos					m_filePointerPos;
 	ifstream					m_InputFile;
-	BoundingBox					m_BoundingBox;
 
 	string						m_strModelName;
 	
