@@ -35,7 +35,7 @@ CPipeLine * CPipeLine::Create()
 
 	if (FAILED(pInstance->Initialize()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CPipeLine"));
+		MSG_BOX(TEXT("Failed To Create : CPipeLine"));
 
 		Safe_Release(pInstance);
 	}

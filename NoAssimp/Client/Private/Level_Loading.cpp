@@ -113,7 +113,7 @@ CLevel_Loading * CLevel_Loading::Create(ID3D11Device* pDevice, ID3D11DeviceConte
 
 	if (FAILED(pInstance->Initialize(eNextLevelID)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CLevel_Loading"));
+		MSG_BOX(TEXT("Failed To Create : CLevel_Loading"));
 
 		Safe_Release(pInstance);
 	}

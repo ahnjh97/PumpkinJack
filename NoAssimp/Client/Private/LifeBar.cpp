@@ -174,7 +174,7 @@ CLifeBar* CLifeBar::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CLifeBar"));
+		MSG_BOX(TEXT("Failed To Create : CLifeBar"));
 
 		Safe_Release(pInstance);
 	}
@@ -188,7 +188,7 @@ CGameObject* CLifeBar::Clone(void* pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CLifeBar"));
+		MSG_BOX(TEXT("Failed To Create : CLifeBar"));
 
 		Safe_Release(pInstance);
 	}

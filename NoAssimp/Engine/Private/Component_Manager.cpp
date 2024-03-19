@@ -88,7 +88,7 @@ CComponent_Manager * CComponent_Manager::Create(_uint iNumLevels)
 
 	if (FAILED(pInstance->Initialize(iNumLevels)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CComponent_Manager"));
+		MSG_BOX(TEXT("Failed To Create : CComponent_Manager"));
 
 		Safe_Release(pInstance);
 	}

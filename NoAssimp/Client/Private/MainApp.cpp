@@ -127,7 +127,7 @@ CMainApp * CMainApp::Create()
 
 	if (FAILED(pInstance->Initialize()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CMainApp"));
+		MSG_BOX(TEXT("Failed To Create : CMainApp"));
 		
 		Safe_Release(pInstance);
 	}

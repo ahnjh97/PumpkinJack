@@ -60,7 +60,7 @@ CLevel_Manager * CLevel_Manager::Create()
 
 	if (FAILED(pInstance->Initialize()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CLevel_Manager"));
+		MSG_BOX(TEXT("Failed To Create : CLevel_Manager"));
 
 		Safe_Release(pInstance);
 	}

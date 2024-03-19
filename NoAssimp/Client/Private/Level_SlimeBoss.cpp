@@ -144,6 +144,11 @@ HRESULT CLevel_SlimeBoss::Ready_Layer_Monster(const wstring& strLayerTag)
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Player"), &tempDesc)))
 				return E_FAIL;
 		}
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_SlimeBoss"))
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_SlimeBoss"), TEXT("Prototype_GameObject_SlimeBoss"), &tempDesc)))
+				return E_FAIL;
+		}
 		else
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, strLayerTag, TEXT("Prototype_GameObject_Monster"), &tempDesc)))
@@ -178,7 +183,7 @@ CLevel_SlimeBoss* CLevel_SlimeBoss::Create(ID3D11Device* pDevice, ID3D11DeviceCo
 
 	if (FAILED(pInstance->Initialize()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CLevel_SlimeBoss"));
+		MSG_BOX(TEXT("Failed To Create : CLevel_SlimeBoss"));
 
 		Safe_Release(pInstance);
 	}
@@ -188,6 +193,6 @@ CLevel_SlimeBoss* CLevel_SlimeBoss::Create(ID3D11Device* pDevice, ID3D11DeviceCo
 
 void CLevel_SlimeBoss::Free()
 {
-	__super::Free();
 	m_pGameInstance->Release_ImGui();
+	__super::Free();
 }

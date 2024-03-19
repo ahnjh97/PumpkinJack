@@ -42,7 +42,7 @@ CLight_Manager* CLight_Manager::Create()
 
 	if (FAILED(pInstance->Initialize()))
 	{
-		MSG_BOX(TEXT("Failed to Created : CLight_Manager"));
+		MSG_BOX(TEXT("Failed To Create : CLight_Manager"));
 		Safe_Release(pInstance);
 	}
 

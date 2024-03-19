@@ -155,7 +155,7 @@ void CBody::Initialize_AnimSpeed()
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_Roll"), 1.8f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_Roll"), 3.f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Roll"), 2.4f);
-	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Roll"), 2.7f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Roll"), 3.f);
 	
 	for(int i = 1; i< 4; i++)
 		m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_Atk" + to_string(i)), 1.85f);
@@ -223,7 +223,7 @@ CBody* CBody::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	CBody* pInstance = new CBody(pDevice, pContext);
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CBody"));
+		MSG_BOX(TEXT("Failed To Create : CBody"));
 		Safe_Release(pInstance);
 	}
 	return pInstance;
@@ -234,7 +234,7 @@ CGameObject* CBody::Clone(void* pArg)
 	CBody* pInstance = new CBody(*this);
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CBody"));
+		MSG_BOX(TEXT("Failed To Create : CBody"));
 		Safe_Release(pInstance);
 	}
 	return pInstance;

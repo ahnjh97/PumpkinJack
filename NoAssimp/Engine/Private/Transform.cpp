@@ -201,7 +201,7 @@ CTransform * CTransform::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pC
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CTransform"));
+		MSG_BOX(TEXT("Failed To Create : CTransform"));
 
 		Safe_Release(pInstance);
 	}

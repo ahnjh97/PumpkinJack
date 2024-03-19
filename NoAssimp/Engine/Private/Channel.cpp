@@ -86,7 +86,7 @@ CChannel* CChannel::Create(const vector<class CBone*>& Bones, ifstream& fileStre
 
 	if (FAILED(pInstance->Initialize(Bones, fileStream)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CChannel"));
+		MSG_BOX(TEXT("Failed To Create : CChannel"));
 
 		Safe_Release(pInstance);
 	}

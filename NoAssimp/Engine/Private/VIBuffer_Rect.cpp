@@ -107,7 +107,7 @@ CVIBuffer_Rect * CVIBuffer_Rect::Create(ID3D11Device * pDevice, ID3D11DeviceCont
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CVIBuffer_Rect"));
+		MSG_BOX(TEXT("Failed To Create : CVIBuffer_Rect"));
 
 		Safe_Release(pInstance);
 	}

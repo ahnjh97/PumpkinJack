@@ -73,8 +73,8 @@ void CCamera_Jack::RevolveAroundPlayer()
 	_vector vCamLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
 	/*vCamLook = XMVectorSetY(vCamLook, 0.f);*/
 	vCamLook = XMVector3Normalize(vCamLook);
-	_vector vHeight = XMVectorSet(0, 5, 0, 0);
-	_vector vResult = XMLoadFloat3(&m_vPlayerPos) - (vCamLook * 35.f) + vHeight;
+	_vector vHeight = XMVectorSet(0, 10, 0, 0);
+	_vector vResult = XMLoadFloat3(&m_vPlayerPos) - (vCamLook * 40.f) + vHeight;
 	vResult = XMVectorSetW(vResult, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vResult); 
 }
@@ -85,7 +85,7 @@ CCamera_Jack* CCamera_Jack::Create(ID3D11Device* pDevice, ID3D11DeviceContext* p
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CCamera_Jack"));
+		MSG_BOX(TEXT("Failed To Create : CCamera_Jack"));
 
 		Safe_Release(pInstance);
 	}
@@ -100,7 +100,7 @@ CGameObject* CCamera_Jack::Clone(void* pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CCamera_Jack"));
+		MSG_BOX(TEXT("Failed To Create : CCamera_Jack"));
 
 		Safe_Release(pInstance);
 	}

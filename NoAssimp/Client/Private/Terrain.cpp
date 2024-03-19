@@ -126,7 +126,7 @@ CTerrain * CTerrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pConte
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CTerrain"));
+		MSG_BOX(TEXT("Failed To Create : CTerrain"));
 
 		Safe_Release(pInstance);
 	}
@@ -141,7 +141,7 @@ CGameObject * CTerrain::Clone(void * pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CTerrain"));
+		MSG_BOX(TEXT("Failed To Create : CTerrain"));
 
 		Safe_Release(pInstance);
 	}

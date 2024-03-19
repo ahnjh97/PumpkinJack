@@ -308,7 +308,7 @@ CVIBuffer_Terrain * CVIBuffer_Terrain::Create(ID3D11Device * pDevice, ID3D11Devi
 
 	if (FAILED(pInstance->Initialize_Prototype(strHeightMapFilePath)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CVIBuffer_Rect"));
+		MSG_BOX(TEXT("Failed To Create : CVIBuffer_Rect"));
 
 		Safe_Release(pInstance);
 	}
@@ -322,7 +322,7 @@ CVIBuffer_Terrain* CVIBuffer_Terrain::Create(ID3D11Device* pDevice, ID3D11Device
 
 	if (FAILED(pInstance->Initialize_Prototype(iX, iZ)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CVIBuffer_Rect"));
+		MSG_BOX(TEXT("Failed To Create : CVIBuffer_Rect"));
 
 		Safe_Release(pInstance);
 	}

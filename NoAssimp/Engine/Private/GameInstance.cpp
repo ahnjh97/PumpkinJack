@@ -79,6 +79,9 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 
 HRESULT CGameInstance::Initialize_ImGui(_uint iLevelIndex, CMyImGui* pImGui)
 {
+	if (m_pImGui_Manager != nullptr)
+		Safe_Release(m_pImGui_Manager);
+
 	m_pImGui_Manager = CImGui_Manager::Create(pImGui);
 
 	if (nullptr == m_pImGui_Manager)
@@ -527,10 +530,10 @@ void CGameInstance::Release_Engine()
 
 void CGameInstance::Free()
 {
+	Safe_Release(m_pImGui_Manager);
 	Safe_Release(m_pBlendState);
 	Safe_Release(m_pLight_Manager);
 	Safe_Release(m_pPicking);
-	Safe_Release(m_pImGui_Manager);
 	Safe_Release(m_pPipeLine);
 	Safe_Release(m_pTimer_Manager);
 	Safe_Release(m_pRenderer);	

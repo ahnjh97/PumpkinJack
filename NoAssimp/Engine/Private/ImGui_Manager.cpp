@@ -56,7 +56,7 @@ HRESULT CImGui_Manager::Render()
 
 HRESULT CImGui_Manager::Release_ImGui()
 {
-	Safe_Release<CMyImGui*>(m_pImGui);
+	Safe_Release(m_pImGui);
 
 	return S_OK;
 }
@@ -67,8 +67,8 @@ CImGui_Manager* CImGui_Manager::Create(CMyImGui* pImGui)
 
 	if (FAILED(pInstance->Initiailize(pImGui)))
 	{
-		MSG_BOX(TEXT("Failed to Created : IMGUI Manager"));
-		Safe_Release<CImGui_Manager*>(pInstance);
+		MSG_BOX(TEXT("Failed To Create : IMGUI Manager"));
+		Safe_Release(pInstance);
 	}
 
 	return pInstance;
@@ -76,7 +76,6 @@ CImGui_Manager* CImGui_Manager::Create(CMyImGui* pImGui)
 
 void CImGui_Manager::Free()
 {
+	Safe_Release(m_pImGui);
 	__super::Free();
-
-	Safe_Release<CMyImGui*>(m_pImGui);
 }

@@ -15,6 +15,8 @@
 #include "Tool_NonAnim.h"
 #include "Body.h"
 #include "Weapon.h"
+#include "SlimeBoss.h"
+#include "SlimeBoss_Slime.h"
 //#include "Effect.h"
 //#include "Sky.h"
 
@@ -259,26 +261,9 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 
 
 	m_strLoadingText = TEXT("객체를(을) 로딩 중 입니다.");
-	/* For.Prototype_GameObject_Terrain */
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Terrain"), CTerrain);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Jack"), CCamera_Jack);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Monster"), CMonster);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Player"), CPlayer);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Body"), CBody);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Spear"), CWeapon);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Rifle"), CWeapon);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Scythe"), CWeapon);
-	///* For.Prototype_GameObject_Effect */
-	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect"),
-	//	CEffect::Create(m_pGraphic_Device))))
-	//	return E_FAIL;
 
-	///* For.Prototype_GameObject_Sky */
-	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Sky"),
-	//	CSky::Create(m_pGraphic_Device))))
-	//	return E_FAIL;
-	//
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SlimeBoss"), CSlimeBoss);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_SlimeBoss_Slime"), CSlimeBoss_Slime);
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
 	m_isFinished = true;
@@ -359,7 +344,7 @@ HRESULT CLoader::Add_Texture(LEVEL eLevel, string strPrototypeName, string strFo
 	return S_OK;
 }
 
-void CLoader::Insert_ScaleRotationData() // Scale, Degree, NewScale, RootIndex
+void CLoader::Insert_ScaleRotationData() // Scale, Degaree, NewScale, RootIndex
 {
 	m_ModelConfigs.emplace("Ballista", MODEL_CONFIG{ 0.03f, 0.f, 2.6f });
 	m_ModelConfigs.emplace("Bat", MODEL_CONFIG{ 0.005f, 0.f, 0.5f, 4 });
@@ -373,7 +358,7 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degree, NewScale, RootIndex
 	m_ModelConfigs.emplace("Owl", MODEL_CONFIG{ 0.03f, 0.f, 1.f, 4 });
 	m_ModelConfigs.emplace("SkeletonBoss", MODEL_CONFIG{ 0.03f, 0.f, 2.6f, 3 });
 	m_ModelConfigs.emplace("Slime", MODEL_CONFIG{ 0.01f, 0.f, 1.f, 4 });
-	m_ModelConfigs.emplace("SlimeBoss", MODEL_CONFIG{ 0.01f, 0.f, 1.f, 4 });
+	m_ModelConfigs.emplace("SlimeBoss", MODEL_CONFIG{ 0.015f, 0.f, 1.5f, 4 });
 	m_ModelConfigs.emplace("Sniper", MODEL_CONFIG{ 0.025f, 0.f, 2.6f, 3 });
 	m_ModelConfigs.emplace("Soldier", MODEL_CONFIG{ 0.025f, 0.f, 2.6f, 5 });
 	m_ModelConfigs.emplace("Trabuchet", MODEL_CONFIG{ 0.03f, 0.f, 2.6f, 2 });
@@ -392,7 +377,9 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degree, NewScale, RootIndex
 
 	m_ModelConfigs.emplace("Rifle", MODEL_CONFIG{ 3.f, 0.f, 3.f });
 	m_ModelConfigs.emplace("Scythe", MODEL_CONFIG{ 0.3f, 0.f, 0.3f });
-	m_ModelConfigs.emplace("Spear", MODEL_CONFIG{ 7.f, 0.f, 7.f });
+	m_ModelConfigs.emplace("Spear", MODEL_CONFIG{ 6.4f, 0.f, 6.4f });
+
+	m_ModelConfigs.emplace("Part_SlimeBoss", MODEL_CONFIG{ 0.015f, 0.f, 1.5f, 4 });
 }
 
 void CLoader::TraverseAnimModels(LEVEL eLevel, const wstring& rootFolderPath)
@@ -500,7 +487,7 @@ CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, L
 
 	if (FAILED(pInstance->Initialize(eNextLevelID)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CLoader"));
+		MSG_BOX(TEXT("Failed To Create : CLoader"));
 
 		Safe_Release(pInstance);
 	}

@@ -8,9 +8,31 @@ namespace Client
 	enum LEVEL { LEVEL_STATIC, LEVEL_LOADING, LEVEL_LOGO, LEVEL_MAPTOOL, 
 		LEVEL_GAMEPLAY, LEVEL_GAMEPLAY2, LEVEL_GAMEPLAY3, LEVEL_SLIMEBOSS, LEVEL_END };
     enum STATE { IDLE, RUN, JUMP, ROLL, ATTACK1, ATTACK2, ATTACK3, AIR_ATTACK, AIR_ATTACK_END, ROLL_ATTACK, PLAYER_END };
+	enum SLIMEBOSS { SLIMEBOSS_IDLE, SLIMEBOSS_END};
     enum WEAPON { WPN_SPEAR, WPN_RIFLE, WPN_SCYTHE, WPN_END };
 	const unsigned int	g_iWinSizeX = 1280;
 	const unsigned int	g_iWinSizeY = 720;
+
+    typedef struct
+    {
+		STATE eState = { PLAYER_END };
+		STATE ePreState = { IDLE };
+		WEAPON eWeapon = { };
+		
+		_bool bIsJumping = { false };
+		_bool bIsAttacking = { false };
+		_bool bIsRolling = { false };
+		_bool bAtkPreInput = { false };
+		_bool bRollPreInput = { false };
+		_bool bJumpPreInput = { false };
+
+		_uint iLastAttack = { 3 };
+
+		_float fTempJumpTime = { 0.f };
+		_float fRollEndTime = { 0.f };
+
+		_float3	vDirection = {};
+    }INFO;
 }
 
 

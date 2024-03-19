@@ -56,8 +56,12 @@ void CImGui_Client::Settings(_float fTimeDelta)
 
 	if (m_pPlayer == nullptr)
 	{
+		if (m_pGameInstance->Get_CurrentLevelID() < LEVEL_GAMEPLAY || m_pGameInstance->Get_CurrentLevelID() > LEVEL_SLIMEBOSS)
+			return;
+
 		m_pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), TEXT("Prototype_GameObject_Player")));
-		Safe_AddRef(m_pPlayer);
+		if(m_pPlayer != nullptr)
+			Safe_AddRef(m_pPlayer);
 	}
 }
 
@@ -101,7 +105,6 @@ void CImGui_Client::ConvertToString()
 	ImGui::Text(strWeapon.c_str());
 	ImGui::Text(strAttack.c_str());
 	ImGui::Text(strIsJumping.c_str());
-
 }
 
 CImGui_Client* CImGui_Client::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -110,8 +113,8 @@ CImGui_Client* CImGui_Client::Create(ID3D11Device* pDevice, ID3D11DeviceContext*
 
 	if (FAILED(pInstance->Initialize()))
 	{
-		MSG_BOX(TEXT("Failed to Created : CImGui_Client"));
-		Safe_Release<CImGui_Client*>(pInstance);
+		MSG_BOX(TEXT("Failed To Create : CImGui_Client"));
+		Safe_Release(pInstance);
 	}
 
 	return pInstance;

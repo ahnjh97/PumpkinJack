@@ -98,7 +98,7 @@ CInput_Device * CInput_Device::Create(HINSTANCE hInst, HWND hWnd)
 
 	if (FAILED(pInstance->Initialize(hInst, hWnd)))
 	{
-		MSG_BOX(TEXT("Failed to Created : CInput_Device"));
+		MSG_BOX(TEXT("Failed To Create : CInput_Device"));
 		Safe_Release(pInstance);
 	}
 

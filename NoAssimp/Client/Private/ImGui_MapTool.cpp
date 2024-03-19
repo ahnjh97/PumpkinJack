@@ -453,8 +453,8 @@ CImGui_MapTool* CImGui_MapTool::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 
 	if (FAILED(pInstance->Initialize()))
 	{
-		MSG_BOX(TEXT("Failed to Created : CImGui_MapTool"));
-		Safe_Release<CImGui_MapTool*>(pInstance);
+		MSG_BOX(TEXT("Failed To Create : CImGui_MapTool"));
+		Safe_Release(pInstance);
 	}
 
 	return pInstance;

@@ -219,7 +219,7 @@ CGraphic_Device * CGraphic_Device::Create(const ENGINE_DESC& EngineDesc, ID3D11D
 
 	if (FAILED(pInstance->Ready_Graphic_Device(EngineDesc, ppDevice, ppDeviceContextOut)))
 	{
-		MSG_BOX(TEXT("Failed to Created : CGraphic_Device"));
+		MSG_BOX(TEXT("Failed To Create : CGraphic_Device"));
 		Safe_Release(pInstance);
 	}
 

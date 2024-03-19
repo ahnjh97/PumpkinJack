@@ -65,7 +65,7 @@ CPicking* CPicking::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,
 
 	if (FAILED(pInstance->Initialize(hWnd, iWinSizeX, iWinSizeY)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CPicking"));
+		MSG_BOX(TEXT("Failed To Create : CPicking"));
 
 		Safe_Release(pInstance);
 	}

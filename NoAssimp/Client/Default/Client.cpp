@@ -72,7 +72,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				break;
             if (WM_MOUSEMOVE == msg.message)
             {
-                if (pGameInstance->Get_CurrentLevelID() == LEVEL_GAMEPLAY)
+                if (pGameInstance->Get_CurrentLevelID() >= LEVEL_GAMEPLAY || pGameInstance->Get_CurrentLevelID() <= LEVEL_SLIMEBOSS)
                 {
                     RECT rect;
                     GetClientRect(msg.hwnd, &rect); // hwnd는 윈도우 핸들입니다.

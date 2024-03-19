@@ -36,7 +36,7 @@ HRESULT CWeapon::Initialize(void* pArg)
 	
 	if (m_pModelCom->Get_ModelName() == "Spear")
 	{
-		m_pTransformCom->Rotation(XMVectorSet(0, 0, 1, 0), -XM_PIDIV2 + 0.15f);
+		m_pTransformCom->Rotation(XMVectorSet(0, 0, 1, 0), -XM_PIDIV2 + 0.1f);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0, 0, 0, 1));
 	}
 		
@@ -158,7 +158,7 @@ CWeapon* CWeapon::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CWeapon"));
+		MSG_BOX(TEXT("Failed To Create : CWeapon"));
 
 		Safe_Release(pInstance);
 	}
@@ -172,7 +172,7 @@ CGameObject* CWeapon::Clone(void* pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CWeapon"));
+		MSG_BOX(TEXT("Failed To Create : CWeapon"));
 
 		Safe_Release(pInstance);
 	}

@@ -70,7 +70,7 @@ CLevel_Logo * CLevel_Logo::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pC
 
 	if (FAILED(pInstance->Initialize()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CLevel_Logo"));
+		MSG_BOX(TEXT("Failed To Create : CLevel_Logo"));
 
 		Safe_Release(pInstance);
 	}

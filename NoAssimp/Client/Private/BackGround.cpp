@@ -74,7 +74,7 @@ void CBackGround::Tick(_float fTimeDelta)
 void CBackGround::Late_Tick(_float fTimeDelta)
 {
 	m_fTime += fTimeDelta;
-	float currentSpeed = 1.f / (log(m_fTime + 1) * 1.f + 1) / 30;
+	float currentSpeed = 0.5f / (log(m_fTime + 1) * 1.f + 1) / 30;
 	if (m_fZ == fZ_Jack)
 		m_pTransformCom->Go_Right(currentSpeed);
 	else if (m_fZ == fZ_GameLogo)
@@ -188,7 +188,7 @@ CBackGround* CBackGround::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CBackGround"));
+		MSG_BOX(TEXT("Failed To Create : CBackGround"));
 
 		Safe_Release(pInstance);
 	}
@@ -202,7 +202,7 @@ CGameObject * CBackGround::Clone(void * pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CBackGround"));
+		MSG_BOX(TEXT("Failed To Create : CBackGround"));
 
 		Safe_Release(pInstance);
 	}

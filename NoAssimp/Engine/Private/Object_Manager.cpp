@@ -354,7 +354,7 @@ CObject_Manager * CObject_Manager::Create(_uint iNumLevels)
 
 	if (FAILED(pInstance->Initialize(iNumLevels)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CObject_Manager"));
+		MSG_BOX(TEXT("Failed To Create : CObject_Manager"));
 
 		Safe_Release(pInstance);
 	}

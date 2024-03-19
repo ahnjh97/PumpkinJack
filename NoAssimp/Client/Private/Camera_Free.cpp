@@ -95,7 +95,7 @@ CCamera_Free * CCamera_Free::Create(ID3D11Device * pDevice, ID3D11DeviceContext 
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CCamera_Free"));
+		MSG_BOX(TEXT("Failed To Create : CCamera_Free"));
 
 		Safe_Release(pInstance);
 	}
@@ -110,7 +110,7 @@ CGameObject * CCamera_Free::Clone(void * pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CCamera_Free"));
+		MSG_BOX(TEXT("Failed To Create : CCamera_Free"));
 
 		Safe_Release(pInstance);
 	}

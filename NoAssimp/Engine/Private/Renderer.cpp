@@ -113,7 +113,7 @@ CRenderer * CRenderer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pConte
 
 	if (FAILED(pInstance->Initialize()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CRenderer"));
+		MSG_BOX(TEXT("Failed To Create : CRenderer"));
 
 		Safe_Release(pInstance);
 	}

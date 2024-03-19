@@ -17,7 +17,7 @@ CLight* CLight::Create(const LIGHT_DESC& LightDesc)
 
 	if (FAILED(pInstance->Initialize(LightDesc)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CLight"));
+		MSG_BOX(TEXT("Failed To Create : CLight"));
 
 		Safe_Release(pInstance);
 	}

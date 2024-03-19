@@ -207,7 +207,7 @@ CLevel_GamePlay * CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceCon
 
 	if (FAILED(pInstance->Initialize()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CLevel_GamePlay"));
+		MSG_BOX(TEXT("Failed To Create : CLevel_GamePlay"));
 
 		Safe_Release(pInstance);
 	}
@@ -217,6 +217,6 @@ CLevel_GamePlay * CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceCon
 
 void CLevel_GamePlay::Free()
 {
-	__super::Free();
 	m_pGameInstance->Release_ImGui();
+	__super::Free();
 }

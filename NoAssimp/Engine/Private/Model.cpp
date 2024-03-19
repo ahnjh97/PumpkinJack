@@ -221,7 +221,7 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 
 	else // Anim간 선형보간
 	{
-		_float fLerpTime = 0.2f;
+		_float fLerpTime = 0.08f;
 		m_fLerpRatio += fTimeDelta / fLerpTime;
 
 		if (m_fLerpRatio < 1.f)
@@ -405,7 +405,7 @@ CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYP
 
 	if (FAILED(pInstance->Initialize_Prototype(eType, strModelName, TransformMatrix, tConfig, bNonAnimVersion)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CModel"));
+		MSG_BOX(TEXT("Failed To Create : CModel"));
 
 		Safe_Release(pInstance);
 	}

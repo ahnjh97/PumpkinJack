@@ -138,7 +138,7 @@ CGrid* CGrid::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CGrid"));
+		MSG_BOX(TEXT("Failed To Create : CGrid"));
 
 		Safe_Release(pInstance);
 	}
@@ -153,7 +153,7 @@ CGameObject* CGrid::Clone(void* pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CGrid"));
+		MSG_BOX(TEXT("Failed To Create : CGrid"));
 
 		Safe_Release(pInstance);
 	}

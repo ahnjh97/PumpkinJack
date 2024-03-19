@@ -248,7 +248,7 @@ CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE 
 
 	if (FAILED(pInstance->Initialize_Prototype(eModelType, strDirectory, filePtPos, Bones, TransformMatrix)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CMesh"));
+		MSG_BOX(TEXT("Failed To Create : CMesh"));
 
 		Safe_Release(pInstance);
 	}

@@ -63,7 +63,7 @@ CLayer * CLayer::Create()
 
 	if (FAILED(pInstance->Initialize()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CLayer"));
+		MSG_BOX(TEXT("Failed To Create : CLayer"));
 
 		Safe_Release(pInstance);
 	}

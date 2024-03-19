@@ -70,6 +70,18 @@
     <Filter Include="01.Levels\SlimeBoss">
       <UniqueIdentifier>{94e6e0d5-20a5-469f-9fc1-b657d034cb3a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\SlimeBoss">
+      <UniqueIdentifier>{4aa7cc76-a207-452b-b071-fee6bb68994c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Slime">
+      <UniqueIdentifier>{648a160a-7c63-49a0-b820-4ba862557ace}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Slime\Part_Slime">
+      <UniqueIdentifier>{36a44a1c-3991-4319-977a-dddd21ee109c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\SlimeBoss\Part_SlimeBoss">
+      <UniqueIdentifier>{4bd183c5-abbb-4768-8e59-0bce6d955da6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -150,6 +162,18 @@
     <ClInclude Include="..\Public\Level_SlimeBoss.h">
       <Filter>01.Levels\SlimeBoss</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SlimeBoss.h">
+      <Filter>02.GameObjects\SlimeBoss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Slime.h">
+      <Filter>02.GameObjects\Slime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SlimeBoss_Slime.h">
+      <Filter>02.GameObjects\SlimeBoss\Part_SlimeBoss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Slime_Slime.h">
+      <Filter>02.GameObjects\Slime\Part_Slime</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -220,6 +244,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_SlimeBoss.cpp">
       <Filter>01.Levels\SlimeBoss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SlimeBoss.cpp">
+      <Filter>02.GameObjects\SlimeBoss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Slime.cpp">
+      <Filter>02.GameObjects\Slime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SlimeBoss_Slime.cpp">
+      <Filter>02.GameObjects\SlimeBoss\Part_SlimeBoss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Slime_Slime.cpp">
+      <Filter>02.GameObjects\Slime\Part_Slime</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
