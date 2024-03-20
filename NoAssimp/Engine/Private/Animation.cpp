@@ -48,13 +48,12 @@ void CAnimation::Update_TransformationMatrix(_float fTimeDelta, const vector<cla
 		if (false == isLoop)
 		{
 			m_isFinished = true;
-			/*for (_uint i = 0; i < m_iNumChannels; ++i)
-			{
+			for (_uint i = 0; i < m_iNumChannels; ++i)
 				m_Channels[i]->Update_TransformationMatrix(Bones, m_fTrackPosition, &m_CurrentKeyFrameIndices[i]);
-			}*/
 			return;
 		}
 		m_fTrackPosition = 0.f;
+		m_iPlayCount++;
 	}
 
 	for (_uint i = 0; i < m_iNumChannels; ++i)

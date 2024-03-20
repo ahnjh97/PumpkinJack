@@ -28,18 +28,22 @@ HRESULT CSlimeBoss_Slime::Initialize(void* pArg)
 	if (FAILED(Add_Components(LEVEL(pSlimeBossDesc->iLevel), pSlimeBossDesc->wstrModelTag)))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(0, true);
-
+	m_pModelCom->Set_Animation(SLIMEBOSS_SPAWN, false);
+	m_pModelCom->Set_LerpTime(0.2f);
 	return S_OK;
 }
 
 void CSlimeBoss_Slime::Tick(_float fTimeDelta)
 {
+	if (*m_pState == SLIMEBOSS_DEATH)
+		m_pModelCom->Shrink();
+	if (m_pModelCom->Get_Shrinked())
+		Set_Dead();
+	StateToAnimation();
 }
 
 void CSlimeBoss_Slime::Late_Tick(_float fTimeDelta)
 {
-
 	m_pModelCom->Play_Animation(fTimeDelta);
 	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * XMLoadFloat4x4(m_pParentMatrix));
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
@@ -47,6 +51,9 @@ void CSlimeBoss_Slime::Late_Tick(_float fTimeDelta)
 
 HRESULT CSlimeBoss_Slime::Render()
 {
+	_float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	m_pContext->OMSetBlendState(m_pGameInstance->Get_BlendState(), blendFactor, 0xffffffff);
+
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -54,11 +61,10 @@ HRESULT CSlimeBoss_Slime::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
-		if (m_pModelCom->Get_ModelType() == TYPE_NONANIM)
-			m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", i, aiTextureType_DIFFUSE);
-		if (m_pModelCom->Get_ModelType() == TYPE_ANIM)
-			m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE);
-
+		if(FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE)))
+			return E_FAIL;
+		if (FAILED(m_pTextureCom->Bind_ShaderResources(m_pShaderCom, "g_EmitTexture")))
+			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
@@ -72,20 +78,29 @@ HRESULT CSlimeBoss_Slime::Render()
 	return S_OK;
 }
 
+void CSlimeBoss_Slime::StateToAnimation()
+{
+	_bool bLoop = true;
+	_uint iIndex = *m_pState;
+	if (*m_pState == SLIMEBOSS_SPAWN || *m_pState == SLIMEBOSS_INVOKE_BEGIN || *m_pState == SLIMEBOSS_DEATH || *m_pState == SLIMEBOSS_FORK
+		|| *m_pState == SLIMEBOSS_PILLAR_SPAWN || *m_pState == SLIMEBOSS_MEGASPAWN)
+		bLoop = false;
+	m_pModelCom->Change_Animation_ByIndex(iIndex, bLoop);
+}
+
 HRESULT CSlimeBoss_Slime::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 {
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_SlimeBoss_Emit"),
+		TEXT("Com_Texture_Emit"), (CComponent**)&m_pTextureCom)))
+		return E_FAIL;
+
 	/* For.Com_Model */
 	wstring wstrModelTag = _wstrModelTag;
 	if (FAILED(__super::Add_Component(eLevel, wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
-	wstring wstrShaderTag = {};
-	if (m_pModelCom->Get_ModelType() == TYPE_ANIM)
-		wstrShaderTag = TEXT("Prototype_Component_Shader_VtxAnimModel");
-	else
-		wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel");
-
-	if (FAILED(__super::Add_Component(eLevel, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxAnimModel_Slime");
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	return S_OK;
@@ -95,10 +110,6 @@ HRESULT CSlimeBoss_Slime::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
-
-	if (nullptr == m_pShaderCom)
-		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
@@ -160,4 +171,5 @@ void CSlimeBoss_Slime::Free()
 
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
+	Safe_Release(m_pTextureCom);
 }

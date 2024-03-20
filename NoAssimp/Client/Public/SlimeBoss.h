@@ -25,17 +25,29 @@ public:
 	virtual HRESULT Render() override;
 
 private:
+	void Link_Animation(_float fTimeDelta);
+	void StateToAnimation();
+	void TurnTowards_Player(_float fTimeDelta);
+
+private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
-
-	SLIMEBOSS m_eState = { SLIMEBOSS_END };
-
 	map<const wstring, CPart*> m_Parts;
+	class CPlayer* m_pPlayer = { nullptr };
+
+	SLIMEBOSS m_eState = { SLIMEBOSS_SPAWN };
+	_bool m_bSpawn = { false };
+	_int m_iHp = { 100 };
+	_int m_iCurPattern = { -1};
+	_int m_iLightningCount = {};
+	_float4 m_vLightningPos = {};
+
+	vector<SLIMEBOSS> m_vecSlimeBossPattern = { SLIMEBOSS_FORK, SLIMEBOSS_INVOKE_BEGIN, SLIMEBOSS_INVOKE
+		, SLIMEBOSS_FORK, SLIMEBOSS_LIGHTNING, SLIMEBOSS_FORK, SLIMEBOSS_PILLAR_SPAWN, SLIMEBOSS_IDLE, SLIMEBOSS_MEGASPAWN };
 
 private:
 	HRESULT Add_Components(LEVEL eLevel, const wstring& _wstrModelTag);
 	HRESULT Bind_ShaderResources();
-
 	HRESULT Add_PartObjects(LEVEL eLevel);
 
 public:

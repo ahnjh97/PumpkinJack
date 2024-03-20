@@ -16,7 +16,7 @@ private:
 	virtual ~CLevel_Manager() = default;
 
 public:
-	_uint Get_CurrentLevelID() { return m_iNewLevelID; }
+	_uint* Get_CurrentLevelID() { return &m_iNewLevelID; }
 
 public:
 	HRESULT Initialize();

@@ -51,7 +51,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 	if (pArg)
 		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
 
-	GameObjectDesc.fSpeedPerSec = 25.f;
+	GameObjectDesc.fSpeedPerSec = 32.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
@@ -78,7 +78,7 @@ void CPlayer::Tick(_float fTimeDelta)
 		
 	if (m_pCamera == nullptr)
 	{
-		m_pCamera = dynamic_cast<CCamera_Jack*>(m_pGameInstance->Get_GameObject(m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Jack")));
+		m_pCamera = dynamic_cast<CCamera_Jack*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Jack")));
 		Safe_AddRef(m_pCamera);
 	}
 

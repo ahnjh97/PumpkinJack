@@ -29,10 +29,11 @@ HRESULT CCamera_Jack::Initialize(void* pArg)
 	if (nullptr == pArg)
 		return E_FAIL;
 
-	CAMERA_DESC* pCameraDesc = (CAMERA_DESC*)pArg;
+	CAMERA_JACK_DESC* pCameraDesc = (CAMERA_JACK_DESC*)pArg;
 
 	m_fMouseSensor = pCameraDesc->fMouseSensor;
-
+	m_fDistance = pCameraDesc->fDistance;
+	m_fHeight = pCameraDesc->fHeight;
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
@@ -73,8 +74,8 @@ void CCamera_Jack::RevolveAroundPlayer()
 	_vector vCamLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
 	/*vCamLook = XMVectorSetY(vCamLook, 0.f);*/
 	vCamLook = XMVector3Normalize(vCamLook);
-	_vector vHeight = XMVectorSet(0, 10, 0, 0);
-	_vector vResult = XMLoadFloat3(&m_vPlayerPos) - (vCamLook * 40.f) + vHeight;
+	_vector vHeight = XMVectorSet(0, m_fHeight, 0, 0);
+	_vector vResult = XMLoadFloat3(&m_vPlayerPos) - (vCamLook * m_fDistance) + vHeight;
 	vResult = XMVectorSetW(vResult, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vResult); 
 }

@@ -121,6 +121,14 @@ void CTransform::Move(_float fTimeDelta, _fvector vTargetDir)
 	Set_State(STATE_POSITION, vPosition);
 }
 
+void CTransform::Fall(_float fTimeDelta)
+{
+	_vector vDir = XMVectorSet(0, -1, 0, 0);
+	_vector		vPosition = Get_State_Vector(STATE_POSITION);
+	vPosition += XMVector3Normalize(vDir) * m_fSpeedPerSec * fTimeDelta;
+	Set_State(STATE_POSITION, vPosition);
+}
+
 void CTransform::Look_At(_fvector vAt)
 {
 	_vector		vLook = vAt - Get_State_Vector(STATE_POSITION);

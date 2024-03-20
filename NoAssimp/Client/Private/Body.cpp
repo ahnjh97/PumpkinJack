@@ -34,7 +34,7 @@ HRESULT CBody::Initialize(void* pArg)
 	if (FAILED(Add_Components(LEVEL(BodyDesc.iLevel), BodyDesc.wstrModelTag)))
 		return E_FAIL;
 
-	if(m_pModelCom!=nullptr)
+	if(m_pModelCom != nullptr)
 		Initialize_AnimSpeed();
 	
 	m_pModelCom->Set_Animation(m_pModelCom->Get_AnimIndex("Spear_Idle"), true);
@@ -175,12 +175,7 @@ HRESULT CBody::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 	if (FAILED(__super::Add_Component(eLevel, wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
-	wstring wstrShaderTag = {};
-	if (m_pModelCom->Get_ModelType() == TYPE_ANIM)
-		wstrShaderTag = TEXT("Prototype_Component_Shader_VtxAnimModel");
-	else
-		wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel");
-
+	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxAnimModel");
 	if (FAILED(__super::Add_Component(eLevel, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 

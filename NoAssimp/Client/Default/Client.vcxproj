@@ -170,6 +170,7 @@
     <ClInclude Include="..\Public\Grid.h" />
     <ClInclude Include="..\Public\ImGui_Client.h" />
     <ClInclude Include="..\Public\ImGui_MapTool.h" />
+    <ClInclude Include="..\Public\Knife.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
@@ -201,6 +202,7 @@
     <ClCompile Include="..\Private\Grid.cpp" />
     <ClCompile Include="..\Private\ImGui_Client.cpp" />
     <ClCompile Include="..\Private\ImGui_MapTool.cpp" />
+    <ClCompile Include="..\Private\Knife.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
@@ -236,6 +238,7 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel_Slime.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl" />

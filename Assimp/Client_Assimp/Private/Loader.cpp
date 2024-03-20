@@ -228,7 +228,7 @@ void CLoader::TraverseAnimModels(const wstring& rootFolderPath)
 				_bool bExist = { false };
 				for (auto txt : txtList)
 				{
-					if (txt.find(temp) != wstring::npos)
+					if (txt.erase(txt.size() - 4) == temp)
 					{
 						bExist = true;
 						break;
@@ -268,7 +268,7 @@ void CLoader::TraverseNonAnimModels(const wstring& rootFolderPath)
 				_bool bExist = { false };
 				for (auto Animtxt : AnimtxtList)
 				{
-					if (Animtxt.find(temp) != wstring::npos)
+					if (Animtxt.erase(Animtxt.size() - 4) == temp)
 					{
 						bNonAnimVersion = true;
 						break;
@@ -280,7 +280,7 @@ void CLoader::TraverseNonAnimModels(const wstring& rootFolderPath)
 
 				for (auto txt : txtList)
 				{
-					if(txt.find(temp) != wstring::npos)
+					if(txt.erase(txt.size() - 4) == temp)
 					{
 						bExist = true;
 						break;

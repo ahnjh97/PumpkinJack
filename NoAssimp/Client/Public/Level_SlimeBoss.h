@@ -25,6 +25,7 @@ private:
 
 private:
 	ifstream m_InputFile;
+	_bool m_bPressed = { false };
 
 public:
 	static CLevel_SlimeBoss* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

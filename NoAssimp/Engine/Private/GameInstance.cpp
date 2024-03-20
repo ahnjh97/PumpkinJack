@@ -122,7 +122,7 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 	/* 반복적인 갱신이 필요한 객체들의 Tick함수를 호출한다. */
 	m_pLevel_Manager->Tick(fTimeDelta);
 
-	if ((Get_CurrentLevelID() != Level_MapTool) && (Get_DIKeyState(DIK_ESCAPE) & 0x80))
+	if ((*Get_CurrentLevelID() != Level_MapTool) && (Get_DIKeyState(DIK_ESCAPE) & 0x80))
 		PostQuitMessage(0);
 
 	if (m_pImGui_Manager)
@@ -246,10 +246,10 @@ HRESULT CGameInstance::Open_Level(_uint iNewLevelID, CLevel * pNewLevel)
 	return m_pLevel_Manager->Open_Level(iNewLevelID, pNewLevel);
 }
 
-_uint CGameInstance::Get_CurrentLevelID()
+_uint* CGameInstance::Get_CurrentLevelID()
 {
 	if (nullptr == m_pLevel_Manager)
-		return E_FAIL;
+		return nullptr;
 
 	return m_pLevel_Manager->Get_CurrentLevelID();
 }
@@ -530,16 +530,16 @@ void CGameInstance::Release_Engine()
 
 void CGameInstance::Free()
 {
-	Safe_Release(m_pImGui_Manager);
 	Safe_Release(m_pBlendState);
 	Safe_Release(m_pLight_Manager);
 	Safe_Release(m_pPicking);
 	Safe_Release(m_pPipeLine);
 	Safe_Release(m_pTimer_Manager);
 	Safe_Release(m_pRenderer);	
-	Safe_Release(m_pObject_Manager);
 	Safe_Release(m_pComponent_Manager);
+	Safe_Release(m_pObject_Manager);
 	Safe_Release(m_pLevel_Manager);
+	Safe_Release(m_pImGui_Manager);
 	Safe_Release(m_pInput_Device);
 	Safe_Release(m_pGraphic_Device);
 }

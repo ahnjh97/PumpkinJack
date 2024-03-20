@@ -29,8 +29,7 @@ HRESULT CTool_Anim::Initialize(void* pArg)
 		return E_FAIL;
 	if (FAILED(Add_Components(GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
-
-
+	m_iLevel = GameObjectDesc.iLevel;
 	return S_OK;
 }
 

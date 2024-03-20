@@ -27,6 +27,11 @@ public:
 	class CBone* Get_BonePtr(const _char* pBoneName) const;
 	_int Get_AnimIndex(const string& strAnimName);
 	_bool Get_IsLerping() { return m_bIsLerping; }
+	_uint Get_AnimPlayCount(_uint iAnimIndex) { return m_Animations[iAnimIndex]->Get_PlayCount(); }
+	_float Get_AnimPlayRatio(_uint iAnimIndex) { return m_Animations[iAnimIndex]->Get_PlayRatio(); }
+	_bool Get_Shrinked() {
+		if (abs(m_vOriginalScale.x / m_vScale.x) > 33.f) { return true; }
+	else { return false; }}
 
 	void Set_Animation(_uint iAnimIndex, _bool isLoop) {
 		if (m_bIsNonAnimVersion) return;
@@ -40,6 +45,9 @@ public:
 	void Set_AnimSpeed(_uint iAnimIndex, _float fCoefficient) { m_Animations[iAnimIndex]->Set_Coefficient(fCoefficient); }
 	void Save_FinalKeyFrames();
 	void Rotate_NonAnimVersion();
+	void Reset_AnimPlayCount(_uint iAnimIndex) { m_Animations[iAnimIndex]->Reset_PlayCount(); }
+	void Set_LerpTime(_float fLerpTime) { m_fLerpTime = fLerpTime; }
+	void Shrink();
 
 public: // 바운딩박스
 	_bool Check_BoundingBox(const class CTransform* pTransform) const;
@@ -56,7 +64,8 @@ public:
 	HRESULT Render(_uint iMeshIndex);
 
 public:
-	void Change_Animation(string& strAnimName, _bool isLoop);
+	void Change_Animation(string& strAnimName, _bool isLoop, _bool bLerp = true);
+	void Change_Animation_ByIndex(_uint iAnimIndex, _bool isLoop, _bool bLerp = true);
 
 private:
 	TYPE						m_eModelType = { TYPE_END };
@@ -71,6 +80,7 @@ private:
 	_float4x4					m_TransformMatrix;
 	_float3						m_vRootTranslation = {};
 	_float3						m_vHandTranslation = {};
+	_float4						m_vOriginalScale = {};
 	_float4						m_vScale = {};
 	_float4						m_vRotation = {};
 	MODEL_CONFIG				m_tConfig = {};
@@ -85,6 +95,8 @@ private:
 	_float						m_fLerpRatio = {};
 	_bool						m_bIsLerping = { false };
 	vector<KEYFRAME>			m_FinalKeyFrames;
+	_float						m_fLerpTime = { 0.08f };
+
 
 	// 파일입출력 변수
 	string						m_strDirectory;

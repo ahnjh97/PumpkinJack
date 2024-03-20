@@ -38,10 +38,10 @@ HRESULT CLifeBar::Initialize(void* pArg)
 	m_fY = g_iWinSizeY * 0.5f;
 	if (m_fZ == fZ_LifeBarMask)
 	{
-		m_fSizeX = 360;
-		m_fSizeY = 70;
+		m_fSizeX = 320;
+		m_fSizeY = 55;
 		m_fX -= 430;
-		m_fY += 300;
+		m_fY += 290;
 	}
 	//else if (m_fZ == fZ_LifeBar)
 	//{
@@ -51,10 +51,10 @@ HRESULT CLifeBar::Initialize(void* pArg)
 	//}
 	else if (m_fZ == fZ_CrowLifeBar)
 	{
-		m_fSizeX = 360;
-		m_fSizeY = 125;
-		m_fX -= 426.5f;
-		m_fY += 258.f;
+		m_fSizeX = 323.5f;
+		m_fSizeY = 100;
+		m_fX -= 426.8f;
+		m_fY += 256.f;
 	}
 
 	m_pTransformCom->Set_Scaled(m_fSizeX, m_fSizeY, 1.f);

@@ -55,7 +55,7 @@ void CCamera_Free::Tick(_float fTimeDelta)
 
 	
 	_long	MouseMove = { 0 };
-	if (m_pGameInstance->Get_CurrentLevelID() == LEVEL_MAPTOOL)
+	if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_MAPTOOL)
 	{
 		if ((m_pGameInstance->Get_DIMouseState(DIMKS_WHEEL) & 0x80) && !ImGuizmo::IsOver()) // 좌클릭 중인경우 && 기즈모를 클릭중이지 않은경우
 		{

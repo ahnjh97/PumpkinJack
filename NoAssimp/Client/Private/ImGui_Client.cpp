@@ -56,10 +56,10 @@ void CImGui_Client::Settings(_float fTimeDelta)
 
 	if (m_pPlayer == nullptr)
 	{
-		if (m_pGameInstance->Get_CurrentLevelID() < LEVEL_GAMEPLAY || m_pGameInstance->Get_CurrentLevelID() > LEVEL_SLIMEBOSS)
+		if (*m_pGameInstance->Get_CurrentLevelID() < LEVEL_GAMEPLAY || *m_pGameInstance->Get_CurrentLevelID() > LEVEL_SLIMEBOSS)
 			return;
 
-		m_pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), TEXT("Prototype_GameObject_Player")));
+		m_pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), TEXT("Prototype_GameObject_Player")));
 		if(m_pPlayer != nullptr)
 			Safe_AddRef(m_pPlayer);
 	}

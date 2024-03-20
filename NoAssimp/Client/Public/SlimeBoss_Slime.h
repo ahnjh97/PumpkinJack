@@ -4,6 +4,7 @@
 
 BEGIN(Engine)
 class CModel;
+class CTexture;
 class CShader;
 END
 
@@ -29,9 +30,14 @@ public:
 	virtual HRESULT Render() override;
 
 private:
+	void StateToAnimation();
+
+private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
-	const SLIMEBOSS* m_pState = { nullptr };
+	CTexture* m_pTextureCom = { nullptr }; // Emit ÅØ½ºÃÄ
+	const SLIMEBOSS* m_pState = { };
+	_bool m_bSpawn = { false };
 
 private:
 	HRESULT Add_Components(LEVEL eLevel, const wstring& _wstrModelTag);

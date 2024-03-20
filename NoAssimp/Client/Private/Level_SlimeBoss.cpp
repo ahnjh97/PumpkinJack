@@ -48,6 +48,22 @@ HRESULT CLevel_SlimeBoss::Initialize()
 void CLevel_SlimeBoss::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
+	if (m_pGameInstance->KeyDown(DIK_F) && !m_bPressed)
+	{
+		m_bPressed = true;
+		CGameObject* pNotOpen = m_pGameInstance->Get_GameObject(LEVEL_SLIMEBOSS, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Monster"));
+		pNotOpen->Set_Dead();
+		CGameObject::GAMEOBJECT_DESC tempDesc = {};
+		PARSE_DATA tParseData = pNotOpen->Get_ParseData();
+		tempDesc.matWorld._41 = tParseData.matWorld._41;
+		tempDesc.matWorld._42 = tParseData.matWorld._42;
+		tempDesc.matWorld._43 = tParseData.matWorld._43;
+		tempDesc.iLevel = LEVEL_SLIMEBOSS;
+		tempDesc.wstrModelTag = TEXT("Prototype_Component_Model_SlimeBoss");
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_SlimeBoss"), TEXT("Prototype_GameObject_SlimeBoss"), &tempDesc)))
+			return;
+	}
+		
 }
 
 HRESULT CLevel_SlimeBoss::Render()
@@ -83,7 +99,7 @@ HRESULT CLevel_SlimeBoss::Ready_Lights()
 
 HRESULT CLevel_SlimeBoss::Ready_Layer_Camera(const wstring& strLayerTag)
 {
-	CCamera_Jack::CAMERA_DESC		CameraDesc{};
+	CCamera_Jack::CAMERA_JACK_DESC		CameraDesc{};
 
 	CameraDesc.fMouseSensor = 0.1f;
 	CameraDesc.fFovy = XMConvertToRadians(60.0f);
@@ -94,6 +110,9 @@ HRESULT CLevel_SlimeBoss::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 	CameraDesc.fSpeedPerSec = 20.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+
+	CameraDesc.fDistance = 39.f;
+	CameraDesc.fHeight = 20.f;
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, strLayerTag, TEXT("Prototype_GameObject_Camera_Jack"), &CameraDesc)))
 		return E_FAIL;
@@ -147,6 +166,11 @@ HRESULT CLevel_SlimeBoss::Ready_Layer_Monster(const wstring& strLayerTag)
 		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_SlimeBoss"))
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_SlimeBoss"), TEXT("Prototype_GameObject_SlimeBoss"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if(tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Level_SlimeBoss"))
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_Map"), TEXT("Prototype_GameObject_Monster"), &tempDesc)))
 				return E_FAIL;
 		}
 		else

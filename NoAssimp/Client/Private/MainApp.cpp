@@ -80,7 +80,9 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex_CrowLifeBar"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex_CrowLifeBar.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
 		return E_FAIL;
-
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel_Slime"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimModel_Slime.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
+		return E_FAIL;
 	if(FAILED(Add_Texture(LEVEL_STATIC, "LoadingScreens", "Logo/T_LoadingScreens%d.dds", 6)))
 		return E_FAIL;
 	if (FAILED(Add_Texture(LEVEL_STATIC, "LoadingScreens_GameLogo", "Logo/T_LoadingScreens_GameLogo.dds")))

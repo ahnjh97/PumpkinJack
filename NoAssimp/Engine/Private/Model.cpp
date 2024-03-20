@@ -29,6 +29,7 @@ CModel::CModel(const CModel& rhs)
 	, m_eModelType{ rhs.m_eModelType }
 	, m_strModelName { rhs.m_strModelName }
 	, m_AnimIndex{ rhs.m_AnimIndex }
+	, m_vOriginalScale{ rhs.m_vOriginalScale }
 {
 	for (auto& pPrototypeAnimation : rhs.m_Animations)
 		m_Animations.push_back(pPrototypeAnimation->Clone());
@@ -87,6 +88,18 @@ void CModel::Rotate_NonAnimVersion()
 	XMStoreFloat4x4(&m_TransformMatrix, matTransformation * rotatedMatrix);
 }
 
+void CModel::Shrink()
+{
+	m_vScale.x *= 0.97f;
+	m_vScale.y *= 0.97f;
+	m_vScale.z *= 0.97f;
+
+	_matrix matWorld = XMLoadFloat4x4(&m_TransformMatrix);
+	_matrix matScaleDown = XMMatrixScaling(0.98f, 0.98f, 0.98f);
+
+	XMStoreFloat4x4(&m_TransformMatrix, matWorld * matScaleDown);
+}
+
 _bool CModel::Check_BoundingBox(const CTransform* pTransform) const
 {
 	//_float3 vRayDir{}, vRayPos{};
@@ -143,6 +156,7 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelName, _fm
 	// 기존 행렬에서 성분 분해
 	XMMatrixDecompose(&scale, &rotation, &position, TransformMatrix);
 	XMStoreFloat4(&m_vScale, scale);
+	m_vOriginalScale = m_vScale;
 	XMStoreFloat4(&m_vRotation, rotation);
 
 
@@ -221,8 +235,7 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 
 	else // Anim간 선형보간
 	{
-		_float fLerpTime = 0.08f;
-		m_fLerpRatio += fTimeDelta / fLerpTime;
+		m_fLerpRatio += fTimeDelta / m_fLerpTime;
 
 		if (m_fLerpRatio < 1.f)
 		{
@@ -270,7 +283,7 @@ HRESULT CModel::Render(_uint iMeshIndex)
 	return S_OK;
 }
 
-void CModel::Change_Animation(string& strAnimName, _bool isLoop)
+void CModel::Change_Animation(string& strAnimName, _bool isLoop, _bool bLerp)
 {
 	auto iter = m_AnimIndex.find(strAnimName);
 	if (iter == m_AnimIndex.end())
@@ -281,12 +294,25 @@ void CModel::Change_Animation(string& strAnimName, _bool isLoop)
 		if (iter->first == "Roll")
 			m_bIsLerping = false;
 		else
-			m_bIsLerping = true;
+			m_bIsLerping = bLerp;
 		m_fLerpRatio = 0.f;
 		m_Animations[iter->second]->Reset(m_Bones);
 		Set_Animation(iter->second, isLoop);
 		if (isLoop == false)
 			m_Animations[iter->second]->Set_IsFinished(false);
+	}
+}
+
+void CModel::Change_Animation_ByIndex(_uint iAnimIndex, _bool isLoop, _bool bLerp)
+{
+	if (m_iCurrentAnimIndex != iAnimIndex)
+	{
+		m_bIsLerping = bLerp;
+		m_fLerpRatio = 0.f;
+		m_Animations[iAnimIndex]->Reset(m_Bones);
+		Set_Animation(iAnimIndex, isLoop);
+		if (isLoop == false)
+			m_Animations[iAnimIndex]->Set_IsFinished(false);
 	}
 }
 
@@ -353,7 +379,6 @@ HRESULT CModel::Ready_Bones()
 		CBone* pBone = CBone::Create(m_InputFile);
 		if (nullptr == pBone)
 			return E_FAIL;
-
 		m_Bones.push_back(pBone);
 	}
 

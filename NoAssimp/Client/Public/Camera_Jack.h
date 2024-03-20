@@ -3,6 +3,12 @@
 #include "Camera.h"
 class CCamera_Jack : public CCamera
 {
+public:
+	typedef struct : public CCamera::CAMERA_DESC
+	{
+		_float fDistance = { 0.f };
+		_float fHeight = { 0.f };
+	}CAMERA_JACK_DESC;
 private:
 	CCamera_Jack(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CCamera_Jack(const CCamera_Jack& rhs);
@@ -23,7 +29,8 @@ private:
 	void RevolveAroundPlayer();
 
 	_float3 m_vPlayerPos = {};
-	_float3 m_vOffset = {};
+	_float m_fDistance = {};
+	_float m_fHeight = {};
 
 public:
 	static CCamera_Jack* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

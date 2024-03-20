@@ -54,7 +54,7 @@ void CImGui_MapTool::Tick(_float fTimeDelta)
 	if (m_pGameInstance->MouseDown(DIMKS_RBUTTON))
 		OnRightClick(); // 피킹으로 객체생성
 
-	if (!ImGui::IsAnyItemHovered() && m_pGameInstance->MouseDown(DIMKS_LBUTTON))
+	if (!ImGui::IsAnyItemHovered() && m_pGameInstance->MouseDown(DIMKS_LBUTTON) && !(m_pGameInstance->Get_DIKeyState(DIK_LSHIFT) & 0x80))
 		OnLeftClick(); // 피킹으로 객체 고르기
 
 	if (m_pGameInstance->KeyDown(DIK_ESCAPE)) 
@@ -84,15 +84,14 @@ void CImGui_MapTool::Tick(_float fTimeDelta)
 	if (m_pGameInstance->KeyDown(DIK_DELETE))
 		On_DIK_Delete();
 
-
-	if ((m_pGameInstance->Get_DIKeyState(DIK_LCONTROL) & 0x80) && m_pGameInstance->KeyDown(DIK_S))
-		Save_Level();
-
 	if (bIsLevelOpen == false)
 	{
 		Load_Level();
 		bIsLevelOpen = true;
 	}
+
+	if ((m_pGameInstance->Get_DIKeyState(DIK_LCONTROL) & 0x80) && m_pGameInstance->KeyDown(DIK_S))
+		Save_Level();
 }
 
 HRESULT CImGui_MapTool::Render()
@@ -156,7 +155,7 @@ void CImGui_MapTool::OnRightClick()
 
 void CImGui_MapTool::OnLeftClick()
 {
-	CGameObject* pObj = m_pGameInstance->Select_ModelByPicking(m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Parse"));
+	CGameObject* pObj = m_pGameInstance->Select_ModelByPicking(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Parse"));
 	if (pObj == nullptr)
 		return;
 
@@ -326,6 +325,7 @@ void CImGui_MapTool::Menu_Animation()
 				CGameObject::GAMEOBJECT_DESC tempDesc = {};
 				tempDesc.matWorld = tempParseData.matWorld;
 				tempDesc.wstrModelTag = tempParseData.wstrModelTag;
+
 				wstring wstrPrototypeTag = TEXT("Prototype_GameObject_Tool_Anim");
 				if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Temp"), wstrPrototypeTag, &tempDesc)))
 					return;
@@ -426,6 +426,11 @@ void CImGui_MapTool::Load_Level()
 		CGameObject::GAMEOBJECT_DESC tempDesc = {};
 		tempDesc.matWorld = matWorld;
 		tempDesc.wstrModelTag = wcharModelTag;
+		for (_uint i = 0; i < vecLevelName.size(); i++)
+		{
+			if (strCurLevel == vecLevelName[i])
+				tempDesc.iLevel = i;
+		}
 		string strModelTag = m_pGameInstance->WstrToStr(tempDesc.wstrModelTag);
 		size_t lastUnderscorePos = strModelTag.find_last_of('_');
 		strModelTag = strModelTag.substr(lastUnderscorePos + 1);

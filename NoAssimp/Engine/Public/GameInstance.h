@@ -38,7 +38,7 @@ public: /* For.Renderer */
 
 public: /* For.Level_Manager */
 	HRESULT Open_Level(_uint iNewLevelID, class CLevel* pNewLevel);
-	_uint Get_CurrentLevelID();
+	_uint* Get_CurrentLevelID();
 
 public: /* For.Object_Manager */
 	HRESULT Add_Prototype(const wstring& strPrototypeTag, class CGameObject* pPrototype);

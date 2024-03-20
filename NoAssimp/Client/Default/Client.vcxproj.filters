@@ -82,6 +82,9 @@
     <Filter Include="02.GameObjects\SlimeBoss\Part_SlimeBoss">
       <UniqueIdentifier>{4bd183c5-abbb-4768-8e59-0bce6d955da6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\SlimeBoss\Knife">
+      <UniqueIdentifier>{12d7815e-e351-420a-9d1a-1c9732d1c368}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -174,6 +177,9 @@
     <ClInclude Include="..\Public\Slime_Slime.h">
       <Filter>02.GameObjects\Slime\Part_Slime</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Knife.h">
+      <Filter>02.GameObjects\SlimeBoss\Knife</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -257,6 +263,9 @@
     <ClCompile Include="..\Private\Slime_Slime.cpp">
       <Filter>02.GameObjects\Slime\Part_Slime</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Knife.cpp">
+      <Filter>02.GameObjects\SlimeBoss\Knife</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -288,6 +297,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex_LifeBar.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel_Slime.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

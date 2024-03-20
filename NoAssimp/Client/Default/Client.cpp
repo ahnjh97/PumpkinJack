@@ -72,7 +72,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				break;
             if (WM_MOUSEMOVE == msg.message)
             {
-                if (pGameInstance->Get_CurrentLevelID() >= LEVEL_GAMEPLAY || pGameInstance->Get_CurrentLevelID() <= LEVEL_SLIMEBOSS)
+                if(*pGameInstance->Get_CurrentLevelID() == LEVEL_MAPTOOL)
+                    ShowCursor(TRUE);
+                else if (*pGameInstance->Get_CurrentLevelID() >= LEVEL_GAMEPLAY && *pGameInstance->Get_CurrentLevelID() <= LEVEL_SLIMEBOSS)
                 {
                     RECT rect;
                     GetClientRect(msg.hwnd, &rect); // hwnd는 윈도우 핸들입니다.
@@ -80,7 +82,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                     ClientToScreen(msg.hwnd, (POINT*)&rect.right); // 클라이언트 영역의 우측 하단을 스크린 좌표로 변환
                     ClipCursor(&rect); // 마우스 커서가 이동할 수 있는 영역을 rect로 제한
                     ShowCursor(FALSE);
-                }              
+                }
             }
             if (WM_DESTROY == msg.message)
             {

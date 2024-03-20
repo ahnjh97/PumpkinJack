@@ -42,7 +42,6 @@ PARSE_DATA CGameObject::Get_ParseData()
 	return parseData;
 }
 
-
 CComponent * CGameObject::Get_Component(const wstring & strComTag)
 {
 	auto	iter = m_Components.find(strComTag);
