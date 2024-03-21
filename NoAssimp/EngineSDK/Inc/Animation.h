@@ -33,6 +33,7 @@ public:
 	void Update_TransformationMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, _bool isLoop);
 	void Reset(const vector<class CBone*>& Bones);
 	void Lerp_Animation(const vector<class CBone*>& Bones, vector<KEYFRAME>& vecKeyFrame, _float fRatio);
+	void Play_FinalFrame() { m_fTrackPosition = m_fDuration; }
 
 public:
 	void Read_AnimationData(ifstream& fileStream);

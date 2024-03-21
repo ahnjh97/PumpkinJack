@@ -28,6 +28,7 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 
 	_float m_fTime = {};
+	_float m_fAlpha = {1.f};
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);

@@ -259,9 +259,7 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 
 	// 0번 노드의 변환행렬 
 	_matrix RootLocalTransform = XMLoadFloat4x4(m_Bones[0]->Get_TransformationMatrix());
-	_vector vRotation = XMLoadFloat4(&m_vRotation);
-	_vector vScale = XMLoadFloat4(&m_vScale);
-	RootLocalTransform = XMMatrixScalingFromVector(vScale) * XMMatrixRotationQuaternion(vRotation) * RootLocalTransform;
+	RootLocalTransform = XMMatrixScalingFromVector(XMLoadFloat4(&m_vScale)) * XMMatrixRotationQuaternion(XMLoadFloat4(&m_vRotation)) * RootLocalTransform;
 	XMStoreFloat4x4(&m_TransformMatrix, RootLocalTransform);
 
 	for (auto& pBone : m_Bones)
@@ -316,6 +314,28 @@ void CModel::Change_Animation_ByIndex(_uint iAnimIndex, _bool isLoop, _bool bLer
 	}
 }
 
+void CModel::Play_FinalFrame(string& strAnimName)
+{
+	auto iter = m_AnimIndex.find(strAnimName);
+	if (iter == m_AnimIndex.end())
+		return;
+
+	m_Animations[iter->second]->Play_FinalFrame();
+	Set_Animation(iter->second, false);
+	m_bIsLerping = true;
+	m_fLerpRatio = 0.f;
+}
+
+void CModel::Reset_Animation(string& strAnimName)
+{
+	auto iter = m_AnimIndex.find(strAnimName);
+	if (iter == m_AnimIndex.end())
+		return;
+
+	m_Animations[iter->second]->Reset(m_Bones);
+	m_Animations[iter->second]->Set_IsFinished(false);
+}
+
 HRESULT CModel::Ready_Meshes()
 {
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumMeshes), sizeof(m_iNumMeshes));
@@ -329,7 +349,6 @@ HRESULT CModel::Ready_Meshes()
 
 		m_Meshes.push_back(pMesh);
 		m_filePointerPos = pMesh->Get_IncreasedFilePtPos(); // 파일포인터 위치 갱신
-
 	}
 
 	return S_OK;

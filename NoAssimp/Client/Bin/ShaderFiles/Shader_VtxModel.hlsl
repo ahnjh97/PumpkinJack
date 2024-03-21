@@ -4,7 +4,6 @@
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 texture2D	g_Texture;
-
 sampler LinearSampler = sampler_state
 {
 	Filter = MIN_MAG_MIP_LINEAR;
@@ -62,7 +61,6 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	if (0.3f >= Out.vColor.a)
 		discard;	
-	
 	return Out;
 }
 

@@ -27,23 +27,6 @@ public:
 	virtual ~CTransform() = default;
 
 public:
-	//void Set_State(STATE eState, _fvector vState) {
-	//	_matrix		WorldMatrix;
-	//	WorldMatrix = XMLoadFloat4x4(&m_WorldMatrix);
-	//	WorldMatrix.r[eState] = vState;
-	//	XMStoreFloat4x4(&m_WorldMatrix, WorldMatrix);
-	//}
-
-	void Set_State(STATE eState, _fvector vState) {
-		_float4		vTemp;
-		XMStoreFloat4(&vTemp, vState);
-		memcpy(&m_WorldMatrix.m[eState], &vTemp, sizeof(_float4));
-	}
-
-	void Set_State(STATE eState, const _float4& vState)	{ memcpy(&m_WorldMatrix.m[eState], &vState, sizeof(_float4)); }
-	void Set_Scaled(_float fScaleX, _float fScaleY, _float fScaleZ);
-	void Set_WorldMatrix(_float4x4 _matWorld) { m_WorldMatrix = _matWorld; }
-
 	_vector Get_State_Vector(STATE eState) { return XMLoadFloat4x4(&m_WorldMatrix).r[eState]; }
 
 	_float4 Get_State_Float4(STATE eState) {
@@ -72,6 +55,20 @@ public:
 	}
 	_matrix Get_WorldMatrix_Inverse() const { return XMMatrixInverse(nullptr, ::XMLoadFloat4x4(&m_WorldMatrix)); }
 
+	void Set_State(STATE eState, _fvector vState) {
+		_float4		vTemp;
+		XMStoreFloat4(&vTemp, vState);
+		memcpy(&m_WorldMatrix.m[eState], &vTemp, sizeof(_float4));
+	}
+	_float Get_JumpTime() { return m_fJumpTime; }
+	_bool Get_GroundCol() { return m_bGroundCol; }
+
+	void Set_State(STATE eState, const _float4& vState) { memcpy(&m_WorldMatrix.m[eState], &vState, sizeof(_float4)); }
+	void Set_Scaled(_float fScaleX, _float fScaleY, _float fScaleZ);
+	void Set_WorldMatrix(_float4x4 _matWorld) { m_WorldMatrix = _matWorld; }
+	void Reset_Jump() { m_fJumpTime = 0.f; m_fJumpPower = 0.f; }
+	void Set_GroundCol(_bool bGroundCol) { m_bGroundCol = bGroundCol; }
+
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -86,6 +83,9 @@ public:
 	void Go_Right(_float fTimeDelta, _uint iNum = 0, _fvector vCamRight = _vector());
 	void Move(_float fTimeDelta, _fvector vTargetDir);
 	void Fall(_float fTimeDelta);
+	void Jump(_float fTimeDelta);
+	void Gravity(_float fTimeDelta);
+	void AirAttack_End() { m_fJumpTime = 0.55f / 1.3f + 0.2f; }
 
 	void Look_At(_fvector vPosition);
 	void Look_At_ForLandObject(_fvector vPosition);
@@ -95,9 +95,12 @@ public:
 
 private:
 	_float4x4				m_WorldMatrix;
-	_float					m_fSpeedPerSec = { 0.0f };
-	_float					m_fRotationPerSec = { 0.0f };
-
+	_float					m_fSpeedPerSec = { 0.f };
+	_float					m_fRotationPerSec = { 0.f };
+	_float					m_fJumpPower = { 0.f };
+	_float					m_fJumpTime = { 0.f };
+	_float					m_fGravity = { 300.f };
+	_bool					m_bGroundCol = { false };
 
 public:
 	static CTransform* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

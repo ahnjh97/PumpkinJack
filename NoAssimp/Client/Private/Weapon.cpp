@@ -48,8 +48,8 @@ HRESULT CWeapon::Initialize(void* pArg)
 		
 	if (m_pModelCom->Get_ModelName() == "Scythe")
 	{
-		m_pTransformCom->Rotation(XMVectorSet(0, 0, 1, 0), -XM_PIDIV2);
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(-3.5f, -0.25f, 0.3f, 1));
+		m_pTransformCom->Rotation(XMVectorSet(0, 0, 1, 0), XM_PIDIV2);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0, -0.25f, 0.3f, 1));
 	}
 		
 		
@@ -78,7 +78,7 @@ void CWeapon::Late_Tick(_float fTimeDelta)
 		
 	}
 	if (m_pModelCom->Get_ModelName() == "Scythe")
-		matRot = XMMatrixRotationX(XMConvertToRadians(-65.f));
+		matRot = XMMatrixRotationX(XMConvertToRadians(155.f));
 		
 	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * matRot * matNew * XMLoadFloat4x4(m_pParentMatrix));
 	

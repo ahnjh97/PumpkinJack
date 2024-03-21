@@ -302,5 +302,8 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel_Slime.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Knife.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

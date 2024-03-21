@@ -3,18 +3,22 @@
 /* 전역변수 : 쉐이더 외부에 있는 데이터를 쉐이더 안으로 받아온다. */
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
-texture2D g_DiffuseTexture;
-
+texture2D	g_Texture;
+float g_fAlpha;
 sampler LinearSampler = sampler_state
 {
-	Filter = MIN_MAG_MIP_LINEAR;	
+	Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = wrap;
+    AddressV = wrap;		
 };
 
 
 struct VS_IN
 {
 	float3		vPosition : POSITION;
+	float3		vNormal : NORMAL;
 	float2		vTexcoord : TEXCOORD0;
+	float3		vTangent : TANGENT;
 };
 
 struct VS_OUT
@@ -53,11 +57,9 @@ struct PS_OUT
 PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
-    
-    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-    if (Out.vColor.r < 0.3f)
-        discard;
-	
+
+	Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
+    Out.vColor.a = g_fAlpha;
 	return Out;
 }
 

@@ -15,6 +15,7 @@ public:
 		const STATE* pState;
 		const WEAPON* pWeapon;
 		const _uint* pLastAttack;
+		const _bool* pIsJumping;
 	}BODY_DESC;
 
 private:
@@ -42,7 +43,7 @@ private:
 	const STATE* m_pState;
 	const WEAPON* m_pWeapon;
 	const _uint* m_pLastAttack;
-
+	const _bool* m_pIsJumping;
 
 private:
 	HRESULT Add_Components(LEVEL eLevel, const wstring& _wstrModelTag);

@@ -28,6 +28,7 @@ HRESULT CBody::Initialize(void* pArg)
 	m_pState = BodyDesc.pState;
 	m_pWeapon = BodyDesc.pWeapon;
 	m_pLastAttack = BodyDesc.pLastAttack;
+	m_pIsJumping = BodyDesc.pIsJumping;
 	if (FAILED(__super::Initialize(&BodyDesc)))
 		return E_FAIL;
 
@@ -51,12 +52,8 @@ void CBody::Tick(_float fTimeDelta)
 
 void CBody::Late_Tick(_float fTimeDelta)
 {
-
 	m_pModelCom->Play_Animation(fTimeDelta);
-
-
 	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * XMLoadFloat4x4(m_pParentMatrix));
-
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
@@ -86,6 +83,8 @@ HRESULT CBody::Render()
 
 void CBody::StateToAnimation()
 {
+	m_pModelCom->Set_LerpTime(0.08f);
+
 	string strWeapon, strState;
 
 	switch (*m_pWeapon)
@@ -113,6 +112,7 @@ void CBody::StateToAnimation()
 		strState = "Jump";
 		break;
 	case ROLL:
+		strWeapon = "";
 		strState = "Roll";
 		break;
 	case ATTACK1:
@@ -126,12 +126,18 @@ void CBody::StateToAnimation()
 		break;
 	case AIR_ATTACK:
 		strState = "AirAttack";
+		if (*m_pWeapon == WPN_SCYTHE || *m_pWeapon == WPN_SPEAR)
+			strState += "_Start";
 		break;
 	case AIR_ATTACK_END:
 		strState = "AirAttack_End";
+		if(*m_pWeapon == WPN_SCYTHE)
+			m_pModelCom->Set_LerpTime(0.105f);
 		break;
 	case ROLL_ATTACK:
 		strState = "Roll";
+		if (*m_pWeapon == WPN_SPEAR)
+			strState = "Atk3";
 		break;
 	}
 
@@ -141,31 +147,32 @@ void CBody::StateToAnimation()
 	else
 		bLoop = false;
 
-	if(*m_pState == ROLL)
-		m_pModelCom->Change_Animation(strState, false);
+	if (*m_pState == IDLE && *m_pIsJumping == true)
+		m_pModelCom->Play_FinalFrame(strWeapon + "Jump");
 	else
 		m_pModelCom->Change_Animation(strWeapon + strState, bLoop);
 }
 
 void CBody::Initialize_AnimSpeed()
 {
-	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_AirAttack"), 1.85f);
-	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_AirAttack"), 2.3f);
-	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_AirAttack"), 1.8f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_AirAttack_Start"), 2.2f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_AirAttack"), 3.f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_AirAttack_Start"), 2.f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_AirAttack_End"), 3.f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_Roll"), 1.8f);
-	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_Roll"), 3.f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_Roll"), 3.2f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Roll"), 2.4f);
-	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Roll"), 3.f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Roll"), 3.8f);
 	
 	for(int i = 1; i< 4; i++)
-		m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_Atk" + to_string(i)), 1.85f);
+		m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_Atk" + to_string(i)), 2.2f);
 
 	for (int i = 1; i < 4; i++)
-		m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_Atk" + to_string(i)), 2.2f);
+		m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_Atk" + to_string(i)), 2.6f);
 
-	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Atk1"), 3.8f);
-	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Atk2"), 3.1f);
-	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Atk3"), 2.85f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Atk1"), 4.8f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Atk2"), 3.8f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Atk3"), 3.2f);
 }
 
 HRESULT CBody::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)

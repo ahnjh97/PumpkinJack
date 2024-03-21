@@ -129,6 +129,27 @@ void CTransform::Fall(_float fTimeDelta)
 	Set_State(STATE_POSITION, vPosition);
 }
 
+void CTransform::Jump(_float fTimeDelta)
+{
+	m_fJumpTime += fTimeDelta;
+	m_fJumpPower = 0.55f - (m_fJumpTime * 1.3f);
+
+	_vector vDir = XMVectorSet(0, 1, 0, 0);
+	_vector	vPosition = Get_State_Vector(STATE_POSITION);
+	vPosition += XMVector3Normalize(vDir) * m_fJumpPower * fTimeDelta * 90.f;
+	Set_State(STATE_POSITION, vPosition);
+}
+
+void CTransform::Gravity(_float fTimeDelta)
+{
+	if (m_bGroundCol)
+		return;
+	_vector vDir = XMVectorSet(0, 1, 0, 0);
+	_vector	vPosition = Get_State_Vector(STATE_POSITION);
+	vPosition -= XMVector3Normalize(vDir) * m_fGravity * fTimeDelta * fTimeDelta * 0.5f;
+	Set_State(STATE_POSITION, vPosition);
+}
+
 void CTransform::Look_At(_fvector vAt)
 {
 	_vector		vLook = vAt - Get_State_Vector(STATE_POSITION);
@@ -190,9 +211,6 @@ void CTransform::Rotation(_fvector vAxis, _float fRadian)
 		XMVectorSet(0.f, 1.f, 0.f, 0.f) * vScaled.y, 
 		XMVectorSet(0.f, 0.f, 1.f, 0.f) * vScaled.z, 		
 	};
-
-	
-	// XMConvertToRadians(Degree);
 
 	_matrix			RotationMatrix = XMMatrixRotationAxis(vAxis, fRadian);
 

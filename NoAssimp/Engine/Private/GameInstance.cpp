@@ -538,8 +538,8 @@ void CGameInstance::Free()
 	Safe_Release(m_pRenderer);	
 	Safe_Release(m_pComponent_Manager);
 	Safe_Release(m_pObject_Manager);
-	Safe_Release(m_pLevel_Manager);
 	Safe_Release(m_pImGui_Manager);
+	Safe_Release(m_pLevel_Manager);
 	Safe_Release(m_pInput_Device);
 	Safe_Release(m_pGraphic_Device);
 }

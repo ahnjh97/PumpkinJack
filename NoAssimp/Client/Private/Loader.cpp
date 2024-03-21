@@ -332,6 +332,11 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxAnimModel"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimModel.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
 		return E_FAIL;
+	
+	/* For.Prototype_Component_Shader_VtxModel */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_Knife"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_Knife.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -381,7 +386,7 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degaree, NewScale, RootIndex
 	m_ModelConfigs.emplace("shroom", MODEL_CONFIG{ 3.f, 0.f, 3.f });
 
 	m_ModelConfigs.emplace("Rifle", MODEL_CONFIG{ 3.f, 0.f, 3.f });
-	m_ModelConfigs.emplace("Scythe", MODEL_CONFIG{ 0.3f, 0.f, 0.3f });
+	m_ModelConfigs.emplace("Scythe", MODEL_CONFIG{ 0.22f, 0.f, 0.22f });
 	m_ModelConfigs.emplace("Spear", MODEL_CONFIG{ 6.4f, 0.f, 6.4f });
 
 	m_ModelConfigs.emplace("Knife", MODEL_CONFIG{ 5.f, 0.f, 5.f });

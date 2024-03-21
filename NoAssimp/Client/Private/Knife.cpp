@@ -39,15 +39,20 @@ HRESULT CKnife::Initialize(void* pArg)
 
 void CKnife::Tick(_float fTimeDelta)
 {
-	m_fTime += fTimeDelta * 1.4f;
+	m_fTime += fTimeDelta * 1.5f;
 
 	if (m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y >= 0)
 		m_pTransformCom->Fall(m_fTime);
+	else
+		m_fAlpha -= 0.005f;
 }
 
 void CKnife::Late_Tick(_float fTimeDelta)
 {
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	if (m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y >= 0)
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	else
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
 }
 
 HRESULT CKnife::Render()
@@ -60,7 +65,7 @@ HRESULT CKnife::Render()
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
 		m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", i, aiTextureType_DIFFUSE);
-
+		
 			/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
 		if (FAILED(m_pShaderCom->Begin(0)))
 			return E_FAIL;
@@ -74,7 +79,7 @@ HRESULT CKnife::Render()
 HRESULT CKnife::Add_Components(const wstring& _wstrModelTag)
 {
 	/* For.Com_Shader */
-	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel");
+	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel_Knife");
 	if (FAILED(__super::Add_Component(LEVEL_SLIMEBOSS, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
@@ -97,6 +102,8 @@ HRESULT CKnife::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
+	if(FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(m_fAlpha))))
 		return E_FAIL;
 
 	return S_OK;

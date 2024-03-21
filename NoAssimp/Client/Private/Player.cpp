@@ -51,7 +51,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 	if (pArg)
 		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
 
-	GameObjectDesc.fSpeedPerSec = 32.f;
+	GameObjectDesc.fSpeedPerSec = 34.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
@@ -68,12 +68,12 @@ HRESULT CPlayer::Initialize(void* pArg)
 
 void CPlayer::Tick(_float fTimeDelta)
 {
-	if (m_bIsJumping)
-		m_fTempJumpTime += fTimeDelta;
-	if (m_fTempJumpTime > 1.2f)
+	Check_GroundCol();
+	if (m_pTransformCom->Get_GroundCol())
 	{
 		m_bIsJumping = false;
-		m_fTempJumpTime = 0.f;
+		m_pTransformCom->Reset_Jump();
+		m_iJumpCount = 2;
 	}
 		
 	if (m_pCamera == nullptr)
@@ -87,6 +87,17 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	Link_Animation();
 	OnKeyInput(fTimeDelta);
+	if (m_bIsJumping)
+	{
+		if (m_eState != AIR_ATTACK)
+			m_pTransformCom->Jump(fTimeDelta);
+		else
+		{
+			if (m_eWeapon == WPN_SCYTHE || m_eWeapon == WPN_SPEAR)
+				m_pTransformCom->Jump(fTimeDelta * 0.4f);
+		}
+	}
+		
 	Update_PositionToCam();
 	Turn_Body(fTimeDelta);
 
@@ -133,22 +144,30 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 	}
 
 	if(m_eState == ROLL)
-		m_pTransformCom->Move(fTimeDelta * 1.4f, XMLoadFloat3(&m_vDirection));
+		m_pTransformCom->Move(fTimeDelta * 1.5f, XMLoadFloat3(&m_vDirection));
 
 	if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) || (m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80)
 		|| (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80) || (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80))
 	{
-		if(!m_bIsAttacking && !m_bIsRolling)
-			m_pTransformCom->Move(fTimeDelta, XMLoadFloat3(&m_vDirection));
+		if (!m_bIsAttacking && !m_bIsRolling)
+		{
+			if(m_bIsJumping)
+				m_pTransformCom->Move(fTimeDelta * 0.85f, XMLoadFloat3(&m_vDirection));
+			else
+				m_pTransformCom->Move(fTimeDelta, XMLoadFloat3(&m_vDirection));
+		}
+			
 		if(!m_bIsJumping && !m_bIsAttacking && !m_bIsRolling)
 			m_eState = RUN;
 	}
 
-	if (m_pGameInstance->KeyDown(DIK_SPACE) && !m_bIsAttacking && !m_bIsRolling)
+	if (m_pGameInstance->KeyDown(DIK_SPACE) && !m_bIsAttacking && !m_bIsRolling && (m_iJumpCount > 0))
 	{
-		m_pTransformCom->Go_Right(fTimeDelta, 1, vCamRight);
+		m_pTransformCom->Reset_Jump();
 		m_eState = JUMP;
 		m_bIsJumping = true;
+		m_iJumpCount--;
+		pBodyModel->Reset_Animation(m_vecWeaponName[m_eWeapon] + "_Jump");
 	}
 
 	if (m_pGameInstance->MouseDown(DIMKS_LBUTTON) && !m_bIsAttacking && !m_bIsRolling)
@@ -198,37 +217,21 @@ void CPlayer::Update_Direction(_fvector vCamLook, _fvector vCamRight)
 	vRight = XMVectorSetY(vRight, 0.f);
 
 	if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) && (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80))
-	{
 		XMStoreFloat3(&m_vDirection, XMVector3Normalize(vLook - vRight));
-	}
 	else if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) && (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80))
-	{
 		XMStoreFloat3(&m_vDirection, XMVector3Normalize(vLook + vRight));
-	}
 	else if ((m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80) && (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80))
-	{
 		XMStoreFloat3(&m_vDirection, XMVector3Normalize(-vLook - vRight));
-	}
 	else if ((m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80) && (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80))
-	{
 		XMStoreFloat3(&m_vDirection, XMVector3Normalize(-vLook + vRight));
-	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80)
-	{
 		XMStoreFloat3(&m_vDirection, XMVector3Normalize(vLook));
-	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80)
-	{
 		XMStoreFloat3(&m_vDirection, XMVector3Normalize(-vRight));
-	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80)
-	{
 		XMStoreFloat3(&m_vDirection, XMVector3Normalize(vRight));
-	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80)
-	{
 		XMStoreFloat3(&m_vDirection, XMVector3Normalize(-vLook));
-	}
 }
 
 void CPlayer::Update_PositionToCam()
@@ -263,11 +266,30 @@ void CPlayer::Link_Animation()
 		m_bIsRolling = false;
 		m_fRollEndTime = 0;
 	}
-	else if (m_eState == AIR_ATTACK && !m_bIsJumping)
-		m_bIsAttacking = false;
+	else if (m_eState == AIR_ATTACK && pBody->Get_IsFinished())
+	{
+		if (m_eWeapon == WPN_SCYTHE || m_eWeapon == WPN_SPEAR)
+			m_eState = AIR_ATTACK_END;
+		else
+		{
+			m_bIsAttacking = false;
+			m_eState = IDLE;
+		}
+			
+		m_pTransformCom->AirAttack_End();
+	}
 		
 	else if ((m_eState == AIR_ATTACK_END || m_eState == ATTACK1 || m_eState == ATTACK2 || m_eState == ATTACK3 || m_eState == ROLL_ATTACK) && pBody->Get_IsFinished())
 		m_bIsAttacking = false;
+}
+
+void CPlayer::Check_GroundCol()
+{
+	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	if (vPos.y <= -0.f)
+		m_pTransformCom->Set_GroundCol(true);
+	else
+		m_pTransformCom->Set_GroundCol(false);
 }
 
 HRESULT CPlayer::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
@@ -285,6 +307,7 @@ HRESULT CPlayer::Add_PartObjects(LEVEL eLevel)
 	BodyDesc.pState = &m_eState;
 	BodyDesc.pWeapon = &m_eWeapon;
 	BodyDesc.pLastAttack = &m_iLastAttack;
+	BodyDesc.pIsJumping = &m_bIsJumping;
 	BodyDesc.iLevel = eLevel;
 	BodyDesc.wstrModelTag = TEXT("Prototype_Component_Model_Jack");
 	pBody = dynamic_cast<CPart*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Part_Body"), &BodyDesc));
@@ -328,7 +351,7 @@ HRESULT CPlayer::Add_PartObjects(LEVEL eLevel)
 	CPart* pScythe = { nullptr };
 	CWeapon::WEAPON_DESC	ScytheDesc{};
 	ScytheDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-	ScytheDesc.pSocket = pModel->Get_BonePtr("RightHand");
+	ScytheDesc.pSocket = pModel->Get_BonePtr("LeftHandIndex1");
 	ScytheDesc.pState = &m_eState;
 	ScytheDesc.pWeapon = &m_eWeapon;
 	ScytheDesc.iLevel = eLevel;
