@@ -1,5 +1,6 @@
 #include "..\Public\Texture.h"
 #include "Shader.h"
+#include "GameInstance.h"
 
 CTexture::CTexture(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent(pDevice, pContext)
@@ -11,6 +12,7 @@ CTexture::CTexture(const CTexture & rhs)
 	: CComponent{ rhs }
 	, m_Textures{ rhs.m_Textures }
 	, m_iNumTextures{ rhs.m_iNumTextures }
+	, m_strName{ rhs.m_strName }
 {
 	for (auto& pSRV : m_Textures)
 		Safe_AddRef(pSRV);
@@ -19,11 +21,14 @@ CTexture::CTexture(const CTexture & rhs)
 HRESULT CTexture::Initialize_Prototype(const wstring & strTextureFilePath, _uint iNumTextures)
 {
 	_tchar		szEXT[MAX_PATH] = TEXT("");
-
+	_tchar		szTextureName[MAX_PATH] = TEXT("");
 	/* 1번째 인자에 해당하는 문자열을 종류에 분해해준다. */
 
 	/* ..\Bin\정의훈\141\Framework\Client\Bin\Resources\Textures\Test.jpg */
-	_wsplitpath_s(strTextureFilePath.c_str(), nullptr, 0, nullptr, 0, nullptr, 0, szEXT, MAX_PATH);
+	_wsplitpath_s(strTextureFilePath.c_str(), nullptr, 0, nullptr, 0, szTextureName, MAX_PATH, szEXT, MAX_PATH);
+
+	if (iNumTextures == 1) 
+ 		m_strName = m_pGameInstance->WstrToStr(wstring(szTextureName)); // 텍스쳐 이름 저장
 
 	HRESULT hr = { 0 };
 

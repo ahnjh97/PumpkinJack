@@ -74,7 +74,6 @@ HRESULT CLifeBar::Initialize(void* pArg)
 
 void CLifeBar::Tick(_float fTimeDelta)
 {
-	
 	m_fOffset_Y += 0.002f;
 }
 

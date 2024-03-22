@@ -17,7 +17,9 @@ private:
 public:
 	_uint Get_MaterialIndex() const { return m_iMaterialIndex; }
 	streampos Get_IncreasedFilePtPos() { return m_filePointerPos; }
-	pair<_float3, _float3> Get_MinMax() { return m_MinMax; }
+	string Get_MeshName() { return string(m_szName); }
+	_float Get_OffSetX() { if (m_OffsetMatrices.empty()) { return 0; }
+		else { return m_OffsetMatrices.front()._41; } }
 
 public:
 	virtual HRESULT Initialize_Prototype(TYPE eModelType, string strDirectory, streampos filePtPos, const vector<CBone*>& Bones, _fmatrix TransformMatrix);
@@ -46,9 +48,6 @@ private:
 	ifstream&			m_InputFile;
 	_float3*			m_pVerticesPos = { nullptr }; // 정점 위치 
 	_uint*				m_pIndices = { nullptr }; // 인덱스 버퍼 
-
-	// 바운딩박스
-	pair<_float3, _float3> m_MinMax = {};
 
 private:
 	HRESULT Ready_Vertices_For_NonAnimModel(_fmatrix TransformationMatrix);

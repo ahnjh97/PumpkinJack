@@ -51,7 +51,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 	if (pArg)
 		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
 
-	GameObjectDesc.fSpeedPerSec = 34.f;
+	GameObjectDesc.fSpeedPerSec = 38.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
@@ -236,11 +236,11 @@ void CPlayer::Update_Direction(_fvector vCamLook, _fvector vCamRight)
 
 void CPlayer::Update_PositionToCam()
 {
-	if (m_pTransformCom != nullptr)
+	/*if (m_pTransformCom != nullptr)
 	{
 		_vector vPlayerPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 		m_pCamera->Copy_PlayerPos(vPlayerPos);
-	}
+	}*/
 }
 
 void CPlayer::Turn_Body(_float fTimeDelta)

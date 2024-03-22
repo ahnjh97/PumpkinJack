@@ -85,6 +85,9 @@
     <Filter Include="02.GameObjects\SlimeBoss\Knife">
       <UniqueIdentifier>{12d7815e-e351-420a-9d1a-1c9732d1c368}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\TongMap">
+      <UniqueIdentifier>{498efa8d-cab0-4f0e-a224-df381af38efc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -180,6 +183,9 @@
     <ClInclude Include="..\Public\Knife.h">
       <Filter>02.GameObjects\SlimeBoss\Knife</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\TongMap.h">
+      <Filter>02.GameObjects\TongMap</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -266,6 +272,9 @@
     <ClCompile Include="..\Private\Knife.cpp">
       <Filter>02.GameObjects\SlimeBoss\Knife</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\TongMap.cpp">
+      <Filter>02.GameObjects\TongMap</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -303,6 +312,15 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Knife.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_AlphaTex.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_SlimeBossRoom.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Lighted.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

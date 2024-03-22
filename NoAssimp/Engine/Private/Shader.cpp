@@ -51,7 +51,7 @@ HRESULT CShader::Initialize_Prototype(const wstring& strShaderFilePath, const D3
 			PassDesc.pIAInputSignature,
 			PassDesc.IAInputSignatureSize,
 			&pInputLayout)))
-			return E_FAIL;
+ 			return E_FAIL;
 
 		m_InputLayouts.push_back(pInputLayout);
 	}

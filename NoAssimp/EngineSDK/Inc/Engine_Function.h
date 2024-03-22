@@ -38,7 +38,7 @@ namespace Engine
 	unsigned int Safe_Release(T& pInstance)
 	{
 		unsigned int iRefCnt = 0;
-
+		 
 		if (nullptr != pInstance)
 		{
 			iRefCnt = pInstance->Release();

@@ -160,9 +160,6 @@ HRESULT CMesh::Ready_Vertices_For_NonAnimModel(_fmatrix TransformMatrix)
 		XMStoreFloat3(&pVertices[i].vPosition, XMVector3TransformCoord(XMLoadFloat3(&pVertices[i].vPosition), TransformMatrix));
 		XMStoreFloat3(&pVertices[i].vNormal, XMVector3TransformNormal(XMLoadFloat3(&pVertices[i].vNormal), TransformMatrix));
 		m_pVerticesPos[i] = pVertices[i].vPosition;
-
-		m_MinMax.first = _float3(min(m_pVerticesPos[i].x, m_MinMax.first.x), min(m_pVerticesPos[i].y, m_MinMax.first.y), min(m_pVerticesPos[i].z, m_MinMax.first.z));
-		m_MinMax.second = _float3(max(m_pVerticesPos[i].x, m_MinMax.second.x), max(m_pVerticesPos[i].y, m_MinMax.second.y), max(m_pVerticesPos[i].z, m_MinMax.second.z));
 	}
 
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);

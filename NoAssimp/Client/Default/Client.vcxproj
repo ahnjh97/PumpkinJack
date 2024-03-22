@@ -186,6 +186,7 @@
     <ClInclude Include="..\Public\SlimeBoss_Slime.h" />
     <ClInclude Include="..\Public\Slime_Slime.h" />
     <ClInclude Include="..\Public\Terrain.h" />
+    <ClInclude Include="..\Public\TongMap.h" />
     <ClInclude Include="..\Public\Tool_Anim.h" />
     <ClInclude Include="..\Public\Tool_NonAnim.h" />
     <ClInclude Include="..\Public\Weapon.h" />
@@ -218,6 +219,7 @@
     <ClCompile Include="..\Private\SlimeBoss_Slime.cpp" />
     <ClCompile Include="..\Private\Slime_Slime.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
+    <ClCompile Include="..\Private\TongMap.cpp" />
     <ClCompile Include="..\Private\Tool_Anim.cpp" />
     <ClCompile Include="..\Private\Tool_NonAnim.cpp" />
     <ClCompile Include="..\Private\Weapon.cpp" />
@@ -240,7 +242,10 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel_Slime.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_AlphaTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Knife.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Lighted.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_SlimeBossRoom.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex_CrowLifeBar.hlsl" />

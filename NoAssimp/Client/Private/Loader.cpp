@@ -18,6 +18,7 @@
 #include "SlimeBoss.h"
 #include "SlimeBoss_Slime.h"
 #include "Knife.h"
+#include "TongMap.h"
 //#include "Effect.h"
 //#include "Sky.h"
 
@@ -247,7 +248,12 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "SlimeBoss_Emit", "CommonTextures/slimeBossTex_Emit.dds")))
 		return E_FAIL;
-
+	if (FAILED(Add_Texture(eLevel, "pineTreeAlpha_Tex", "CommonTextures/pineTreeAlpha_Tex.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Water", "CommonTextures/Water.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "waterCausticText", "CommonTextures/waterCausticText.dds")))
+		return E_FAIL;
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 
 	/* Prototype_Component_VIBuffer_Terrain */
@@ -268,6 +274,7 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SlimeBoss"), CSlimeBoss);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_SlimeBoss_Slime"), CSlimeBoss_Slime);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Knife"), CKnife);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TongMap"), CTongMap);
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
 	m_isFinished = true;
@@ -333,10 +340,28 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimModel.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
 		return E_FAIL;
 	
-	/* For.Prototype_Component_Shader_VtxModel */
-	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_Knife"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_Knife.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
-		return E_FAIL;
+	if (eLevel == LEVEL_SLIMEBOSS)
+	{
+		/* For.Prototype_Component_Shader_VtxModel_Knife */
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_Knife"),
+			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_Knife.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+			return E_FAIL;
+
+		/* For.Prototype_Component_Shader_VtxModel_AlphaTex */
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_AlphaTex"),
+			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_AlphaTex.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+			return E_FAIL;
+
+		/* For.Prototype_Component_Shader_VtxModel_Lighted */
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_Lighted"),
+			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_Lighted.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+			return E_FAIL;
+
+		/* For.Prototype_Component_Shader_VtxModel_SlimeBossRoom */
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_SlimeBossRoom"),
+			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_SlimeBossRoom.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -442,6 +467,29 @@ void CLoader::TraverseNonAnimModels(LEVEL eLevel, const wstring& rootFolderPath)
 		wstring temp = listIter.substr(0, listIter.length() - 4);
 		wstring_convert<codecvt_utf8<wchar_t>> converter;
 		string strModelName = converter.to_bytes(temp);
+
+		if (strModelName.find("Level") != string::npos) // 문자열에 Level이 포함될경우
+		{
+			switch (eLevel) // 해당 레벨의 맵 Model만 불러오기를 하도록 
+			{
+			case Client::LEVEL_GAMEPLAY:
+				if (strModelName != "LevelGamePlay")
+					continue;
+				break;
+			case Client::LEVEL_GAMEPLAY2:
+				if (strModelName != "LevelGamePlay2")
+					continue;
+				break;
+			case Client::LEVEL_GAMEPLAY3:
+				if (strModelName != "LevelGamePlay3")
+					continue;
+				break;
+			case Client::LEVEL_SLIMEBOSS:
+				if (strModelName != "LevelSlimeBoss")
+					continue;
+				break;
+			}
+		}
 
 		for (auto Animtxt : AnimtxtList)
 		{

@@ -108,13 +108,13 @@ HRESULT CLevel_SlimeBoss::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fFar = 1000.0f;
 	CameraDesc.vEye = _float4(0.f, 10.f, -7.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
-	CameraDesc.fSpeedPerSec = 20.f;
+	CameraDesc.fSpeedPerSec = 60.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
 	CameraDesc.fDistance = 38.f;
 	CameraDesc.fHeight = 13.f;
 
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, strLayerTag, TEXT("Prototype_GameObject_Camera_Jack"), &CameraDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -168,9 +168,9 @@ HRESULT CLevel_SlimeBoss::Ready_Layer_Monster(const wstring& strLayerTag)
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_SlimeBoss"), TEXT("Prototype_GameObject_SlimeBoss"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if(tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Level_SlimeBoss"))
+		else if(tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_LevelSlimeBoss"))
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_Map"), TEXT("Prototype_GameObject_Monster"), &tempDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_Map"), TEXT("Prototype_GameObject_TongMap"), &tempDesc)))
 				return E_FAIL;
 		}
 		else

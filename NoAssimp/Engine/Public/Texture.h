@@ -12,6 +12,9 @@ private:
 	virtual ~CTexture() = default;
 
 public:
+	string Get_TextureName() { return m_strName; }
+
+public:
 	virtual HRESULT Initialize_Prototype(const wstring& strTextureFilePath, _uint iNumTexture);
 	virtual HRESULT Initialize(void* pArg) override;
 public:
@@ -21,6 +24,7 @@ public:
 private:
 	vector<ID3D11ShaderResourceView*>			m_Textures;
 	_uint										m_iNumTextures = { 0 };
+	string										m_strName;
 
 public:
 	static CTexture* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring& strTextureFilePath, _uint iNumTexture = 1);

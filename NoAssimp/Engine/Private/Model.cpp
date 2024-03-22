@@ -30,6 +30,7 @@ CModel::CModel(const CModel& rhs)
 	, m_strModelName { rhs.m_strModelName }
 	, m_AnimIndex{ rhs.m_AnimIndex }
 	, m_vOriginalScale{ rhs.m_vOriginalScale }
+	, m_vecMeshShaderType{ rhs.m_vecMeshShaderType }
 {
 	for (auto& pPrototypeAnimation : rhs.m_Animations)
 		m_Animations.push_back(pPrototypeAnimation->Clone());
@@ -93,11 +94,6 @@ void CModel::Shrink()
 	m_vScale.x *= 0.97f;
 	m_vScale.y *= 0.97f;
 	m_vScale.z *= 0.97f;
-
-	_matrix matWorld = XMLoadFloat4x4(&m_TransformMatrix);
-	_matrix matScaleDown = XMMatrixScaling(0.98f, 0.98f, 0.98f);
-
-	XMStoreFloat4x4(&m_TransformMatrix, matWorld * matScaleDown);
 }
 
 _bool CModel::Check_BoundingBox(const CTransform* pTransform) const
@@ -339,7 +335,6 @@ void CModel::Reset_Animation(string& strAnimName)
 HRESULT CModel::Ready_Meshes()
 {
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumMeshes), sizeof(m_iNumMeshes));
-	_float3 vMin{}, vMax{};
 
 	for (size_t i = 0; i < m_iNumMeshes; i++)
 	{
@@ -350,6 +345,8 @@ HRESULT CModel::Ready_Meshes()
 		m_Meshes.push_back(pMesh);
 		m_filePointerPos = pMesh->Get_IncreasedFilePtPos(); // 파일포인터 위치 갱신
 	}
+
+
 
 	return S_OK;
 }
@@ -382,6 +379,35 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 			m_Materials[iTemp].MaterialTextures[jTemp] = MeshMaterial.MaterialTextures[jTemp];
 	}
 
+
+	if (m_strModelName == "LevelSlimeBoss")
+	{
+		vector<_uint> vecSlimeBossRoom;
+
+		m_vecMeshShaderType.resize(m_Meshes.size());
+		for (_int i = 0; i< m_Meshes.size(); i++)
+		{
+			_uint iMaterialIdx = m_Meshes[i]->Get_MaterialIndex();
+			string strTextureName = m_Materials[iMaterialIdx].MaterialTextures[1]->Get_TextureName(); // DIFFUSE
+			if (strTextureName == "pine_Mat")
+				m_vecMeshShaderType[i] = 1;  // ALPHA
+			else if (strTextureName == "slimeBossTex2_Mat")
+				vecSlimeBossRoom.push_back(i);
+			
+		}
+
+		// 크기가 더 작은놈을 이펙트용으로 할당
+		if (m_Meshes[vecSlimeBossRoom.front()]->Get_OffSetX() < m_Meshes[vecSlimeBossRoom.back()]->Get_OffSetX())
+		{
+			m_vecMeshShaderType[vecSlimeBossRoom.front()] = 2; // SLIMEBOSSROOM
+			m_vecMeshShaderType[vecSlimeBossRoom.back()] = 3; // NO_LIGHT
+		}
+		else
+		{
+			m_vecMeshShaderType[vecSlimeBossRoom.back()] = 2; // SLIMEBOSSROOM
+			m_vecMeshShaderType[vecSlimeBossRoom.front()] = 3; // NO_LIGHT
+		}
+	}
 
 	return S_OK;
 }

@@ -32,6 +32,7 @@ public:
 	_bool Get_Shrinked() {
 		if (abs(m_vOriginalScale.x / m_vScale.x) > 33.f) { return true; }
 	else { return false; }}
+	vector<_uint> Get_MeshShaderType() { return m_vecMeshShaderType; }
 
 	void Set_Animation(_uint iAnimIndex, _bool isLoop) {
 		if (m_bIsNonAnimVersion) return;
@@ -99,6 +100,8 @@ private:
 	vector<KEYFRAME>			m_FinalKeyFrames;
 	_float						m_fLerpTime = { 0.08f };
 
+	vector<_uint>				m_vecMeshShaderType;
+
 
 	// 파일입출력 변수
 	string						m_strDirectory;
@@ -109,8 +112,6 @@ private:
 	
 	_bool						m_bIsNonAnimVersion = { false };
 	_bool						m_bHide = { false };
-
-
 private:
 	HRESULT Ready_Meshes();
 	HRESULT Ready_Materials(const _char* pModelFilePath);
