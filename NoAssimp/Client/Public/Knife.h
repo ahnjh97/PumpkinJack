@@ -24,11 +24,17 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	CModel* m_pModelCom = { nullptr };
-	CShader* m_pShaderCom = { nullptr };
+	_bool m_bDamaged = { false };
 
 	_float m_fTime = {};
-	_float m_fAlpha = {1.f};
+	_float m_fAlpha = { 1.f };
+	
+	
+
+private:
+	CModel* m_pModelCom = { nullptr };
+	CShader* m_pShaderCom = { nullptr };
+	CCollider* m_pColliderCom = { nullptr };
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);

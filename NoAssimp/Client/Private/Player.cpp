@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "Weapon.h"
 #include "Body.h"
+#include "Collider.h"
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -68,7 +69,38 @@ HRESULT CPlayer::Initialize(void* pArg)
 
 void CPlayer::Tick(_float fTimeDelta)
 {
-	Check_GroundCol();
+	if (m_pCamera == nullptr)
+	{
+		m_pCamera = dynamic_cast<CCamera_Jack*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Jack")));
+		Safe_AddRef(m_pCamera);
+	}
+
+
+	_bool bPortalCol = Check_SlimeBossPortal(fTimeDelta);
+	if(bPortalCol)
+		m_eState = HIGHFALL;
+	_bool bGroundCol = Check_GroundCol();
+	m_pTransformCom->Set_GroundCol(bGroundCol);
+
+	if (!bGroundCol && !m_bIsJumping && !bPortalCol)
+	{
+		m_fGravityTime += fTimeDelta;
+		m_pTransformCom->Fall(m_fGravityTime * 0.05f); // 임시 자유낙하
+	}
+	else
+		m_fGravityTime = 0;
+		
+	if (m_fHighFallTime >= 2.f)
+	{
+		/*_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		_vector vSlimeBossRoom = XMVectorSetY(vPos, -150.f);*/
+		_vector vSlimeBossRoom = XMVectorSet(205, -150, 150, 1);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vSlimeBossRoom);
+		m_fHighFallTime = 0.f;
+		m_eState = IDLE;
+		m_bInSlimeBossRoom = true;
+	}
+
 	if (m_pTransformCom->Get_GroundCol())
 	{
 		m_bIsJumping = false;
@@ -76,11 +108,7 @@ void CPlayer::Tick(_float fTimeDelta)
 		m_iJumpCount = 2;
 	}
 		
-	if (m_pCamera == nullptr)
-	{
-		m_pCamera = dynamic_cast<CCamera_Jack*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Jack")));
-		Safe_AddRef(m_pCamera);
-	}
+	Check_GoBackUp();
 
 	if (!m_bIsRolling)
 		m_fRollEndTime += fTimeDelta;
@@ -103,16 +131,22 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	for (auto& Pair : m_Parts)
 		Pair.second->Tick(fTimeDelta);
+
+	m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
 }
 
 void CPlayer::Late_Tick(_float fTimeDelta)
 {
 	for (auto& Pair : m_Parts)
 		Pair.second->Late_Tick(fTimeDelta);
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
 HRESULT CPlayer::Render()
 {
+#ifdef _DEBUG
+	m_pColliderCom->Render();
+#endif
 	return S_OK;
 }
 
@@ -120,7 +154,12 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 {
 	if (m_pCamera == nullptr)
 		return;
-
+	if (m_eState == HIGHFALL)
+	{
+		m_bIsJumping = false;
+		return;
+	}
+	
 	CTransform* pCamTransform = dynamic_cast<CTransform*>(m_pCamera->Get_Component(g_strTransformTag));
 	if (pCamTransform == nullptr)
 		return;
@@ -236,11 +275,11 @@ void CPlayer::Update_Direction(_fvector vCamLook, _fvector vCamRight)
 
 void CPlayer::Update_PositionToCam()
 {
-	/*if (m_pTransformCom != nullptr)
+	if (m_pTransformCom != nullptr)
 	{
 		_vector vPlayerPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 		m_pCamera->Copy_PlayerPos(vPlayerPos);
-	}*/
+	}
 }
 
 void CPlayer::Turn_Body(_float fTimeDelta)
@@ -283,17 +322,122 @@ void CPlayer::Link_Animation()
 		m_bIsAttacking = false;
 }
 
-void CPlayer::Check_GroundCol()
+_bool CPlayer::Check_GroundCol()
 {
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-	if (vPos.y <= -0.f)
-		m_pTransformCom->Set_GroundCol(true);
+	if (m_bInSlimeBossRoom == false)
+	{
+		if (vPos.y <= -0.f)
+			return true;
+		else if (Check_GroundMeshes())
+			return true;
+	}
 	else
-		m_pTransformCom->Set_GroundCol(false);
+	{
+		if (vPos.y <= -150.f)
+			return true;
+	}
+
+	return false;
+}
+
+_bool CPlayer::Check_GroundMeshes()
+{
+	_float fY = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y;
+	CCollider* pPillarCollider = { nullptr };
+	if (*m_pGameInstance->Get_CurrentLevelID() != LEVEL_SLIMEBOSS)
+		return false;
+	list<CGameObject*> objList = m_pGameInstance->Get_ObjectList(LEVEL_SLIMEBOSS, TEXT("Layer_Pillar"));
+	if (objList.empty())
+		return false;
+
+	for (auto& pillar : objList)
+	{
+		if (pillar == nullptr)
+			continue;
+
+		pPillarCollider = dynamic_cast<CCollider*>(pillar->Get_Component(TEXT("Com_Collider")));
+		if (pPillarCollider == nullptr)
+			continue;
+
+		if (m_pColliderCom->Intersect(pPillarCollider) && m_pColliderCom->Get_HightestPoint(CCollider::TYPE_OBB) > fY)
+			return true;
+	}
+	
+	return false;
+}
+
+_bool CPlayer::Check_SlimeBossPortal(_float fTimeDelta)
+{
+	CCollider* pPortalCollider = { nullptr };
+	list<CGameObject*> objList = m_pGameInstance->Get_ObjectList(LEVEL_SLIMEBOSS, TEXT("Layer_Portal"));
+	if (objList.empty())
+		return false;
+
+	for (auto& portal : objList)
+	{
+		if (portal == nullptr)
+			continue;
+
+		pPortalCollider = dynamic_cast<CCollider*>(portal->Get_Component(TEXT("Com_Collider")));
+		if (pPortalCollider == nullptr)
+			continue;
+
+		if (m_pColliderCom->Intersect(pPortalCollider))
+		{
+			_vector vPortalCenter = XMLoadFloat3(&pPortalCollider->Get_Center(CCollider::TYPE_OBB));
+			XMVectorSetW(vPortalCenter, 1);
+			m_pTransformCom->Move_toTarget(vPortalCenter, fTimeDelta * 30.f, 2.f);
+			m_fHighFallTime += fTimeDelta;
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+void CPlayer::Check_GoBackUp()
+{
+	if (m_bInSlimeBossRoom)
+	{
+		list<CGameObject*> objList = m_pGameInstance->Get_ObjectList(LEVEL_SLIMEBOSS, TEXT("Layer_Pillar2"));
+		_bool bNullPointers = { true };
+		if (objList.empty())
+		{
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(205, 0, 150, 1));
+			m_bInSlimeBossRoom = false;
+			m_iSlimeBossRoomEscapeCount++;
+		}
+		else
+		{
+			for (auto& iter : objList)
+			{
+				if (iter != nullptr)
+				{
+					bNullPointers = false;
+					break;
+				}
+			}
+
+			if (bNullPointers == true)
+			{
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(205, 0, 150, 1));
+				m_bInSlimeBossRoom = false;
+				m_iSlimeBossRoomEscapeCount++;
+			}
+		}
+	}
 }
 
 HRESULT CPlayer::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 {
+	CBounding_OBB::BOUNDING_OBB_DESC		ColliderDesc{};
+	ColliderDesc.vSize = _float3(4, 8, 4);
+	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f + 1, 0.f);
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"),
+		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom, &ColliderDesc)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -395,6 +539,7 @@ CGameObject* CPlayer::Clone(void* pArg)
 void CPlayer::Free()
 {
 	__super::Free();
+	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pCamera);
 	for (auto& Pair : m_Parts)
 		Safe_Release(Pair.second);

@@ -21,6 +21,8 @@ public:
 	class CGameObject* Select_ModelByPicking(_uint iLevelIndex, const wstring& wstrLayerTag); // MapTool에서의 모델선택
 	CGameObject* Get_GameObject(_uint iLevelIndex, const wstring& wstrLayerTag, const wstring& wstrPrototypeTag);
 	CGameObject* Get_LastGameObject(_uint iLevelIndex, const wstring& wstrLayerTag); // MapTool용
+	list<CGameObject*>& Get_ObjectList(_uint iLevelIndex, const wstring& wstrLayerTag);
+	CGameObject* Get_Player(_uint iLevelIndex);
 
 public:
 	HRESULT Initialize(_uint iNumLevels);

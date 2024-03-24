@@ -7,11 +7,16 @@ CLayer::CLayer()
 
 const CComponent * CLayer::Get_Component(const wstring & strComTag, _uint iIndex)
 {
+	if (iIndex >= m_GameObjects.size())
+		return nullptr;
+
 	auto	iter = m_GameObjects.begin();
 
 	for (size_t i = 0; i < iIndex; i++)
 		++iter;
-	
+
+	if (*iter == nullptr)
+		return nullptr;
 
 	return (*iter)->Get_Component(strComTag);
 }

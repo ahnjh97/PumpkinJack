@@ -37,7 +37,7 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr }; // Emit ÅØ½ºÃÄ
 	const SLIMEBOSS* m_pState = { };
-	_bool m_bSpawn = { false };
+	_bool m_bPillarSpawn = { false };
 
 private:
 	HRESULT Add_Components(LEVEL eLevel, const wstring& _wstrModelTag);

@@ -139,10 +139,13 @@ void CBody::StateToAnimation()
 		if (*m_pWeapon == WPN_SPEAR)
 			strState = "Atk3";
 		break;
+	case HIGHFALL:
+		strWeapon = "";
+		strState = "HighFall";
 	}
 
 	_bool bLoop;
-	if ((*m_pState == IDLE) || (*m_pState == RUN))
+	if ((*m_pState == IDLE) || (*m_pState == RUN) || (*m_pState == HIGHFALL))
 		bLoop = true;
 	else
 		bLoop = false;

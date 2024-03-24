@@ -27,7 +27,7 @@ HRESULT CSlimeBoss::Initialize(void* pArg)
 
 	GameObjectDesc.fSpeedPerSec = 10.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-
+	m_iLevel = GameObjectDesc.iLevel = LEVEL_SLIMEBOSS;
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
@@ -51,10 +51,17 @@ void CSlimeBoss::Tick(_float fTimeDelta)
 		{
 			m_pPlayer = pPlayer;
 			Safe_AddRef(m_pPlayer);
+			m_pPlayerWorldMatrix = m_pPlayer->Get_PlayerWorldMatrix();
 		}
 	}
 
-
+	if (m_pPlayer != nullptr)
+	{
+		if (m_pPlayer->Get_InSlimeBossRoom())
+			return;
+		if (m_pPlayer->Get_SlimeBossRoomEscapeCount() >= 2)
+			m_eState = SLIMEBOSS_DEATH;
+	}
 
 	TurnTowards_Player(fTimeDelta);
 	Link_Animation(fTimeDelta);
@@ -68,6 +75,11 @@ void CSlimeBoss::Tick(_float fTimeDelta)
 
 void CSlimeBoss::Late_Tick(_float fTimeDelta)
 {
+	if (m_pPlayer != nullptr)
+	{
+		if (m_pPlayer->Get_InSlimeBossRoom())
+			return;
+	}
 	m_pModelCom->Play_Animation(fTimeDelta);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	for (auto& Pair : m_Parts)
@@ -109,8 +121,12 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 
 	if (m_eState == SLIMEBOSS_SPAWN)
 	{
-		if(m_pModelCom->isFinished())
+		if (m_pModelCom->isFinished())
+		{
+			PillarSpawn();
+			PortalSpawn();
 			m_eState = SLIMEBOSS_IDLE;
+		}
 	}	
 	else if (m_eState == SLIMEBOSS_IDLE && m_iCurPattern == -1)
 	{
@@ -125,6 +141,18 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 		if (m_eState == SLIMEBOSS_FORK || m_eState == SLIMEBOSS_INVOKE_BEGIN
 			|| m_eState == SLIMEBOSS_PILLAR_SPAWN || m_eState == SLIMEBOSS_MEGASPAWN)
 		{
+			if (m_eState == SLIMEBOSS_PILLAR_SPAWN && m_bPillarSpawn == false)
+			{
+				PillarSpawn();
+				m_bPillarSpawn = true;
+			}
+
+			if (m_eState == SLIMEBOSS_MEGASPAWN && m_bPortalSpawn == false)
+			{
+				PortalSpawn();
+				m_bPortalSpawn = true;
+			}
+
 			if (m_pModelCom->isFinished())
 			{
 				++m_iCurPattern;
@@ -144,15 +172,14 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 		}
 		else if (m_eState == SLIMEBOSS_LIGHTNING)
 		{
-			XMStoreFloat4(&m_vLightningPos, m_pPlayer->Get_PlayerPos());
+			XMStoreFloat4(&m_vLightningPos, XMVectorSet(m_pPlayerWorldMatrix->_41, m_pPlayerWorldMatrix->_42, m_pPlayerWorldMatrix->_43, 1));
 
 			_float fPlayRatio = m_pModelCom->Get_AnimPlayRatio(SLIMEBOSS_LIGHTNING);
 			if (m_iLightningCount == m_pModelCom->Get_AnimPlayCount(SLIMEBOSS_LIGHTNING) && fPlayRatio > 0.7f)
 			{
-				_float fHeight = 45.f;
 				CGameObject::GAMEOBJECT_DESC tDesc{};
 				tDesc.matWorld._41 = m_vLightningPos.x;
-				tDesc.matWorld._42 = m_vLightningPos.y + fHeight;
+				tDesc.matWorld._42 = 90.f;
 				tDesc.matWorld._43 = m_vLightningPos.z;
 				tDesc.iLevel = LEVEL_SLIMEBOSS;
 				tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Knife");
@@ -176,6 +203,7 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 			}
 		}
 	}
+	m_ePreState = m_eState;
 }
 
 void CSlimeBoss::StateToAnimation()
@@ -193,17 +221,67 @@ void CSlimeBoss::TurnTowards_Player(_float fTimeDelta)
 	if (m_eState == SLIMEBOSS_DEATH)
 		return;
 
-	_vector	vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-
+	/*_vector	vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);*/
 	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	_vector vPlayerPos = m_pPlayer->Get_PlayerPos();
-	_vector vDirection = XMVector3Normalize(vPos - vPlayerPos);
+
+	_vector vPlayerPos = XMVectorSet(m_pPlayerWorldMatrix->_41, m_pPlayerWorldMatrix->_42, m_pPlayerWorldMatrix->_43, 1);
+	/*_vector vDirection = XMVector3Normalize(vPos - vPlayerPos);
+	
 	_float fAngle = ::XMVectorGetX(::XMVector3AngleBetweenVectors(vLook, vDirection));
 	_float fY = XMVectorGetY(::XMVector3Cross(vLook, vDirection));
+	_float fClockWise = 1.f;
 	if (fY < 0)
-		fAngle = -fAngle;
-	if (abs(fAngle) >= XMConvertToRadians(2.f))
-		m_pTransformCom->Turn(::XMVectorSet(0, 1, 0, 0), fTimeDelta * fAngle * 7.f);
+		fClockWise = -fClockWise;*/
+	m_pTransformCom->Look_At_ForLandObject(vPlayerPos);
+}
+
+void CSlimeBoss::PillarSpawn()
+{
+	_float4 vPillarPos = {};
+	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	_vector vLook = XMVector3Normalize(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
+	_float4 vRight = {};
+	XMStoreFloat4(&vRight, XMVector3Normalize(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT)));
+	XMStoreFloat4(&vPillarPos, vPos + vLook * 40.f);
+
+	wstring wstrLayer = TEXT("Layer_Pillar");
+	wstring wstrPrototype = TEXT("Prototype_GameObject_cemeteryPillar");
+	CGameObject::GAMEOBJECT_DESC tDesc{};
+ 	tDesc.iLevel = LEVEL_SLIMEBOSS;
+	tDesc.wstrModelTag = TEXT("Prototype_Component_Model_cemeteryPillar");
+	
+	tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	tDesc.matWorld._41 = vPillarPos.x + vRight.x * 13.f;
+	tDesc.matWorld._42 = -42;
+	tDesc.matWorld._43 = vPillarPos.z + vRight.z * 13.f;
+	if(FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, wstrLayer, wstrPrototype, &tDesc)))
+		return;
+	
+	tDesc.matWorld._41 = vPillarPos.x - vRight.x * 13.f;
+	tDesc.matWorld._43 = vPillarPos.z - vRight.z * 13.f;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, wstrLayer, wstrPrototype, &tDesc)))
+		return;
+}
+
+void CSlimeBoss::PortalSpawn()
+{
+	_float4 vPortalPos = {};
+	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	//_vector vLook = -XMVector3Normalize(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
+	XMStoreFloat4(&vPortalPos, vPos);
+
+	wstring wstrLayer = TEXT("Layer_Portal");
+	wstring wstrPrototype = TEXT("Prototype_GameObject_Portal");
+
+	CGameObject::GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = LEVEL_SLIMEBOSS;
+	tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	tDesc.matWorld._41 = vPortalPos.x;
+	tDesc.matWorld._42 = vPortalPos.y + 10.f;
+	tDesc.matWorld._43 = vPortalPos.z;
+	
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, wstrLayer, wstrPrototype, &tDesc)))
+		return;
 }
 
 HRESULT CSlimeBoss::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
@@ -305,5 +383,4 @@ void CSlimeBoss::Free()
 	m_Parts.clear();
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
-
 }

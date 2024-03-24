@@ -88,6 +88,12 @@
     <Filter Include="02.GameObjects\TongMap">
       <UniqueIdentifier>{498efa8d-cab0-4f0e-a224-df381af38efc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\SlimeBoss\Pillar">
+      <UniqueIdentifier>{366cb4af-d02a-4290-95b4-92b68db42690}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\SlimeBoss\Portal">
+      <UniqueIdentifier>{cf0a68f4-a85d-417d-8f2f-15a2bf4a4377}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -186,6 +192,15 @@
     <ClInclude Include="..\Public\TongMap.h">
       <Filter>02.GameObjects\TongMap</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Pillar.h">
+      <Filter>02.GameObjects\SlimeBoss\Pillar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Pillar_SlimeBossRoom.h">
+      <Filter>02.GameObjects\SlimeBoss\Pillar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Portal.h">
+      <Filter>02.GameObjects\SlimeBoss\Portal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -274,6 +289,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\TongMap.cpp">
       <Filter>02.GameObjects\TongMap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Pillar.cpp">
+      <Filter>02.GameObjects\SlimeBoss\Pillar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Pillar_SlimeBossRoom.cpp">
+      <Filter>02.GameObjects\SlimeBoss\Pillar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Portal.cpp">
+      <Filter>02.GameObjects\SlimeBoss\Portal</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

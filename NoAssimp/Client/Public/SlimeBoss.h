@@ -28,18 +28,24 @@ private:
 	void Link_Animation(_float fTimeDelta);
 	void StateToAnimation();
 	void TurnTowards_Player(_float fTimeDelta);
+	void PillarSpawn();
+	void PortalSpawn();
 
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 	map<const wstring, CPart*> m_Parts;
 	class CPlayer* m_pPlayer = { nullptr };
+	const _float4x4* m_pPlayerWorldMatrix = { nullptr };
 
 	SLIMEBOSS m_eState = { SLIMEBOSS_SPAWN };
-	_bool m_bSpawn = { false };
+	SLIMEBOSS m_ePreState = { SLIMEBOSS_SPAWN };
+	_bool m_bPillarSpawn = { false };
+	_bool m_bPortalSpawn = { false };
 	_int m_iHp = { 100 };
 	_int m_iCurPattern = { -1};
 	_int m_iLightningCount = {};
+	_float m_fPreAngle = {};
 	_float4 m_vLightningPos = {};
 
 	vector<SLIMEBOSS> m_vecSlimeBossPattern = { SLIMEBOSS_FORK, SLIMEBOSS_INVOKE_BEGIN, SLIMEBOSS_INVOKE

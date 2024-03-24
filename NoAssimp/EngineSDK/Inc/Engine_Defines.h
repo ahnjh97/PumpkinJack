@@ -24,9 +24,14 @@ namespace Engine
 #include "Effects11/d3dx11effect.h"
 #include "DirectXTK/DDSTextureLoader.h"
 #include "DirectXTK/WICTextureLoader.h"
-//#include "assimp\scene.h"
-//#include "assimp\Importer.hpp"
-//#include "assimp\postprocess.h"
+
+#include "DirectXTK/ScreenGrab.h"
+#include "DirectXTK/PrimitiveBatch.h"
+#include "DirectXTK/VertexTypes.h"
+#include "DirectXTK/Effects.h"
+
+#include "DirectXTK/SpriteBatch.h"
+#include "DirectXTK/SpriteFont.h"
 #define AI_TEXTURE_TYPE_MAX 21
 #define aiTextureType_DIFFUSE 1
 #define Level_MapTool 3

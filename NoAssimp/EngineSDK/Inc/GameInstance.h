@@ -41,24 +41,26 @@ public: /* For.Level_Manager */
 	_uint* Get_CurrentLevelID();
 
 public: /* For.Object_Manager */
-	HRESULT Add_Prototype(const wstring& strPrototypeTag, class CGameObject* pPrototype);
-	HRESULT Add_Clone(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg = nullptr);
-	class CGameObject* Clone_GameObject(const wstring& strPrototypeTag, void* pArg = nullptr);
-	const CComponent* Get_Component(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strComTag, _uint iIndex = 0);
+	HRESULT Add_Prototype(const wstring& wstrPrototypeTag, class CGameObject* pPrototype);
+	HRESULT Add_Clone(_uint iLevelIndex, const wstring& wstrLayerTag, const wstring& wstrPrototypeTag, void* pArg = nullptr);
+	class CGameObject* Clone_GameObject(const wstring& wstrPrototypeTag, void* pArg = nullptr);
+	const CComponent* Get_Component(_uint iLevelIndex, const wstring& wstrLayerTag, const wstring& wstrComTag, _uint iIndex = 0);
 	_bool Binarize_Objects(_uint iLevel, string strLevel);
 	CGameObject* Select_ModelByPicking(_uint iLevelIndex, const wstring& wstrLayerTag); // MapTool에서의 모델선택
-	CGameObject* Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag);
+	CGameObject* Get_GameObject(_uint iLevelIndex, const wstring& wstrLayerTag, const wstring& wstrPrototypeTag);
 	CGameObject* Get_LastGameObject(_uint iLevelIndex, const wstring& wstrLayerTag); // MapTool용
+	list<CGameObject*>& Get_ObjectList(_uint iLevelIndex, const wstring& wstrLayrTag);
 	void Clear_Layer(_uint iLevelIndex, const wstring& wstrLayerTag);
+	CGameObject* Get_Player(_uint iLevelIndex);
 
 public: /* For.Component_Manager */
 	HRESULT Add_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag, class CComponent* pPrototype);
-	class CComponent* Clone_Component(_uint iLevelIndex, const wstring& strPrototypeTag, void* pArg = nullptr);
-	class CComponent* Find_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag);
+	class CComponent* Clone_Component(_uint iLevelIndex, const wstring& wstrPrototypeTag, void* pArg = nullptr);
+	class CComponent* Find_Prototype(_uint iLevelIndex, const wstring& wstrPrototypeTag);
 
 public: /* For.Timer_Manager */
-	HRESULT Add_Timer(const wstring& strTimerTag);
-	_float Compute_TimeDelta(const wstring& strTimerTag);
+	HRESULT Add_Timer(const wstring& wstrTimerTag);
+	_float Compute_TimeDelta(const wstring& wstrTimerTag);
 
 public: /* For.PipeLine */
 	void Set_Transform(CPipeLine::TRANSFORMSTATE eState, _fmatrix TransformMatrix);

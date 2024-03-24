@@ -19,6 +19,9 @@
 #include "SlimeBoss_Slime.h"
 #include "Knife.h"
 #include "TongMap.h"
+#include "Pillar.h"
+#include "Portal.h"
+#include "Pillar_SlimeBossRoom.h"
 //#include "Effect.h"
 //#include "Sky.h"
 
@@ -254,6 +257,8 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "waterCausticText", "CommonTextures/waterCausticText.dds")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Portal", "Portal/Portal.dds")))
+		return E_FAIL;
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 
 	/* Prototype_Component_VIBuffer_Terrain */
@@ -275,6 +280,10 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_SlimeBoss_Slime"), CSlimeBoss_Slime);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Knife"), CKnife);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TongMap"), CTongMap);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("cemeteryPillar"), CPillar);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Portal"), CPortal);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Pillar_SlimeBossRoom"), CPillar_SlimeBossRoom);
+
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
 	m_isFinished = true;
@@ -392,8 +401,8 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degaree, NewScale, RootIndex
 	m_ModelConfigs.emplace("Owl", MODEL_CONFIG{ 0.03f, 0.f, 1.f, 4 });
 	m_ModelConfigs.emplace("SkeletonBoss", MODEL_CONFIG{ 0.03f, 0.f, 2.6f, 3 });
 	m_ModelConfigs.emplace("Slime", MODEL_CONFIG{ 0.01f, 0.f, 1.f, 4 });
-	m_ModelConfigs.emplace("SlimeBoss", MODEL_CONFIG{ 0.026f, 0.f, 2.6f, 4 });
-	m_ModelConfigs.emplace("PartSlimeBoss", MODEL_CONFIG{ 0.026f, 0.f, 2.6f, 4 });
+	m_ModelConfigs.emplace("SlimeBoss", MODEL_CONFIG{ 0.032f, 180.f, 3.2f, 4 });
+	m_ModelConfigs.emplace("PartSlimeBoss", MODEL_CONFIG{ 0.032f, 180.f, 3.2f, 4 });
 	m_ModelConfigs.emplace("Sniper", MODEL_CONFIG{ 0.025f, 0.f, 2.6f, 3 });
 	m_ModelConfigs.emplace("Soldier", MODEL_CONFIG{ 0.025f, 0.f, 2.6f, 5 });
 	m_ModelConfigs.emplace("Trabuchet", MODEL_CONFIG{ 0.03f, 0.f, 2.6f, 2 });
@@ -414,7 +423,9 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degaree, NewScale, RootIndex
 	m_ModelConfigs.emplace("Scythe", MODEL_CONFIG{ 0.22f, 0.f, 0.22f });
 	m_ModelConfigs.emplace("Spear", MODEL_CONFIG{ 6.4f, 0.f, 6.4f });
 
-	m_ModelConfigs.emplace("Knife", MODEL_CONFIG{ 5.f, 0.f, 5.f });
+	m_ModelConfigs.emplace("Knife", MODEL_CONFIG{ 6.5f, 0.f, 6.5f });
+	m_ModelConfigs.emplace("NotOpen", MODEL_CONFIG{ 3.1f, 0.f, 3.1f });
+	m_ModelConfigs.emplace("cemeteryPillar", MODEL_CONFIG{ 6.5f, 0.f, 6.5f });
 }
 
 void CLoader::TraverseAnimModels(LEVEL eLevel, const wstring& rootFolderPath)

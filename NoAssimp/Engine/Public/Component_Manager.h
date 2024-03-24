@@ -3,11 +3,14 @@
 #include "Model.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "Collider.h"
 #include "Transform.h"
 #include "VIBuffer_Rect.h"
 //#include "VIBuffer_Cube.h"
 #include "VIBuffer_Terrain.h"
-
+#include "Bounding_AABB.h"
+#include "Bounding_OBB.h"
+#include "Bounding_SPHERE.h"
 #include "Component.h"
 
 /* 1. 컴포넌트들의 원형을 레벨별로 보관한다. */

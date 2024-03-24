@@ -112,6 +112,24 @@
     <Filter Include="01.Utility\08. Light\Manager">
       <UniqueIdentifier>{2f5d39cd-05d8-406e-900f-429d6e4b243e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\02.Components\Collider">
+      <UniqueIdentifier>{4eefce3e-194a-439b-8eba-c136f7256ce9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\02.Components\Collider\Bounding">
+      <UniqueIdentifier>{c0a67190-2717-49a0-95b8-f004f1f67320}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\02.Components\Collider\Bounding\AABB">
+      <UniqueIdentifier>{cecd9f53-b380-49b0-adc0-497ec978c3fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\02.Components\Collider\Bounding\OBB">
+      <UniqueIdentifier>{cd293f87-3628-4fa5-8def-f154cac04b67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\02.Components\Collider\Bounding\Sphere">
+      <UniqueIdentifier>{982dc280-662d-4deb-b923-8f1542b789c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\02.Components\Collider\DebugDraw">
+      <UniqueIdentifier>{55cfd869-4d8a-41ed-9844-8eeb7c217a96}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -239,6 +257,24 @@
     </ClCompile>
     <ClCompile Include="..\Private\Light_Manager.cpp">
       <Filter>01.Utility\08. Light\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Collider.cpp">
+      <Filter>01.Utility\02.Components\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DebugDraw.cpp">
+      <Filter>01.Utility\02.Components\Collider\DebugDraw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bounding.cpp">
+      <Filter>01.Utility\02.Components\Collider\Bounding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bounding_Sphere.cpp">
+      <Filter>01.Utility\02.Components\Collider\Bounding\Sphere</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bounding_AABB.cpp">
+      <Filter>01.Utility\02.Components\Collider\Bounding\AABB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bounding_OBB.cpp">
+      <Filter>01.Utility\02.Components\Collider\Bounding\OBB</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -382,6 +418,24 @@
     </ClInclude>
     <ClInclude Include="..\Public\Light_Manager.h">
       <Filter>01.Utility\08. Light\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Collider.h">
+      <Filter>01.Utility\02.Components\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DebugDraw.h">
+      <Filter>01.Utility\02.Components\Collider\DebugDraw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bounding.h">
+      <Filter>01.Utility\02.Components\Collider\Bounding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bounding_AABB.h">
+      <Filter>01.Utility\02.Components\Collider\Bounding\AABB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bounding_OBB.h">
+      <Filter>01.Utility\02.Components\Collider\Bounding\OBB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bounding_Sphere.h">
+      <Filter>01.Utility\02.Components\Collider\Bounding\Sphere</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -321,6 +321,46 @@ CGameObject* CObject_Manager::Get_LastGameObject(_uint iLevelIndex, const wstrin
 	return nullptr;
 }
 
+list<CGameObject*>& CObject_Manager::Get_ObjectList(_uint iLevelIndex, const wstring& wstrLayerTag)
+{
+	static list<CGameObject*> emptyVector;
+
+	auto		iter = m_pLayers[iLevelIndex].find(wstrLayerTag);
+	if (iter == m_pLayers[iLevelIndex].end())
+		return emptyVector;
+
+	CLayer* pLayer = iter->second;
+	if (pLayer == nullptr)
+		return emptyVector;
+
+	return pLayer->Get_ObjectList();
+}
+
+CGameObject* CObject_Manager::Get_Player(_uint iLevelIndex)
+{
+	auto iter = m_pLayers[iLevelIndex].find(TEXT("Layer_Player"));
+	if (iter == m_pLayers[iLevelIndex].end())
+		return nullptr;
+
+	CLayer* pLayer = iter->second;
+	if (pLayer == nullptr)
+		return nullptr;
+
+	list<CGameObject*>& tempList = pLayer->Get_ObjectList();
+	if (tempList.empty())
+		return nullptr;
+
+	for (auto& listIter : tempList)
+	{
+		if (listIter == nullptr)
+			continue;
+
+		return listIter;
+	}
+
+	return nullptr;
+}
+
 CGameObject* CObject_Manager::Get_GameObject(_uint iLevelIndex, const wstring& wstrLayerTag, const wstring& wstrPrototypeTag)
 {
 	auto		iter = m_pLayers[iLevelIndex].find(wstrLayerTag);

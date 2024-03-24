@@ -318,12 +318,29 @@ CGameObject* CGameInstance::Get_LastGameObject(_uint iLevelIndex, const wstring&
 	return m_pObject_Manager->Get_LastGameObject(iLevelIndex, wstrLayerTag);
 }
 
+list<CGameObject*>& CGameInstance::Get_ObjectList(_uint iLevelIndex, const wstring& wstrLayrTag)
+{
+	static list<CGameObject*> emptyVector;
+	if (nullptr == m_pObject_Manager)
+		return emptyVector;
+
+	return m_pObject_Manager->Get_ObjectList(iLevelIndex, wstrLayrTag);
+}
+
 void CGameInstance::Clear_Layer(_uint iLevelIndex, const wstring& wstrLayerTag)
 {
 	if (nullptr == m_pObject_Manager)
 		return;
 
 	return m_pObject_Manager->Clear_Layer(iLevelIndex, wstrLayerTag);
+}
+
+CGameObject* CGameInstance::Get_Player(_uint iLevelIndex)
+{
+	if (nullptr == m_pObject_Manager)
+		return nullptr;
+
+	return  m_pObject_Manager->Get_Player(iLevelIndex);
 }
 
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const wstring & strPrototypeTag, CComponent * pPrototype)

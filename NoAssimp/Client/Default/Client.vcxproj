@@ -180,7 +180,10 @@
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\Public\Monster.h" />
+    <ClInclude Include="..\Public\Pillar.h" />
+    <ClInclude Include="..\Public\Pillar_SlimeBossRoom.h" />
     <ClInclude Include="..\Public\Player.h" />
+    <ClInclude Include="..\Public\Portal.h" />
     <ClInclude Include="..\Public\Slime.h" />
     <ClInclude Include="..\Public\SlimeBoss.h" />
     <ClInclude Include="..\Public\SlimeBoss_Slime.h" />
@@ -213,7 +216,10 @@
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\private\Monster.cpp" />
+    <ClCompile Include="..\Private\Pillar.cpp" />
+    <ClCompile Include="..\Private\Pillar_SlimeBossRoom.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
+    <ClCompile Include="..\Private\Portal.cpp" />
     <ClCompile Include="..\Private\Slime.cpp" />
     <ClCompile Include="..\Private\SlimeBoss.cpp" />
     <ClCompile Include="..\Private\SlimeBoss_Slime.cpp" />
