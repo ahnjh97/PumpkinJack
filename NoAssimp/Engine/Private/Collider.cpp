@@ -124,6 +124,11 @@ _bool CCollider::Intersect(CCollider* pTargetCollider)
 	return false;
 }
 
+_bool CCollider::Intersect_Ray(_fvector vRayOrigin, _fvector vRayDir, _float& fDis)
+{
+	return m_pBounding->Intersect_Ray(vRayOrigin, vRayDir, fDis);
+}
+
 HRESULT CCollider::Render()
 {
 	m_pEffect->SetWorld(XMMatrixIdentity());

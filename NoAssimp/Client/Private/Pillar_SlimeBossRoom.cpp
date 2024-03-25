@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Pillar_SlimeBossRoom.h"
+#include "Player.h"
 
 CPillar_SlimeBossRoom::CPillar_SlimeBossRoom(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -38,8 +39,15 @@ HRESULT CPillar_SlimeBossRoom::Initialize(void* pArg)
 
 void CPillar_SlimeBossRoom::Tick(_float fTimeDelta)
 {
-	if (Check_PlayerCol())
+	if(m_iHP <=0)
 		Set_Dead();
+
+	if (Check_PlayerAtkCol())
+		m_iHP--;
+
+	if (Check_HeadCol())
+		Set_Dead();
+
 	m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
 }
 
@@ -73,10 +81,35 @@ HRESULT CPillar_SlimeBossRoom::Render()
 	return S_OK;
 }
 
-_bool CPillar_SlimeBossRoom::Check_PlayerCol()
+_bool CPillar_SlimeBossRoom::Check_PlayerAtkCol()
 {
-	if (m_pColliderCom->Intersect((CCollider*)m_pGameInstance->Get_Component(LEVEL_SLIMEBOSS, TEXT("Layer_Player"), TEXT("Com_Collider"))))
-		return true;
+	return _bool();
+}
+
+_bool CPillar_SlimeBossRoom::Check_HeadCol()
+{
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_SLIMEBOSS));
+	_bool bInSlimeBossRoom = false;
+	if (pPlayer)
+		bInSlimeBossRoom = pPlayer->Get_InSlimeBossRoom();
+
+	if (bInSlimeBossRoom == false)
+		return false;
+
+	list<CGameObject*> headList = m_pGameInstance->Get_ObjectList(LEVEL_SLIMEBOSS, TEXT("Layer_SlimeBossHead"));
+	if (headList.empty())
+		return false;
+
+	for (auto& head : headList)
+	{
+		if (head == nullptr)
+			continue;
+
+		CCollider* pHeadCollider = dynamic_cast<CCollider*>(head->Get_Component(TEXT("Com_Collider")));
+
+		if (m_pColliderCom->Intersect(pHeadCollider))
+			return true;
+	}
 
 	return false;
 }

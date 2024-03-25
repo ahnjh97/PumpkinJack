@@ -42,7 +42,7 @@ void CKnife::Tick(_float fTimeDelta)
 	if (m_fAlpha <= 0.01f)
 		Set_Dead();
 
-	m_fTime += fTimeDelta * 1.5f;
+	m_fTime += fTimeDelta * 1.6f;
 
 	if (m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y >= 0)
 		m_pTransformCom->Fall(m_fTime);
@@ -66,7 +66,7 @@ void CKnife::Tick(_float fTimeDelta)
 
 void CKnife::Late_Tick(_float fTimeDelta)
 {
-	if (m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y >= 0)
+	if (m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y >= -3)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	else
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);

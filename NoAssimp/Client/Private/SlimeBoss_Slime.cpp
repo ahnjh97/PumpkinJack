@@ -36,7 +36,11 @@ HRESULT CSlimeBoss_Slime::Initialize(void* pArg)
 void CSlimeBoss_Slime::Tick(_float fTimeDelta)
 {
 	if (*m_pState == SLIMEBOSS_DEATH)
-		m_pModelCom->Shrink();
+	{
+		if (m_pModelCom->isFinished())
+			m_pModelCom->Shrink();
+	}
+
 	if (m_pModelCom->Get_Shrinked())
 		Set_Dead();
 	StateToAnimation();

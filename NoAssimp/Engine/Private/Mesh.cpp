@@ -97,9 +97,9 @@ HRESULT CMesh::Stock_Matrices(const vector<CBone*>& Bones, _float4x4* pMeshBoneM
 	return S_OK;
 }
 
-_float3 CMesh::Get_PickPos(const CTransform* pTransform) const
+_float4 CMesh::Get_PickPos(const CTransform* pTransform) const
 {
-	vector<_float3> vecPickPos;
+	vector<_float4> vecPickPos;
 
 	_float3 vRayDir, vRayPos;
 	m_pGameInstance->Transform_PickingToLocalSpace(pTransform, &vRayDir, &vRayPos);
@@ -121,20 +121,26 @@ _float3 CMesh::Get_PickPos(const CTransform* pTransform) const
 
 			_matrix* pWorldMatrix = &pTransform->Get_WorldMatrix();
 			vPickPos = XMVector3TransformCoord(vPickPos, *pWorldMatrix);
-			_float3 tempPos;
-			::XMStoreFloat3(&tempPos, vPickPos);
-
-			/*if (!XMVector3Equal(vPickPos, XMVectorSet(0.f, 0.f, 0.f, 0.f)))
-				vecPickPos.push_back(tempPos);*/
-			return tempPos;
+			_float4 tempPos;
+			::XMStoreFloat4(&tempPos, vPickPos);
+			tempPos.w = fDis;
+			if (tempPos.w != 0)
+				vecPickPos.push_back(tempPos);
 		}
 	}
 
 	if (vecPickPos.empty())
-		return _float3();
+		return _float4();
 
-	// 카메라와 가장 거리가 가까운놈 계산 
-	return vecPickPos[0];
+	_float fShortest = { FLT_MAX };
+	_float4 fResult = {};
+	for (auto& iter : vecPickPos) // 카메라와 가장 거리가 가까운놈 계산 
+	{
+		if (iter.w <= fShortest)
+			fResult = iter;
+	}
+	
+	return fResult;
 }
 
 HRESULT CMesh::Ready_Vertices_For_NonAnimModel(_fmatrix TransformMatrix)

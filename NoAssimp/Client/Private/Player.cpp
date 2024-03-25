@@ -402,13 +402,9 @@ void CPlayer::Check_GoBackUp()
 	{
 		list<CGameObject*> objList = m_pGameInstance->Get_ObjectList(LEVEL_SLIMEBOSS, TEXT("Layer_Pillar2"));
 		_bool bNullPointers = { true };
-		if (objList.empty())
-		{
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(205, 0, 150, 1));
-			m_bInSlimeBossRoom = false;
-			m_iSlimeBossRoomEscapeCount++;
-		}
-		else
+		_vector vTeleportPos = XMVectorSet(180, 0, 65, 1);
+
+		if (!objList.empty())
 		{
 			for (auto& iter : objList)
 			{
@@ -418,13 +414,13 @@ void CPlayer::Check_GoBackUp()
 					break;
 				}
 			}
+		}
 
-			if (bNullPointers == true)
-			{
-				m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(205, 0, 150, 1));
-				m_bInSlimeBossRoom = false;
-				m_iSlimeBossRoomEscapeCount++;
-			}
+		if (bNullPointers == true)
+		{
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vTeleportPos);
+			m_bInSlimeBossRoom = false;
+			m_iSlimeBossRoomEscapeCount++;
 		}
 	}
 }

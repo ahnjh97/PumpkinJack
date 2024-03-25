@@ -28,7 +28,7 @@ public:
 public:
 	HRESULT Stock_Matrices(const vector<CBone*>& Bones, _float4x4* pMeshBoneMatrices);
 
-	_float3 Get_PickPos(const class CTransform* pTransform) const;
+	_float4 Get_PickPos(const class CTransform* pTransform) const;
 
 
 private:

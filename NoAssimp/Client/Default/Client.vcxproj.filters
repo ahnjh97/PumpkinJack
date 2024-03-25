@@ -94,6 +94,9 @@
     <Filter Include="02.GameObjects\SlimeBoss\Portal">
       <UniqueIdentifier>{cf0a68f4-a85d-417d-8f2f-15a2bf4a4377}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\SlimeBoss\SlimeBossHead">
+      <UniqueIdentifier>{a6e76243-75ab-45cc-a229-09e4ee3d6e25}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -201,6 +204,9 @@
     <ClInclude Include="..\Public\Portal.h">
       <Filter>02.GameObjects\SlimeBoss\Portal</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SlimeBossHead.h">
+      <Filter>02.GameObjects\SlimeBoss\SlimeBossHead</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -298,6 +304,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Portal.cpp">
       <Filter>02.GameObjects\SlimeBoss\Portal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SlimeBossHead.cpp">
+      <Filter>02.GameObjects\SlimeBoss\SlimeBossHead</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

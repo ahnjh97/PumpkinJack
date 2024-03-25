@@ -58,7 +58,14 @@ void CSlimeBoss::Tick(_float fTimeDelta)
 	if (m_pPlayer != nullptr)
 	{
 		if (m_pPlayer->Get_InSlimeBossRoom())
+		{
+			m_bPillarSpawn = false;
+			m_bPortalSpawn = false;
+			m_iCurPattern = 0;
+			m_eState = SLIMEBOSS_FORK;
 			return;
+		}
+			
 		if (m_pPlayer->Get_SlimeBossRoomEscapeCount() >= 2)
 			m_eState = SLIMEBOSS_DEATH;
 	}
@@ -117,14 +124,17 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 		m_eState = SLIMEBOSS_DEATH;
 
 	if (m_eState == SLIMEBOSS_DEATH)
-		m_pModelCom->Shrink();
-
+	{
+		if(m_pModelCom->isFinished())
+			m_pModelCom->Shrink();
+	}
+		
 	if (m_eState == SLIMEBOSS_SPAWN)
 	{
 		if (m_pModelCom->isFinished())
 		{
-			PillarSpawn();
-			PortalSpawn();
+			/*PillarSpawn();
+			PortalSpawn();*/
 			m_eState = SLIMEBOSS_IDLE;
 		}
 	}	
@@ -175,11 +185,11 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 			XMStoreFloat4(&m_vLightningPos, XMVectorSet(m_pPlayerWorldMatrix->_41, m_pPlayerWorldMatrix->_42, m_pPlayerWorldMatrix->_43, 1));
 
 			_float fPlayRatio = m_pModelCom->Get_AnimPlayRatio(SLIMEBOSS_LIGHTNING);
-			if (m_iLightningCount == m_pModelCom->Get_AnimPlayCount(SLIMEBOSS_LIGHTNING) && fPlayRatio > 0.7f)
+			if (m_iLightningCount == m_pModelCom->Get_AnimPlayCount(SLIMEBOSS_LIGHTNING) && fPlayRatio > 0.6f)
 			{
 				CGameObject::GAMEOBJECT_DESC tDesc{};
 				tDesc.matWorld._41 = m_vLightningPos.x;
-				tDesc.matWorld._42 = 90.f;
+				tDesc.matWorld._42 = 85.f;
 				tDesc.matWorld._43 = m_vLightningPos.z;
 				tDesc.iLevel = LEVEL_SLIMEBOSS;
 				tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Knife");
@@ -291,12 +301,7 @@ HRESULT CSlimeBoss::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 	if (FAILED(__super::Add_Component(eLevel, wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
-	wstring wstrShaderTag = {};
-	if (m_pModelCom->Get_ModelType() == TYPE_ANIM)
-		wstrShaderTag = TEXT("Prototype_Component_Shader_VtxAnimModel");
-	else
-		wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel");
-
+	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxAnimModel");
 	if (FAILED(__super::Add_Component(eLevel, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 

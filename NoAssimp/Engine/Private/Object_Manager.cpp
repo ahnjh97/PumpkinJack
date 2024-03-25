@@ -252,6 +252,7 @@ _bool CObject_Manager::Binarize_Objects(_uint iLevel, string strLevel)
 CGameObject* CObject_Manager::Select_ModelByPicking(_uint iLevelIndex, const wstring& wstrLayerTag)
 {
 	vector<CGameObject*> vecPickedObjects;
+	vector<_float4> vecPickPos;
 
 	for (auto& mapIter : m_pLayers[iLevelIndex])
 	{
@@ -276,26 +277,28 @@ CGameObject* CObject_Manager::Select_ModelByPicking(_uint iLevelIndex, const wst
 				continue;
 
 			CTransform* pTransform = dynamic_cast<CTransform*>(objectListIter->Get_Component(g_strTransformTag));
-			/*if (pModel->Check_BoundingBox(pTransform) == false) // BoundingBox 이거 이상함
-				continue;*/
 
-			_float3 vPickPos = pModel->Check_Meshes(pTransform);
-			_vector vTemp = XMLoadFloat3(&vPickPos);
-			_bool bResult = XMVector3Equal(vTemp, ::XMVectorSet(0.f, 0.f, 0.f, 0.f)); // 
-			if (false == bResult) // 피킹 성공
+			_float4 vPickPos = pModel->Check_Meshes(pTransform);
+			if (vPickPos.w != 0) // 피킹 성공
+			{
 				vecPickedObjects.push_back(objectListIter);
+				vecPickPos.push_back(vPickPos);
+			}
+				
 		}
 	}
 
 	if (vecPickedObjects.empty())
 		return nullptr;
 
-	for (auto vecIter : vecPickedObjects)
+	_float fShortest = { FLT_MAX };
+	CGameObject* pResult = { nullptr };
+	for (int i = 0; i< vecPickPos.size(); i++)
 	{
-		// 가장 거리가 가까운 놈 찾기
-		return vecPickedObjects[0];
+		if (vecPickPos[i].w <= fShortest)
+			pResult = vecPickedObjects[i];
 	}
-	return nullptr;
+	return pResult;
 }
 
 CGameObject* CObject_Manager::Get_LastGameObject(_uint iLevelIndex, const wstring& wstrLayerTag)

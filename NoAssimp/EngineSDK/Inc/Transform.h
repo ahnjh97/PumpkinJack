@@ -85,7 +85,7 @@ public:
 	void Fall(_float fTimeDelta);
 	void Jump(_float fTimeDelta);
 	void Gravity(_float fTimeDelta);
-	void AirAttack_End() { m_fJumpTime = 0.55f / 1.3f + 0.2f; }
+	void AirAttack_End() { m_fJumpTime = 0.55f / 1.3f + 0.45f; }
 
 	void Look_At(_fvector vPosition);
 	void Look_At_ForLandObject(_fvector vPosition);

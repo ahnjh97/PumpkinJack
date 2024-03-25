@@ -22,6 +22,7 @@
 #include "Pillar.h"
 #include "Portal.h"
 #include "Pillar_SlimeBossRoom.h"
+#include "SlimeBossHead.h"
 //#include "Effect.h"
 //#include "Sky.h"
 
@@ -283,6 +284,7 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("cemeteryPillar"), CPillar);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Portal"), CPortal);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Pillar_SlimeBossRoom"), CPillar_SlimeBossRoom);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SlimeBossHead"), CSlimeBossHead);
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
@@ -349,6 +351,11 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimModel.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
 		return E_FAIL;
 	
+	/* For.Prototype_Component_Shader_VtxModel_Lighted */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_Lighted"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_Lighted.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+		return E_FAIL;
+
 	if (eLevel == LEVEL_SLIMEBOSS)
 	{
 		/* For.Prototype_Component_Shader_VtxModel_Knife */
@@ -359,11 +366,6 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 		/* For.Prototype_Component_Shader_VtxModel_AlphaTex */
 		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_AlphaTex"),
 			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_AlphaTex.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
-			return E_FAIL;
-
-		/* For.Prototype_Component_Shader_VtxModel_Lighted */
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_Lighted"),
-			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_Lighted.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 			return E_FAIL;
 
 		/* For.Prototype_Component_Shader_VtxModel_SlimeBossRoom */
@@ -401,8 +403,8 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degaree, NewScale, RootIndex
 	m_ModelConfigs.emplace("Owl", MODEL_CONFIG{ 0.03f, 0.f, 1.f, 4 });
 	m_ModelConfigs.emplace("SkeletonBoss", MODEL_CONFIG{ 0.03f, 0.f, 2.6f, 3 });
 	m_ModelConfigs.emplace("Slime", MODEL_CONFIG{ 0.01f, 0.f, 1.f, 4 });
-	m_ModelConfigs.emplace("SlimeBoss", MODEL_CONFIG{ 0.032f, 180.f, 3.2f, 4 });
-	m_ModelConfigs.emplace("PartSlimeBoss", MODEL_CONFIG{ 0.032f, 180.f, 3.2f, 4 });
+	m_ModelConfigs.emplace("SlimeBoss", MODEL_CONFIG{ 0.041f, 180.f, 4.1f, 4 });
+	m_ModelConfigs.emplace("PartSlimeBoss", MODEL_CONFIG{ 0.041f, 180.f, 4.1f, 4 });
 	m_ModelConfigs.emplace("Sniper", MODEL_CONFIG{ 0.025f, 0.f, 2.6f, 3 });
 	m_ModelConfigs.emplace("Soldier", MODEL_CONFIG{ 0.025f, 0.f, 2.6f, 5 });
 	m_ModelConfigs.emplace("Trabuchet", MODEL_CONFIG{ 0.03f, 0.f, 2.6f, 2 });
@@ -423,9 +425,10 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degaree, NewScale, RootIndex
 	m_ModelConfigs.emplace("Scythe", MODEL_CONFIG{ 0.22f, 0.f, 0.22f });
 	m_ModelConfigs.emplace("Spear", MODEL_CONFIG{ 6.4f, 0.f, 6.4f });
 
-	m_ModelConfigs.emplace("Knife", MODEL_CONFIG{ 6.5f, 0.f, 6.5f });
-	m_ModelConfigs.emplace("NotOpen", MODEL_CONFIG{ 3.1f, 0.f, 3.1f });
+	m_ModelConfigs.emplace("Knife", MODEL_CONFIG{ 8.f, 0.f, 8.f });
+	m_ModelConfigs.emplace("NotOpen", MODEL_CONFIG{ 3.9f, 0.f, 3.9f });
 	m_ModelConfigs.emplace("cemeteryPillar", MODEL_CONFIG{ 6.5f, 0.f, 6.5f });
+	m_ModelConfigs.emplace("SlimeBossHead", MODEL_CONFIG{ 10.f, 0.f, 10.f });
 }
 
 void CLoader::TraverseAnimModels(LEVEL eLevel, const wstring& rootFolderPath)

@@ -45,8 +45,7 @@ HRESULT CTransform::Initialize(void * pArg)
 
 HRESULT CTransform::Bind_ShaderResource(CShader * pShader, const _char * pConstantName)
 {
-	return pShader->Bind_Matrix(pConstantName, &m_WorldMatrix);
-	
+	return pShader->Bind_Matrix(pConstantName, &m_WorldMatrix);	
 }
 
 void CTransform::Go_Straight(_float fTimeDelta, _uint iNum, _fvector vCamLook)
@@ -114,8 +113,8 @@ void CTransform::Go_Right(_float fTimeDelta, _uint iNum, _fvector vCamRight)
 
 void CTransform::Move(_float fTimeDelta, _fvector vTargetDir)
 {
-	_vector vDir = vTargetDir;
-	vDir = XMVectorSetY(vDir, 0.f);
+	_vector vDir = XMVectorSetY(vTargetDir, 0.f);
+	vDir = XMVectorSetW(vDir, 0.f);
 	_vector		vPosition = Get_State_Vector(STATE_POSITION);
 	vPosition += XMVector3Normalize(vDir) * m_fSpeedPerSec * fTimeDelta;
 	Set_State(STATE_POSITION, vPosition);

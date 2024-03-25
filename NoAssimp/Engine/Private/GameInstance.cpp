@@ -74,6 +74,8 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 		return E_FAIL;
 
 	Set_BlendState(*ppDevice);
+	Set_DepthStencilStateEnabled(*ppDevice);
+	Set_DepthStencilStateDisabled(*ppDevice);
 	return S_OK;
 }
 
@@ -537,6 +539,34 @@ void CGameInstance::Set_BlendState(ID3D11Device* pDevice)
 	pDevice->CreateBlendState(&blendDesc, &m_pBlendState);
 }
 
+void CGameInstance::Set_DepthStencilStateEnabled(ID3D11Device* pDevice)
+{
+	// 활성화된 깊이 스텐실 상태 생성
+	D3D11_DEPTH_STENCIL_DESC depthStencilDescEnabled{};
+	ZeroMemory(&depthStencilDescEnabled, sizeof(depthStencilDescEnabled));
+	depthStencilDescEnabled.DepthEnable = true; // 깊이 테스트 활성화
+	depthStencilDescEnabled.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL; // 모든 깊이 값을 쓰기
+	depthStencilDescEnabled.DepthFunc = D3D11_COMPARISON_LESS_EQUAL; // 깊이 비교 함수
+	depthStencilDescEnabled.StencilEnable = true; // 스텐실 테스트 활성화
+
+	// 활성화된 깊이 스텐실 상태 생성
+	pDevice->CreateDepthStencilState(&depthStencilDescEnabled, &m_pDepthStencilStateEnabled);
+}
+
+void CGameInstance::Set_DepthStencilStateDisabled(ID3D11Device* pDevice)
+{
+	// 후면 컬링을 비활성화하는 깊이 스텐실 상태 생성
+	D3D11_DEPTH_STENCIL_DESC depthStencilDesc{};
+	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
+	depthStencilDesc.DepthEnable = true; // 깊이 테스트 활성화
+	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL; // 모든 깊이 값을 쓰기
+	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL; // 깊이 비교 함수
+	depthStencilDesc.StencilEnable = false; // 스텐실 테스트 비활성화
+
+	// 새로운 깊이 스텐실 상태를 생성
+	pDevice->CreateDepthStencilState(&depthStencilDesc, &m_pDepthStencilStateDisabled);
+}
+
 
 void CGameInstance::Release_Engine()
 {
@@ -547,6 +577,8 @@ void CGameInstance::Release_Engine()
 
 void CGameInstance::Free()
 {
+	Safe_Release(m_pDepthStencilStateEnabled);
+	Safe_Release(m_pDepthStencilStateDisabled);
 	Safe_Release(m_pBlendState);
 	Safe_Release(m_pLight_Manager);
 	Safe_Release(m_pPicking);

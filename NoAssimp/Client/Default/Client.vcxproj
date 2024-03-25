@@ -186,6 +186,7 @@
     <ClInclude Include="..\Public\Portal.h" />
     <ClInclude Include="..\Public\Slime.h" />
     <ClInclude Include="..\Public\SlimeBoss.h" />
+    <ClInclude Include="..\Public\SlimeBossHead.h" />
     <ClInclude Include="..\Public\SlimeBoss_Slime.h" />
     <ClInclude Include="..\Public\Slime_Slime.h" />
     <ClInclude Include="..\Public\Terrain.h" />
@@ -222,6 +223,7 @@
     <ClCompile Include="..\Private\Portal.cpp" />
     <ClCompile Include="..\Private\Slime.cpp" />
     <ClCompile Include="..\Private\SlimeBoss.cpp" />
+    <ClCompile Include="..\Private\SlimeBossHead.cpp" />
     <ClCompile Include="..\Private\SlimeBoss_Slime.cpp" />
     <ClCompile Include="..\Private\Slime_Slime.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />

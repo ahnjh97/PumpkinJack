@@ -158,7 +158,7 @@ void CBody::StateToAnimation()
 
 void CBody::Initialize_AnimSpeed()
 {
-	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_AirAttack_Start"), 2.2f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_AirAttack_Start"), 3.5f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_AirAttack"), 3.f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_AirAttack_Start"), 2.f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_AirAttack_End"), 3.f);

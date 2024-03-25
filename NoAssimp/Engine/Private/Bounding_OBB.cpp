@@ -48,6 +48,11 @@ _bool CBounding_OBB::Intersect(CCollider::TYPE eType, CBounding* pBounding)
 	return m_isCollision;
 }
 
+_bool CBounding_OBB::Intersect_Ray(_fvector vRayOrigin, _fvector vRayDir, _float& fDis)
+{
+	return m_pBoundingDesc->Intersects(vRayOrigin, vRayDir, fDis);
+}
+
 _bool CBounding_OBB::Intersect(CBounding_OBB* pTargetBounding)
 {
 	m_isCollision = false;

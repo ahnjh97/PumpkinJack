@@ -52,7 +52,7 @@ public:
 
 public: // 바운딩박스
 	_bool Check_BoundingBox(const class CTransform* pTransform) const;
-	_float3 Check_Meshes(const class CTransform* pTransform) const;
+	_float4 Check_Meshes(const class CTransform* pTransform) const;
 
 public:
 	virtual HRESULT Initialize_Prototype(TYPE eType, const string& strModelName, _fmatrix TransformMatrix, MODEL_CONFIG tConfig, _bool bNonAnimVersion);

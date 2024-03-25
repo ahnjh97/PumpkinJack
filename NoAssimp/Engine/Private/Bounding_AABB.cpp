@@ -70,6 +70,11 @@ _bool CBounding_AABB::Intersect(CBounding_AABB* pTargetBounding)
 	return m_isCollision = true;
 }
 
+_bool CBounding_AABB::Intersect_Ray(_fvector vRayOrigin, _fvector vRayDir, _float& fDis)
+{
+	return m_pBoundingDesc->Intersects(vRayOrigin, vRayDir, fDis);
+}
+
 #ifdef _DEBUG
 
 HRESULT CBounding_AABB::Render(PrimitiveBatch<VertexPositionColor>* pBatch)

@@ -21,6 +21,7 @@ public:
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Tick(_fmatrix WorldMatrix);
 	_bool Intersect(CCollider* pTargetCollider);
+	_bool Intersect_Ray(_fvector vRayOrigin, _fvector vRayDir, _float& fDis);
 
 #ifdef _DEBUG
 public:

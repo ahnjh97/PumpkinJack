@@ -29,12 +29,9 @@ HRESULT CPortal::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	//m_pTransformCom->Set_WorldMatrix(GameObjectDesc.matWorld);
-
 	if (FAILED(Add_Components((LEVEL)GameObjectDesc.iLevel)))
 		return E_FAIL;
 
-	/*m_pTransformCom->Rotation(XMVectorSet(0, 0, 1, 0), XM_PIDIV2);*/
 	return S_OK;
 }
 
@@ -58,13 +55,16 @@ void CPortal::Tick(_float fTimeDelta)
 		_float fDis = 40.f;
 		for (_int i = 0; i < 3; i++)
 		{
-			float fAngle = i * XM_PI * 2 / 3.f;
+			_float fAngle = i * XM_2PI / 3.f;
 			tDesc.matWorld._41 = 205 + cosf(fAngle) * fDis;
-			tDesc.matWorld._42 = -170;
+			tDesc.matWorld._42 = -162;
 			tDesc.matWorld._43 = 150 + sinf(fAngle) * fDis;
 			m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_Pillar2"), TEXT("Prototype_GameObject_Pillar_SlimeBossRoom"), &tDesc);
 		}
-	
+
+		_float fHeadAngle = { XM_PI * 3.f };
+		_float3 vHeadPos = _float3(205 + cosf(fHeadAngle) * fDis, -138, 150 + sinf(fHeadAngle) * fDis);
+		SlimeBossHeadSpawn(vHeadPos);
 		m_bSpawnSlimeBossRoomPillars = true;
 	}
 
@@ -96,6 +96,17 @@ HRESULT CPortal::Render()
 #endif
 
 	return S_OK;
+}
+
+void CPortal::SlimeBossHeadSpawn(_float3 vPos)
+{
+	CGameObject::GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = LEVEL_SLIMEBOSS;
+	tDesc.wstrModelTag = TEXT("Prototype_Component_Model_SlimeBossHead");
+	tDesc.matWorld._41 = vPos.x;
+	tDesc.matWorld._42 = vPos.y;
+	tDesc.matWorld._43 = vPos.z;
+	m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_SlimeBossHead"), TEXT("Prototype_GameObject_SlimeBossHead"), &tDesc);
 }
 
 HRESULT CPortal::Add_Components(LEVEL eLevel)

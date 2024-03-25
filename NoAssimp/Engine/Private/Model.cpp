@@ -107,22 +107,27 @@ _bool CModel::Check_BoundingBox(const CTransform* pTransform) const
 	return false;
 }
 
-_float3 CModel::Check_Meshes(const CTransform* pTransform) const
+_float4 CModel::Check_Meshes(const CTransform* pTransform) const
 {
-	vector<_float3> vecPickPos;
+	vector<_float4> vecPickPos;
 	for (auto iter : m_Meshes)
 	{
-		_float3 vTemp = iter->Get_PickPos(pTransform);
-		_vector vPickPos = ::XMLoadFloat3(&vTemp);
-		if (!XMVector3Equal(vPickPos, XMVectorSet(0.f, 0.f, 0.f, 0.f)))
+		_float4 vTemp = iter->Get_PickPos(pTransform);
+		if (vTemp.w != 0)
 			vecPickPos.push_back(vTemp);
 	}
 
 	if(vecPickPos.empty())
-		return _float3();
+		return _float4();
 
-	// 가장 가까운놈 계산 필요
-	return vecPickPos[0];
+	_float fShortest = { FLT_MAX };
+	_float4 fResult = {};
+	for (auto& iter : vecPickPos)
+	{
+		if (iter.w <= fShortest)
+			fResult = iter;
+	}
+	return fResult;
 }
 
 HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelName, _fmatrix TransformMatrix, MODEL_CONFIG tConfig, _bool bNonAnimVersion)

@@ -22,6 +22,7 @@ public:
 	virtual HRESULT Initialize(CBounding::BOUNDING_DESC* pBoundingDesc);
 	virtual void Tick(_fmatrix WorldMatrix) = 0;
 	virtual _bool Intersect(CCollider::TYPE eType, CBounding* pBoundingDesc) = 0;
+	virtual _bool Intersect_Ray(_fvector vRayOrigin, _fvector vRayDir, _float& fDis) = 0;
 
 #ifdef _DEBUG
 public:

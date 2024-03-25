@@ -25,6 +25,9 @@ public:
 	virtual HRESULT Render() override;
 
 private:
+	void SlimeBossHeadSpawn(_float3 vPos);
+
+private:
 	_bool m_bSpawnSlimeBossRoomPillars = { false };
 
 private:

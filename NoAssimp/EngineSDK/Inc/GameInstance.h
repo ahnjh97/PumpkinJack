@@ -90,7 +90,11 @@ public: /* For.Light_Manager */
 	_int Get_FPS() { return iFps; }
 	_int RandomNumber(_int iMin, _int iMax);
 	void Set_BlendState(ID3D11Device* pDevice);
+	void Set_DepthStencilStateEnabled(ID3D11Device* pDevice);
+	void Set_DepthStencilStateDisabled(ID3D11Device* pDevice);
 	ID3D11BlendState* Get_BlendState() { return m_pBlendState; }
+	ID3D11DepthStencilState* Get_DepthStencilStateEnabled() { return m_pDepthStencilStateEnabled; }
+	ID3D11DepthStencilState* Get_DepthStencilStateDisabled() { return m_pDepthStencilStateDisabled; }
 
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };
@@ -111,7 +115,8 @@ private:
 	_float fElapsedTime = { 0.f };
 	_int iFps = { 0 };
 	ID3D11BlendState* m_pBlendState = { nullptr };
-
+	ID3D11DepthStencilState* m_pDepthStencilStateEnabled = { nullptr };
+	ID3D11DepthStencilState* m_pDepthStencilStateDisabled = { nullptr };
 public:		
 	static void Release_Engine();
 	virtual void Free() override;
