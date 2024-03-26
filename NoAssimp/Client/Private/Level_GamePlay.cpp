@@ -196,15 +196,12 @@ HRESULT CLevel_GamePlay::Ready_UI(const wstring& strLayerTag)
 		tInvenDesc.iLevel = LEVEL_GAMEPLAY;
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Inven"), &tInvenDesc)))
 			return E_FAIL;
+		
+		tInvenDesc.matWorld._43 = 0.85f - i * 0.1f;
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Indicator"), &tInvenDesc)))
+			return E_FAIL;
 	}
 
-	/*for (_int i = 0; i < WPN_END; i++)
-	{
-		tInvenDesc.eWeapon = (WEAPON)i;
-		tInvenDesc.matWorld._43 = 0.6f - i * 0.1f;
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_UI_Weapon"), &tInvenDesc)))
-			return E_FAIL;
-	}*/
 	return S_OK;
 }
 

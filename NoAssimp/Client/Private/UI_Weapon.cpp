@@ -34,17 +34,37 @@ HRESULT CUI_Weapon::Initialize(void* pArg)
 	if (FAILED(Add_Components(UIWeaponDesc.eWeapon)))
 		return E_FAIL;
 
-	m_fX = 0;
-	m_fY = 0;
-
-	m_fSizeX = m_fSizeY = 60;
-
+	m_fSizeX = m_fSizeY = 90;
+	if (m_eWeapon == WPN_SCYTHE)
+		m_fSizeX = m_fSizeY = 82;
 	m_pTransformCom->Set_Scaled(m_fSizeX, m_fSizeY, 1.f);
+
+	if (m_eWeapon == WPN_SPEAR)
+	{
+		m_fX = -50;
+		m_fY = -29;
+		m_pTransformCom->Turn(XMVectorSet(0, 0, 1, 0), 0.2f);
+	}
+	else if (m_eWeapon == WPN_RIFLE)
+	{
+		m_fX = 0;
+		m_fY = 52;
+		m_pTransformCom->Turn(XMVectorSet(0, 0, 1, 0), 0.45f);
+	}
+	else if (m_eWeapon == WPN_SCYTHE)
+	{
+		m_fX = 47;
+		m_fY = -26;
+		m_pTransformCom->Turn(XMVectorSet(0, 0, 1, 0), 0.1f);
+	}
+
+
+
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(
 		m_fX , -m_fY, m_fZ, 1.f));
 
-	::XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
-	::XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
+	::XMStoreFloat4x4(&m_ViewMatrix, ::XMMatrixIdentity());
+	::XMStoreFloat4x4(&m_ProjMatrix, ::XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
 	/*_matrix matRotation = XMMatrixRotationAxis(XMVectorSet(0, 0, 1, 0), XMConvertToRadians(-120.f));
 	m_vInvenUp[WPN_SPEAR] = XMVectorSet(0, 1, 0, 0);
@@ -74,9 +94,11 @@ void CUI_Weapon::Tick(_float fTimeDelta)
 
 void CUI_Weapon::Late_Tick(_float fTimeDelta)
 {
-	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * XMLoadFloat4x4(m_pParentMatrix));
-	m_WorldMatrix._11 = m_fSizeX;
-	m_WorldMatrix._22 = m_fSizeY;
+	_vector vScale, vRot, vTrans;
+	::XMMatrixDecompose(&vScale, &vRot, &vTrans, XMLoadFloat4x4(m_pParentMatrix));
+	_matrix matNewParent =  ::XMMatrixRotationQuaternion(vRot) * ::XMMatrixTranslationFromVector(vTrans);
+	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * matNewParent);
+
 	m_WorldMatrix._43 = m_fZ;
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }

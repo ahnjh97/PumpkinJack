@@ -75,7 +75,7 @@ void CInven::Tick(_float fTimeDelta)
 	_vector vUp = m_pTransformCom->Get_State_Vector(CTransform::STATE_UP);
 	_float fDegree = XMConvertToDegrees(XMVectorGetY(XMVector3AngleBetweenVectors(vUp, m_vInvenUp[m_pPlayer->Get_Weapon()])));
 	if (fDegree > 4.f)
-		m_pTransformCom->Turn(XMVectorSet(0, 0, 1, 0), -fTimeDelta * fDegree * 0.035f);
+		m_pTransformCom->Turn(XMVectorSet(0, 0, 1, 0), -fTimeDelta * fDegree * 0.055f);
 	for (auto& Pair : m_Parts)
 		Pair.second->Tick(fTimeDelta);
 }
@@ -112,7 +112,6 @@ HRESULT CInven::Add_Components(WEAPON eWeapon)
 {
 	/* For.Com_Texture */
 	wstring wstrTextureTag = TEXT("Prototype_Component_Texture_Inven");
-		
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, wstrTextureTag,	TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 

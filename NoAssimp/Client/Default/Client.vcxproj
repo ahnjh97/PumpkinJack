@@ -170,6 +170,7 @@
     <ClInclude Include="..\Public\Grid.h" />
     <ClInclude Include="..\Public\ImGui_Client.h" />
     <ClInclude Include="..\Public\ImGui_MapTool.h" />
+    <ClInclude Include="..\Public\Indicator.h" />
     <ClInclude Include="..\Public\Inven.h" />
     <ClInclude Include="..\Public\Knife.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
@@ -210,6 +211,7 @@
     <ClCompile Include="..\Private\Grid.cpp" />
     <ClCompile Include="..\Private\ImGui_Client.cpp" />
     <ClCompile Include="..\Private\ImGui_MapTool.cpp" />
+    <ClCompile Include="..\Private\Indicator.cpp" />
     <ClCompile Include="..\Private\Inven.cpp" />
     <ClCompile Include="..\Private\Knife.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />

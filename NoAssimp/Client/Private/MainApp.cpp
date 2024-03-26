@@ -3,6 +3,7 @@
 #include "MainApp.h"
 #include "LifeBar.h"
 #include "UI_Weapon.h"
+#include "Indicator.h"
 #include "BackGround.h"
 #include "GameInstance.h"
 #include "Level_Loading.h"
@@ -108,6 +109,8 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		return E_FAIL;
  	if (FAILED(Add_Texture(LEVEL_STATIC, "Inven", "Weapon/UI_Inventory_3_%d.dds", 3)))
 		return E_FAIL;
+	if (FAILED(Add_Texture(LEVEL_STATIC, "Indicator", "Weapon/UI_Indicator_3_%d.dds", 3)))
+		return E_FAIL;
 	if (FAILED(Add_Texture(LEVEL_STATIC, "Spear", "Weapon/T_Weapon_Spear.dds")))
 		return E_FAIL;
 	if (FAILED(Add_Texture(LEVEL_STATIC, "Rifle", "Weapon/T_Weapon_Rifle.dds")))
@@ -127,7 +130,9 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI_Weapon"),
 		CUI_Weapon::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
-
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Indicator"),
+		CIndicator::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Collider_AABB"),
 		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_AABB))))
 		return E_FAIL;

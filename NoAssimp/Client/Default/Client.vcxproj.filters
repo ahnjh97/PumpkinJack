@@ -109,6 +109,9 @@
     <Filter Include="02.GameObjects\UI\Inven\Weapon">
       <UniqueIdentifier>{c1ba97f4-4b17-4182-b6a4-5577d73f9b08}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\Indicator">
+      <UniqueIdentifier>{9f55ce19-c5df-480d-9b8b-63bc33537f91}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -228,6 +231,9 @@
     <ClInclude Include="..\Public\UI_Weapon.h">
       <Filter>02.GameObjects\UI\Inven\Weapon</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Indicator.h">
+      <Filter>02.GameObjects\UI\Indicator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -337,6 +343,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\UI_Weapon.cpp">
       <Filter>02.GameObjects\UI\Inven\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Indicator.cpp">
+      <Filter>02.GameObjects\UI\Indicator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

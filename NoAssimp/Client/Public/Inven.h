@@ -12,7 +12,6 @@ END
 BEGIN(Client)
 class CInven final : public CGameObject
 {
-	enum TEXTURETYPE { TYPE_DIFFUSE, TYPE_BRUSH, TYPE_END };
 public:
 	typedef struct : public GAMEOBJECT_DESC
 	{
