@@ -24,7 +24,7 @@ public:
 	_float3 Get_TargetDir() { return m_vDirection; }
 	CPart* Get_Part(const wstring& wstrPart);
 	_float4 Get_WeaponPos(WEAPON eWeapon);
-	const _float4x4* Get_PlayerWorldMatrix() { if (m_pTransformCom == nullptr) { return nullptr; }
+	const _float4x4* Get_PlayerWorldMatrixPtr() { if (m_pTransformCom == nullptr) { return nullptr; }
 		else { return m_pTransformCom->Get_WorldFloat4x4_Ptr(); }}
 	_bool Get_InSlimeBossRoom() { return m_bInSlimeBossRoom; }
 	_uint Get_SlimeBossRoomEscapeCount() { return m_iSlimeBossRoomEscapeCount; }

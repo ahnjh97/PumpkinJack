@@ -106,7 +106,7 @@ PS_OUT PS_MAIN(PS_IN In)
     Out.vColor = (vMtrlDiffuse * g_vLightDiffuse) * saturate(vShade) +
 		(g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
     Out.vColor += vEmitColor;
-    Out.vColor.a = 0.4f;
+    Out.vColor.a = 0.5f;
     
     return Out;
 }

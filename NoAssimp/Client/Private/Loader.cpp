@@ -23,6 +23,9 @@
 #include "Portal.h"
 #include "Pillar_SlimeBossRoom.h"
 #include "SlimeBossHead.h"
+#include "Slime.h"
+#include "Slime_Slime.h"
+#include "SlimeDamageZone.h"
 //#include "Effect.h"
 //#include "Sky.h"
 
@@ -285,6 +288,9 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Portal"), CPortal);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Pillar_SlimeBossRoom"), CPillar_SlimeBossRoom);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SlimeBossHead"), CSlimeBossHead);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Slime"), CSlime);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Slime_Slime"), CSlime_Slime);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SlimeDamageZone"), CSlimeDamageZone);
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
@@ -402,9 +408,10 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degaree, NewScale, RootIndex
 	m_ModelConfigs.emplace("Mummy", MODEL_CONFIG{ 0.03f, 0.f, 2.2f, 4 });
 	m_ModelConfigs.emplace("Owl", MODEL_CONFIG{ 0.03f, 0.f, 1.f, 4 });
 	m_ModelConfigs.emplace("SkeletonBoss", MODEL_CONFIG{ 0.03f, 0.f, 2.6f, 3 });
-	m_ModelConfigs.emplace("Slime", MODEL_CONFIG{ 0.01f, 0.f, 1.f, 4 });
-	m_ModelConfigs.emplace("SlimeBoss", MODEL_CONFIG{ 0.041f, 180.f, 4.1f, 4 });
-	m_ModelConfigs.emplace("PartSlimeBoss", MODEL_CONFIG{ 0.041f, 180.f, 4.1f, 4 });
+	m_ModelConfigs.emplace("Slime", MODEL_CONFIG{ 0.027f, 180.f, 2.7f });
+	m_ModelConfigs.emplace("PartSlime", MODEL_CONFIG{ 0.027f, 180.f, 2.7f });
+	m_ModelConfigs.emplace("SlimeBoss", MODEL_CONFIG{ 0.041f, 180.f, 4.1f });
+	m_ModelConfigs.emplace("PartSlimeBoss", MODEL_CONFIG{ 0.041f, 180.f, 4.1f });
 	m_ModelConfigs.emplace("Sniper", MODEL_CONFIG{ 0.025f, 0.f, 2.6f, 3 });
 	m_ModelConfigs.emplace("Soldier", MODEL_CONFIG{ 0.025f, 0.f, 2.6f, 5 });
 	m_ModelConfigs.emplace("Trabuchet", MODEL_CONFIG{ 0.03f, 0.f, 2.6f, 2 });
@@ -429,6 +436,7 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degaree, NewScale, RootIndex
 	m_ModelConfigs.emplace("NotOpen", MODEL_CONFIG{ 3.9f, 0.f, 3.9f });
 	m_ModelConfigs.emplace("cemeteryPillar", MODEL_CONFIG{ 6.5f, 0.f, 6.5f });
 	m_ModelConfigs.emplace("SlimeBossHead", MODEL_CONFIG{ 10.f, 0.f, 10.f });
+	m_ModelConfigs.emplace("SlimeDamageZone", MODEL_CONFIG{ 6.f, 0.f, 6.f });
 }
 
 void CLoader::TraverseAnimModels(LEVEL eLevel, const wstring& rootFolderPath)

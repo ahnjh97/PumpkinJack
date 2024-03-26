@@ -345,6 +345,14 @@ CGameObject* CGameInstance::Get_Player(_uint iLevelIndex)
 	return  m_pObject_Manager->Get_Player(iLevelIndex);
 }
 
+_bool CGameInstance::Check_Collision(_uint iLevelIndex, const wstring& wstrLayerTag, CCollider* pMyCollider, const wstring& wstrColliderTag)
+{
+	if (nullptr == m_pObject_Manager)
+		return false;
+
+	return  m_pObject_Manager->Check_Collision(iLevelIndex, wstrLayerTag, pMyCollider, wstrColliderTag);
+}
+
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const wstring & strPrototypeTag, CComponent * pPrototype)
 {
 	if (nullptr == m_pComponent_Manager)

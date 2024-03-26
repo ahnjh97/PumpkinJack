@@ -5,13 +5,14 @@
 BEGIN(Engine)
 class CModel;
 class CShader;
+class CPart;
 END
 
 BEGIN(Client)
 
 class CSlime : public CGameObject
 {
-
+	enum COLLIDER { DEFAULT, DAMAGE_RANGE, COLLIDER_END };
 private:
 	CSlime(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CSlime(const CSlime& rhs);
@@ -25,19 +26,28 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	_bool m_bCollision = { false };
+	void StateToAnimation();
+	_bool Check_DeathTrigger();
+
+private:
+	SLIME m_eState = { SLIME_MOVE };
+
+	_bool m_bAttackTrigger = { false };
+	_bool m_bDamagedPlayer = { false };
 
 	_float m_fTime = {};
-	_float m_fDamageTime = { 1.f };
 
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
-	CCollider* m_pColliderCom = { nullptr };
+	map<const wstring, CPart*> m_Parts;
+	CCollider* m_pColliderCom[COLLIDER_END] = {nullptr};
+	const _float4x4* m_pPlayerWorldMat = { nullptr };
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);
 	HRESULT Bind_ShaderResources();
+	HRESULT Add_PartObjects(LEVEL eLevel);
 
 public:
 	static CSlime* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

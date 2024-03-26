@@ -11,6 +11,7 @@ namespace Client
 	enum SLIMEBOSS { SLIMEBOSS_DEATH, SLIMEBOSS_FORK, SLIMEBOSS_HIT, SLIMEBOSS_IDLE, SLIMEBOSS_INVOKE, SLIMEBOSS_INVOKE_BEGIN
 		, SLIMEBOSS_LIGHTNING, SLIMEBOSS_MEGASPAWN, SLIMEBOSS_NOT_OPEN, SLIMEBOSS_PILLAR_SPAWN, SLIMEBOSS_REAP, SLIMEBOSS_REAP_BEGIN
 		, SLIMEBOSS_REAP_END, SLIMEBOSS_SPAWN, SLIMEBOSS_END};
+	enum SLIME { SLIME_ATTACK, SLIME_IDLE, SLIME_MOVE, SLIME_DEATH };
     enum WEAPON { WPN_SPEAR, WPN_RIFLE, WPN_SCYTHE, WPN_END };
 	const unsigned int	g_iWinSizeX = 1280;
 	const unsigned int	g_iWinSizeY = 720;
@@ -24,9 +25,6 @@ namespace Client
 		_bool bIsJumping = { false };
 		_bool bIsAttacking = { false };
 		_bool bIsRolling = { false };
-		_bool bAtkPreInput = { false };
-		_bool bRollPreInput = { false };
-		_bool bJumpPreInput = { false };
 
 		_uint iLastAttack = { 3 };
 

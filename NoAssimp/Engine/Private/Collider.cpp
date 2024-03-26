@@ -118,6 +118,9 @@ void CCollider::Tick(_fmatrix WorldMatrix)
 
 _bool CCollider::Intersect(CCollider* pTargetCollider)
 {
+	if (m_bDisabled)
+		return false;
+
 	if(pTargetCollider != nullptr)
 		return m_pBounding->Intersect(pTargetCollider->m_eType, pTargetCollider->m_pBounding);
 
@@ -131,6 +134,9 @@ _bool CCollider::Intersect_Ray(_fvector vRayOrigin, _fvector vRayDir, _float& fD
 
 HRESULT CCollider::Render()
 {
+	if (m_bDisabled)
+		return S_OK;
+
 	m_pEffect->SetWorld(XMMatrixIdentity());
 	m_pEffect->SetView(m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW));
 	m_pEffect->SetProjection(m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ));

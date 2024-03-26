@@ -51,7 +51,7 @@ void CSlimeBoss::Tick(_float fTimeDelta)
 		{
 			m_pPlayer = pPlayer;
 			Safe_AddRef(m_pPlayer);
-			m_pPlayerWorldMatrix = m_pPlayer->Get_PlayerWorldMatrix();
+			m_pPlayerWorldMatrix = m_pPlayer->Get_PlayerWorldMatrixPtr();
 		}
 	}
 
@@ -61,8 +61,10 @@ void CSlimeBoss::Tick(_float fTimeDelta)
 		{
 			m_bPillarSpawn = false;
 			m_bPortalSpawn = false;
+			m_bSlimeSpawn = false;
+			m_bSlimeDamageZoneSpawn = false;
+			m_eState = SLIMEBOSS_HIT;
 			m_iCurPattern = 0;
-			m_eState = SLIMEBOSS_FORK;
 			return;
 		}
 			
@@ -125,16 +127,20 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 
 	if (m_eState == SLIMEBOSS_DEATH)
 	{
-		if(m_pModelCom->isFinished())
+		if (m_pModelCom->isFinished())
 			m_pModelCom->Shrink();
 	}
+
+	if (m_eState == SLIMEBOSS_HIT && m_pModelCom->isFinished())
+		m_eState = m_vecSlimeBossPattern[0];
 		
 	if (m_eState == SLIMEBOSS_SPAWN)
 	{
 		if (m_pModelCom->isFinished())
 		{
-			/*PillarSpawn();
-			PortalSpawn();*/
+			//SlimeSpawn();
+			//PillarSpawn();
+			//PortalSpawn();
 			m_eState = SLIMEBOSS_IDLE;
 		}
 	}	
@@ -151,6 +157,15 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 		if (m_eState == SLIMEBOSS_FORK || m_eState == SLIMEBOSS_INVOKE_BEGIN
 			|| m_eState == SLIMEBOSS_PILLAR_SPAWN || m_eState == SLIMEBOSS_MEGASPAWN)
 		{
+			if (m_eState == SLIMEBOSS_FORK)
+			{
+				if (m_pPlayer->Get_SlimeBossRoomEscapeCount() >= 1 && m_bSlimeDamageZoneSpawn == false)
+				{
+					SlimeDamageZoneSpawn(10);
+					m_bSlimeDamageZoneSpawn = true;
+				}
+			}
+
 			if (m_eState == SLIMEBOSS_PILLAR_SPAWN && m_bPillarSpawn == false)
 			{
 				PillarSpawn();
@@ -163,7 +178,7 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 				m_bPortalSpawn = true;
 			}
 
-			if (m_pModelCom->isFinished())
+			if (m_pModelCom->isFinished() && m_ePreState != SLIMEBOSS_HIT)
 			{
 				++m_iCurPattern;
 				if (m_iCurPattern >= m_vecSlimeBossPattern.size())
@@ -197,21 +212,28 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 				m_iLightningCount++;
 			}
 
+			if (m_bSlimeSpawn == false)
+			{
+				SlimeSpawn();
+				m_bSlimeSpawn = true;
+			}
+
 			if (m_pModelCom->Get_AnimPlayCount(SLIMEBOSS_LIGHTNING) >= 5)
 			{
 				m_eState = m_vecSlimeBossPattern[++m_iCurPattern];
 				m_pModelCom->Reset_AnimPlayCount(SLIMEBOSS_LIGHTNING);
+				m_iLightningCount = 0;
 			}
 		}
-		else if (m_eState == SLIMEBOSS_IDLE)
+		/*else if (m_eState == SLIMEBOSS_IDLE)
 		{
 			if (m_pModelCom->Get_AnimPlayCount(SLIMEBOSS_IDLE) >= 1)
 			{
 				m_eState = m_vecSlimeBossPattern[++m_iCurPattern];
 				m_pModelCom->Reset_AnimPlayCount(SLIMEBOSS_IDLE);
-				m_iLightningCount = 0;
+
 			}
-		}
+		}*/
 	}
 	m_ePreState = m_eState;
 }
@@ -221,28 +243,20 @@ void CSlimeBoss::StateToAnimation()
 	_bool bLoop = true;
 	_uint iIndex = m_eState;
 	if (m_eState == SLIMEBOSS_SPAWN || m_eState == SLIMEBOSS_INVOKE_BEGIN|| m_eState == SLIMEBOSS_DEATH || m_eState == SLIMEBOSS_FORK 
-		|| m_eState == SLIMEBOSS_PILLAR_SPAWN || m_eState == SLIMEBOSS_MEGASPAWN)
+		|| m_eState == SLIMEBOSS_PILLAR_SPAWN || m_eState == SLIMEBOSS_MEGASPAWN || m_eState == SLIMEBOSS_HIT)
 		bLoop = false;
 	m_pModelCom->Change_Animation_ByIndex(iIndex, bLoop);
 }
 
 void CSlimeBoss::TurnTowards_Player(_float fTimeDelta)
 {
-	if (m_eState == SLIMEBOSS_DEATH)
+	if (m_bTurnToPlayer == true)
 		return;
 
-	/*_vector	vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);*/
-	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-
 	_vector vPlayerPos = XMVectorSet(m_pPlayerWorldMatrix->_41, m_pPlayerWorldMatrix->_42, m_pPlayerWorldMatrix->_43, 1);
-	/*_vector vDirection = XMVector3Normalize(vPos - vPlayerPos);
-	
-	_float fAngle = ::XMVectorGetX(::XMVector3AngleBetweenVectors(vLook, vDirection));
-	_float fY = XMVectorGetY(::XMVector3Cross(vLook, vDirection));
-	_float fClockWise = 1.f;
-	if (fY < 0)
-		fClockWise = -fClockWise;*/
 	m_pTransformCom->Look_At_ForLandObject(vPlayerPos);
+	if (m_eState == SLIMEBOSS_DEATH)
+		m_bTurnToPlayer = true;
 }
 
 void CSlimeBoss::PillarSpawn()
@@ -292,6 +306,53 @@ void CSlimeBoss::PortalSpawn()
 	
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, wstrLayer, wstrPrototype, &tDesc)))
 		return;
+}
+
+void CSlimeBoss::SlimeSpawn()
+{
+	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+	wstring wstrLayer = TEXT("Layer_Slime");
+	wstring wstrPrototype = TEXT("Prototype_GameObject_Slime");
+
+	CGameObject::GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = LEVEL_SLIMEBOSS;
+	tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Slime");
+	_int iSlimeNum = 10;
+	_float fDis = 35.f;
+	for (_int i = 0; i < iSlimeNum; i++)
+	{
+		
+		tDesc.matWorld._41 = XMVectorGetX(vPos) + cosf(i * XM_2PI / iSlimeNum) * fDis;
+		tDesc.matWorld._42 = 0;
+		tDesc.matWorld._43 = XMVectorGetZ(vPos) + sinf(i * XM_2PI / iSlimeNum) * fDis;
+		if (m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, wstrLayer, wstrPrototype, &tDesc))
+			return;
+	}
+}
+
+void CSlimeBoss::SlimeDamageZoneSpawn(_uint iNum)
+{
+	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	wstring wstrLayer = TEXT("Layer_SlimeDamageZone");
+	wstring wstrPrototype = TEXT("Prototype_GameObject_SlimeDamageZone");
+
+	CGameObject::GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = LEVEL_SLIMEBOSS;
+	tDesc.wstrModelTag = TEXT("Prototype_Component_Model_SlimeDamageZone");
+	_float fDis = 50.f;
+	for (_uint i = 0; i < iNum; i++)
+	{
+		if (i >= iNum / 2)
+			fDis = 105.f;
+
+		_float fAngle = XMConvertToRadians(360.f/iNum * 2 * i + m_pGameInstance->RandomNumber(-30, 30));
+		tDesc.matWorld._41 = XMVectorGetX(vPos) + cosf(fAngle) * fDis;
+		tDesc.matWorld._42 = -5;
+		tDesc.matWorld._43 = XMVectorGetZ(vPos) + sinf(fAngle) * fDis;;
+		if (m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, wstrLayer, wstrPrototype, &tDesc))
+			return;
+	}
 }
 
 HRESULT CSlimeBoss::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)

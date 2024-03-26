@@ -30,6 +30,8 @@ private:
 	void TurnTowards_Player(_float fTimeDelta);
 	void PillarSpawn();
 	void PortalSpawn();
+	void SlimeSpawn();
+	void SlimeDamageZoneSpawn(_uint iNum);
 
 private:
 	CModel* m_pModelCom = { nullptr };
@@ -42,14 +44,16 @@ private:
 	SLIMEBOSS m_ePreState = { SLIMEBOSS_SPAWN };
 	_bool m_bPillarSpawn = { false };
 	_bool m_bPortalSpawn = { false };
+	_bool m_bSlimeSpawn = { false };
+	_bool m_bSlimeDamageZoneSpawn = { false };
+	_bool m_bTurnToPlayer = { false };
 	_int m_iHp = { 100 };
 	_int m_iCurPattern = { -1};
 	_int m_iLightningCount = {};
-	_float m_fPreAngle = {};
 	_float4 m_vLightningPos = {};
 
 	vector<SLIMEBOSS> m_vecSlimeBossPattern = { SLIMEBOSS_FORK, SLIMEBOSS_INVOKE_BEGIN, SLIMEBOSS_INVOKE
-		, SLIMEBOSS_FORK, SLIMEBOSS_LIGHTNING, SLIMEBOSS_FORK, SLIMEBOSS_PILLAR_SPAWN, SLIMEBOSS_IDLE, SLIMEBOSS_MEGASPAWN };
+		, SLIMEBOSS_FORK, SLIMEBOSS_LIGHTNING, SLIMEBOSS_FORK, SLIMEBOSS_PILLAR_SPAWN, SLIMEBOSS_MEGASPAWN };
 
 private:
 	HRESULT Add_Components(LEVEL eLevel, const wstring& _wstrModelTag);

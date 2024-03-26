@@ -28,6 +28,7 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	CTexture* m_pTextureCom[TYPE_END] = {nullptr};
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
+	class CPlayer* m_pPlayer = { nullptr };
 
 private:
 	_float					m_fX, m_fY, m_fZ, m_fSizeX, m_fSizeY;

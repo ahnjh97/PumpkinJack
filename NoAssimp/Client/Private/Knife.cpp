@@ -44,10 +44,13 @@ void CKnife::Tick(_float fTimeDelta)
 
 	m_fTime += fTimeDelta * 1.6f;
 
-	if (m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y >= 0)
+	if (m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y >= -3)
 		m_pTransformCom->Fall(m_fTime);
 	else
+	{
 		m_fAlpha -= 0.005f;
+		return;
+	}
 
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_SLIMEBOSS));
 	if (pPlayer)
@@ -69,7 +72,10 @@ void CKnife::Late_Tick(_float fTimeDelta)
 	if (m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y >= -3)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	else
+	{
+		m_pColliderCom->Set_Disabled(true);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
+	}
 }
 
 HRESULT CKnife::Render()

@@ -5,6 +5,7 @@
 #include "Model.h"
 #include <chrono>
 #include <ctime>
+#include "Collider.h" 
 
 CObject_Manager::CObject_Manager()
 {
@@ -362,6 +363,38 @@ CGameObject* CObject_Manager::Get_Player(_uint iLevelIndex)
 	}
 
 	return nullptr;
+}
+
+_bool CObject_Manager::Check_Collision(_uint iLevelIndex, const wstring& wstrLayerTag, CCollider* pMyCollider, const wstring& wstrColliderTag)
+{
+	auto iter = m_pLayers[iLevelIndex].find(wstrLayerTag);
+	if (iter == m_pLayers[iLevelIndex].end())
+		return false;
+
+	CLayer* pLayer = iter->second;
+	if (pLayer == nullptr)
+		return false;
+
+	list<CGameObject*>& tempList = pLayer->Get_ObjectList();
+	if (tempList.empty())
+		return false;
+
+	for (auto& listIter : tempList)
+	{
+		if (listIter == nullptr)
+			continue;
+
+		CComponent* pComponent = listIter->Get_Component(wstrColliderTag);
+		if (pComponent == nullptr)
+			continue;
+
+		CCollider* pIterCollider = dynamic_cast<CCollider*>(pComponent);
+
+		if (pIterCollider->Intersect(pMyCollider))
+			return true;
+	}
+
+	return _bool();
 }
 
 CGameObject* CObject_Manager::Get_GameObject(_uint iLevelIndex, const wstring& wstrLayerTag, const wstring& wstrPrototypeTag)

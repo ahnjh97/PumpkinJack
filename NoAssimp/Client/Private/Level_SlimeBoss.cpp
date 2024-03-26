@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Level_SlimeBoss.h"
 #include "ImGui_Client.h"
+#include "Inven.h"
 
 CLevel_SlimeBoss::CLevel_SlimeBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -198,6 +199,14 @@ HRESULT CLevel_SlimeBoss::Ready_UI(const wstring& strLayerTag)
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, strLayerTag, TEXT("Prototype_GameObject_LifeBar"), &tDesc)))
 		return E_FAIL;
 
+	CInven::INVEN_DESC tInvenDesc{};
+	for (_int i = 0; i < WPN_END; i++)
+	{
+		tInvenDesc.eWeapon = (WEAPON)i;
+		tInvenDesc.matWorld._43 = 0.9f - i * 0.1f;
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, strLayerTag, TEXT("Prototype_GameObject_Inven"), &tInvenDesc)))
+			return E_FAIL;
+	}
 	return S_OK;
 }
 

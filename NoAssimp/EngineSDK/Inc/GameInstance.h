@@ -49,9 +49,10 @@ public: /* For.Object_Manager */
 	CGameObject* Select_ModelByPicking(_uint iLevelIndex, const wstring& wstrLayerTag); // MapTool에서의 모델선택
 	CGameObject* Get_GameObject(_uint iLevelIndex, const wstring& wstrLayerTag, const wstring& wstrPrototypeTag);
 	CGameObject* Get_LastGameObject(_uint iLevelIndex, const wstring& wstrLayerTag); // MapTool용
-	list<CGameObject*>& Get_ObjectList(_uint iLevelIndex, const wstring& wstrLayrTag);
+	list<CGameObject*>& Get_ObjectList(_uint iLevelIndex, const wstring& wstrLayerTag);
 	void Clear_Layer(_uint iLevelIndex, const wstring& wstrLayerTag);
 	CGameObject* Get_Player(_uint iLevelIndex);
+	_bool Check_Collision(_uint iLevelIndex, const wstring& wstrLayerTag, class CCollider* pMyCollider, const wstring& wstrColliderTag = L"Com_Collider");
 
 public: /* For.Component_Manager */
 	HRESULT Add_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag, class CComponent* pPrototype);

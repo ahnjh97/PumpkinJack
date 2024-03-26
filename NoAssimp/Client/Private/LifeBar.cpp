@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "LifeBar.h"
+#include "Player.h"
 
 CLifeBar::CLifeBar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -74,6 +75,16 @@ HRESULT CLifeBar::Initialize(void* pArg)
 
 void CLifeBar::Tick(_float fTimeDelta)
 {
+	if (m_pPlayer == nullptr)
+	{
+		CGameObject* pObject = m_pGameInstance->Get_Player(*m_pGameInstance->Get_CurrentLevelID());
+		if (pObject != nullptr)
+		{
+			m_pPlayer = dynamic_cast<CPlayer*>(pObject);
+			Safe_AddRef(m_pPlayer);
+		}
+	}
+
 	m_fOffset_Y += 0.002f;
 }
 
@@ -199,6 +210,7 @@ void CLifeBar::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pPlayer);
 	Safe_Release(m_pShaderCom);
 	for (size_t i = 0; i < TYPE_END; i++)
 		Safe_Release(m_pTextureCom[i]);

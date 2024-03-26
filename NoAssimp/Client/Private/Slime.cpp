@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Slime.h"
 #include "Player.h"
+#include "Part.h"
+#include "Slime_Slime.h"
 
 CSlime::CSlime(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -33,6 +35,13 @@ HRESULT CSlime::Initialize(void* pArg)
 	if (FAILED(Add_Components(GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
 
+	if (FAILED(Add_PartObjects(LEVEL_SLIMEBOSS)))
+		return E_FAIL;
+
+	m_pModelCom->Set_LerpTime(0.2f);
+
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_SLIMEBOSS));
+	m_pPlayerWorldMat = pPlayer->Get_PlayerWorldMatrixPtr();
 	return S_OK;
 }
 
@@ -40,25 +49,41 @@ void CSlime::Tick(_float fTimeDelta)
 {
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_SLIMEBOSS));
 
-	m_bCollision = { false };
+	if (m_eState == SLIME_ATTACK && m_pModelCom->isFinished())
+		Set_Dead();
+	if (pPlayer->Get_InSlimeBossRoom())
+		Set_Dead();
+	_vector vPlayerPos = XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1);
+	m_pTransformCom->Look_At_ForLandObject(vPlayerPos);
+	m_pTransformCom->Move(fTimeDelta * 2.f, XMVector3Normalize(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK)));
 
 	CCollider* pPlayerCollider = dynamic_cast<CCollider*>(pPlayer->Get_Component(TEXT("Com_Collider")));
-	if (m_pColliderCom->Intersect(pPlayerCollider))
-	{
-		if (m_fDamageTime >= 1.f)
-		{
-			pPlayer->Reduce_HP(20);
-			m_fDamageTime = 0.f;
-			m_bCollision = true;
-		}
-	}
-	
-	m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
+	if(m_pColliderCom[DEFAULT]->Intersect(pPlayerCollider))
+		m_bAttackTrigger = true;
+
+	if (m_bAttackTrigger == true)
+		m_eState = SLIME_ATTACK;
+
+	StateToAnimation();
+
+	if (Check_DeathTrigger())
+		Set_Dead();
+
+	m_pColliderCom[DEFAULT]->Tick(m_pTransformCom->Get_WorldMatrix());
+	if(m_pColliderCom[DAMAGE_RANGE] != nullptr)
+		m_pColliderCom[DAMAGE_RANGE]->Tick(m_pTransformCom->Get_WorldMatrix());
+
+	for (auto& Pair : m_Parts)
+		Pair.second->Tick(fTimeDelta);
 }
 
 void CSlime::Late_Tick(_float fTimeDelta)
 {
+	m_pModelCom->Play_Animation(fTimeDelta);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+
+	for (auto& Pair : m_Parts)
+		Pair.second->Late_Tick(fTimeDelta);
 }
 
 HRESULT CSlime::Render()
@@ -70,7 +95,10 @@ HRESULT CSlime::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
-		m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", i, aiTextureType_DIFFUSE);
+		m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE);
+
+		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
 		if (FAILED(m_pShaderCom->Begin(0)))
@@ -80,9 +108,32 @@ HRESULT CSlime::Render()
 	}
 
 #ifdef _DEBUG
-	m_pColliderCom->Render();
+	m_pColliderCom[DEFAULT]->Render();
+	if(m_pColliderCom[DAMAGE_RANGE] != nullptr)
+		m_pColliderCom[DAMAGE_RANGE]->Render();
 #endif
 	return S_OK;
+}
+
+void CSlime::StateToAnimation()
+{
+	_bool bLoop = true;
+	_uint iIndex = m_eState;
+	if (m_eState == SLIME_ATTACK || m_eState == SLIME_DEATH)
+		bLoop = false;
+	m_pModelCom->Change_Animation_ByIndex(iIndex, bLoop);
+}
+
+_bool CSlime::Check_DeathTrigger()
+{
+	_bool bDeathTrigger = { false };
+	// 플레이어 공격 체크
+
+	// 슬라임보스 칼 체크
+	if (m_pGameInstance->Check_Collision(LEVEL_SLIMEBOSS, TEXT("Layer_Knife"), m_pColliderCom[DEFAULT]))
+		bDeathTrigger = true;
+
+	return bDeathTrigger;
 }
 
 
@@ -103,7 +154,7 @@ HRESULT CSlime::Add_Components(const wstring& _wstrModelTag)
 	ColliderDesc.fRadius = 4.f;
 	ColliderDesc.vCenter = _float3(0.f, 0, 0.f);
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
-		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom, &ColliderDesc)))
+		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom[DEFAULT], &ColliderDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -121,6 +172,24 @@ HRESULT CSlime::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CSlime::Add_PartObjects(LEVEL eLevel)
+{
+	/* For.Part_Slime */
+	CPart* pSlime_Slime = { nullptr };
+	CSlime_Slime::SLIME_SLIME_DESC	SlimeDesc{};
+
+	SlimeDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	SlimeDesc.pState = &m_eState;
+	SlimeDesc.iLevel = eLevel;
+	SlimeDesc.wstrModelTag = TEXT("Prototype_Component_Model_PartSlime");
+	pSlime_Slime = dynamic_cast<CPart*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Part_Slime_Slime"), &SlimeDesc));
+	if (nullptr == pSlime_Slime)
+		return E_FAIL;
+	m_Parts.emplace(TEXT("Part_Slime_Slime"), pSlime_Slime);
 
 	return S_OK;
 }
@@ -152,7 +221,12 @@ void CSlime::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pColliderCom);
+	for (auto& Pair : m_Parts)
+		Safe_Release(Pair.second);
+	m_Parts.clear();
+
+	for(_int i = 0; i< COLLIDER_END; i++)
+		Safe_Release(m_pColliderCom[i]);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
 }

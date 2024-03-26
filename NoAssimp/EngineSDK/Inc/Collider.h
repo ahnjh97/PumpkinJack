@@ -15,6 +15,7 @@ private:
 public: 
 	_float Get_HightestPoint(TYPE eType);
 	_float3 Get_Center(TYPE eType);
+	void Set_Disabled(_bool bDisabled) { m_bDisabled = bDisabled; }
 
 public:
 	virtual HRESULT Initialize_Prototype(TYPE eType);
@@ -31,6 +32,7 @@ public:
 private:
 	TYPE				m_eType = { TYPE_END };
 	class CBounding*	m_pBounding = { nullptr };
+	_bool				m_bDisabled = { false };
 
 #ifdef _DEBUG
 private:

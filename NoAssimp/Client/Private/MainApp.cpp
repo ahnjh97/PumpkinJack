@@ -1,6 +1,8 @@
 #include "stdafx.h"
+#include "Inven.h"
 #include "MainApp.h"
 #include "LifeBar.h"
+#include "UI_Weapon.h"
 #include "BackGround.h"
 #include "GameInstance.h"
 #include "Level_Loading.h"
@@ -83,6 +85,9 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel_Slime"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimModel_Slime.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex_Inven"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex_Inven.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+		return E_FAIL;
 	if(FAILED(Add_Texture(LEVEL_STATIC, "LoadingScreens", "Logo/T_LoadingScreens%d.dds", 6)))
 		return E_FAIL;
 	if (FAILED(Add_Texture(LEVEL_STATIC, "LoadingScreens_GameLogo", "Logo/T_LoadingScreens_GameLogo.dds")))
@@ -101,12 +106,26 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		return E_FAIL;
 	if (FAILED(Add_Texture(LEVEL_STATIC, "LifeBar", "Logo/T_LifeBar%d.dds", 2)))
 		return E_FAIL;
+ 	if (FAILED(Add_Texture(LEVEL_STATIC, "Inven", "Weapon/UI_Inventory_3_%d.dds", 3)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(LEVEL_STATIC, "Spear", "Weapon/T_Weapon_Spear.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(LEVEL_STATIC, "Rifle", "Weapon/T_Weapon_Rifle.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(LEVEL_STATIC, "Scythe", "Weapon/T_Weapon_Scythe.dds")))
+		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_LoadingScreen"),
 		CBackGround::Create(m_pDevice, m_pContext, true))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_LifeBar"),
 		CLifeBar::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Inven"),
+		CInven::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI_Weapon"),
+		CUI_Weapon::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Collider_AABB"),

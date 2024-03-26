@@ -23,6 +23,7 @@ public:
 	CGameObject* Get_LastGameObject(_uint iLevelIndex, const wstring& wstrLayerTag); // MapTool¿ë
 	list<CGameObject*>& Get_ObjectList(_uint iLevelIndex, const wstring& wstrLayerTag);
 	CGameObject* Get_Player(_uint iLevelIndex);
+	_bool Check_Collision(_uint iLevelIndex, const wstring& wstrLayerTag, class CCollider* pMyCollider, const wstring& wstrColliderTag);
 
 public:
 	HRESULT Initialize(_uint iNumLevels);

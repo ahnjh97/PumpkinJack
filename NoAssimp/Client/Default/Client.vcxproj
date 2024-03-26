@@ -170,6 +170,7 @@
     <ClInclude Include="..\Public\Grid.h" />
     <ClInclude Include="..\Public\ImGui_Client.h" />
     <ClInclude Include="..\Public\ImGui_MapTool.h" />
+    <ClInclude Include="..\Public\Inven.h" />
     <ClInclude Include="..\Public\Knife.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
@@ -188,11 +189,13 @@
     <ClInclude Include="..\Public\SlimeBoss.h" />
     <ClInclude Include="..\Public\SlimeBossHead.h" />
     <ClInclude Include="..\Public\SlimeBoss_Slime.h" />
+    <ClInclude Include="..\Public\SlimeDamageZone.h" />
     <ClInclude Include="..\Public\Slime_Slime.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\TongMap.h" />
     <ClInclude Include="..\Public\Tool_Anim.h" />
     <ClInclude Include="..\Public\Tool_NonAnim.h" />
+    <ClInclude Include="..\Public\UI_Weapon.h" />
     <ClInclude Include="..\Public\Weapon.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
@@ -207,6 +210,7 @@
     <ClCompile Include="..\Private\Grid.cpp" />
     <ClCompile Include="..\Private\ImGui_Client.cpp" />
     <ClCompile Include="..\Private\ImGui_MapTool.cpp" />
+    <ClCompile Include="..\Private\Inven.cpp" />
     <ClCompile Include="..\Private\Knife.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
@@ -225,11 +229,13 @@
     <ClCompile Include="..\Private\SlimeBoss.cpp" />
     <ClCompile Include="..\Private\SlimeBossHead.cpp" />
     <ClCompile Include="..\Private\SlimeBoss_Slime.cpp" />
+    <ClCompile Include="..\Private\SlimeDamageZone.cpp" />
     <ClCompile Include="..\Private\Slime_Slime.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\TongMap.cpp" />
     <ClCompile Include="..\Private\Tool_Anim.cpp" />
     <ClCompile Include="..\Private\Tool_NonAnim.cpp" />
+    <ClCompile Include="..\Private\UI_Weapon.cpp" />
     <ClCompile Include="..\Private\Weapon.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -257,6 +263,7 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex_CrowLifeBar.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex_Inven.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex_LifeBar.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

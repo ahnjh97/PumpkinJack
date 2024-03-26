@@ -3,6 +3,7 @@
 #include "ImGui_Client.h"
 #include "Camera_Jack.h"
 #include "Level_Loading.h"
+#include "Inven.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -187,6 +188,23 @@ HRESULT CLevel_GamePlay::Ready_UI(const wstring& strLayerTag)
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_LifeBar"), &tDesc)))
 		return E_FAIL;
 
+	CInven::INVEN_DESC tInvenDesc{};
+	for (_int i = 0; i < WPN_END; i++)
+	{
+		tInvenDesc.eWeapon = (WEAPON)i;
+		tInvenDesc.matWorld._43 = 0.9f - i * 0.1f;
+		tInvenDesc.iLevel = LEVEL_GAMEPLAY;
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Inven"), &tInvenDesc)))
+			return E_FAIL;
+	}
+
+	/*for (_int i = 0; i < WPN_END; i++)
+	{
+		tInvenDesc.eWeapon = (WEAPON)i;
+		tInvenDesc.matWorld._43 = 0.6f - i * 0.1f;
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_UI_Weapon"), &tInvenDesc)))
+			return E_FAIL;
+	}*/
 	return S_OK;
 }
 

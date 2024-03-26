@@ -49,6 +49,9 @@ CComponent * CGameObject::Get_Component(const wstring & strComTag)
 	if (iter == m_Components.end())
 		return nullptr;
 
+	if (iter->second == nullptr)
+		return nullptr;
+
 	return iter->second;	
 }
 

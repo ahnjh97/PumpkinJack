@@ -64,20 +64,11 @@
     <Filter Include="02.GameObjects\Player\Weapon">
       <UniqueIdentifier>{4569359c-bf45-4398-b9d7-4dd78585945f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\LifeBar">
-      <UniqueIdentifier>{d7004d9d-b6cf-45f3-9007-dc0fc86a9a14}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Levels\SlimeBoss">
       <UniqueIdentifier>{94e6e0d5-20a5-469f-9fc1-b657d034cb3a}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\SlimeBoss">
       <UniqueIdentifier>{4aa7cc76-a207-452b-b071-fee6bb68994c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Slime">
-      <UniqueIdentifier>{648a160a-7c63-49a0-b820-4ba862557ace}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Slime\Part_Slime">
-      <UniqueIdentifier>{36a44a1c-3991-4319-977a-dddd21ee109c}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\SlimeBoss\Part_SlimeBoss">
       <UniqueIdentifier>{4bd183c5-abbb-4768-8e59-0bce6d955da6}</UniqueIdentifier>
@@ -96,6 +87,27 @@
     </Filter>
     <Filter Include="02.GameObjects\SlimeBoss\SlimeBossHead">
       <UniqueIdentifier>{a6e76243-75ab-45cc-a229-09e4ee3d6e25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\SlimeBoss\Slime">
+      <UniqueIdentifier>{648a160a-7c63-49a0-b820-4ba862557ace}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\SlimeBoss\Slime\Part_Slime">
+      <UniqueIdentifier>{36a44a1c-3991-4319-977a-dddd21ee109c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\SlimeBoss\SlimeDamageZone">
+      <UniqueIdentifier>{b75b9b11-437e-434b-ba83-9f97fb384393}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI">
+      <UniqueIdentifier>{a3660a24-62fb-47bf-91ab-fe5bb344bfa2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\LifeBar">
+      <UniqueIdentifier>{d7004d9d-b6cf-45f3-9007-dc0fc86a9a14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\Inven">
+      <UniqueIdentifier>{b797f4f2-d873-42d7-98e7-7a09f176df97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\Inven\Weapon">
+      <UniqueIdentifier>{c1ba97f4-4b17-4182-b6a4-5577d73f9b08}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -172,7 +184,7 @@
       <Filter>02.GameObjects\Player\Body</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LifeBar.h">
-      <Filter>02.GameObjects\LifeBar</Filter>
+      <Filter>02.GameObjects\UI\LifeBar</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_SlimeBoss.h">
       <Filter>01.Levels\SlimeBoss</Filter>
@@ -181,13 +193,13 @@
       <Filter>02.GameObjects\SlimeBoss</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Slime.h">
-      <Filter>02.GameObjects\Slime</Filter>
+      <Filter>02.GameObjects\SlimeBoss\Slime</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SlimeBoss_Slime.h">
       <Filter>02.GameObjects\SlimeBoss\Part_SlimeBoss</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Slime_Slime.h">
-      <Filter>02.GameObjects\Slime\Part_Slime</Filter>
+      <Filter>02.GameObjects\SlimeBoss\Slime\Part_Slime</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Knife.h">
       <Filter>02.GameObjects\SlimeBoss\Knife</Filter>
@@ -206,6 +218,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\SlimeBossHead.h">
       <Filter>02.GameObjects\SlimeBoss\SlimeBossHead</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SlimeDamageZone.h">
+      <Filter>02.GameObjects\SlimeBoss\SlimeDamageZone</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Inven.h">
+      <Filter>02.GameObjects\UI\Inven</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_Weapon.h">
+      <Filter>02.GameObjects\UI\Inven\Weapon</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -273,7 +294,7 @@
       <Filter>02.GameObjects\Player\Body</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LifeBar.cpp">
-      <Filter>02.GameObjects\LifeBar</Filter>
+      <Filter>02.GameObjects\UI\LifeBar</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_SlimeBoss.cpp">
       <Filter>01.Levels\SlimeBoss</Filter>
@@ -282,13 +303,13 @@
       <Filter>02.GameObjects\SlimeBoss</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Slime.cpp">
-      <Filter>02.GameObjects\Slime</Filter>
+      <Filter>02.GameObjects\SlimeBoss\Slime</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SlimeBoss_Slime.cpp">
       <Filter>02.GameObjects\SlimeBoss\Part_SlimeBoss</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Slime_Slime.cpp">
-      <Filter>02.GameObjects\Slime\Part_Slime</Filter>
+      <Filter>02.GameObjects\SlimeBoss\Slime\Part_Slime</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Knife.cpp">
       <Filter>02.GameObjects\SlimeBoss\Knife</Filter>
@@ -307,6 +328,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\SlimeBossHead.cpp">
       <Filter>02.GameObjects\SlimeBoss\SlimeBossHead</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SlimeDamageZone.cpp">
+      <Filter>02.GameObjects\SlimeBoss\SlimeDamageZone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Inven.cpp">
+      <Filter>02.GameObjects\UI\Inven</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_Weapon.cpp">
+      <Filter>02.GameObjects\UI\Inven\Weapon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -354,6 +384,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Lighted.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex_Inven.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>
