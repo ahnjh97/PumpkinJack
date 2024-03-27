@@ -7,10 +7,16 @@
 #include "ImGuizmo.h"
 #include <locale>
 #include <codecvt>
+#include "Navigation.h"
+#include "Grid.h"
+#include "Cell.h"
+#include <chrono>
+#include <ctime>
 
 CImGui_MapTool::CImGui_MapTool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMyImGui{ pDevice, pContext }
 {
+
 }
 
 static _bool Is_IMGUI_Switch = true;
@@ -23,10 +29,16 @@ static _int AnimModelIdx = 0;
 static _int NonAnimModelIdx = -1;
 static _int iLevelIndex = 0;
 static _int AnimationIdx = -1;
+static _int iNavigationIndex = 0;
 
 HRESULT CImGui_MapTool::Initialize()
 {
 	__super::Initialize(g_hWnd);
+
+	m_pShader = CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_Cell.hlsl"), VTXPOS::Elements, VTXPOS::iNumElements);
+	if (nullptr == m_pShader)
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -52,10 +64,18 @@ void CImGui_MapTool::Tick(_float fTimeDelta)
 	strCurLevel = vecLevelName[iLevelIndex + (_int)(LEVEL_GAMEPLAY)];
 
 	if (m_pGameInstance->MouseDown(DIMKS_RBUTTON))
-		OnRightClick(); // 피킹으로 객체생성
+	{
+		if(bNavigationMode == false)
+			OnRightClick_ObjectMode(); // 피킹으로 객체생성
+	}
+		
 
 	if (!ImGui::IsAnyItemHovered() && m_pGameInstance->MouseDown(DIMKS_LBUTTON) && !(m_pGameInstance->Get_DIKeyState(DIK_LSHIFT) & 0x80))
-		OnLeftClick(); // 피킹으로 객체 고르기
+	{
+		if (bNavigationMode == false)
+			OnLeftClick_ObjectMode(); // 피킹으로 객체 고르기
+	}
+		
 
 	if (m_pGameInstance->KeyDown(DIK_ESCAPE)) 
 		On_DIK_Escape(); // esc누르면 선택 취소
@@ -77,6 +97,10 @@ void CImGui_MapTool::Tick(_float fTimeDelta)
 		Menu_Animation();
 		ImGui::End();
 
+		ImGui::Begin(u8"Mode");
+		Menu_Mode();
+		ImGui::End();
+
 		Edit_Object(); // 선택한 객체 월드행렬 수정
 	}
 
@@ -92,6 +116,9 @@ void CImGui_MapTool::Tick(_float fTimeDelta)
 
 	if ((m_pGameInstance->Get_DIKeyState(DIK_LCONTROL) & 0x80) && m_pGameInstance->KeyDown(DIK_S))
 		Save_Level();
+
+	if (bNavigationMode == true)
+		OptionChange();
 }
 
 HRESULT CImGui_MapTool::Render()
@@ -102,7 +129,7 @@ HRESULT CImGui_MapTool::Render()
 	return S_OK;
 }
 
-void CImGui_MapTool::OnRightClick()
+void CImGui_MapTool::OnRightClick_ObjectMode()
 {
 	const CVIBuffer_Terrain* pTerrainBuf = dynamic_cast<const CVIBuffer_Terrain*>(m_pGameInstance->Get_Component(LEVEL_MAPTOOL, TEXT("Layer_Grid"), TEXT("Com_VIBuffer")));
 	if (!pTerrainBuf)
@@ -153,7 +180,7 @@ void CImGui_MapTool::OnRightClick()
 	}
 }
 
-void CImGui_MapTool::OnLeftClick()
+void CImGui_MapTool::OnLeftClick_ObjectMode()
 {
 	CGameObject* pObj = m_pGameInstance->Select_ModelByPicking(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Parse"));
 	if (pObj == nullptr)
@@ -241,6 +268,22 @@ void CImGui_MapTool::On_DIK_Delete()
 		pAnimObject->Set_Dead();
 	pAnimModel = nullptr;
 	pAnimObject = nullptr;
+}
+
+void CImGui_MapTool::OptionChange()
+{
+	if (m_pGameInstance->KeyDown(DIK_ESCAPE) || m_pGameInstance->KeyDown(DIK_0))
+		m_iOption = 0;
+	else if (m_pGameInstance->KeyDown(DIK_1))
+		m_iOption = 1;
+	else if (m_pGameInstance->KeyDown(DIK_2))
+		m_iOption = 2;
+
+	if (m_pGameInstance->KeyDown(DIK_TAB))
+	{
+		m_iMode++;
+		m_iMode = m_iMode % 3;
+	}
 }
 
 _bool CImGui_MapTool::Menu_Level()
@@ -379,6 +422,43 @@ void CImGui_MapTool::Edit_Object()
 		EditGuizmo(_float4x4());
 }
 
+void CImGui_MapTool::Menu_Mode()
+{
+	for (_int i = 0; i < 2; i++)
+	{
+		if (ImGui::RadioButton(vecMode[i].c_str(), iNavigationIndex == i))
+		{
+			iNavigationIndex = i; // 선택 시 실행할 로직 추가
+			if (i == 0)
+				bNavigationMode = false;
+			else if (i == 1)
+				bNavigationMode = true;
+		}
+		if (i == 0)
+			ImGui::SameLine();
+	}
+	ImGui::Text("	Option : %d", m_iOption);
+
+	switch (m_iMode)
+	{
+	case 0:
+		ImGui::Text("	Mode : SOLID");
+		break;
+	case 1:
+		ImGui::Text("	Mode : WIREFRAME");
+		break;
+	case 2:
+		ImGui::Text("	Mode : CELLS");
+		break;
+	}
+
+	if (ImGui::Button("Save", ImVec2(100, 40)))
+		Save_Cells();
+	ImGui::SameLine();
+	if (ImGui::Button("Load", ImVec2(100, 40)))
+		Load_Cells();
+}
+
 void CImGui_MapTool::Save_Level()
 {
 	_uint iCurLevel = { LEVEL_GAMEPLAY };
@@ -449,6 +529,108 @@ void CImGui_MapTool::Load_Level()
 			return;
 		}
 	}
+	fileStream.close();
+}
+
+void CImGui_MapTool::Save_Cells()
+{
+	if (vecCells.empty())
+		return;
+
+	string strCurLevel = vecLevelName[iLevelIndex + (_int)(LEVEL_GAMEPLAY)];
+
+	string tempFileName = "temp_" + strCurLevel + "_Cells.txt";
+	ofstream outputFile(tempFileName, ios::out | ios::binary);
+	if (!outputFile.is_open()) // 임시파일 열렸는지 확인
+	{
+		string tempstr = "Failed to Open: " + tempFileName;
+		MB(tempstr);
+		return;
+	}
+
+	for (auto& cell : vecCells)
+	{
+		if (cell == nullptr)
+			continue;
+
+		for (_int i = 0; i < 3; i++)
+		{
+			_float3 vPoint{};
+			 XMStoreFloat3(&vPoint, cell->Get_Point((CCell::POINT)i));
+			 outputFile.write(reinterpret_cast<const char*>(&vPoint), sizeof(vPoint));
+		}
+	}
+	
+	outputFile.close();
+
+	if (!outputFile)
+	{
+		string errorStr = "Failed to write data to " + tempFileName;
+		MB(errorStr);
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return;
+	}
+
+	// 현재시간 받아오기
+	auto now = chrono::system_clock::now();
+	time_t currentTime = chrono::system_clock::to_time_t(now);
+
+	struct tm timeinfo;
+	localtime_s(&timeinfo, &currentTime);
+
+	// 현재 시간을 문자열로 변환
+	char buffer[80];
+	strftime(buffer, sizeof(buffer), "%H%M%S", &timeinfo);
+
+	string fileName_Time = "../../../objects_txt/" + string(buffer) + "_" + strCurLevel + "_Cells.txt";
+	string fileName = "../../../objects_txt/" + strCurLevel + "_Cells.txt";
+	if (rename(fileName.c_str(), fileName_Time.c_str()) != 0)
+	{
+		MB("Failed to rename original file.");
+		return;
+	}
+
+	if (rename(tempFileName.c_str(), fileName.c_str()) != 0) // 임시파일 이름을 level 이름으로 변경
+	{
+		string errorStr2 = "Failed to rename " + tempFileName;
+		MB(errorStr2);
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return;
+	}
+
+	MB(strCurLevel + "_Cells.txt Saved.");
+}
+
+void CImGui_MapTool::Load_Cells()
+{
+	for (auto& cell : vecCells)
+		Safe_Release(cell);
+	vecCells.clear();
+
+	string strFileName = "../../../objects_txt/" + strCurLevel + "_Cells.txt";
+	fstream fileStream(strFileName, ios::in | ios::binary);
+	if (fileStream.is_open() == false)
+	{
+		MB("Failed to open CurLevel_Cells.txt");
+		return;
+	}
+
+	_float3 vPoints[3];
+	while (!fileStream.eof())
+	{
+		for(_int i = 0; i<3;i++)
+			fileStream.read(reinterpret_cast<char*>(&vPoints[i]), sizeof(vPoints[i]));
+
+		if (fileStream.eof())
+			break;
+
+		CCell* pCell = CCell::Create(m_pDevice, m_pContext, vPoints, vecCells.size());
+		if (nullptr == pCell)
+			break;
+
+		vecCells.emplace_back(pCell);
+	}
+
 	fileStream.close();
 }
 

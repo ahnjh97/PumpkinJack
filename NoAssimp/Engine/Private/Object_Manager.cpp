@@ -390,6 +390,9 @@ _bool CObject_Manager::Check_Collision(_uint iLevelIndex, const wstring& wstrLay
 
 		CCollider* pIterCollider = dynamic_cast<CCollider*>(pComponent);
 
+		if (pIterCollider->Get_Disabled() == true)
+			continue;
+
 		if (pIterCollider->Intersect(pMyCollider))
 			return true;
 	}

@@ -168,7 +168,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 	auto iter = m_Parts.find(TEXT("Part_Body"));
 	CModel* pBodyModel = dynamic_cast<CModel*>(iter->second->Get_Component(TEXT("Com_Model")));
 
-	if (m_pGameInstance->KeyDown(DIK_TAB) && m_eState == IDLE)
+	if (!(m_pGameInstance->Get_DIKeyState(DIK_LSHIFT) & 0x80) && m_pGameInstance->KeyDown(DIK_TAB) && m_eState == IDLE)
 	{
 		m_eWeapon = (WEAPON)((_uint)(m_eWeapon)+1);
 		m_iLastAttack = 0;

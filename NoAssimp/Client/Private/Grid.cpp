@@ -19,15 +19,15 @@ HRESULT CGrid::Initialize_Prototype()
 
 HRESULT CGrid::Initialize(void* pArg)
 {
-	GAMEOBJECT_DESC		GameObjectDesc{};
+	GRID_DESC		GridDesc{};
 
-	GameObjectDesc.fSpeedPerSec = 10.f;
-	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	GridDesc.fSpeedPerSec = 10.f;
+	GridDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-	if (FAILED(__super::Initialize(&GameObjectDesc)))
+	if (FAILED(__super::Initialize(&GridDesc)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components()))
+	if (FAILED(Add_Components(GridDesc.wstrFileName)))
 		return E_FAIL;
 
 	return S_OK;
@@ -48,18 +48,7 @@ HRESULT CGrid::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	////Wireframe 모드
-	//ID3D11RasterizerState* wireframeState;
-	//D3D11_RASTERIZER_DESC rasterizerDesc;
-	//ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
-	//rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME; // Wireframe으로 설정
-	//rasterizerDesc.FrontCounterClockwise = FALSE;
-	//if (FAILED(m_pDevice->CreateRasterizerState(&rasterizerDesc, &wireframeState)))
-	//	return E_FAIL;
-	//m_pContext->RSSetState(wireframeState);
-
-	/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-	if (FAILED(m_pShaderCom->Begin(0)))
+	if (FAILED(m_pShaderCom->Begin(m_iPassIndex)))
 		return E_FAIL;
 
 	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
@@ -68,12 +57,14 @@ HRESULT CGrid::Render()
 	if (FAILED(m_pVIBufferCom->Render()))
 		return E_FAIL;
 
-	m_pContext->RSSetState(NULL);
+#ifdef _DEBUG
+	m_pNavigationCom->Render();
+#endif
 
 	return S_OK;
 }
 
-HRESULT CGrid::Add_Components()
+HRESULT CGrid::Add_Components(const wstring& wstrFileName)
 {
 	/* For.Com_Shader */
 	if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_Shader_VtxNorTex"),
@@ -100,6 +91,14 @@ HRESULT CGrid::Add_Components()
 		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
 
+	if (wstrFileName != L"")
+	{
+		GRID_DESC tGridDesc{};
+		tGridDesc.wstrFileName = wstrFileName;
+		if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_Navigation"), 
+			TEXT("Com_Navigation"), (CComponent**)&m_pNavigationCom, &tGridDesc)))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -165,6 +164,7 @@ void CGrid::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pShaderCom);
 	for (size_t i = 0; i < TYPE_END; i++)
 		Safe_Release(m_pTextureCom[i]);

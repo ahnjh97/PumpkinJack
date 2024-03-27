@@ -41,7 +41,7 @@ private:
 	_float4x4				m_WorldMatrix, m_ViewMatrix, m_ProjMatrix;
 	_uint					m_iTextureIndex = {};
 	_float					m_fTime = {};
-
+	_float					m_fAlpha = { 1.f };
 	_vector					m_vInvenUp[WPN_END];
 
 private:

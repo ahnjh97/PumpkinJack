@@ -27,7 +27,7 @@
 #include "Slime_Slime.h"
 #include "SlimeDamageZone.h"
 //#include "Effect.h"
-//#include "Sky.h"
+#include "Sky.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }

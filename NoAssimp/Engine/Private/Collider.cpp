@@ -3,6 +3,7 @@
 #include "Bounding_OBB.h"
 #include "Bounding_SPHERE.h"
 #include "GameInstance.h"
+#include "GameObject.h"
 
 CCollider::CCollider(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent{ pDevice, pContext }
@@ -94,7 +95,6 @@ HRESULT CCollider::Initialize_Prototype(TYPE eType)
 HRESULT CCollider::Initialize(void* pArg)
 {
 	CBounding::BOUNDING_DESC* pBoundDesc = (CBounding::BOUNDING_DESC*)pArg;
-
 	switch (m_eType)
 	{
 	case TYPE_AABB:
@@ -107,7 +107,7 @@ HRESULT CCollider::Initialize(void* pArg)
 		m_pBounding = CBounding_Sphere::Create(m_pDevice, m_pContext, pBoundDesc);
 		break;
 	}
-
+	
 	return S_OK;
 }
 
@@ -134,6 +134,9 @@ _bool CCollider::Intersect_Ray(_fvector vRayOrigin, _fvector vRayDir, _float& fD
 
 HRESULT CCollider::Render()
 {
+	if (!m_pGameInstance->Get_Toggle())
+		return S_OK;
+
 	if (m_bDisabled)
 		return S_OK;
 

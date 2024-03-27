@@ -52,7 +52,11 @@ void CImGui_Client::Settings(_float fTimeDelta)
 		IsMouseTrigger = true;
 
 	if ((m_pGameInstance->Get_DIKeyState(DIK_LSHIFT) & 0x80) && (m_pGameInstance->KeyDown(DIK_TAB)))
+	{
 		Is_IMGUI_Switch = !Is_IMGUI_Switch; // ImGui 보이기 / 숨기기 토글
+		m_pGameInstance->Toggle_Toggle();
+	}
+		
 
 	if (m_pPlayer == nullptr)
 	{

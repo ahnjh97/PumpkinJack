@@ -95,9 +95,6 @@ void CLifeBar::Late_Tick(_float fTimeDelta)
 
 HRESULT CLifeBar::Render()
 {
-	_float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	m_pContext->OMSetBlendState(m_pGameInstance->Get_BlendState(), blendFactor, 0xffffffff);
-
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 

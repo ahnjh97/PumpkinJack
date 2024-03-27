@@ -55,9 +55,6 @@ void CSlimeBoss_Slime::Late_Tick(_float fTimeDelta)
 
 HRESULT CSlimeBoss_Slime::Render()
 {
-	_float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	m_pContext->OMSetBlendState(m_pGameInstance->Get_BlendState(), blendFactor, 0xffffffff);
-
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 

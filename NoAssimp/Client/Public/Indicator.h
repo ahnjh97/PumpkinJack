@@ -42,8 +42,7 @@ private:
 	_uint					m_iTextureIndex = {};
 	_float					m_fTime = {};
 	_float					m_fDegree = {};
-	
-	_bool					m_bTurning = { false };
+	_float					m_fAlpha = { };
 
 	_vector					m_vInvenUp[WPN_END];
 	

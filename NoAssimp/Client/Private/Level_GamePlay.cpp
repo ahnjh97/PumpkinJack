@@ -202,6 +202,8 @@ HRESULT CLevel_GamePlay::Ready_UI(const wstring& strLayerTag)
 			return E_FAIL;
 	}
 
+
+
 	return S_OK;
 }
 
@@ -211,11 +213,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring & strLayerTag)
 	tDesc.iLevel = LEVEL_GAMEPLAY;
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Terrain"), &tDesc)))
 		return E_FAIL;
-
-	/*
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Sky"))))
+	if(FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Sky"), &tDesc)))
 		return E_FAIL;
-*/
+
 	return S_OK;
 }
 

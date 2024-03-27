@@ -186,6 +186,7 @@
     <ClInclude Include="..\Public\Pillar_SlimeBossRoom.h" />
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\Portal.h" />
+    <ClInclude Include="..\Public\Sky.h" />
     <ClInclude Include="..\Public\Slime.h" />
     <ClInclude Include="..\Public\SlimeBoss.h" />
     <ClInclude Include="..\Public\SlimeBossHead.h" />
@@ -227,6 +228,7 @@
     <ClCompile Include="..\Private\Pillar_SlimeBossRoom.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\Portal.cpp" />
+    <ClCompile Include="..\Private\Sky.cpp" />
     <ClCompile Include="..\Private\Slime.cpp" />
     <ClCompile Include="..\Private\SlimeBoss.cpp" />
     <ClCompile Include="..\Private\SlimeBossHead.cpp" />
@@ -257,6 +259,7 @@
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel_Slime.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCube.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_AlphaTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Knife.hlsl" />

@@ -73,9 +73,6 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	if (nullptr == m_pComponent_Manager)
 		return E_FAIL;
 
-	Set_BlendState(*ppDevice);
-	Set_DepthStencilStateEnabled(*ppDevice);
-	Set_DepthStencilStateDisabled(*ppDevice);
 	return S_OK;
 }
 
@@ -126,6 +123,8 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 
 	if ((*Get_CurrentLevelID() != Level_MapTool) && (Get_DIKeyState(DIK_ESCAPE) & 0x80))
 		PostQuitMessage(0);
+
+
 
 	if (m_pImGui_Manager)
 		m_pImGui_Manager->Tick(fTimeDelta);
@@ -524,58 +523,6 @@ _int CGameInstance::RandomNumber(_int iMin, _int iMax)
 	return dis(gen);
 }
 
-void CGameInstance::Set_BlendState(ID3D11Device* pDevice)
-{
-	D3D11_BLEND_DESC blendDesc = {};
-	blendDesc.AlphaToCoverageEnable = FALSE;
-	blendDesc.IndependentBlendEnable = FALSE; // 또는 TRUE, 필요에 따라 설정
-
-	// 렌더 타겟에 대한 블렌드 설정 구조체 생성 및 초기화
-	D3D11_RENDER_TARGET_BLEND_DESC rtBlendDesc = {};
-	rtBlendDesc.BlendEnable = TRUE; // 블렌딩 활성화
-	rtBlendDesc.SrcBlend = D3D11_BLEND_SRC_ALPHA; // 소스 블렌드 팩터
-	rtBlendDesc.DestBlend = D3D11_BLEND_INV_SRC_ALPHA; // 대상 블렌드 팩터
-	rtBlendDesc.BlendOp = D3D11_BLEND_OP_ADD; // 블렌드 연산
-	rtBlendDesc.SrcBlendAlpha = D3D11_BLEND_ONE; // 알파 소스 블렌드 팩터
-	rtBlendDesc.DestBlendAlpha = D3D11_BLEND_ZERO; // 알파 대상 블렌드 팩터
-	rtBlendDesc.BlendOpAlpha = D3D11_BLEND_OP_ADD; // 알파 블렌드 연산
-	rtBlendDesc.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL; // 색상 쓰기 마스크
-
-	// 렌더 타겟에 블렌드 설정 적용
-	blendDesc.RenderTarget[0] = rtBlendDesc; // 여러 렌더 타겟에 대한 설정이 필요한 경우 배열에 추가
-
-	pDevice->CreateBlendState(&blendDesc, &m_pBlendState);
-}
-
-void CGameInstance::Set_DepthStencilStateEnabled(ID3D11Device* pDevice)
-{
-	// 활성화된 깊이 스텐실 상태 생성
-	D3D11_DEPTH_STENCIL_DESC depthStencilDescEnabled{};
-	ZeroMemory(&depthStencilDescEnabled, sizeof(depthStencilDescEnabled));
-	depthStencilDescEnabled.DepthEnable = true; // 깊이 테스트 활성화
-	depthStencilDescEnabled.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL; // 모든 깊이 값을 쓰기
-	depthStencilDescEnabled.DepthFunc = D3D11_COMPARISON_LESS_EQUAL; // 깊이 비교 함수
-	depthStencilDescEnabled.StencilEnable = true; // 스텐실 테스트 활성화
-
-	// 활성화된 깊이 스텐실 상태 생성
-	pDevice->CreateDepthStencilState(&depthStencilDescEnabled, &m_pDepthStencilStateEnabled);
-}
-
-void CGameInstance::Set_DepthStencilStateDisabled(ID3D11Device* pDevice)
-{
-	// 후면 컬링을 비활성화하는 깊이 스텐실 상태 생성
-	D3D11_DEPTH_STENCIL_DESC depthStencilDesc{};
-	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
-	depthStencilDesc.DepthEnable = true; // 깊이 테스트 활성화
-	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL; // 모든 깊이 값을 쓰기
-	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL; // 깊이 비교 함수
-	depthStencilDesc.StencilEnable = false; // 스텐실 테스트 비활성화
-
-	// 새로운 깊이 스텐실 상태를 생성
-	pDevice->CreateDepthStencilState(&depthStencilDesc, &m_pDepthStencilStateDisabled);
-}
-
-
 void CGameInstance::Release_Engine()
 {
 	CGameInstance::Get_Instance()->Free();
@@ -585,9 +532,6 @@ void CGameInstance::Release_Engine()
 
 void CGameInstance::Free()
 {
-	Safe_Release(m_pDepthStencilStateEnabled);
-	Safe_Release(m_pDepthStencilStateDisabled);
-	Safe_Release(m_pBlendState);
 	Safe_Release(m_pLight_Manager);
 	Safe_Release(m_pPicking);
 	Safe_Release(m_pPipeLine);

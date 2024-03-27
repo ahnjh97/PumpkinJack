@@ -15,7 +15,6 @@ namespace Client
     enum WEAPON { WPN_SPEAR, WPN_RIFLE, WPN_SCYTHE, WPN_END };
 	const unsigned int	g_iWinSizeX = 1280;
 	const unsigned int	g_iWinSizeY = 720;
-
     typedef struct
     {
 		STATE eState = { PLAYER_END };

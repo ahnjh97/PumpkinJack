@@ -72,10 +72,13 @@ void CInven::Tick(_float fTimeDelta)
 		}
 	}
 
+	if (m_pPlayer == nullptr)
+		return;
+
 	_vector vUp = m_pTransformCom->Get_State_Vector(CTransform::STATE_UP);
 	_float fDegree = XMConvertToDegrees(XMVectorGetY(XMVector3AngleBetweenVectors(vUp, m_vInvenUp[m_pPlayer->Get_Weapon()])));
 	if (fDegree > 4.f)
-		m_pTransformCom->Turn(XMVectorSet(0, 0, 1, 0), -fTimeDelta * fDegree * 0.055f);
+		m_pTransformCom->Turn(XMVectorSet(0, 0, 1, 0), -fTimeDelta * fDegree * 0.045f);
 	for (auto& Pair : m_Parts)
 		Pair.second->Tick(fTimeDelta);
 }
@@ -89,9 +92,6 @@ void CInven::Late_Tick(_float fTimeDelta)
 
 HRESULT CInven::Render()
 {
-	_float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	m_pContext->OMSetBlendState(m_pGameInstance->Get_BlendState(), blendFactor, 0xffffffff);
-
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -141,7 +141,8 @@ HRESULT CInven::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_eWeapon)))
 		return E_FAIL;
-	
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(m_fAlpha))))
+		return E_FAIL;
 	return S_OK;
 }
 

@@ -302,6 +302,49 @@ _float3 CVIBuffer_Terrain::Get_PickPos(const CTransform* pTransform) const
 	return _float3();
 }
 
+_float3 CVIBuffer_Terrain::Compute_Picking(const CTransform* pTransform) const
+{
+	_float3 vRayDir, vRayPos;
+	m_pGameInstance->Transform_PickingToLocalSpace(pTransform, &vRayDir, &vRayPos);
+
+	_vector vPickPos;
+	for (_uint i = 0; i < m_iNumVerticesZ - 1; i++)
+	{
+		for (_uint j = 0; j < m_iNumVerticesX - 1; j++)
+		{
+			_uint iIndex = i * m_iNumVerticesX + j;
+			_uint iIndices[4] = { iIndex + m_iNumVerticesX, iIndex + m_iNumVerticesX + 1, iIndex + 1, iIndex };
+			_float fDis;
+
+			for (int k = 0; k < 2; ++k)
+			{
+				_uint i0 = iIndices[0];
+				_uint i1 = iIndices[k + 1];
+				_uint i2 = iIndices[k + 2];
+
+				_vector v0 = ::XMLoadFloat3(&m_pVerticesPos[i0]);
+				_vector v1 = ::XMLoadFloat3(&m_pVerticesPos[i1]);
+				_vector v2 = ::XMLoadFloat3(&m_pVerticesPos[i2]);
+
+				_vector vecRayDir = ::XMVector3Normalize(::XMLoadFloat3(&vRayDir));
+				_vector vecRayPos = ::XMLoadFloat3(&vRayPos);
+				if (::TriangleTests::Intersects(vecRayPos, vecRayDir, v0, v1, v2, fDis))
+				{
+					vPickPos = vecRayPos + vecRayDir * fDis;
+
+					_matrix* pWorldMatrix = &pTransform->Get_WorldMatrix();
+					vPickPos = XMVector3TransformCoord(vPickPos, *pWorldMatrix);
+					_float3 tempPos;
+					::XMStoreFloat3(&tempPos, vPickPos);
+					return tempPos;
+				}
+			}
+		}
+	}
+
+	return _float3();
+}
+
 CVIBuffer_Terrain * CVIBuffer_Terrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const wstring& strHeightMapFilePath)
 {
 	CVIBuffer_Terrain*		pInstance = new CVIBuffer_Terrain(pDevice, pContext);
@@ -348,6 +391,6 @@ void CVIBuffer_Terrain::Free()
 {
 	__super::Free();
 
-
-
+	if (false == m_isCloned)
+		Safe_Delete_Array(m_pVerticesPos);
 }

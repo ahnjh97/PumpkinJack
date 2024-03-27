@@ -33,7 +33,9 @@ HRESULT CKnife::Initialize(void* pArg)
 	if (FAILED(Add_Components(GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
 
-	m_pTransformCom->Rotation(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(m_pGameInstance->RandomNumber(0, 360)));
+	_float fAngle = m_pGameInstance->RandomNumber(0, 359) / 90.f;
+	m_pTransformCom->Turn(XMVectorSet(0, 1, 0, 0), fAngle);
+	m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), 0.15f);
 	return S_OK;
 }
 

@@ -15,6 +15,7 @@ private:
 public: 
 	_float Get_HightestPoint(TYPE eType);
 	_float3 Get_Center(TYPE eType);
+	_bool Get_Disabled() { return m_bDisabled; }
 	void Set_Disabled(_bool bDisabled) { m_bDisabled = bDisabled; }
 
 public:
