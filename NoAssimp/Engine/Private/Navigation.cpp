@@ -117,6 +117,9 @@ _bool CNavigation::isMove(_fvector vPosition)
 
 HRESULT CNavigation::Render()
 {
+	if (m_pShader == nullptr)
+		return S_OK;
+
 	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
 		return E_FAIL;
 
@@ -124,8 +127,7 @@ HRESULT CNavigation::Render()
 		return E_FAIL;
 
 	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
-		return E_FAIL
-		;
+		return E_FAIL;
 
 	m_pShader->Begin(0);
 

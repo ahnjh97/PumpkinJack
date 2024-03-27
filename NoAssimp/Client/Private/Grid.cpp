@@ -45,6 +45,9 @@ void CGrid::Late_Tick(_float fTimeDelta)
 
 HRESULT CGrid::Render()
 {
+	if (m_bHide)
+		return S_OK;
+
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -58,7 +61,8 @@ HRESULT CGrid::Render()
 		return E_FAIL;
 
 #ifdef _DEBUG
-	m_pNavigationCom->Render();
+	if (m_pNavigationCom != nullptr)
+		m_pNavigationCom->Render();
 #endif
 
 	return S_OK;

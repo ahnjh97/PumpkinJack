@@ -9,7 +9,7 @@ CVIBuffer_Terrain::CVIBuffer_Terrain(ID3D11Device * pDevice, ID3D11DeviceContext
 }
 
 CVIBuffer_Terrain::CVIBuffer_Terrain(const CVIBuffer_Terrain & rhs)
-	: CVIBuffer{ rhs }, m_iNumVerticesX{rhs.m_iNumVerticesX}, m_iNumVerticesZ{ rhs.m_iNumVerticesZ }
+	: CVIBuffer{ rhs }, m_iNumVerticesX{rhs.m_iNumVerticesX}, m_iNumVerticesZ{ rhs.m_iNumVerticesZ }, m_pVerticesPos{rhs.m_pVerticesPos }
 {
 
 }
@@ -39,16 +39,16 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(_uint iX, _uint iZ)
 
 	VTXNORTEX* pVertices = new VTXNORTEX[m_iNumVertices];
 	ZeroMemory(pVertices, sizeof(VTXNORTEX) * m_iNumVertices);
-
+	m_pVerticesPos = new _float3[m_iNumVertices];
 	for (_uint i = 0; i < m_iNumVerticesZ; i++)
 	{
 		for (_uint j = 0; j < m_iNumVerticesX; j++)
 		{
 			_uint	iIndex = i * m_iNumVerticesX + j;
 
-			pVertices[iIndex].vPosition = _float3(j, 0, i);
+			m_pVerticesPos[iIndex] = pVertices[iIndex].vPosition = _float3(j * 5, 0, i * 5);
 			pVertices[iIndex].vNormal = _float3(0.0f, 0.f, 0.f);
-			pVertices[iIndex].vTexcoord = _float2(j / (m_iNumVerticesX - 1.f), i / (m_iNumVerticesZ - 1.f));
+			pVertices[iIndex].vTexcoord = _float2(j / (m_iNumVerticesX - 1.f), i/ (m_iNumVerticesZ - 1.f));
 		}
 	}
 
@@ -302,12 +302,11 @@ _float3 CVIBuffer_Terrain::Get_PickPos(const CTransform* pTransform) const
 	return _float3();
 }
 
-_float3 CVIBuffer_Terrain::Compute_Picking(const CTransform* pTransform) const
+_int CVIBuffer_Terrain::Get_TriangleIndex(const CTransform* pTransform, _float3& vA, _float3& vB, _float3& vC ) const
 {
 	_float3 vRayDir, vRayPos;
 	m_pGameInstance->Transform_PickingToLocalSpace(pTransform, &vRayDir, &vRayPos);
 
-	_vector vPickPos;
 	for (_uint i = 0; i < m_iNumVerticesZ - 1; i++)
 	{
 		for (_uint j = 0; j < m_iNumVerticesX - 1; j++)
@@ -330,19 +329,17 @@ _float3 CVIBuffer_Terrain::Compute_Picking(const CTransform* pTransform) const
 				_vector vecRayPos = ::XMLoadFloat3(&vRayPos);
 				if (::TriangleTests::Intersects(vecRayPos, vecRayDir, v0, v1, v2, fDis))
 				{
-					vPickPos = vecRayPos + vecRayDir * fDis;
-
-					_matrix* pWorldMatrix = &pTransform->Get_WorldMatrix();
-					vPickPos = XMVector3TransformCoord(vPickPos, *pWorldMatrix);
-					_float3 tempPos;
-					::XMStoreFloat3(&tempPos, vPickPos);
-					return tempPos;
+					vA = m_pVerticesPos[i0];
+					vB = m_pVerticesPos[i1];
+					vC = m_pVerticesPos[i2];
+				
+					return iIndex * 2 - (i * 2) + 1 - k; // ¾Æ·¡ÂÊ»ï°¢Çü: Â¦¼ö, À§ÂÊ»ï°¢Çü: È¦¼ö
 				}
 			}
 		}
 	}
 
-	return _float3();
+	return -1;
 }
 
 CVIBuffer_Terrain * CVIBuffer_Terrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const wstring& strHeightMapFilePath)

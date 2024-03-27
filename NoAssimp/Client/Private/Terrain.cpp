@@ -45,11 +45,14 @@ void CTerrain::Late_Tick(_float fTimeDelta)
 
 HRESULT CTerrain::Render()
 {
+	if (m_bHide)
+		return S_OK;
+
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
 	/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-	if (FAILED(m_pShaderCom->Begin(0)))
+	if (FAILED(m_pShaderCom->Begin(m_iPassIndex)))
 		return E_FAIL;
 
 	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
@@ -59,7 +62,8 @@ HRESULT CTerrain::Render()
 		return E_FAIL;
 
 #ifdef _DEBUG
-	m_pNavigationCom->Render();
+	if(m_pNavigationCom != nullptr)
+		m_pNavigationCom->Render();
 #endif
 
 	return S_OK;
@@ -157,6 +161,7 @@ void CTerrain::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pShaderCom);
 	for (size_t i = 0; i < TYPE_END; i++)
 		Safe_Release(m_pTextureCom[i]);

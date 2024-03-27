@@ -23,6 +23,8 @@ public:
 		wstring wstrFileName = L"";
 	}GRID_DESC;
 
+	void Set_PassIndex(_int iPassIndex) { m_iPassIndex = iPassIndex; }
+
 private:
 	CGrid(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CGrid(const CGrid& rhs);
@@ -43,6 +45,7 @@ private:
 	CTexture* m_pTextureCom[TYPE_END] = { nullptr };
 	CVIBuffer_Terrain* m_pVIBufferCom = { nullptr };
 	CNavigation* m_pNavigationCom = { nullptr };
+
 private:
 	HRESULT Add_Components(const wstring& wstrFileName);
 	HRESULT Bind_ShaderResources();

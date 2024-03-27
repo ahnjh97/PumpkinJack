@@ -12,13 +12,17 @@ private:
 	virtual ~CVIBuffer_Terrain() = default;
 
 public:
+	_int Get_NumVerticesX() { return m_iNumVerticesX; }
+	_int Get_NumVerticesZ() { return m_iNumVerticesZ; }
+
+public:
 	virtual HRESULT Initialize_Prototype(_uint iX, _uint iZ);
 	virtual HRESULT Initialize_Prototype(const wstring& strHeightMapFilePath);
 	virtual HRESULT Initialize(void* pArg);
 
 public:
 	_float3 Get_PickPos(const class CTransform* pTransform) const; // 높이가 전부 0인 Terrain에 대한 피킹
-	_float3 Compute_Picking(const class CTransform* pTransform) const; // 굴곡진 Terrain에 대한 피킹
+	_int Get_TriangleIndex(const class CTransform* pTransform, _float3& vA, _float3& vB, _float3& vC) const; // 굴곡진 Terrain에 대한 피킹
 
 private:
 	_uint				m_iNumVerticesX = { 0 };

@@ -1,5 +1,6 @@
 #include "Cell.h"
 #include "VIBuffer_Cell.h"
+#include "GameInstance.h"
 
 CCell::CCell(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }

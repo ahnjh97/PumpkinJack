@@ -26,6 +26,7 @@ public:
 	_bool Get_Dead() { return m_bDead; }
 	void Set_Dead() { m_bDead = true; }
 	_uint Get_Level() { return m_iLevel; }
+	void Set_Hide(_bool bHide) { m_bHide = bHide; }
 
 public:
 	class CComponent* Get_Component(const wstring& strComTag);
@@ -51,7 +52,9 @@ protected:
 	HRESULT Add_Component(_uint iLevelIndex, const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut, void* pArg = nullptr);
 	
 	HRESULT Deactivate_BackFaceCulling();
+
 protected:
+	_bool m_bHide = { false };
 	_bool m_bDead = false;
 	wstring wstrPrototypeTag = {};
 	_uint m_iLevel = {};

@@ -41,6 +41,10 @@ public:
 	void				Save_Cells();
 	void				Load_Cells();
 
+	CCell*				Pick_Cell();
+	void				Delete_Cells();
+	void				Add_Cells();
+
 private:
 	_bool						bCallNewFrame = { false };
 	_bool						bSeeAnim = { false };

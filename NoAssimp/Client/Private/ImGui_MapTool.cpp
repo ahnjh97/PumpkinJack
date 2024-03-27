@@ -7,7 +7,6 @@
 #include "ImGuizmo.h"
 #include <locale>
 #include <codecvt>
-#include "Navigation.h"
 #include "Grid.h"
 #include "Cell.h"
 #include <chrono>
@@ -65,10 +64,14 @@ void CImGui_MapTool::Tick(_float fTimeDelta)
 
 	if (m_pGameInstance->MouseDown(DIMKS_RBUTTON))
 	{
-		if(bNavigationMode == false)
+		if (bNavigationMode == false)
 			OnRightClick_ObjectMode(); // 피킹으로 객체생성
+		//else
+		//	Add_Cells(); // 피킹으로 셀 생성
 	}
-		
+	
+	if ((m_pGameInstance->Get_DIMouseState(DIMKS_RBUTTON) & 0x80) && bNavigationMode)
+		Add_Cells();
 
 	if (!ImGui::IsAnyItemHovered() && m_pGameInstance->MouseDown(DIMKS_LBUTTON) && !(m_pGameInstance->Get_DIKeyState(DIK_LSHIFT) & 0x80))
 	{
@@ -126,23 +129,50 @@ HRESULT CImGui_MapTool::Render()
 	if (bCallNewFrame)
 		__super::Render();
 
+	CGrid* pGrid = dynamic_cast<CGrid*>(m_pGameInstance->Get_GameObject(LEVEL_MAPTOOL, TEXT("Layer_Grid"), TEXT("Prototype_GameObject_Grid")));
+	if (/*m_iMode == 2 &&*/ pGrid != nullptr) // Mode: Cells
+	{
+		if (m_pShader == nullptr)
+			return S_OK;
+		CTransform* pGridTransform = dynamic_cast<CTransform*>(pGrid->Get_Component(g_strTransformTag));
+		
+		if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", pGridTransform->Get_WorldFloat4x4_Ptr())))
+			return E_FAIL;
+
+		if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
+			return E_FAIL;
+
+		if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+			return E_FAIL;
+
+		m_pShader->Begin(0);
+
+		/*if (-1 == m_iCurrentIndex)
+		{
+
+			for (auto& pCell : m_Cells)
+			{
+				if (nullptr != pCell)
+					pCell->Render();
+			}
+		}
+		else
+			m_Cells[m_iCurrentIndex]->Render();*/
+		for (auto& cell : vecCells)
+		{
+			if(cell != nullptr)
+				cell->Render();
+		}
+	}
+
 	return S_OK;
 }
 
 void CImGui_MapTool::OnRightClick_ObjectMode()
 {
-	const CVIBuffer_Terrain* pTerrainBuf = dynamic_cast<const CVIBuffer_Terrain*>(m_pGameInstance->Get_Component(LEVEL_MAPTOOL, TEXT("Layer_Grid"), TEXT("Com_VIBuffer")));
-	if (!pTerrainBuf)
-	{
-		MSG_BOX(TEXT("Grid-> Failed to get : TerrainBuffer "));
-		return;
-	}
-	const CTransform* pTransform = dynamic_cast<const CTransform*>(m_pGameInstance->Get_Component(LEVEL_MAPTOOL, TEXT("Layer_Grid"), g_strTransformTag));
-	if (!pTransform)
-	{
-		MSG_BOX(TEXT("Grid-> Failed to get : pTransform"));
-		return;
-	}
+	CGameObject* pGrid = m_pGameInstance->Get_GameObject(LEVEL_MAPTOOL, TEXT("Layer_Grid"), TEXT("Prototype_GameObject_Grid"));
+	CVIBuffer_Terrain* pTerrainBuf = dynamic_cast<CVIBuffer_Terrain*>(pGrid->Get_Component(TEXT("Com_VIBuffer")));
+	const CTransform* pTransform = dynamic_cast<const CTransform*>(pGrid->Get_Component(g_strTransformTag));
 
 	m_vPickPos = pTerrainBuf->Get_PickPos(pTransform);
 
@@ -281,9 +311,24 @@ void CImGui_MapTool::OptionChange()
 
 	if (m_pGameInstance->KeyDown(DIK_TAB))
 	{
-		m_iMode++;
-		m_iMode = m_iMode % 3;
+		m_iMode += 1;
+		if (m_iMode >= 2)
+			m_iMode = 0;
 	}
+
+	CGrid* pGrid = dynamic_cast<CGrid*>(m_pGameInstance->Get_GameObject(LEVEL_MAPTOOL, TEXT("Layer_Grid"), TEXT("Prototype_GameObject_Grid")));
+	if (m_iMode == 0) // SOLID
+	{
+		pGrid->Set_PassIndex(0);
+		pGrid->Set_Hide(false);
+	}
+	else if (m_iMode == 1) // WIREFRAME
+	{
+		pGrid->Set_PassIndex(1);
+		pGrid->Set_Hide(false);
+	}
+	else if (m_iMode == 2) // CELL
+		pGrid->Set_Hide(true);
 }
 
 _bool CImGui_MapTool::Menu_Level()
@@ -634,6 +679,28 @@ void CImGui_MapTool::Load_Cells()
 	fileStream.close();
 }
 
+void CImGui_MapTool::Add_Cells()
+{
+	CGameObject* pGrid = m_pGameInstance->Get_GameObject(LEVEL_MAPTOOL, TEXT("Layer_Grid"), TEXT("Prototype_GameObject_Grid"));
+	CVIBuffer_Terrain* pTerrainBuffer = dynamic_cast<CVIBuffer_Terrain*>(pGrid->Get_Component(TEXT("Com_VIBuffer")));
+	CTransform* pGridTransform = dynamic_cast<CTransform*>(pGrid->Get_Component(g_strTransformTag));	
+	if (vecCellOptions.empty())
+		vecCellOptions.resize(pTerrainBuffer->Get_NumVerticesX() * pTerrainBuffer->Get_NumVerticesZ() * 2);
+
+	_float3 vPoints[3];
+	_int iTriangleIndex = pTerrainBuffer->Get_TriangleIndex(pGridTransform, vPoints[0], vPoints[1], vPoints[2]);
+	if (iTriangleIndex == -1)
+		return;
+
+	if (vecCellOptions[iTriangleIndex] == 1)
+		return;
+
+	vecCellOptions[iTriangleIndex] = 1;
+	
+	CCell* pCell = CCell::Create(m_pDevice, m_pContext, vPoints, vecCells.size());
+	vecCells.emplace_back(pCell);
+}
+
 CImGui_MapTool* CImGui_MapTool::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CImGui_MapTool* pInstance = new CImGui_MapTool(pDevice, pContext);
@@ -650,4 +717,8 @@ CImGui_MapTool* CImGui_MapTool::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 void CImGui_MapTool::Free()
 {
 	__super::Free();
+	Safe_Release(m_pShader);
+	for (auto& cell : vecCells)
+		Safe_Release(cell);
+	vecCells.clear();
 }

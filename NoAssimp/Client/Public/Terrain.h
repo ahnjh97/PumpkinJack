@@ -21,6 +21,9 @@ public:
 	{
 		wstring wstrFileName = L"";
 	}TERRAIN_DESC;
+
+	void Set_PassIndex(_int iPassIndex) { m_iPassIndex = iPassIndex; }
+
 private:
 	CTerrain(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CTerrain(const CTerrain& rhs);
@@ -32,6 +35,9 @@ public:
 	virtual void Tick(_float fTimeDelta) override;
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+
+private:
+	_uint m_iPassIndex = {};
 
 private:
 	CShader*				m_pShaderCom = { nullptr };
