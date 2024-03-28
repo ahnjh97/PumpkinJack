@@ -15,6 +15,7 @@ public:
 	virtual void		Tick(_float fTimeDelta)		override;
 	virtual HRESULT		Render()					override;
 	void				Settings(_float fTimeDelta);
+	void				OnKeyInput();
 	void				ConvertToString();
 
 private:

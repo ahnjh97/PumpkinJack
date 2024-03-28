@@ -66,13 +66,13 @@ HRESULT CLevel_MapTool::Ready_Layer_Camera(const wstring& strLayerTag)
 	CCamera_Free::CAMERA_FREE_DESC		CameraDesc{};
 
 	CameraDesc.fMouseSensor = 0.1f;
-	CameraDesc.fFovy = XMConvertToRadians(60.0f);
+	CameraDesc.fFovy = XMConvertToRadians(70.0f);
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
 	CameraDesc.fFar = 1000.0f;
 	CameraDesc.vEye = _float4(0.f, 10.f, -7.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
-	CameraDesc.fSpeedPerSec = 20.f;
+	CameraDesc.fSpeedPerSec = 100.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))

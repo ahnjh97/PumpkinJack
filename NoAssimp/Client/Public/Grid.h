@@ -44,7 +44,6 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	CTexture* m_pTextureCom[TYPE_END] = { nullptr };
 	CVIBuffer_Terrain* m_pVIBufferCom = { nullptr };
-	CNavigation* m_pNavigationCom = { nullptr };
 
 private:
 	HRESULT Add_Components(const wstring& wstrFileName);

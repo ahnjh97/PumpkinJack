@@ -51,10 +51,6 @@ private:
 	void Check_GoBackUp();
 
 private:
-	map<const wstring, CPart*> m_Parts;
-	CCamera_Jack* m_pCamera = { nullptr };
-	CCollider* m_pColliderCom = { nullptr };
-
 	STATE m_eState = { PLAYER_END };
 	WEAPON m_eWeapon = {};
 	_uint m_iLastAttack = {};
@@ -77,6 +73,12 @@ private:
 private:
 	HRESULT Add_Components(LEVEL eLevel, const wstring& _wstrModelTag);
 	HRESULT Add_PartObjects(LEVEL eLevel);
+
+private:
+	map<const wstring, CPart*> m_Parts;
+	CCamera_Jack* m_pCamera = { nullptr };
+	CCollider* m_pColliderCom = { nullptr };
+	CNavigation* m_pNavigationCom = { nullptr };
 
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

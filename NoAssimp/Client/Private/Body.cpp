@@ -158,9 +158,9 @@ void CBody::StateToAnimation()
 
 void CBody::Initialize_AnimSpeed()
 {
-	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_AirAttack_Start"), 3.5f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_AirAttack_Start"), 4.1f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_AirAttack"), 3.f);
-	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_AirAttack_Start"), 2.f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_AirAttack_Start"), 3.4f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_AirAttack_End"), 3.f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_Roll"), 1.8f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_Roll"), 3.2f);
@@ -173,8 +173,8 @@ void CBody::Initialize_AnimSpeed()
 	for (int i = 1; i < 4; i++)
 		m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_Atk" + to_string(i)), 2.6f);
 
-	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Atk1"), 4.8f);
-	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Atk2"), 3.8f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Atk1"), 5.f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Atk2"), 4.2f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Atk3"), 3.2f);
 }
 

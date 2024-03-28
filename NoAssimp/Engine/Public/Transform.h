@@ -81,7 +81,7 @@ public:
 	void Go_Backward(_float fTimeDelta, _uint iNum = 0, _fvector vCamLook = _vector());
 	void Go_Left(_float fTimeDelta, _uint iNum = 0, _fvector vCamRight = _vector());
 	void Go_Right(_float fTimeDelta, _uint iNum = 0, _fvector vCamRight = _vector());
-	void Move(_float fTimeDelta, _fvector vTargetDir);
+	void Move(_float fTimeDelta, _fvector vTargetDir, class CNavigation* pNavigation = nullptr);
 	void Fall(_float fTimeDelta);
 	void Jump(_float fTimeDelta);
 	void Gravity(_float fTimeDelta);

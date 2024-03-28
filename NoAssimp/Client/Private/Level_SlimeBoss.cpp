@@ -103,7 +103,7 @@ HRESULT CLevel_SlimeBoss::Ready_Layer_Camera(const wstring& strLayerTag)
 	CCamera_Jack::CAMERA_JACK_DESC		CameraDesc{};
 
 	CameraDesc.fMouseSensor = 0.1f;
-	CameraDesc.fFovy = XMConvertToRadians(60.0f);
+	CameraDesc.fFovy = XMConvertToRadians(70.0f);
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
 	CameraDesc.fFar = 1000.0f;
@@ -112,8 +112,8 @@ HRESULT CLevel_SlimeBoss::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fSpeedPerSec = 60.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-	CameraDesc.fDistance = 54.f;
-	CameraDesc.fHeight = 24.f;
+	CameraDesc.fDistance = 42.f;
+	CameraDesc.fHeight = 22.f;
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, strLayerTag, TEXT("Prototype_GameObject_Camera_Jack"), &CameraDesc)))
 		return E_FAIL;

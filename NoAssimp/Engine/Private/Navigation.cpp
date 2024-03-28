@@ -80,6 +80,9 @@ void CNavigation::Tick(_fmatrix WorldMatrix)
 
 _bool CNavigation::isMove(_fvector vPosition)
 {
+	if (m_Cells.empty())
+		return true;
+
 	if (-1 == m_iCurrentIndex)
 		return false;
 
@@ -117,6 +120,12 @@ _bool CNavigation::isMove(_fvector vPosition)
 
 HRESULT CNavigation::Render()
 {
+	if (m_Cells.empty())
+		return S_OK;
+
+	if (!m_pGameInstance->Get_Toggle())
+		return S_OK;
+
 	if (m_pShader == nullptr)
 		return S_OK;
 
@@ -133,7 +142,6 @@ HRESULT CNavigation::Render()
 
 	if (-1 == m_iCurrentIndex)
 	{
-
 		for (auto& pCell : m_Cells)
 		{
 			if (nullptr != pCell)
@@ -142,7 +150,6 @@ HRESULT CNavigation::Render()
 	}
 	else
 		m_Cells[m_iCurrentIndex]->Render();
-
 
 
 	return S_OK;

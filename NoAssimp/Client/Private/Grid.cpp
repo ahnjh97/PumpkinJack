@@ -60,11 +60,6 @@ HRESULT CGrid::Render()
 	if (FAILED(m_pVIBufferCom->Render()))
 		return E_FAIL;
 
-#ifdef _DEBUG
-	if (m_pNavigationCom != nullptr)
-		m_pNavigationCom->Render();
-#endif
-
 	return S_OK;
 }
 
@@ -91,18 +86,9 @@ HRESULT CGrid::Add_Components(const wstring& wstrFileName)
 		return E_FAIL;
 
 	/* For.Com_VIBuffer */
-	if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_VIBuffer_Grid"),
+	if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_VIBuffer_Terrain_HM"),
 		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
-
-	if (wstrFileName != L"")
-	{
-		GRID_DESC tGridDesc{};
-		tGridDesc.wstrFileName = wstrFileName;
-		if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_Navigation"), 
-			TEXT("Com_Navigation"), (CComponent**)&m_pNavigationCom, &tGridDesc)))
-			return E_FAIL;
-	}
 
 	return S_OK;
 }
@@ -168,7 +154,6 @@ void CGrid::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pShaderCom);
 	for (size_t i = 0; i < TYPE_END; i++)
 		Safe_Release(m_pTextureCom[i]);

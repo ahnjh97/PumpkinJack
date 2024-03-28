@@ -52,7 +52,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 	if (pArg)
 		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
 
-	GameObjectDesc.fSpeedPerSec = 38.f;
+	GameObjectDesc.fSpeedPerSec = 43.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
@@ -146,6 +146,8 @@ HRESULT CPlayer::Render()
 {
 #ifdef _DEBUG
 	m_pColliderCom->Render();
+	if (m_pNavigationCom != nullptr && m_pGameInstance->Get_NavigationMode() == true)
+		m_pNavigationCom->Render();
 #endif
 	return S_OK;
 }
@@ -183,7 +185,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 	}
 
 	if(m_eState == ROLL)
-		m_pTransformCom->Move(fTimeDelta * 1.5f, XMLoadFloat3(&m_vDirection));
+		m_pTransformCom->Move(fTimeDelta * 1.5f, ::XMLoadFloat3(&m_vDirection), m_pNavigationCom);
 
 	if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) || (m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80)
 		|| (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80) || (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80))
@@ -191,9 +193,9 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 		if (!m_bIsAttacking && !m_bIsRolling)
 		{
 			if(m_bIsJumping)
-				m_pTransformCom->Move(fTimeDelta * 0.85f, XMLoadFloat3(&m_vDirection));
+				m_pTransformCom->Move(fTimeDelta * 0.85f, ::XMLoadFloat3(&m_vDirection), m_pNavigationCom);
 			else
-				m_pTransformCom->Move(fTimeDelta, XMLoadFloat3(&m_vDirection));
+				m_pTransformCom->Move(fTimeDelta, ::XMLoadFloat3(&m_vDirection), m_pNavigationCom);
 		}
 			
 		if(!m_bIsJumping && !m_bIsAttacking && !m_bIsRolling)
@@ -434,6 +436,12 @@ HRESULT CPlayer::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom, &ColliderDesc)))
 		return E_FAIL;
 
+	/* For.Com_Navigation */
+	CNavigation::NAVIGATION_DESC			NavigationDesc{};
+	NavigationDesc.iCurrentIndex = 0;
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Navigation") + to_wstring(eLevel),
+		TEXT("Com_Navigation"), (CComponent**)&m_pNavigationCom, &NavigationDesc)))
+		return E_FAIL;
 	return S_OK;
 }
 
@@ -535,6 +543,7 @@ CGameObject* CPlayer::Clone(void* pArg)
 void CPlayer::Free()
 {
 	__super::Free();
+	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pCamera);
 	for (auto& Pair : m_Parts)

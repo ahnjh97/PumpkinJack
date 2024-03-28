@@ -20,6 +20,7 @@ static _bool IsMouseTrigger = false;
 void CImGui_Client::Tick(_float fTimeDelta)
 {
 	Settings(fTimeDelta);
+	OnKeyInput();
 	if (true == Is_IMGUI_Switch && m_pPlayer)
 	{
 		ImGui::Begin("Jack");
@@ -51,13 +52,6 @@ void CImGui_Client::Settings(_float fTimeDelta)
 	else
 		IsMouseTrigger = true;
 
-	if ((m_pGameInstance->Get_DIKeyState(DIK_LSHIFT) & 0x80) && (m_pGameInstance->KeyDown(DIK_TAB)))
-	{
-		Is_IMGUI_Switch = !Is_IMGUI_Switch; // ImGui 보이기 / 숨기기 토글
-		m_pGameInstance->Toggle_Toggle();
-	}
-		
-
 	if (m_pPlayer == nullptr)
 	{
 		if (*m_pGameInstance->Get_CurrentLevelID() < LEVEL_GAMEPLAY || *m_pGameInstance->Get_CurrentLevelID() > LEVEL_SLIMEBOSS)
@@ -67,6 +61,18 @@ void CImGui_Client::Settings(_float fTimeDelta)
 		if(m_pPlayer != nullptr)
 			Safe_AddRef(m_pPlayer);
 	}
+}
+
+void CImGui_Client::OnKeyInput()
+{
+	if ((m_pGameInstance->Get_DIKeyState(DIK_LSHIFT) & 0x80) && (m_pGameInstance->KeyDown(DIK_TAB)))
+	{
+		Is_IMGUI_Switch = !Is_IMGUI_Switch; // ImGui 보이기 / 숨기기 토글
+		m_pGameInstance->Toggle_Toggle();
+	}
+
+	if (m_pGameInstance->KeyDown(DIK_Q))
+		m_pGameInstance->Toggle_NavigationMode();
 }
 
 void CImGui_Client::ConvertToString()

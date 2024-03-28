@@ -147,6 +147,12 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 100, 100))))
 		return E_FAIL;
 
+	/* For.Prototype_Component_Navigation */
+	wstring wstrNavigationTag = TEXT("Prototype_Component_Navigation") + to_wstring(eLevel);
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrNavigationTag,
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../objects_txt/Level_GamePlay_Cells.txt")))))
+		return E_FAIL;
+
 	TraverseAnimModels(eLevel, L"../../../model_txt/Anim/");
 	TraverseNonAnimModels(eLevel, L"../../../model_txt/NonAnim/");
 
@@ -206,7 +212,10 @@ HRESULT CLoader::Loading_For_MapTool(LEVEL eLevel)
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MAPTOOL, TEXT("Prototype_Component_VIBuffer_Grid"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 400, 400))))
 		return E_FAIL;
-
+	/* Prototype_Component_VIBuffer_Terrain_HM */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_HM"),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_SlimeBosss.bmp")))))
+		return E_FAIL;
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 
@@ -265,9 +274,20 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 		return E_FAIL;
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 
-	/* Prototype_Component_VIBuffer_Terrain */
-	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain"),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 400, 400))))
+	///* Prototype_Component_VIBuffer_Terrain */
+	//if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain"),
+	//	CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 400, 400))))
+	//	return E_FAIL;
+
+	/* Prototype_Component_VIBuffer_Terrain_HM */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_HM"),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_SlimeBosss.bmp")))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_Navigation */
+	wstring wstrNavigationTag = TEXT("Prototype_Component_Navigation") + to_wstring(eLevel);
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrNavigationTag,
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../objects_txt/Level_SlimeBoss_Cells.txt")))))
 		return E_FAIL;
 
 	TraverseAnimModels(eLevel, L"../../../model_txt/Anim/");

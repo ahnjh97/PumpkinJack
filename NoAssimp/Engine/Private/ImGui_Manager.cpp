@@ -56,7 +56,8 @@ HRESULT CImGui_Manager::Render()
 
 HRESULT CImGui_Manager::Release_ImGui()
 {
-	Safe_Release(m_pImGui);
+	if(m_pImGui != nullptr)
+		Safe_Release(m_pImGui);
 
 	return S_OK;
 }

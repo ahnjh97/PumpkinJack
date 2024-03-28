@@ -36,6 +36,8 @@ HRESULT CTerrain::Initialize(void * pArg)
 
 void CTerrain::Tick(_float fTimeDelta)
 {
+	if(m_pNavigationCom != nullptr)
+		m_pNavigationCom->Tick(m_pTransformCom->Get_WorldMatrix());
 }
 
 void CTerrain::Late_Tick(_float fTimeDelta)
@@ -62,7 +64,8 @@ HRESULT CTerrain::Render()
 		return E_FAIL;
 
 #ifdef _DEBUG
-	if(m_pNavigationCom != nullptr)
+
+	if(m_pNavigationCom != nullptr && m_pGameInstance->Get_NavigationMode() == false)
 		m_pNavigationCom->Render();
 #endif
 
@@ -90,12 +93,20 @@ HRESULT CTerrain::Add_Components(LEVEL eLevel)
 	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_Brush"),
 		TEXT("Com_Texture_Brush"), (CComponent**)&m_pTextureCom[TYPE_BRUSH])))
 		return E_FAIL;
+	
+	wstring wstrVIBufferTerrain = TEXT("Prototype_Component_VIBuffer_Terrain");
+	if (eLevel == LEVEL_SLIMEBOSS)
+		wstrVIBufferTerrain += TEXT("_HM");
 
 	/* For.Com_VIBuffer */
-	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain"),
-		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
+	if (FAILED(__super::Add_Component(eLevel, wstrVIBufferTerrain, TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
 
+
+	/* For.Com_Navigation */
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Navigation" + to_wstring(eLevel)), 
+		TEXT("Com_Navigation"), (CComponent**)&m_pNavigationCom)))
+		return E_FAIL;
 
 	return S_OK;
 }

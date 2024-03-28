@@ -62,21 +62,37 @@ void CImGui_MapTool::Tick(_float fTimeDelta)
 
 	strCurLevel = vecLevelName[iLevelIndex + (_int)(LEVEL_GAMEPLAY)];
 
+	if (m_pGameInstance->KeyDown(DIK_SPACE))
+		bNavigationMode = !bNavigationMode;
+
 	if (m_pGameInstance->MouseDown(DIMKS_RBUTTON))
 	{
 		if (bNavigationMode == false)
 			OnRightClick_ObjectMode(); // 피킹으로 객체생성
-		//else
-		//	Add_Cells(); // 피킹으로 셀 생성
 	}
 	
 	if ((m_pGameInstance->Get_DIMouseState(DIMKS_RBUTTON) & 0x80) && bNavigationMode)
-		Add_Cells();
+	{
+		if(m_iOption == 1)
+			Add_Cells();
+		else if(m_iOption == 2)
+		{
+			_int iCellIndex{};
+			CCell* pCell = Pick_Cell(iCellIndex);
+			if (pCell != nullptr)
+			{
+				Safe_Release(pCell);
+				vecCells[iCellIndex] = nullptr;
+			}
+		}
+	}
 
 	if (!ImGui::IsAnyItemHovered() && m_pGameInstance->MouseDown(DIMKS_LBUTTON) && !(m_pGameInstance->Get_DIKeyState(DIK_LSHIFT) & 0x80))
 	{
 		if (bNavigationMode == false)
 			OnLeftClick_ObjectMode(); // 피킹으로 객체 고르기
+		else
+			OnLeftClick_NavigationMode();
 	}
 		
 
@@ -101,7 +117,7 @@ void CImGui_MapTool::Tick(_float fTimeDelta)
 		ImGui::End();
 
 		ImGui::Begin(u8"Mode");
-		Menu_Mode();
+		Menu_Navigation();
 		ImGui::End();
 
 		Edit_Object(); // 선택한 객체 월드행렬 수정
@@ -129,8 +145,11 @@ HRESULT CImGui_MapTool::Render()
 	if (bCallNewFrame)
 		__super::Render();
 
+	if (!Is_IMGUI_Switch || !bNavigationMode)
+		return S_OK;
+
 	CGrid* pGrid = dynamic_cast<CGrid*>(m_pGameInstance->Get_GameObject(LEVEL_MAPTOOL, TEXT("Layer_Grid"), TEXT("Prototype_GameObject_Grid")));
-	if (/*m_iMode == 2 &&*/ pGrid != nullptr) // Mode: Cells
+	if (pGrid != nullptr) 
 	{
 		if (m_pShader == nullptr)
 			return S_OK;
@@ -147,22 +166,12 @@ HRESULT CImGui_MapTool::Render()
 
 		m_pShader->Begin(0);
 
-		/*if (-1 == m_iCurrentIndex)
-		{
-
-			for (auto& pCell : m_Cells)
-			{
-				if (nullptr != pCell)
-					pCell->Render();
-			}
-		}
-		else
-			m_Cells[m_iCurrentIndex]->Render();*/
 		for (auto& cell : vecCells)
 		{
-			if(cell != nullptr)
+			if (cell != nullptr)
 				cell->Render();
 		}
+		
 	}
 
 	return S_OK;
@@ -176,7 +185,7 @@ void CImGui_MapTool::OnRightClick_ObjectMode()
 
 	m_vPickPos = pTerrainBuf->Get_PickPos(pTransform);
 
-	if (!XMVector3Equal(XMLoadFloat3(&m_vPickPos), XMVectorSet(0.f, 0.f, 0.f, 0.f)))
+	if (!::XMVector3Equal(::XMLoadFloat3(&m_vPickPos), ::XMVectorSet(0.f, 0.f, 0.f, 0.f)))
 	{
 		_float4 vTemp(m_vPickPos.x, m_vPickPos.y, m_vPickPos.z, 1.0f); // 위치
 		CGameObject::GAMEOBJECT_DESC tempDesc = {};
@@ -270,8 +279,50 @@ void CImGui_MapTool::OnLeftClick_ObjectMode()
 	m_pPickedObject = pObj;
 }
 
+void CImGui_MapTool::OnLeftClick_NavigationMode()
+{
+	list<CGameObject*> objList = m_pGameInstance->Get_ObjectList(LEVEL_MAPTOOL, TEXT("Layer_Parse"));
+
+	if (objList.empty())
+		return;
+
+	vector<_float4> vecPickPos;
+	for (auto& obj : objList)
+	{
+		if (obj == nullptr)
+			continue;
+
+		CModel* pModel = dynamic_cast<CModel*>(obj->Get_Component(TEXT("Com_Model")));
+		if (pModel == nullptr)
+			continue;
+
+		CTransform* pTransform = dynamic_cast<CTransform*>(obj->Get_Component(g_strTransformTag));
+		if (pTransform == nullptr)
+			continue;
+
+		_float4 vTemp = pModel->Check_Meshes(pTransform);
+		if(vTemp.w != 0)
+			vecPickPos.push_back(vTemp);
+	}
+
+	if (vecPickPos.empty())
+		return;
+
+	_float fShortest = { FLT_MAX };
+	_float4 fResult = {};
+	for (auto& iter : vecPickPos)
+	{
+		if (iter.w <= fShortest)
+			fResult = iter;
+	}
+
+	m_vLeftClickPos = fResult;
+}
+
 void CImGui_MapTool::On_DIK_Escape()
 {
+	bNavigationMode = false;
+
 	if (bSeeAnim)
 	{
 		pNonAnimModel->Set_Hide(false);
@@ -284,8 +335,8 @@ void CImGui_MapTool::On_DIK_Escape()
 		bSeeAnim = false;
 		AnimationIdx = -1;
 	}
-	m_pPickedObject = nullptr;
 
+	m_pPickedObject = nullptr;
 }
 
 void CImGui_MapTool::On_DIK_Delete()
@@ -302,14 +353,12 @@ void CImGui_MapTool::On_DIK_Delete()
 
 void CImGui_MapTool::OptionChange()
 {
-	if (m_pGameInstance->KeyDown(DIK_ESCAPE) || m_pGameInstance->KeyDown(DIK_0))
-		m_iOption = 0;
-	else if (m_pGameInstance->KeyDown(DIK_1))
+	 if (m_pGameInstance->KeyDown(DIK_1))
 		m_iOption = 1;
 	else if (m_pGameInstance->KeyDown(DIK_2))
 		m_iOption = 2;
 
-	if (m_pGameInstance->KeyDown(DIK_TAB))
+	if (!(m_pGameInstance->Get_DIKeyState(DIK_LSHIFT) & 0x80) && m_pGameInstance->KeyDown(DIK_TAB))
 	{
 		m_iMode += 1;
 		if (m_iMode >= 2)
@@ -467,33 +516,28 @@ void CImGui_MapTool::Edit_Object()
 		EditGuizmo(_float4x4());
 }
 
-void CImGui_MapTool::Menu_Mode()
+void CImGui_MapTool::Menu_Navigation()
 {
-	for (_int i = 0; i < 2; i++)
-	{
-		if (ImGui::RadioButton(vecMode[i].c_str(), iNavigationIndex == i))
-		{
-			iNavigationIndex = i; // 선택 시 실행할 로직 추가
-			if (i == 0)
-				bNavigationMode = false;
-			else if (i == 1)
-				bNavigationMode = true;
-		}
-		if (i == 0)
-			ImGui::SameLine();
-	}
-	ImGui::Text("	Option : %d", m_iOption);
+	ImGui::Checkbox(vecMode[1].c_str(), &bNavigationMode);
+
+	if (!bNavigationMode)
+		return;
+	
+	if (m_iOption == 1)
+		ImGui::Text("	Option : ADD");
+	else if(m_iOption == 2)
+		ImGui::Text("	Option : DELETE");
 
 	switch (m_iMode)
 	{
 	case 0:
-		ImGui::Text("	Mode : SOLID");
+		ImGui::Text("	RenderState : SOLID");
 		break;
 	case 1:
-		ImGui::Text("	Mode : WIREFRAME");
+		ImGui::Text("	RenderState : WIREFRAME");
 		break;
 	case 2:
-		ImGui::Text("	Mode : CELLS");
+		ImGui::Text("	RenderState : CELLS");
 		break;
 	}
 
@@ -502,6 +546,9 @@ void CImGui_MapTool::Menu_Mode()
 	ImGui::SameLine();
 	if (ImGui::Button("Load", ImVec2(100, 40)))
 		Load_Cells();
+
+	ImGui::SeparatorText("LeftClickPos");
+	ImGui::Text("	%.2f, %.2f, %.2f ", m_vLeftClickPos.x, m_vLeftClickPos.y, m_vLeftClickPos.z);
 }
 
 void CImGui_MapTool::Save_Level()
@@ -575,6 +622,8 @@ void CImGui_MapTool::Load_Level()
 		}
 	}
 	fileStream.close();
+
+	Load_Cells(); 
 }
 
 void CImGui_MapTool::Save_Cells()
@@ -601,7 +650,7 @@ void CImGui_MapTool::Save_Cells()
 		for (_int i = 0; i < 3; i++)
 		{
 			_float3 vPoint{};
-			 XMStoreFloat3(&vPoint, cell->Get_Point((CCell::POINT)i));
+			 ::XMStoreFloat3(&vPoint, cell->Get_Point((CCell::POINT)i));
 			 outputFile.write(reinterpret_cast<const char*>(&vPoint), sizeof(vPoint));
 		}
 	}
@@ -663,7 +712,7 @@ void CImGui_MapTool::Load_Cells()
 	_float3 vPoints[3];
 	while (!fileStream.eof())
 	{
-		for(_int i = 0; i<3;i++)
+		for(_int i = 0; i< 3; i++)
 			fileStream.read(reinterpret_cast<char*>(&vPoints[i]), sizeof(vPoints[i]));
 
 		if (fileStream.eof())
@@ -675,8 +724,47 @@ void CImGui_MapTool::Load_Cells()
 
 		vecCells.emplace_back(pCell);
 	}
-
 	fileStream.close();
+	bNavigationMode = true;
+}
+
+CCell* CImGui_MapTool::Pick_Cell(_Out_ _int& iIndex)
+{
+	if (vecCells.empty())
+		return nullptr;
+
+	CGrid* pGrid = dynamic_cast<CGrid*>(m_pGameInstance->Get_GameObject(LEVEL_MAPTOOL, TEXT("Layer_Grid"), TEXT("Prototype_GameObject_Grid")));
+	CTransform* pGridTransform = dynamic_cast<CTransform*>(pGrid->Get_Component(g_strTransformTag));
+
+	_float3 vRayDir, vRayPos;
+	m_pGameInstance->Transform_PickingToLocalSpace(pGridTransform, &vRayDir, &vRayPos);
+
+	_vector vPoints[3];
+	_float fDis{};
+
+	for (_int i = 0; i< vecCells.size(); i++)
+	{
+		if (vecCells[i] == nullptr)
+			continue;
+
+		for (_int j = 0; j < CCell::POINT_END; j++)
+			vPoints[j] = vecCells[i]->Get_Point((CCell::POINT)j);
+
+		_vector vecRayDir = ::XMVector3Normalize(::XMLoadFloat3(&vRayDir));
+		_vector vecRayPos = ::XMLoadFloat3(&vRayPos);
+		if (::TriangleTests::Intersects(vecRayPos, vecRayDir, vPoints[0], vPoints[1], vPoints[2], fDis))
+		{
+			iIndex = i;
+			return vecCells[i];
+		}
+	}
+
+	return nullptr; 
+}
+
+void CImGui_MapTool::Delete_Cells()
+{
+
 }
 
 void CImGui_MapTool::Add_Cells()
@@ -684,21 +772,40 @@ void CImGui_MapTool::Add_Cells()
 	CGameObject* pGrid = m_pGameInstance->Get_GameObject(LEVEL_MAPTOOL, TEXT("Layer_Grid"), TEXT("Prototype_GameObject_Grid"));
 	CVIBuffer_Terrain* pTerrainBuffer = dynamic_cast<CVIBuffer_Terrain*>(pGrid->Get_Component(TEXT("Com_VIBuffer")));
 	CTransform* pGridTransform = dynamic_cast<CTransform*>(pGrid->Get_Component(g_strTransformTag));	
-	if (vecCellOptions.empty())
-		vecCellOptions.resize(pTerrainBuffer->Get_NumVerticesX() * pTerrainBuffer->Get_NumVerticesZ() * 2);
+	//if (vecCellOptions.empty())
+	//	vecCellOptions.resize(pTerrainBuffer->Get_NumVerticesX() * pTerrainBuffer->Get_NumVerticesZ() * 2);
 
 	_float3 vPoints[3];
 	_int iTriangleIndex = pTerrainBuffer->Get_TriangleIndex(pGridTransform, vPoints[0], vPoints[1], vPoints[2]);
 	if (iTriangleIndex == -1)
 		return;
 
-	if (vecCellOptions[iTriangleIndex] == 1)
+	if (Check_ExistingCell(vPoints[0], vPoints[1], vPoints[2]) == true)
 		return;
-
-	vecCellOptions[iTriangleIndex] = 1;
 	
 	CCell* pCell = CCell::Create(m_pDevice, m_pContext, vPoints, vecCells.size());
 	vecCells.emplace_back(pCell);
+}
+
+_bool CImGui_MapTool::Check_ExistingCell(_float3 fA, _float3 fB, _float3 fC)
+{
+	if (vecCells.empty())
+		return false;
+
+	for (auto& cell : vecCells)
+	{
+		if (cell == nullptr)
+			continue;
+		if (::XMVector3Equal(cell->Get_Point(CCell::POINT_A), ::XMLoadFloat3(&fA)) == false)
+			continue;
+		if (::XMVector3Equal(cell->Get_Point(CCell::POINT_B), ::XMLoadFloat3(&fB)) == false)
+			continue;
+		if (::XMVector3Equal(cell->Get_Point(CCell::POINT_C), ::XMLoadFloat3(&fC)) == false)
+			continue;
+
+		return true;
+	}
+	return _bool();
 }
 
 CImGui_MapTool* CImGui_MapTool::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

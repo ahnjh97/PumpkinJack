@@ -10,6 +10,7 @@ public:
 	{
 		_int			iCurrentIndex = { 0 };
 	}NAVIGATION_DESC;
+
 private:
 	CNavigation(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CNavigation(const CNavigation& rhs);

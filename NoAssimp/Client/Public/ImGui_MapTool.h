@@ -24,6 +24,7 @@ public:
 	// On Key/Mouse Input
 	void				OnRightClick_ObjectMode();
 	void				OnLeftClick_ObjectMode();
+	void				OnLeftClick_NavigationMode();
 	void				On_DIK_Escape();
 	void				On_DIK_Delete();
 	void				OptionChange();
@@ -33,17 +34,18 @@ public:
 	void				Menu_NonAnim();
 	void				Menu_Animation();
 	void				Edit_Object();
-	void				Menu_Mode();
+	void				Menu_Navigation();
 	// File I/O
 	void				Save_Level();
 	void				Load_Level();
 
+	// Cells
 	void				Save_Cells();
 	void				Load_Cells();
-
-	CCell*				Pick_Cell();
+	CCell*				Pick_Cell(_Out_ _int& iIndex);
 	void				Delete_Cells();
 	void				Add_Cells();
+	_bool				Check_ExistingCell(_float3 fA, _float3 fB, _float3 fC);
 
 private:
 	_bool						bCallNewFrame = { false };
@@ -52,15 +54,16 @@ private:
 	_bool						bIsLevelOpen = { false };
 	_bool						bNavigationMode = { false };
 
-	_int						m_iOption = { };
+	_int						m_iOption = { 1 };
 	_int						m_iMode = {};
 
+	_float4						m_vLeftClickPos = {};
+	
 	vector<string>				vecLevelName = {"Level_Static", "Level_Loading", "Level_Logo", "Level_MapTool", 
 		"Level_GamePlay", "Level_GamePlay2","Level_GamePlay3", "Level_SlimeBoss", "Level_End"};
 	vector<CAnimation*>			vecAnimations;
 	vector<string>				vecMode = { "Objects", "Navigation", "None" };
 
-	vector<_uint>				vecCellOptions;
 	vector<CCell*>				vecCells;
 
 	CModel*						pNonAnimModel = { nullptr };

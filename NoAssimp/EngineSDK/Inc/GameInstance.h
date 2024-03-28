@@ -92,6 +92,8 @@ public: /* For.Light_Manager */
 	_int RandomNumber(_int iMin, _int iMax);
 	_bool Get_Toggle() { return m_bToggle; }
 	void Toggle_Toggle() { m_bToggle = !m_bToggle; }
+	_int Get_NavigationMode() { return m_bNavigationMode; }
+	void Toggle_NavigationMode() { m_bNavigationMode = !m_bNavigationMode; }
 
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };
@@ -112,6 +114,7 @@ private:
 	_float fElapsedTime = { 0.f };
 	_int iFps = { 0 };
 	_bool m_bToggle = { true };
+	_bool m_bNavigationMode = { true };
 
 public:		
 	static void Release_Engine();
