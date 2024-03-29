@@ -43,9 +43,10 @@ public:
 	void				Save_Cells();
 	void				Load_Cells();
 	CCell*				Pick_Cell(_Out_ _int& iIndex);
-	void				Delete_Cells();
 	void				Add_Cells();
 	_bool				Check_ExistingCell(_float3 fA, _float3 fB, _float3 fC);
+	_int				Check_PotentialNeighbor(_int iPotentialNeighbor);
+	void				Erase_NullPointers();
 
 private:
 	_bool						bCallNewFrame = { false };

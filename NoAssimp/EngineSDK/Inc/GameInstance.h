@@ -92,7 +92,7 @@ public: /* For.Light_Manager */
 	_int RandomNumber(_int iMin, _int iMax);
 	_bool Get_Toggle() { return m_bToggle; }
 	void Toggle_Toggle() { m_bToggle = !m_bToggle; }
-	_int Get_NavigationMode() { return m_bNavigationMode; }
+	_bool Get_NavigationMode() { return m_bNavigationMode; }
 	void Toggle_NavigationMode() { m_bNavigationMode = !m_bNavigationMode; }
 
 private:

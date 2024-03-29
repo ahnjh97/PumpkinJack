@@ -106,6 +106,8 @@ void CImGui_Client::ConvertToString()
 	string strWeaponPos = "WeaponPos : " + to_string(vWeaponPos.x).erase(to_string(vWeaponPos.x).size() - 4) + ", "
 		+ to_string(vWeaponPos.y).erase(to_string(vWeaponPos.y).size() - 4) + ", " + to_string(vWeaponPos.z).erase(to_string(vWeaponPos.z).size() - 4);
 
+	CNavigation* pPlayerNavigation = dynamic_cast<CNavigation*>(m_pPlayer->Get_Component(TEXT("Com_Navigation")));
+	string strCellIndex = "CurrentCell : " + to_string(pPlayerNavigation->Get_CurrentIndex());
 	ImGui::Text(strPlayerPos.c_str());
 	ImGui::Text(strCamPos.c_str());
 	ImGui::Text(strWeaponPos.c_str());
@@ -115,6 +117,7 @@ void CImGui_Client::ConvertToString()
 	ImGui::Text(strWeapon.c_str());
 	ImGui::Text(strAttack.c_str());
 	ImGui::Text(strIsJumping.c_str());
+	ImGui::Text(strCellIndex.c_str());
 }
 
 CImGui_Client* CImGui_Client::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

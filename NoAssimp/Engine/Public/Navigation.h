@@ -17,6 +17,9 @@ private:
 	virtual ~CNavigation() = default;
 
 public:
+	_int Get_CurrentIndex() { return m_iCurrentIndex; }
+
+public:
 	virtual HRESULT Initialize_Prototype(const wstring& strDataFile);
 	virtual HRESULT Initialize(void* pArg) override;
 	void Tick(_fmatrix WorldMatrix);

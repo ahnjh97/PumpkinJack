@@ -10,10 +10,21 @@ CCell::CCell(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	Safe_AddRef(m_pContext);
 }
 
-HRESULT CCell::Initialize(const _float3* vPoints, _uint iIndex)
+_bool CCell::Get_Alone()
 {
-	memcpy(m_vPoints, vPoints, sizeof(_float3) * POINT_END);
+	for (_int i = 0; i < 3; i++)
+	{
+		if(m_iNeighborIndices[i] != -1)
+			return false;
+	}
+	return true;
+}
 
+HRESULT CCell::Initialize(_int iTerrainIndex, const _float3* vPoints, const _int* pNeighborIndices, _uint iIndex)
+{
+	m_iTerrainIndex = iTerrainIndex;
+	memcpy(m_vPoints, vPoints, sizeof(_float3) * POINT_END);
+	memcpy(m_iNeighborIndices, pNeighborIndices, sizeof(_int) * LINE_END);
 	m_iIndex = iIndex;
 
 #ifdef _DEBUG
@@ -95,11 +106,11 @@ HRESULT CCell::Render()
 
 #endif
 
-CCell* CCell::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pPoints, _uint iIndex)
+CCell* CCell::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _int iTerrainIndex, const _float3* pPoints, const _int* pNeighborIndices, _uint iIndex)
 {
 	CCell* pInstance = new CCell(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize(pPoints, iIndex)))
+	if (FAILED(pInstance->Initialize(iTerrainIndex, pPoints, pNeighborIndices, iIndex)))
 	{
 		MSG_BOX(TEXT("Failed To Created : CCell"));
 

@@ -14,10 +14,17 @@ private:
 
 public:
 	_vector Get_Point(POINT ePoint) { return XMLoadFloat3(&m_vPoints[ePoint]); }
-	void SetUp_Neighbor(LINE eLine, CCell* pNeighbor) {	m_iNeighborIndices[eLine] = pNeighbor->m_iIndex; }
+	_int Get_NeighborIndex(LINE eLine) { return m_iNeighborIndices[eLine]; }
+	void Set_NeighborIndex(LINE eLine, _int iNeighborIndex) { m_iNeighborIndices[eLine] = iNeighborIndex; }
+	void SetUp_Neighbor(LINE eLine, CCell* pNeighbor) {	m_iNeighborIndices[eLine] = pNeighbor->Get_Index(); }
+
+	_int Get_Index() { return m_iIndex; }
+	_bool Get_Alone();
+	_int Get_TerrainIndex() { return m_iTerrainIndex; }
+	void Set_TerrainIndex(_uint iTerrainIndex) { m_iTerrainIndex = iTerrainIndex; }
 
 public:
-	HRESULT Initialize(const _float3* pPoints, _uint iIndex);
+	HRESULT Initialize(_int iTerrainIndex, const _float3* pPoints, const _int* pNeighborIndices, _uint iIndex);
 	_bool IsIn(_fvector vPosition, _fmatrix TerrainWorldMatrix, _int* pNeighborIndex);
 
 	_bool Compare_Points(_fvector vSourPoint, _fvector vDestPoint);
@@ -36,6 +43,7 @@ private:
 	_uint			m_iIndex = { 0 };
 
 	_int			m_iNeighborIndices[LINE_END] = { -1, -1, -1 };
+	_uint			m_iTerrainIndex = {};
 
 #ifdef _DEBUG
 
@@ -45,7 +53,7 @@ private:
 #endif
 
 public:
-	static CCell* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* vPoints, _uint iIndex);
+	static CCell* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _int iTerrainIndex, const _float3* vPoints, const _int* pNeighborIndices, _uint iIndex);
 	virtual void Free() override;
 };
 

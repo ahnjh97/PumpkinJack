@@ -26,7 +26,7 @@ static _int iSelectTileSetting = { 0 };		/* 라디오 버튼 인덱스 :: 타일용 */
 
 static _int AnimModelIdx = 0;
 static _int NonAnimModelIdx = -1;
-static _int iLevelIndex = 0;
+static _int iLevelIndex = 3;
 static _int AnimationIdx = -1;
 static _int iNavigationIndex = 0;
 
@@ -631,6 +631,8 @@ void CImGui_MapTool::Save_Cells()
 	if (vecCells.empty())
 		return;
 
+	Erase_NullPointers();
+
 	string strCurLevel = vecLevelName[iLevelIndex + (_int)(LEVEL_GAMEPLAY)];
 
 	string tempFileName = "temp_" + strCurLevel + "_Cells.txt";
@@ -642,17 +644,70 @@ void CImGui_MapTool::Save_Cells()
 		return;
 	}
 
+	CGameObject* pGrid = m_pGameInstance->Get_GameObject(LEVEL_MAPTOOL, TEXT("Layer_Grid"), TEXT("Prototype_GameObject_Grid"));
+	CVIBuffer_Terrain* pTerrainBuffer = dynamic_cast<CVIBuffer_Terrain*>(pGrid->Get_Component(TEXT("Com_VIBuffer")));
+	_int iX = pTerrainBuffer->Get_NumVerticesX();
+	_int iZ = pTerrainBuffer->Get_NumVerticesZ();
+
+
+
 	for (auto& cell : vecCells)
 	{
 		if (cell == nullptr)
 			continue;
 
+		_int iTerrainIndex = cell->Get_TerrainIndex();
+		outputFile.write(reinterpret_cast<const char*>(&iTerrainIndex), sizeof(iTerrainIndex));
 		for (_int i = 0; i < 3; i++)
 		{
 			_float3 vPoint{};
 			 ::XMStoreFloat3(&vPoint, cell->Get_Point((CCell::POINT)i));
 			 outputFile.write(reinterpret_cast<const char*>(&vPoint), sizeof(vPoint));
 		}
+
+
+		_int iNeighborIndex[3] = { -1, -1, -1 };
+		for (_int j = 0; j < 3; j++)
+			iNeighborIndex[j] = cell->Get_NeighborIndex((CCell::LINE)j);
+
+		if (iNeighborIndex[0] == -1 || iNeighborIndex[1] || -1 && iNeighborIndex[2] || -1) // NeighborIndex가 하나라도 -1인 경우
+		{
+			if (iTerrainIndex % 2 == 0) // 아래쪽 삼각형이면
+			{
+				if (iNeighborIndex[0] == -1) // iTerrainIndex + 1  -> 필연적으로 존재
+					cell->Set_NeighborIndex(CCell::LINE_AB, Check_PotentialNeighbor(iTerrainIndex + 1));
+				
+				if (iTerrainIndex >= iX * 2)
+				{
+					if (iNeighborIndex[1] == -1) // iTerrainIndex - iX * 2  -> 가장 아랫줄에 있을 경우 존재하지 않음
+						cell->Set_NeighborIndex(CCell::LINE_BC, Check_PotentialNeighbor(iTerrainIndex - iX * 2));
+				}
+				
+				if (iTerrainIndex % iX * 2 != 0)
+				{
+					if (iNeighborIndex[2] == -1) // iTerrainIndex - 1  ->  가장 왼쪽에 있을 경우 존재하지 않음
+						cell->Set_NeighborIndex(CCell::LINE_CA, Check_PotentialNeighbor(iTerrainIndex - 1));
+				}
+			}		
+			else						// 위쪽 삼각형이면
+			{
+				if (iTerrainIndex < iX * 2 * (iZ - 1))
+				{
+					if (iNeighborIndex[0] == -1) // iTerrainIndex + iX * 2  -> 가장 윗줄에 있을경우 존재하지 않음
+						cell->Set_NeighborIndex(CCell::LINE_AB, Check_PotentialNeighbor(iTerrainIndex + iX * 2));
+				}
+				
+				if (iTerrainIndex % iX * 2 != (iX * 2) - 1)
+					if (iNeighborIndex[1] == -1)
+						cell->Set_NeighborIndex(CCell::LINE_BC, Check_PotentialNeighbor(iTerrainIndex + 1));
+
+				if (iNeighborIndex[2] == -1)
+					cell->Set_NeighborIndex(CCell::LINE_CA, Check_PotentialNeighbor(iTerrainIndex - 1));
+			}
+		}
+
+		for (_int ii = 0; ii < 3; ii++)
+			outputFile.write(reinterpret_cast<const char*>(&iNeighborIndex[ii]), sizeof(iNeighborIndex[ii]));
 	}
 	
 	outputFile.close();
@@ -709,16 +764,23 @@ void CImGui_MapTool::Load_Cells()
 		return;
 	}
 
+	_int iTerrainIndex = -1;
 	_float3 vPoints[3];
+	_int iNeighborIndices[3];
 	while (!fileStream.eof())
 	{
+		fileStream.read(reinterpret_cast<char*>(&iTerrainIndex), sizeof(iTerrainIndex));
+
 		for(_int i = 0; i< 3; i++)
 			fileStream.read(reinterpret_cast<char*>(&vPoints[i]), sizeof(vPoints[i]));
+
+		for (_int j = 0; j < 3; j++)
+			fileStream.read(reinterpret_cast<char*>(&iNeighborIndices[j]), sizeof(iNeighborIndices[j]));
 
 		if (fileStream.eof())
 			break;
 
-		CCell* pCell = CCell::Create(m_pDevice, m_pContext, vPoints, vecCells.size());
+		CCell* pCell = CCell::Create(m_pDevice, m_pContext, iTerrainIndex, vPoints, iNeighborIndices, vecCells.size());
 		if (nullptr == pCell)
 			break;
 
@@ -762,11 +824,6 @@ CCell* CImGui_MapTool::Pick_Cell(_Out_ _int& iIndex)
 	return nullptr; 
 }
 
-void CImGui_MapTool::Delete_Cells()
-{
-
-}
-
 void CImGui_MapTool::Add_Cells()
 {
 	CGameObject* pGrid = m_pGameInstance->Get_GameObject(LEVEL_MAPTOOL, TEXT("Layer_Grid"), TEXT("Prototype_GameObject_Grid"));
@@ -783,7 +840,8 @@ void CImGui_MapTool::Add_Cells()
 	if (Check_ExistingCell(vPoints[0], vPoints[1], vPoints[2]) == true)
 		return;
 	
-	CCell* pCell = CCell::Create(m_pDevice, m_pContext, vPoints, vecCells.size());
+	_int iNeighborIndices[3] = { -1,-1,-1 };
+	CCell* pCell = CCell::Create(m_pDevice, m_pContext, iTriangleIndex, vPoints, iNeighborIndices, vecCells.size());
 	vecCells.emplace_back(pCell);
 }
 
@@ -806,6 +864,29 @@ _bool CImGui_MapTool::Check_ExistingCell(_float3 fA, _float3 fB, _float3 fC)
 		return true;
 	}
 	return _bool();
+}
+
+_int CImGui_MapTool::Check_PotentialNeighbor(_int iPotentialNeighbor)
+{
+	for (auto& cell : vecCells)
+	{
+		if (cell == nullptr)
+			continue;
+
+		if (iPotentialNeighbor == cell->Get_TerrainIndex())
+			return cell->Get_Index();
+	}
+
+	return -1;
+}
+
+void CImGui_MapTool::Erase_NullPointers()
+{
+	for (_int i = vecCells.size() - 1; i >= 0; --i)
+	{
+		if (vecCells[i] == nullptr)
+			vecCells.erase(vecCells.begin() + 1);
+	}
 }
 
 CImGui_MapTool* CImGui_MapTool::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -36,22 +36,24 @@ HRESULT CNavigation::Initialize_Prototype(const wstring& strDataFile)
 
 	while (true)
 	{
+		_int		iTerrainIndex = -1;
 		_float3		vPoints[3];
-
+		_int		iNeighborIndices[3];
+		ReadFile(hFile, &iTerrainIndex, sizeof(_int), &dwByte, nullptr);
 		ReadFile(hFile, vPoints, sizeof(_float3) * 3, &dwByte, nullptr);
-
+		ReadFile(hFile, iNeighborIndices, sizeof(_int) * 3, &dwByte, nullptr);
 		if (0 == dwByte)
 			break;
 
-		CCell* pCell = CCell::Create(m_pDevice, m_pContext, vPoints, m_Cells.size());
+		CCell* pCell = CCell::Create(m_pDevice, m_pContext, iTerrainIndex, vPoints, iNeighborIndices, m_Cells.size());
 		if (nullptr == pCell)
 			return E_FAIL;
 
 		m_Cells.emplace_back(pCell);
 	}
 
-	if (FAILED(SetUp_Neighbors()))
-		return E_FAIL;
+	//if (FAILED(SetUp_Neighbors()))
+	//	return E_FAIL;
 
 #ifdef _DEBUG
 	m_pShader = CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_Cell.hlsl"), VTXPOS::Elements, VTXPOS::iNumElements);
@@ -149,8 +151,16 @@ HRESULT CNavigation::Render()
 		}
 	}
 	else
+	{
 		m_Cells[m_iCurrentIndex]->Render();
 
+		for (_int i = 0; i < 3; i++)
+		{
+			_int iIndex = m_Cells[m_iCurrentIndex]->Get_NeighborIndex((CCell::LINE)i);
+			if (iIndex != -1)
+				m_Cells[iIndex]->Render();
+		}
+	}
 
 	return S_OK;
 }
@@ -161,6 +171,12 @@ HRESULT CNavigation::SetUp_Neighbors()
 {
 	for (auto& pSourCell : m_Cells)
 	{
+		if (pSourCell->Get_Index() == 27)
+		{
+			int a = 0;
+			int b = 0;
+		}
+
 		for (auto& pDestCell : m_Cells)
 		{
 			if (pSourCell == pDestCell)
@@ -172,13 +188,18 @@ HRESULT CNavigation::SetUp_Neighbors()
 			if (true == pDestCell->Compare_Points(pSourCell->Get_Point(CCell::POINT_B), pSourCell->Get_Point(CCell::POINT_C)))
 				pSourCell->SetUp_Neighbor(CCell::LINE_BC, pDestCell);
 
-
 			if (true == pDestCell->Compare_Points(pSourCell->Get_Point(CCell::POINT_C), pSourCell->Get_Point(CCell::POINT_A)))
 				pSourCell->SetUp_Neighbor(CCell::LINE_CA, pDestCell);
 		}
+
+		if (pSourCell->Get_Alone())
+		{
+			int c = 0;
+			int d = 0;
+		}
 	}
 
-	return S_OK;
+ 	return S_OK;
 }
 
 CNavigation* CNavigation::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring& strDataFile)
