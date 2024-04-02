@@ -94,8 +94,6 @@ _vector CRail::Compute_Direction(_int iColliderIndex)
 	_float3 vSrcPos = m_pColliderCom[iColliderIndex + 1]->Get_Center(CCollider::TYPE_OBB);
 
 	_vector vDir = XMVector3Normalize(XMLoadFloat3(&vSrcPos) - XMLoadFloat3(&vDstPos));
-	//_matrix rotationMatrix = XMMatrixRotationY(XM_PIDIV2);
-	//_vector vResult = ::XMVector3TransformNormal(vDir, rotationMatrix);
 	return vDir;
 }
 
@@ -120,13 +118,13 @@ HRESULT CRail::Add_Components(const wstring& _wstrModelTag)
 	for (_int i = 0; i < 7; i++)
 	{
 		if(_wstrModelTag == TEXT("Prototype_Component_Model_RailLeft60"))
-			fAngle = (XM_PI / 55.f) * (i - 3);
+			fAngle = (XM_PI / 40.f) * (i - 3);
 		else if (_wstrModelTag == TEXT("Prototype_Component_Model_RailRight60"))
-			fAngle = -(XM_PI / 55.f) * (i - 3);
+			fAngle = -(XM_PI / 40.f) * (i - 3);
 		if (_wstrModelTag == TEXT("Prototype_Component_Model_RailLeft90"))
-			fAngle = (XM_PI / 32.f) * (i - 3);
+			fAngle = (XM_PI / 30.f) * (i - 3);
 		else if (_wstrModelTag == TEXT("Prototype_Component_Model_RailRight90"))
-			fAngle = -(XM_PI / 32.f) * (i - 3);
+			fAngle = -(XM_PI / 30.f) * (i - 3);
 
 		ColliderDesc.vCenter = _float3((i - 3) * fDis * cosf(fAngle), ColliderDesc.vSize.y * 0.5f, (i - 3) * fDis * sinf(fAngle));
 		wstring wstrColliderTag = L"Com_Collider" + to_wstring(i);

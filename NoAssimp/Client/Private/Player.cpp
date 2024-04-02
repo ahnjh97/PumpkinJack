@@ -3,6 +3,7 @@
 #include "Weapon.h"
 #include "Body.h"
 #include "Collider.h"
+#include "Kart.h"
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -81,9 +82,18 @@ void CPlayer::Tick(_float fTimeDelta)
 		m_eState = HIGHFALL;
 	_bool bGroundCol = Check_TerrainCol();
 	m_pTransformCom->Set_GroundCol(bGroundCol);
+	if (m_bIsPushingKart)
+		bGroundCol = true;
+
 	_bool bWallCol = false;
 	if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_GAMEPLAY)
+	{
 		bWallCol = Check_WallColliders_LevelGamePlay();
+		m_bKartCol = Check_Kart();
+		if (false == m_bKartCol)
+			m_bIsPushingKart = false;
+	}
+		
 	else if(*m_pGameInstance->Get_CurrentLevelID() == LEVEL_SLIMEBOSS)
 		bWallCol = Check_WallColliders_LevelSlimeBoss();
 
@@ -99,8 +109,6 @@ void CPlayer::Tick(_float fTimeDelta)
 		
 	if (m_fHighFallTime >= 2.f)
 	{
-		/*_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		_vector vSlimeBossRoom = XMVectorSetY(vPos, -150.f);*/
 		_vector vSlimeBossRoom = ::XMVectorSet(205, -150, 150, 1);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vSlimeBossRoom);
 		m_fHighFallTime = 0.f;
@@ -197,7 +205,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 	if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) || (m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80)
 		|| (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80) || (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80))
 	{
-		if (!m_bIsAttacking && !m_bIsRolling)
+		if (!m_bIsAttacking && !m_bIsRolling && !m_bKartCol)
 		{
 			if(m_bIsJumping)
 				m_pTransformCom->Move(fTimeDelta * 0.85f, ::XMLoadFloat3(&m_vDirection), m_pNavigationCom);
@@ -205,8 +213,16 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 				m_pTransformCom->Move(fTimeDelta, ::XMLoadFloat3(&m_vDirection), m_pNavigationCom);
 		}
 			
-		if(!m_bIsJumping && !m_bIsAttacking && !m_bIsRolling)
+		if(!m_bIsJumping && !m_bIsAttacking && !m_bIsRolling && !m_bIsPushingKart)
 			m_eState = RUN;
+	}
+
+	if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) && m_bKartCol)
+	{
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPushPos);
+		m_pTransformCom->Move(fTimeDelta * 0.24f, XMLoadFloat3(&m_vKartLook), m_pNavigationCom);
+		m_bIsPushingKart = true;
+		m_eState = PUSHING;
 	}
 
 	if (m_pGameInstance->KeyDown(DIK_SPACE) && !m_bIsAttacking && !m_bIsRolling && (m_iJumpCount > 0))
@@ -252,6 +268,8 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 	}
 
 	Update_Direction(vCamLook, vCamRight);
+	if (m_bIsPushingKart)
+		m_vDirection = m_vKartLook;
 }
 
 void CPlayer::Update_Direction(_fvector vCamLook, _fvector vCamRight)
@@ -459,6 +477,41 @@ _bool CPlayer::Check_SlimeBossPortal(_float fTimeDelta)
 	}
 	
 	return false;
+}
+
+_bool CPlayer::Check_Kart()
+{
+	CKart* pKart = dynamic_cast<CKart*>(m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Kart"), TEXT("Prototype_GameObject_Kart")));
+	if (pKart == nullptr)
+		return false;
+
+	CCollider* pPushCollider = dynamic_cast<CCollider*>(pKart->Get_Component(TEXT("Com_Collider_Push")));
+	if (pPushCollider == nullptr)
+		return false;
+
+	_vector vPlayerPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+	if (m_pColliderCom->Intersect(pPushCollider))
+	{
+		_float3 vCenterPosFloat = pPushCollider->Get_Center(CCollider::TYPE_OBB);
+		_vector vCenterPos = XMLoadFloat3(&vCenterPosFloat);
+		_vector vDirectionToWallCenter = vCenterPos - vPlayerPos;
+		vDirectionToWallCenter = ::XMVectorSetY(vDirectionToWallCenter, 0.f);
+		_float fAngle = ::XMVectorGetX(::XMVector3AngleBetweenNormals(::XMVector3Normalize(XMLoadFloat3(&m_vDirection)), ::XMVector3Normalize(vDirectionToWallCenter)));
+		if (fAngle <= XM_PIDIV2 - 0.6f)
+		{
+			CTransform* pKartTransform = dynamic_cast<CTransform*>(pKart->Get_Component(g_strTransformTag));
+			if (pKartTransform == nullptr)
+				return false;
+			XMStoreFloat3(&m_vKartLook, pKartTransform->Get_State_Vector(CTransform::STATE_LOOK));
+			_vector vKartPos = pKartTransform->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vKartLook = pKartTransform->Get_State_Vector(CTransform::STATE_LOOK);
+			XMStoreFloat4(&m_vPushPos, vKartPos - vKartLook * 6.f - XMVectorSet(0, 1.15f, 0, 0));
+			return true;
+		}
+	}
+
+	return _bool();
 }
 
 void CPlayer::Check_GoBackUp()

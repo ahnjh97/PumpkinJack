@@ -33,10 +33,9 @@ HRESULT CKart::Initialize(void* pArg)
 	if (FAILED(Add_Components(GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
 
-	/*if (XMVector3Equal(m_vFrontDir, XMVectorSet(0.f, 0.f, 0.f, 0.f)))
-		*/m_vFrontDir = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-	/*if (XMVector3Equal(m_vRearDir, XMVectorSet(0.f, 0.f, 0.f, 0.f)))
-		*/m_vRearDir = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+	m_vFrontDir = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+	m_vRearDir = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+
 	return S_OK;
 }
 
@@ -118,7 +117,7 @@ _vector CKart::Check_Direction(KART_COLLIDER eKartCollider)
 	if (railList.empty())
 		return _vector();
 
-	_int iMin = 6;
+	_int iMax = 0;
 
 	CRail* pTargetRail = { nullptr };
 	for (auto& rail : railList)
@@ -136,10 +135,10 @@ _vector CKart::Check_Direction(KART_COLLIDER eKartCollider)
 
 			if (m_pColliderCom[eKartCollider]->Intersect(pRailCollider))
 			{
-				if (i <= iMin)
+				if (i >= iMax)
 				{
 					pTargetRail = dynamic_cast<CRail*>(rail);
-					iMin = i;
+					iMax = i;
 				}
 			}		
 		}
@@ -148,7 +147,21 @@ _vector CKart::Check_Direction(KART_COLLIDER eKartCollider)
 	if(pTargetRail == nullptr)
 		return _vector();
 
-	return pTargetRail->Compute_Direction(iMin);
+	if (m_bPush == true)
+	{
+		_vector vRight = m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
+		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		if (pTargetRail->Get_ParseData().wstrModelTag == TEXT("Prototype_Component_Model_RailLeft60"))
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vRight * 0.004f);
+		else if (pTargetRail->Get_ParseData().wstrModelTag == TEXT("Prototype_Component_Model_RailRight60"))
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos - vRight * 0.004f);
+		else if (pTargetRail->Get_ParseData().wstrModelTag == TEXT("Prototype_Component_Model_RailLeft90"))
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vRight * 0.006f);
+		else if (pTargetRail->Get_ParseData().wstrModelTag == TEXT("Prototype_Component_Model_RailRight90"))
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos - vRight * 0.006f);
+	}
+		
+	return pTargetRail->Compute_Direction(iMax);
 }
 
 void CKart::Turn_Kart(_float fTimeDelta)
@@ -176,15 +189,15 @@ HRESULT CKart::Add_Components(const wstring& _wstrModelTag)
 
 	/* For.Com_Collider_Wall */
 	CBounding_OBB::BOUNDING_OBB_DESC		ColliderDesc{};
-	ColliderDesc.vSize = _float3(8, 8, 10.8f);
-	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, -.3f);
+	ColliderDesc.vSize = _float3(8, 8, 9.2f);
+	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, 1.7f);
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"),
 		TEXT("Com_Collider_Wall"), (CComponent**)&m_pColliderCom[COLLIDER_WALL], &ColliderDesc)))
 		return E_FAIL;
 
 	/* For.Com_Collider_Push */
-	ColliderDesc.vSize = _float3(3.5f, 8, 3.f);
-	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, -6.3f);
+	ColliderDesc.vSize = _float3(6.5f, 8, 8.f);
+	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, -0.3f);
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"),
 		TEXT("Com_Collider_Push"), (CComponent**)&m_pColliderCom[COLLIDER_PUSH], &ColliderDesc)))
 		return E_FAIL;

@@ -142,10 +142,13 @@ void CBody::StateToAnimation()
 	case HIGHFALL:
 		strWeapon = "";
 		strState = "HighFall";
+	case PUSHING:
+		strWeapon = "";
+		strState = "Pushing";
 	}
 
 	_bool bLoop;
-	if ((*m_pState == IDLE) || (*m_pState == RUN) || (*m_pState == HIGHFALL))
+	if ((*m_pState == IDLE) || (*m_pState == RUN) || (*m_pState == HIGHFALL) || (*m_pState == PUSHING))
 		bLoop = true;
 	else
 		bLoop = false;

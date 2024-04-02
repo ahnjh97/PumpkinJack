@@ -51,6 +51,7 @@ private:
 	_bool Check_WallColliders_LevelSlimeBoss();
 	_bool Check_WallColliders_LevelGamePlay();
 	_bool Check_SlimeBossPortal(_float fTimeDelta);
+	_bool Check_Kart();
 	void Check_GoBackUp();
 
 private:
@@ -63,6 +64,8 @@ private:
 	_bool m_bIsAttacking = { false };
 	_bool m_bIsRolling = { false };
 	_bool m_bInSlimeBossRoom = { false };
+	_bool m_bIsPushingKart = { false };
+	_bool m_bKartCol = { false };
 
 	_uint m_iJumpCount = { 2 };
 	_uint m_iSlimeBossRoomEscapeCount = {};
@@ -72,6 +75,8 @@ private:
 	_float m_fGravityTime = {};
 
 	_float3	m_vDirection = {};
+	_float3 m_vKartLook = {};
+	_float4 m_vPushPos = {};
 
 private:
 	HRESULT Add_Components(LEVEL eLevel, const wstring& _wstrModelTag);

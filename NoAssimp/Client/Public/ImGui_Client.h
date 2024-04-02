@@ -21,7 +21,7 @@ public:
 private:
 	_bool				bCallNewFrame = { false };
 	CPlayer*			m_pPlayer = { nullptr };
-	vector<string>		m_vecState = { "IDLE", "RUN", "JUMP", "ROLL", "ATTACK1", "ATTACK2", "ATTACK3", "AIR_ATTACK","AIR_ATTACK_END", "ROLL_ATTACK", "HIGHFALL", "STATE_END" };
+	vector<string>		m_vecState = { "IDLE", "RUN", "JUMP", "ROLL", "ATTACK1", "ATTACK2", "ATTACK3", "AIR_ATTACK","AIR_ATTACK_END", "ROLL_ATTACK", "HIGHFALL", "PUSHING", "STATE_END" };
 	vector<string>		m_vecWeapon = { "WPN_SPEAR", "WPN_RIFLE", "WPN_SCYTHE", "WPN_END" };
 	vector<string>		m_vecWeaponName = { "Spear", "Rifle", "Scythe", "WPN_END" };
 
