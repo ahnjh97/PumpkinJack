@@ -133,6 +133,15 @@
     <Filter Include="02.GameObjects\Kart\Rail">
       <UniqueIdentifier>{0f177822-6350-466d-ae58-af50a5a288f1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Kart\CrateBox">
+      <UniqueIdentifier>{52cc2442-0c78-4514-a237-df5d1e5c7c5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Kart\Trigger">
+      <UniqueIdentifier>{f9354dee-2d61-4df4-9a68-b8eecde6a044}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Monster\Soldier">
+      <UniqueIdentifier>{b43b9c15-5169-45c0-9fed-3a7fb94555a7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -279,6 +288,15 @@
     <ClInclude Include="..\Public\Rail.h">
       <Filter>02.GameObjects\Kart\Rail</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\CrateBox.h">
+      <Filter>02.GameObjects\Kart\CrateBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Trigger.h">
+      <Filter>02.GameObjects\Kart\Trigger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Soldier.h">
+      <Filter>02.GameObjects\Monster\Soldier</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -415,6 +433,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Rail.cpp">
       <Filter>02.GameObjects\Kart\Rail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CrateBox.cpp">
+      <Filter>02.GameObjects\Kart\CrateBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Trigger.cpp">
+      <Filter>02.GameObjects\Kart\Trigger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Soldier.cpp">
+      <Filter>02.GameObjects\Monster\Soldier</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

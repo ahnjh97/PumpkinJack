@@ -28,10 +28,12 @@ public:
 private:
 	_vector Check_Direction(KART_COLLIDER eKartCollider);
 	void Turn_Kart(_float fTimeDelta);
+	_bool Check_ExplosionTrigger();
 
 private:
 	_bool m_bPush = { false };
 	_bool m_bCollision = { false };
+	_bool m_bExplode = { false };
 
 	_float m_fTime = {};
 

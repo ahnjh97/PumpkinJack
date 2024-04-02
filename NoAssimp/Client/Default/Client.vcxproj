@@ -170,6 +170,7 @@
     <ClInclude Include="..\public\Camera_Free.h" />
     <ClInclude Include="..\Public\Camera_Jack.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\Public\CrateBox.h" />
     <ClInclude Include="..\Public\Grid.h" />
     <ClInclude Include="..\Public\ImGui_Client.h" />
     <ClInclude Include="..\Public\ImGui_MapTool.h" />
@@ -199,11 +200,13 @@
     <ClInclude Include="..\Public\SlimeBoss_Slime.h" />
     <ClInclude Include="..\Public\SlimeDamageZone.h" />
     <ClInclude Include="..\Public\Slime_Slime.h" />
+    <ClInclude Include="..\Public\Soldier.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\TongMap_GamePlay.h" />
     <ClInclude Include="..\Public\TongMap_SlimeBoss.h" />
     <ClInclude Include="..\Public\Tool_Anim.h" />
     <ClInclude Include="..\Public\Tool_NonAnim.h" />
+    <ClInclude Include="..\Public\Trigger.h" />
     <ClInclude Include="..\Public\UI_Weapon.h" />
     <ClInclude Include="..\Public\Weapon.h" />
     <ClInclude Include="Client.h" />
@@ -219,6 +222,7 @@
     <ClCompile Include="..\Private\Body.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Camera_Jack.cpp" />
+    <ClCompile Include="..\Private\CrateBox.cpp" />
     <ClCompile Include="..\Private\Grid.cpp" />
     <ClCompile Include="..\Private\ImGui_Client.cpp" />
     <ClCompile Include="..\Private\ImGui_MapTool.cpp" />
@@ -248,11 +252,13 @@
     <ClCompile Include="..\Private\SlimeBoss_Slime.cpp" />
     <ClCompile Include="..\Private\SlimeDamageZone.cpp" />
     <ClCompile Include="..\Private\Slime_Slime.cpp" />
+    <ClCompile Include="..\Private\Soldier.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\TongMap_GamePlay.cpp" />
     <ClCompile Include="..\Private\TongMap_SlimeBoss.cpp" />
     <ClCompile Include="..\Private\Tool_Anim.cpp" />
     <ClCompile Include="..\Private\Tool_NonAnim.cpp" />
+    <ClCompile Include="..\Private\Trigger.cpp" />
     <ClCompile Include="..\Private\UI_Weapon.cpp" />
     <ClCompile Include="..\Private\Weapon.cpp" />
     <ClCompile Include="Client.cpp" />

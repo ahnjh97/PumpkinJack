@@ -27,7 +27,7 @@ public:
 private:
 	CModel*					m_pModelCom = { nullptr };
 	CShader*				m_pShaderCom = { nullptr };	
-	
+
 private:
 	HRESULT Add_Components(LEVEL eLevel, const wstring& _wstrModelTag);
 	HRESULT Bind_ShaderResources();

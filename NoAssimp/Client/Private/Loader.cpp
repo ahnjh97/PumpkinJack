@@ -15,11 +15,22 @@
 #include "Tool_NonAnim.h"
 #include "Body.h"
 #include "Weapon.h"
+
+#include "TongMap_GamePlay.h"
+#include "Ballista.h"
+#include "Arrow.h"
+#include "BallistaRotator.h"
+#include "SkullCrossBow.h"
+#include "Kart.h"
+#include "Rail.h"
+#include "CrateBox.h"
+#include "Trigger.h"
+#include "Soldier.h"
+
 #include "SlimeBoss.h"
 #include "SlimeBoss_Slime.h"
 #include "Knife.h"
 #include "TongMap_SlimeBoss.h"
-#include "TongMap_GamePlay.h"
 #include "Pillar.h"
 #include "Portal.h"
 #include "Pillar_SlimeBossRoom.h"
@@ -27,12 +38,7 @@
 #include "Slime.h"
 #include "Slime_Slime.h"
 #include "SlimeDamageZone.h"
-#include "Ballista.h"
-#include "Arrow.h"
-#include "BallistaRotator.h"
-#include "SkullCrossBow.h"
-#include "Kart.h"
-#include "Rail.h"
+
 //#include "Effect.h"
 #include "Sky.h"
 
@@ -184,6 +190,7 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Spear"), CWeapon);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Rifle"), CWeapon);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Scythe"), CWeapon);
+
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TongMap_GamePlay"), CTongMap_GamePlay);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Ballista"), CBallista);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Arrow"), CArrow);
@@ -191,6 +198,9 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SkullCrossBow"), CSkullCrossBow);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kart"), CKart);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rail"), CRail);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CrateBox"), CCrateBox);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Trigger"), CTrigger);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Soldier"), CSoldier);
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
 	m_isFinished = true;
@@ -447,8 +457,8 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degaree, NewScale, RootIndex
 	m_ModelConfigs.emplace("PartSlime", MODEL_CONFIG{ 0.027f, 180.f, 2.7f });
 	m_ModelConfigs.emplace("SlimeBoss", MODEL_CONFIG{ 0.044f, 180.f, 4.4f });
 	m_ModelConfigs.emplace("PartSlimeBoss", MODEL_CONFIG{ 0.044f, 180.f, 4.4f });
-	m_ModelConfigs.emplace("Sniper", MODEL_CONFIG{ 0.025f, 0.f, 2.6f, 3 });
-	m_ModelConfigs.emplace("Soldier", MODEL_CONFIG{ 0.025f, 0.f, 2.6f, 5 });
+	m_ModelConfigs.emplace("Sniper", MODEL_CONFIG{ 0.042f, 180.f, 4.2f, 3 });
+	m_ModelConfigs.emplace("Soldier", MODEL_CONFIG{ 0.042f, 180.f, 4.2f, 5 });
 	m_ModelConfigs.emplace("Trabuchet", MODEL_CONFIG{ 0.03f, 0.f, 2.6f, 2 });
 
 	m_ModelConfigs.emplace("DestroyedBarn", MODEL_CONFIG{ 3.f, 0.f, 3.f });

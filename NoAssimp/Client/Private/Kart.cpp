@@ -41,8 +41,25 @@ HRESULT CKart::Initialize(void* pArg)
 
 void CKart::Tick(_float fTimeDelta)
 {
-	m_fTime += fTimeDelta;
+	if(m_bExplode)
+		m_fTime += fTimeDelta;
 	
+	if (m_fTime >= 3.f)
+	{
+		list<CGameObject*> crateBoxList = m_pGameInstance->Get_ObjectList(LEVEL_GAMEPLAY, TEXT("Layer_CrateBox"));
+		if (!crateBoxList.empty())
+		{
+			for (auto& crateBox : crateBoxList)
+			{
+				if (crateBox != nullptr)
+					crateBox->Set_Dead();
+			}
+		}
+
+		Set_Dead();
+	}
+		
+
 	m_bPush = false;
 	m_bCollision = false;
 
@@ -75,9 +92,14 @@ void CKart::Late_Tick(_float fTimeDelta)
 	_vector vFrontDir = Check_Direction(COLLIDER_FRONT);
 	if (!XMVector3Equal(vFrontDir, XMVectorSet(0, 0, 0, 0)))
 		m_vFrontDir = vFrontDir;
+
 	_vector vRearDir = Check_Direction(COLLIDER_REAR);
 	if (!XMVector3Equal(vRearDir, XMVectorSet(0, 0, 0, 0)))
 		m_vRearDir = vRearDir;
+
+	if (false == m_bExplode)
+		m_bExplode = Check_ExplosionTrigger();
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
@@ -156,9 +178,9 @@ _vector CKart::Check_Direction(KART_COLLIDER eKartCollider)
 		else if (pTargetRail->Get_ParseData().wstrModelTag == TEXT("Prototype_Component_Model_RailRight60"))
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos - vRight * 0.004f);
 		else if (pTargetRail->Get_ParseData().wstrModelTag == TEXT("Prototype_Component_Model_RailLeft90"))
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vRight * 0.006f);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vRight * 0.0055f);
 		else if (pTargetRail->Get_ParseData().wstrModelTag == TEXT("Prototype_Component_Model_RailRight90"))
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos - vRight * 0.006f);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos - vRight * 0.0055f);
 	}
 		
 	return pTargetRail->Compute_Direction(iMax);
@@ -173,6 +195,29 @@ void CKart::Turn_Kart(_float fTimeDelta)
 		fAngle = -fAngle;
 	if (abs(fAngle) >= XMConvertToRadians(2.f))
 		m_pTransformCom->Turn(::XMVectorSet(0, 1, 0, 0), fTimeDelta * fAngle * 7.f);
+}
+
+_bool CKart::Check_ExplosionTrigger()
+{
+	list<CGameObject*> crateBoxList = m_pGameInstance->Get_ObjectList(LEVEL_GAMEPLAY, TEXT("Layer_CrateBox"));
+	if (crateBoxList.empty())
+		return false;
+
+	CCollider* pCrateBoxCollider = { nullptr };
+	for (auto& crateBox : crateBoxList)
+	{
+		if (crateBox == nullptr)
+			continue;
+
+		pCrateBoxCollider = dynamic_cast<CCollider*>(crateBox->Get_Component(TEXT("Com_Collider")));
+		if (pCrateBoxCollider == nullptr)
+			continue;
+
+		if (m_pColliderCom[COLLIDER_WALL]->Intersect(pCrateBoxCollider))
+			return true;
+	}
+		
+	return _bool();
 }
 
 HRESULT CKart::Add_Components(const wstring& _wstrModelTag)
