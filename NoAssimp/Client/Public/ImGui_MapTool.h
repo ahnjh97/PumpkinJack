@@ -25,6 +25,7 @@ public:
 	void				OnRightClick_ObjectMode();
 	void				OnLeftClick_ObjectMode();
 	void				OnLeftClick_NavigationMode();
+	void				OnLeftClick_WireFrameMode();
 	void				On_DIK_Escape();
 	void				On_DIK_Delete();
 	void				OptionChange();
@@ -53,12 +54,16 @@ private:
 	_bool						bSeeAnim = { false };
 	_bool						bAnimWindow = { false };
 	_bool						bIsLevelOpen = { false };
-	_bool						bNavigationMode = { false };
+	_bool						bCellMode = { false };
 
 	_int						m_iOption = { 1 };
 	_int						m_iMode = {};
 
 	_float4						m_vLeftClickPos = {};
+	_int						m_iCellIndex = { -1 };
+	vector<_int>				m_vecNeighborIndices = { -1, -1, -1 };
+	vector<_float3>				m_vecCellPoints = { _float3(0,0,0), _float3(0,0,0), _float3(0,0,0) };
+	_int						m_iTerrainIndex = { -1 };
 	
 	vector<string>				vecLevelName = {"Level_Static", "Level_Loading", "Level_Logo", "Level_MapTool", 
 		"Level_GamePlay", "Level_GamePlay2","Level_GamePlay3", "Level_SlimeBoss", "Level_End"};

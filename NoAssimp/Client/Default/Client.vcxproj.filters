@@ -115,6 +115,24 @@
     <Filter Include="02.GameObjects\Sky">
       <UniqueIdentifier>{07a2a48e-6ad3-457b-8eb8-6f0a333df334}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Ballista">
+      <UniqueIdentifier>{b6020dd5-18c0-4a4b-889f-b0b7bd041d49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Ballista\Arrow">
+      <UniqueIdentifier>{f828f593-9917-48d7-b5a0-ab822a9dca31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Ballista\BallistaRotator">
+      <UniqueIdentifier>{9bf095a1-35d9-4e12-acbf-0c14b26f6173}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Ballista\SkullCrossBow">
+      <UniqueIdentifier>{28bce0e1-5d2e-48e7-88e2-342597485dc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Kart">
+      <UniqueIdentifier>{7d1ee032-fc9f-4574-8621-cb8cf4bdbc72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Kart\Rail">
+      <UniqueIdentifier>{0f177822-6350-466d-ae58-af50a5a288f1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -210,7 +228,7 @@
     <ClInclude Include="..\Public\Knife.h">
       <Filter>02.GameObjects\SlimeBoss\Knife</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\TongMap.h">
+    <ClInclude Include="..\Public\TongMap_SlimeBoss.h">
       <Filter>02.GameObjects\TongMap</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Pillar.h">
@@ -239,6 +257,27 @@
     </ClInclude>
     <ClInclude Include="..\Public\Sky.h">
       <Filter>02.GameObjects\Sky</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TongMap_GamePlay.h">
+      <Filter>02.GameObjects\TongMap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Ballista.h">
+      <Filter>02.GameObjects\Ballista</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Arrow.h">
+      <Filter>02.GameObjects\Ballista\Arrow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BallistaRotator.h">
+      <Filter>02.GameObjects\Ballista\BallistaRotator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SkullCrossBow.h">
+      <Filter>02.GameObjects\Ballista\SkullCrossBow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kart.h">
+      <Filter>02.GameObjects\Kart</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Rail.h">
+      <Filter>02.GameObjects\Kart\Rail</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -326,7 +365,7 @@
     <ClCompile Include="..\Private\Knife.cpp">
       <Filter>02.GameObjects\SlimeBoss\Knife</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\TongMap.cpp">
+    <ClCompile Include="..\Private\TongMap_SlimeBoss.cpp">
       <Filter>02.GameObjects\TongMap</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Pillar.cpp">
@@ -355,6 +394,27 @@
     </ClCompile>
     <ClCompile Include="..\Private\Sky.cpp">
       <Filter>02.GameObjects\Sky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TongMap_GamePlay.cpp">
+      <Filter>02.GameObjects\TongMap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Ballista.cpp">
+      <Filter>02.GameObjects\Ballista</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Arrow.cpp">
+      <Filter>02.GameObjects\Ballista\Arrow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BallistaRotator.cpp">
+      <Filter>02.GameObjects\Ballista\BallistaRotator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SkullCrossBow.cpp">
+      <Filter>02.GameObjects\Ballista\SkullCrossBow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kart.cpp">
+      <Filter>02.GameObjects\Kart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Rail.cpp">
+      <Filter>02.GameObjects\Kart\Rail</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

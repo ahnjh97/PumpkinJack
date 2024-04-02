@@ -14,12 +14,18 @@ private:
 
 public:
 	_vector Get_Point(POINT ePoint) { return XMLoadFloat3(&m_vPoints[ePoint]); }
+
 	_int Get_NeighborIndex(LINE eLine) { return m_iNeighborIndices[eLine]; }
 	void Set_NeighborIndex(LINE eLine, _int iNeighborIndex) { m_iNeighborIndices[eLine] = iNeighborIndex; }
+	void Reset_NeighborIndex() { m_iNeighborIndices[0] = -1;   m_iNeighborIndices[1] = -1;  m_iNeighborIndices[2] = -1;}
+
 	void SetUp_Neighbor(LINE eLine, CCell* pNeighbor) {	m_iNeighborIndices[eLine] = pNeighbor->Get_Index(); }
 
 	_int Get_Index() { return m_iIndex; }
+	void Set_CellIndex(_uint iCellIndex) { m_iIndex = iCellIndex; }
+
 	_bool Get_Alone();
+
 	_int Get_TerrainIndex() { return m_iTerrainIndex; }
 	void Set_TerrainIndex(_uint iTerrainIndex) { m_iTerrainIndex = iTerrainIndex; }
 
@@ -32,11 +38,13 @@ public:
 #ifdef _DEBUG
 public:
 	virtual HRESULT Render();
+	virtual HRESULT ColliderRender();
 #endif
 
 private:
-	ID3D11Device* m_pDevice = { nullptr };
-	ID3D11DeviceContext* m_pContext = { nullptr };
+	ID3D11Device*			m_pDevice = { nullptr };
+	ID3D11DeviceContext*	m_pContext = { nullptr };
+	class CCollider*		m_pCollider = { nullptr };
 
 private:
 	_float3			m_vPoints[POINT_END];

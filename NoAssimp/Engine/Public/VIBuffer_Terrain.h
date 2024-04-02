@@ -21,8 +21,8 @@ public:
 	virtual HRESULT Initialize(void* pArg);
 
 public:
-	_float3 Get_PickPos(const class CTransform* pTransform) const; // 높이가 전부 0인 Terrain에 대한 피킹
-	_int Get_TriangleIndex(const class CTransform* pTransform, _float3& vA, _float3& vB, _float3& vC) const; // 굴곡진 Terrain에 대한 피킹
+	_float3 Get_PickPos(const class CTransform* pTransform) const; // Object Picking
+	_int Get_TriangleIndex(const class CTransform* pTransform, _float3& vA, _float3& vB, _float3& vC) const; // Cell Picking
 
 private:
 	_uint				m_iNumVerticesX = { 0 };

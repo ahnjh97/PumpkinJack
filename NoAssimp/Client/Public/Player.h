@@ -45,8 +45,11 @@ private:
 	void Update_PositionToCam();
 	void Turn_Body(_float fTimeDelta);
 	void Link_Animation();
-	_bool Check_GroundCol();
-	_bool Check_GroundMeshes();
+	_bool Check_TerrainCol();
+	_bool Check_GroundColliders();
+	_bool Check_WallColliders(list<CGameObject*> objList, CCollider::TYPE eColliderType, const wstring& wstrColliderTag = TEXT("Com_Collider_Wall"));
+	_bool Check_WallColliders_LevelSlimeBoss();
+	_bool Check_WallColliders_LevelGamePlay();
 	_bool Check_SlimeBossPortal(_float fTimeDelta);
 	void Check_GoBackUp();
 

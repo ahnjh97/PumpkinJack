@@ -79,8 +79,15 @@ void CPlayer::Tick(_float fTimeDelta)
 	_bool bPortalCol = Check_SlimeBossPortal(fTimeDelta);
 	if(bPortalCol)
 		m_eState = HIGHFALL;
-	_bool bGroundCol = Check_GroundCol();
+	_bool bGroundCol = Check_TerrainCol();
 	m_pTransformCom->Set_GroundCol(bGroundCol);
+	_bool bWallCol = false;
+	if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_GAMEPLAY)
+		bWallCol = Check_WallColliders_LevelGamePlay();
+	else if(*m_pGameInstance->Get_CurrentLevelID() == LEVEL_SLIMEBOSS)
+		bWallCol = Check_WallColliders_LevelSlimeBoss();
+
+	m_pTransformCom->Set_WallCol(bWallCol);
 
 	if (!bGroundCol && !m_bIsJumping && !bPortalCol)
 	{
@@ -94,7 +101,7 @@ void CPlayer::Tick(_float fTimeDelta)
 	{
 		/*_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 		_vector vSlimeBossRoom = XMVectorSetY(vPos, -150.f);*/
-		_vector vSlimeBossRoom = XMVectorSet(205, -150, 150, 1);
+		_vector vSlimeBossRoom = ::XMVectorSet(205, -150, 150, 1);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vSlimeBossRoom);
 		m_fHighFallTime = 0.f;
 		m_eState = IDLE;
@@ -253,31 +260,31 @@ void CPlayer::Update_Direction(_fvector vCamLook, _fvector vCamRight)
 		return;
 
 	_vector vLook = vCamLook;
-	vLook = XMVectorSetY(vLook, 0.f);
+	vLook = ::XMVectorSetY(vLook, 0.f);
 	_vector vRight = vCamRight;
-	vRight = XMVectorSetY(vRight, 0.f);
+	vRight = ::XMVectorSetY(vRight, 0.f);
 
 	if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) && (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80))
-		XMStoreFloat3(&m_vDirection, XMVector3Normalize(vLook - vRight));
+		XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(vLook - vRight));
 	else if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) && (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80))
-		XMStoreFloat3(&m_vDirection, XMVector3Normalize(vLook + vRight));
+		XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(vLook + vRight));
 	else if ((m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80) && (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80))
-		XMStoreFloat3(&m_vDirection, XMVector3Normalize(-vLook - vRight));
+		XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(-vLook - vRight));
 	else if ((m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80) && (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80))
-		XMStoreFloat3(&m_vDirection, XMVector3Normalize(-vLook + vRight));
+		XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(-vLook + vRight));
 	else if (m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80)
-		XMStoreFloat3(&m_vDirection, XMVector3Normalize(vLook));
+		XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(vLook));
 	else if (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80)
 		XMStoreFloat3(&m_vDirection, XMVector3Normalize(-vRight));
 	else if (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80)
-		XMStoreFloat3(&m_vDirection, XMVector3Normalize(vRight));
+		XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(vRight));
 	else if (m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80)
-		XMStoreFloat3(&m_vDirection, XMVector3Normalize(-vLook));
+		XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(-vLook));
 }
 
 void CPlayer::Update_PositionToCam()
 {
-	if (m_pTransformCom != nullptr)
+	if (m_pTransformCom != nullptr && m_pCamera != nullptr)
 	{
 		_vector vPlayerPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 		m_pCamera->Copy_PlayerPos(vPlayerPos);
@@ -288,7 +295,7 @@ void CPlayer::Turn_Body(_float fTimeDelta)
 {
 	_vector	vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
 	_float fAngle = ::XMVectorGetX(::XMVector3AngleBetweenVectors(vLook, XMLoadFloat3(&m_vDirection)));
-	_float fY = XMVectorGetY(::XMVector3Cross(vLook, XMLoadFloat3(&m_vDirection)));
+	_float fY = ::XMVectorGetY(::XMVector3Cross(vLook, XMLoadFloat3(&m_vDirection)));
 	if (fY < 0)
 		fAngle = -fAngle;
 	if (abs(fAngle) >= XMConvertToRadians(2.f))
@@ -324,14 +331,14 @@ void CPlayer::Link_Animation()
 		m_bIsAttacking = false;
 }
 
-_bool CPlayer::Check_GroundCol()
+_bool CPlayer::Check_TerrainCol()
 {
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	if (m_bInSlimeBossRoom == false)
 	{
 		if (vPos.y <= -0.f)
 			return true;
-		else if (Check_GroundMeshes())
+		else if (Check_GroundColliders())
 			return true;
 	}
 	else
@@ -343,10 +350,10 @@ _bool CPlayer::Check_GroundCol()
 	return false;
 }
 
-_bool CPlayer::Check_GroundMeshes()
+_bool CPlayer::Check_GroundColliders()
 {
 	_float fY = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y;
-	CCollider* pPillarCollider = { nullptr };
+	CCollider* pPillarGroundCollider = { nullptr };
 	if (*m_pGameInstance->Get_CurrentLevelID() != LEVEL_SLIMEBOSS)
 		return false;
 	list<CGameObject*> objList = m_pGameInstance->Get_ObjectList(LEVEL_SLIMEBOSS, TEXT("Layer_Pillar"));
@@ -358,15 +365,71 @@ _bool CPlayer::Check_GroundMeshes()
 		if (pillar == nullptr)
 			continue;
 
-		pPillarCollider = dynamic_cast<CCollider*>(pillar->Get_Component(TEXT("Com_Collider")));
-		if (pPillarCollider == nullptr)
+		pPillarGroundCollider = dynamic_cast<CCollider*>(pillar->Get_Component(TEXT("Com_Collider_Ground")));
+		if (pPillarGroundCollider == nullptr)
 			continue;
 
-		if (m_pColliderCom->Intersect(pPillarCollider) && m_pColliderCom->Get_HightestPoint(CCollider::TYPE_OBB) > fY)
+		if (m_pColliderCom->Intersect(pPillarGroundCollider) && m_pColliderCom->Get_HightestPoint(CCollider::TYPE_OBB) > fY)
 			return true;
 	}
 	
 	return false;
+}
+
+_bool CPlayer::Check_WallColliders(list<CGameObject*> objList, CCollider::TYPE eColliderType, const wstring& wstrColliderTag)
+{
+	CCollider* pWallCollider = { nullptr };
+	_vector vPlayerPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	_bool bMovingTowards = false;
+
+	for (auto& obj : objList)
+	{
+		if (obj == nullptr)
+			continue;
+
+		pWallCollider = dynamic_cast<CCollider*>(obj->Get_Component(wstrColliderTag));
+		if (pWallCollider == nullptr)
+			continue;
+
+		_float3 vCenterPosFloat = pWallCollider->Get_Center(eColliderType);
+		_vector vCenterPos = XMLoadFloat3(&vCenterPosFloat);
+		_vector vDirectionToWallCenter = vCenterPos - vPlayerPos;
+		vDirectionToWallCenter = ::XMVectorSetY(vDirectionToWallCenter, 0.f);
+		_float fAngle = ::XMVectorGetX(::XMVector3AngleBetweenNormals(::XMVector3Normalize(XMLoadFloat3(&m_vDirection)), ::XMVector3Normalize(vDirectionToWallCenter)));
+		if (fAngle <= XM_PIDIV2 - 0.15f)
+			bMovingTowards = true;
+
+		if (m_pColliderCom->Intersect(pWallCollider) && bMovingTowards == true)
+			return true;
+	}
+
+	return _bool();
+}
+
+_bool CPlayer::Check_WallColliders_LevelSlimeBoss()
+{
+	list<CGameObject*> objList = m_pGameInstance->Get_ObjectList(LEVEL_SLIMEBOSS, TEXT("Layer_Pillar"));
+	if (objList.empty())
+		return false;
+
+	return Check_WallColliders(objList, CCollider::TYPE_OBB);
+}
+
+_bool CPlayer::Check_WallColliders_LevelGamePlay()
+{
+	list<CGameObject*> kartList = m_pGameInstance->Get_ObjectList(LEVEL_GAMEPLAY, TEXT("Layer_Kart"));
+	if (kartList.empty())
+		return false;
+
+	_bool bWallCol = Check_WallColliders(kartList, CCollider::TYPE_OBB);
+	if (bWallCol)
+		return bWallCol;
+	
+	list<CGameObject*> crateBoxList = m_pGameInstance->Get_ObjectList(LEVEL_GAMEPLAY, TEXT("Layer_CrateBox"));
+	if (crateBoxList.empty())
+		return false;
+
+	return Check_WallColliders(crateBoxList, CCollider::TYPE_OBB);
 }
 
 _bool CPlayer::Check_SlimeBossPortal(_float fTimeDelta)

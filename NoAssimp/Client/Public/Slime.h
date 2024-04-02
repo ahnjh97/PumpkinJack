@@ -28,6 +28,8 @@ public:
 private:
 	void StateToAnimation();
 	_bool Check_DeathTrigger();
+	void Check_SlimeCol(_float fTimeDelta);
+	void Check_WallCol(_float fTimeDelta);
 
 private:
 	SLIME m_eState = { SLIME_MOVE };

@@ -47,7 +47,12 @@ void CPillar::Tick(_float fTimeDelta)
 
 	if(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y <= -23) 
 		m_pTransformCom->Fall(-fTimeDelta * 2.5f);
-	m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
+
+	for (_int i = 0; i < COLLIDER_END; i++)
+	{
+		if (m_pColliderCom[i] != nullptr)
+			m_pColliderCom[i]->Tick(m_pTransformCom->Get_WorldMatrix());
+	}
 }
 
 void CPillar::Late_Tick(_float fTimeDelta)
@@ -74,7 +79,11 @@ HRESULT CPillar::Render()
 	}
 
 #ifdef _DEBUG
-	m_pColliderCom->Render();
+	for (_int i = 0; i < COLLIDER_END; i++)
+	{
+		if(m_pColliderCom[i] != nullptr)
+			m_pColliderCom[i]->Render();
+	}
 #endif
 
 	return S_OK;
@@ -94,10 +103,16 @@ HRESULT CPillar::Add_Components(const wstring& _wstrModelTag)
 
 	/* For.Com_Collider */
 	CBounding_OBB::BOUNDING_OBB_DESC		ColliderDesc{};
-	ColliderDesc.vSize = _float3(10, 39, 8);
+	ColliderDesc.vSize = _float3(10, 1, 8);
+	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f + 39, 0.f);
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"),
+		TEXT("Com_Collider_Ground"), (CComponent**)&m_pColliderCom[COLLIDER_GROUND], &ColliderDesc)))
+		return E_FAIL;
+
+	ColliderDesc.vSize = _float3(6.5f, 39, 6.5f);
 	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, 0.f);
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"),
-		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom, &ColliderDesc)))
+		TEXT("Com_Collider_Wall"), (CComponent**)&m_pColliderCom[COLLIDER_WALL], &ColliderDesc)))
 		return E_FAIL;
 	return S_OK;
 }
@@ -145,7 +160,8 @@ void CPillar::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pColliderCom);
+	for(_int i = 0; i<COLLIDER_END; i++)
+		Safe_Release(m_pColliderCom[i]);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
 }

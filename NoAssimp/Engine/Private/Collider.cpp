@@ -66,6 +66,11 @@ _float3 CCollider::Get_Center(TYPE eType)
 	return _float3();
 }
 
+_float3 CCollider::Get_ColliderLook()
+{
+	return m_pBounding->Get_ColliderLook();
+}
+
 HRESULT CCollider::Initialize_Prototype(TYPE eType)
 {
 	m_eType = eType;

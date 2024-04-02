@@ -151,10 +151,43 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 		CGameObject::GAMEOBJECT_DESC tempDesc = {};
 		tempDesc.matWorld = matWorld;
 		tempDesc.wstrModelTag = wcharModelTag;
+		tempDesc.iLevel = LEVEL_GAMEPLAY;
 
 		if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Jack"))
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Player"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_LevelGamePlay"))
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Map"), TEXT("Prototype_GameObject_TongMap_GamePlay"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Ballista"))
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Ballista"), TEXT("Prototype_GameObject_Ballista"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_ballistaRotator"))
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_BallistaRotator"), TEXT("Prototype_GameObject_BallistaRotator"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_SkullCrossBow"))
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_SkullCrossBow"), TEXT("Prototype_GameObject_SkullCrossBow"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Kart"))
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Kart"), TEXT("Prototype_GameObject_Kart"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Rail") || tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_RailLeft60")
+			|| tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_RailLeft90") || tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_RailRight60")
+			|| tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_RailRight90"))
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Rail"), TEXT("Prototype_GameObject_Rail"), &tempDesc)))
 				return E_FAIL;
 		}
 		else

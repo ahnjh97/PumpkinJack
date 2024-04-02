@@ -172,7 +172,7 @@ HRESULT CLevel_SlimeBoss::Ready_Layer_Monster(const wstring& strLayerTag)
 		}
 		else if(tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_LevelSlimeBoss"))
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_Map"), TEXT("Prototype_GameObject_TongMap"), &tempDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_Map"), TEXT("Prototype_GameObject_TongMap_SlimeBoss"), &tempDesc)))
 				return E_FAIL;
 		}
 		else

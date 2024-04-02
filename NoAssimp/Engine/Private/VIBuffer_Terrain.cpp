@@ -255,17 +255,6 @@ _float3 CVIBuffer_Terrain::Get_PickPos(const CTransform* pTransform) const
 	m_pGameInstance->Transform_PickingToLocalSpace(pTransform, &vRayDir, &vRayPos);
 
 	_vector vPickPos;
-	VTXNORTEX* pVertices = new VTXNORTEX[m_iNumVertices];
-	ZeroMemory(pVertices, sizeof(VTXNORTEX) * m_iNumVertices);
-
-	for (_uint i = 0; i < m_iNumVerticesZ; i++)
-	{
-		for (_uint j = 0; j < m_iNumVerticesX; j++)
-		{
-			_uint iIndex = i * m_iNumVerticesX + j;
-			pVertices[iIndex].vPosition = _float3(j, 0, i);
-		}
-	}
 
 	for (_uint i = 0; i < m_iNumVerticesZ - 1; i++)
 	{
@@ -281,16 +270,15 @@ _float3 CVIBuffer_Terrain::Get_PickPos(const CTransform* pTransform) const
 				_uint i1 = iIndices[k + 1];
 				_uint i2 = iIndices[k + 2];
 
-				_vector v0 = ::XMLoadFloat3(&pVertices[i0].vPosition);
-				_vector v1 = ::XMLoadFloat3(&pVertices[i1].vPosition);
-				_vector v2 = ::XMLoadFloat3(&pVertices[i2].vPosition);
+				_vector v0 = ::XMLoadFloat3(&m_pVerticesPos[i0]);
+				_vector v1 = ::XMLoadFloat3(&m_pVerticesPos[i1]);
+				_vector v2 = ::XMLoadFloat3(&m_pVerticesPos[i2]);
 
 				_vector vecRayDir = ::XMVector3Normalize(::XMLoadFloat3(&vRayDir));
 				_vector vecRayPos = ::XMLoadFloat3(&vRayPos);
 				if (::TriangleTests::Intersects(vecRayPos, vecRayDir, v0, v1, v2, fDis))
 				{
 					vPickPos = vecRayPos + vecRayDir * fDis;
-					delete[] pVertices;
 
 					_matrix* pWorldMatrix = &pTransform->Get_WorldMatrix();
 					vPickPos = XMVector3TransformCoord(vPickPos, *pWorldMatrix);
@@ -301,7 +289,6 @@ _float3 CVIBuffer_Terrain::Get_PickPos(const CTransform* pTransform) const
 			}
 		}
 	}
-	delete[] pVertices; 
 	return _float3();
 }
 

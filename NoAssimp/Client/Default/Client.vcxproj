@@ -162,7 +162,10 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\Public\Arrow.h" />
     <ClInclude Include="..\public\BackGround.h" />
+    <ClInclude Include="..\Public\Ballista.h" />
+    <ClInclude Include="..\Public\BallistaRotator.h" />
     <ClInclude Include="..\Public\Body.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
     <ClInclude Include="..\Public\Camera_Jack.h" />
@@ -172,6 +175,7 @@
     <ClInclude Include="..\Public\ImGui_MapTool.h" />
     <ClInclude Include="..\Public\Indicator.h" />
     <ClInclude Include="..\Public\Inven.h" />
+    <ClInclude Include="..\Public\Kart.h" />
     <ClInclude Include="..\Public\Knife.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
@@ -186,6 +190,8 @@
     <ClInclude Include="..\Public\Pillar_SlimeBossRoom.h" />
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\Portal.h" />
+    <ClInclude Include="..\Public\Rail.h" />
+    <ClInclude Include="..\Public\SkullCrossBow.h" />
     <ClInclude Include="..\Public\Sky.h" />
     <ClInclude Include="..\Public\Slime.h" />
     <ClInclude Include="..\Public\SlimeBoss.h" />
@@ -194,7 +200,8 @@
     <ClInclude Include="..\Public\SlimeDamageZone.h" />
     <ClInclude Include="..\Public\Slime_Slime.h" />
     <ClInclude Include="..\Public\Terrain.h" />
-    <ClInclude Include="..\Public\TongMap.h" />
+    <ClInclude Include="..\Public\TongMap_GamePlay.h" />
+    <ClInclude Include="..\Public\TongMap_SlimeBoss.h" />
     <ClInclude Include="..\Public\Tool_Anim.h" />
     <ClInclude Include="..\Public\Tool_NonAnim.h" />
     <ClInclude Include="..\Public\UI_Weapon.h" />
@@ -205,7 +212,10 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Private\Arrow.cpp" />
     <ClCompile Include="..\private\BackGround.cpp" />
+    <ClCompile Include="..\Private\Ballista.cpp" />
+    <ClCompile Include="..\Private\BallistaRotator.cpp" />
     <ClCompile Include="..\Private\Body.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Camera_Jack.cpp" />
@@ -214,6 +224,7 @@
     <ClCompile Include="..\Private\ImGui_MapTool.cpp" />
     <ClCompile Include="..\Private\Indicator.cpp" />
     <ClCompile Include="..\Private\Inven.cpp" />
+    <ClCompile Include="..\Private\Kart.cpp" />
     <ClCompile Include="..\Private\Knife.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
@@ -228,6 +239,8 @@
     <ClCompile Include="..\Private\Pillar_SlimeBossRoom.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\Portal.cpp" />
+    <ClCompile Include="..\Private\Rail.cpp" />
+    <ClCompile Include="..\Private\SkullCrossBow.cpp" />
     <ClCompile Include="..\Private\Sky.cpp" />
     <ClCompile Include="..\Private\Slime.cpp" />
     <ClCompile Include="..\Private\SlimeBoss.cpp" />
@@ -236,7 +249,8 @@
     <ClCompile Include="..\Private\SlimeDamageZone.cpp" />
     <ClCompile Include="..\Private\Slime_Slime.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
-    <ClCompile Include="..\Private\TongMap.cpp" />
+    <ClCompile Include="..\Private\TongMap_GamePlay.cpp" />
+    <ClCompile Include="..\Private\TongMap_SlimeBoss.cpp" />
     <ClCompile Include="..\Private\Tool_Anim.cpp" />
     <ClCompile Include="..\Private\Tool_NonAnim.cpp" />
     <ClCompile Include="..\Private\UI_Weapon.cpp" />

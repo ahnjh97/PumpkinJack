@@ -53,6 +53,10 @@ void CSlime::Tick(_float fTimeDelta)
 		Set_Dead();
 	if (pPlayer->Get_InSlimeBossRoom())
 		Set_Dead();
+
+	Check_SlimeCol(fTimeDelta);
+	Check_WallCol(fTimeDelta);
+
 	_vector vPlayerPos = XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1);
 	m_pTransformCom->Look_At_ForLandObject(vPlayerPos);
 	m_pTransformCom->Move(fTimeDelta * 2.f, XMVector3Normalize(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK)));
@@ -134,6 +138,73 @@ _bool CSlime::Check_DeathTrigger()
 		bDeathTrigger = true;
 
 	return bDeathTrigger;
+}
+
+void CSlime::Check_SlimeCol(_float fTimeDelta)
+{
+	list<CGameObject*> slimeList = m_pGameInstance->Get_ObjectList(LEVEL_SLIMEBOSS, TEXT("Layer_Slime"));
+
+	if (slimeList.empty())
+		return;
+
+	_float3 vSrcPosFloat = m_pColliderCom[DEFAULT]->Get_Center(CCollider::TYPE_OBB);
+	_vector vSrsPos = XMLoadFloat3(&vSrcPosFloat);
+
+	for (auto& slime : slimeList)
+	{
+		if (slime == nullptr || slime == this)
+			continue;
+
+		CCollider* pSlimeCollider = dynamic_cast<CCollider*>(slime->Get_Component(TEXT("Com_Collider")));
+
+		if (pSlimeCollider == nullptr)
+			continue;
+
+		if (m_pColliderCom[DEFAULT]->Intersect(pSlimeCollider))
+		{
+			_float3 vDstPosFloat = pSlimeCollider->Get_Center(CCollider::TYPE_OBB);
+			_vector vDstPos = XMLoadFloat3(&vDstPosFloat);
+
+			_vector vDir = XMVector3Normalize(vSrsPos - vDstPos);
+
+			m_pTransformCom->Move(fTimeDelta, vDir);
+		}
+	}
+}
+
+void CSlime::Check_WallCol(_float fTimeDelta)
+{
+	list<CGameObject*> pillarList = m_pGameInstance->Get_ObjectList(LEVEL_SLIMEBOSS, TEXT("Layer_Pillar"));
+
+	if (pillarList.empty())
+		return;
+
+	_float3 vSrcPosFloat = m_pColliderCom[DEFAULT]->Get_Center(CCollider::TYPE_OBB);
+	_vector vSrsPos = XMLoadFloat3(&vSrcPosFloat);
+
+
+	for (auto& pillar : pillarList)
+	{
+		if (pillar == nullptr)
+			continue;
+
+		CCollider* pPillarWallCollider = dynamic_cast<CCollider*>(pillar->Get_Component(TEXT("Com_Collider_Wall")));
+
+		if (pPillarWallCollider == nullptr)
+			continue;
+
+		if (m_pColliderCom[DEFAULT]->Intersect(pPillarWallCollider))
+		{
+			_float3 vDstPosFloat = pPillarWallCollider->Get_Center(CCollider::TYPE_OBB);
+			_vector vDstPos = XMLoadFloat3(&vDstPosFloat);
+			
+			_vector vTemp = vSrsPos - vDstPos;
+			vTemp = XMVectorSetY(vTemp, 0.f);
+			_vector vDir = XMVector3Normalize(vTemp);
+			
+			m_pTransformCom->Move(fTimeDelta, vDir);
+		}
+	}
 }
 
 

@@ -384,8 +384,19 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 			m_Materials[iTemp].MaterialTextures[jTemp] = MeshMaterial.MaterialTextures[jTemp];
 	}
 
+	if (m_strModelName == "LevelGamePlay")
+	{
+		m_vecMeshShaderType.resize(m_Meshes.size());
+		for (_int i = 0; i < m_Meshes.size(); i++)
+		{
+			_uint iMaterialIdx = m_Meshes[i]->Get_MaterialIndex();
+			string strTextureName = m_Materials[iMaterialIdx].MaterialTextures[1]->Get_TextureName(); // DIFFUSE
+			if (strTextureName == "pine_Mat")
+				m_vecMeshShaderType[i] = 1;  // ALPHA
+		}
+	}
 
-	if (m_strModelName == "LevelSlimeBoss")
+	else if (m_strModelName == "LevelSlimeBoss")
 	{
 		vector<_uint> vecSlimeBossRoom;
 

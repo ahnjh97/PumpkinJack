@@ -25,6 +25,7 @@ private:
 
 public:
 	virtual void* Get_BoundingDesc() { return m_pBoundingDesc; }
+	virtual _float3 Get_ColliderLook() override;
 
 public:
 	virtual HRESULT Initialize(CBounding::BOUNDING_DESC* pBoundingDesc) override;
@@ -40,7 +41,7 @@ public:
 
 private:
 	BoundingOrientedBox* m_pBoundingDesc_Original = { nullptr };
-	BoundingOrientedBox* m_pBoundingDesc = { nullptr };
+	BoundingOrientedBox* m_pBoundingDesc = { nullptr }; 
 
 private:
 	OBB_DESC Compute_OBBDesc();

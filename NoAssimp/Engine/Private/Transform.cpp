@@ -118,11 +118,14 @@ void CTransform::Move(_float fTimeDelta, _fvector vTargetDir, CNavigation* pNavi
 	vDir = XMVectorSetW(vDir, 0.f);
 	_vector		vPosition = Get_State_Vector(STATE_POSITION);
 	vPosition += XMVector3Normalize(vDir) * m_fSpeedPerSec * fTimeDelta;
+	if (m_bWallCol == true)
+		return;
+
 	if(nullptr == pNavigation)
 		Set_State(STATE_POSITION, vPosition);
 	else
 	{
-		if(true == pNavigation->isMove(vPosition))
+		if(true == pNavigation->isMove(vPosition) || m_fJumpTime != 0.f)
 			Set_State(STATE_POSITION, vPosition);
 	}
 }

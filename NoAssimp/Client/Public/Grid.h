@@ -20,7 +20,7 @@ public:
 public:
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{
-		wstring wstrFileName = L"";
+		wstring wstrCurLevel = L"";
 	}GRID_DESC;
 
 	void Set_PassIndex(_int iPassIndex) { m_iPassIndex = iPassIndex; }
@@ -46,7 +46,7 @@ private:
 	CVIBuffer_Terrain* m_pVIBufferCom = { nullptr };
 
 private:
-	HRESULT Add_Components(const wstring& wstrFileName);
+	HRESULT Add_Components(const wstring& wstrCurLevel);
 	HRESULT Bind_ShaderResources();
 
 public:

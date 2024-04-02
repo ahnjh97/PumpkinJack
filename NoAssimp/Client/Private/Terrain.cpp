@@ -95,8 +95,10 @@ HRESULT CTerrain::Add_Components(LEVEL eLevel)
 		return E_FAIL;
 	
 	wstring wstrVIBufferTerrain = TEXT("Prototype_Component_VIBuffer_Terrain");
-	if (eLevel == LEVEL_SLIMEBOSS)
-		wstrVIBufferTerrain += TEXT("_HM");
+	if (eLevel == LEVEL_GAMEPLAY)
+		wstrVIBufferTerrain += TEXT("_GamePlay");
+	else if (eLevel == LEVEL_SLIMEBOSS)
+		wstrVIBufferTerrain += TEXT("_SlimeBoss");
 
 	/* For.Com_VIBuffer */
 	if (FAILED(__super::Add_Component(eLevel, wstrVIBufferTerrain, TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))

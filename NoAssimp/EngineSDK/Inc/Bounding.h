@@ -17,6 +17,7 @@ protected:
 
 public:
 	virtual void* Get_BoundingDesc() = 0;
+	virtual _float3 Get_ColliderLook() { return _float3(); }
 
 public:
 	virtual HRESULT Initialize(CBounding::BOUNDING_DESC* pBoundingDesc);

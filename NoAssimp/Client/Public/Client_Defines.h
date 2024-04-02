@@ -13,6 +13,8 @@ namespace Client
 		, SLIMEBOSS_REAP_END, SLIMEBOSS_SPAWN, SLIMEBOSS_END};
 	enum SLIME { SLIME_ATTACK, SLIME_IDLE, SLIME_MOVE, SLIME_DEATH };
     enum WEAPON { WPN_SPEAR, WPN_RIFLE, WPN_SCYTHE, WPN_END };
+	enum BALLISTA { BALLISTA_IDLE, BALLISTA_SHOOT, BALLISTA_END };
+
 	const unsigned int	g_iWinSizeX = 1280;
 	const unsigned int	g_iWinSizeY = 720;
     typedef struct

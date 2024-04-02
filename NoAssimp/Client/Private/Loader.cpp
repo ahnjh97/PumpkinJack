@@ -18,7 +18,8 @@
 #include "SlimeBoss.h"
 #include "SlimeBoss_Slime.h"
 #include "Knife.h"
-#include "TongMap.h"
+#include "TongMap_SlimeBoss.h"
+#include "TongMap_GamePlay.h"
 #include "Pillar.h"
 #include "Portal.h"
 #include "Pillar_SlimeBossRoom.h"
@@ -26,6 +27,12 @@
 #include "Slime.h"
 #include "Slime_Slime.h"
 #include "SlimeDamageZone.h"
+#include "Ballista.h"
+#include "Arrow.h"
+#include "BallistaRotator.h"
+#include "SkullCrossBow.h"
+#include "Kart.h"
+#include "Rail.h"
 //#include "Effect.h"
 #include "Sky.h"
 
@@ -142,9 +149,14 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 
-	/* Prototype_Component_VIBuffer_Terrain */
-	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain"),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 100, 100))))
+	///* Prototype_Component_VIBuffer_Terrain */
+	//if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain"),
+	//	CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 100, 100))))
+	//	return E_FAIL;
+
+	/* Prototype_Component_VIBuffer_Terrain_GamePlay */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_GamePlay"),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_GamePlay.bmp")))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Navigation */
@@ -172,16 +184,13 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Spear"), CWeapon);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Rifle"), CWeapon);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Scythe"), CWeapon);
-	///* For.Prototype_GameObject_Effect */
-	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect"),
-	//	CEffect::Create(m_pGraphic_Device))))
-	//	return E_FAIL;
-
-	///* For.Prototype_GameObject_Sky */
-	//if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Sky"),
-	//	CSky::Create(m_pGraphic_Device))))
-	//	return E_FAIL;
-	//
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TongMap_GamePlay"), CTongMap_GamePlay);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Ballista"), CBallista);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Arrow"), CArrow);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BallistaRotator"), CBallistaRotator);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SkullCrossBow"), CSkullCrossBow);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kart"), CKart);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Rail"), CRail);
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
 	m_isFinished = true;
@@ -208,12 +217,18 @@ HRESULT CLoader::Loading_For_MapTool(LEVEL eLevel)
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("컴포넌트를(을) 로딩 중 입니다.");
-	/* Prototype_Component_VIBuffer_Terrain */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MAPTOOL, TEXT("Prototype_Component_VIBuffer_Grid"),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 400, 400))))
+	///* Prototype_Component_VIBuffer_Terrain */
+	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MAPTOOL, TEXT("Prototype_Component_VIBuffer_Grid"),
+	//	CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 400, 400))))
+	//	return E_FAIL;
+
+	/* Prototype_Component_VIBuffer_Terrain_GamePlay */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_GamePlay"),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_GamePlay.bmp")))))
 		return E_FAIL;
-	/* Prototype_Component_VIBuffer_Terrain_HM */
-	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_HM"),
+
+	/* Prototype_Component_VIBuffer_Terrain_SlimeBoss */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_SlimeBoss"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_SlimeBosss.bmp")))))
 		return E_FAIL;
 
@@ -279,8 +294,8 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 	//	CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 400, 400))))
 	//	return E_FAIL;
 
-	/* Prototype_Component_VIBuffer_Terrain_HM */
-	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_HM"),
+	/* Prototype_Component_VIBuffer_Terrain_SlimeBoss */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_SlimeBoss"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_SlimeBosss.bmp")))))
 		return E_FAIL;
 
@@ -303,7 +318,7 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SlimeBoss"), CSlimeBoss);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_SlimeBoss_Slime"), CSlimeBoss_Slime);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Knife"), CKnife);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TongMap"), CTongMap);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TongMap_SlimeBoss"), CTongMap_SlimeBoss);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("cemeteryPillar"), CPillar);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Portal"), CPortal);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Pillar_SlimeBossRoom"), CPillar_SlimeBossRoom);
@@ -382,16 +397,16 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_Lighted.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 		return E_FAIL;
 
+	/* For.Prototype_Component_Shader_VtxModel_AlphaTex */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_AlphaTex"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_AlphaTex.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+		return E_FAIL;
+
 	if (eLevel == LEVEL_SLIMEBOSS)
 	{
 		/* For.Prototype_Component_Shader_VtxModel_Knife */
 		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_Knife"),
 			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_Knife.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
-			return E_FAIL;
-
-		/* For.Prototype_Component_Shader_VtxModel_AlphaTex */
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_AlphaTex"),
-			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_AlphaTex.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 			return E_FAIL;
 
 		/* For.Prototype_Component_Shader_VtxModel_SlimeBossRoom */
@@ -417,7 +432,7 @@ HRESULT CLoader::Add_Texture(LEVEL eLevel, string strPrototypeName, string strFo
 
 void CLoader::Insert_ScaleRotationData() // Scale, Degaree, NewScale, RootIndex
 {
-	m_ModelConfigs.emplace("Ballista", MODEL_CONFIG{ 0.03f, 0.f, 2.6f });
+	m_ModelConfigs.emplace("Ballista", MODEL_CONFIG{ 0.1f, 180.f, 9.f });
 	m_ModelConfigs.emplace("Bat", MODEL_CONFIG{ 0.005f, 0.f, 0.5f, 4 });
 	m_ModelConfigs.emplace("Charon", MODEL_CONFIG{ 0.03f, 180.f, 2.6f, 4 });
 	m_ModelConfigs.emplace("Crow", MODEL_CONFIG{ 0.0003f, 180.f, 0.03f, 1 });
@@ -430,8 +445,8 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degaree, NewScale, RootIndex
 	m_ModelConfigs.emplace("SkeletonBoss", MODEL_CONFIG{ 0.03f, 0.f, 2.6f, 3 });
 	m_ModelConfigs.emplace("Slime", MODEL_CONFIG{ 0.027f, 180.f, 2.7f });
 	m_ModelConfigs.emplace("PartSlime", MODEL_CONFIG{ 0.027f, 180.f, 2.7f });
-	m_ModelConfigs.emplace("SlimeBoss", MODEL_CONFIG{ 0.041f, 180.f, 4.1f });
-	m_ModelConfigs.emplace("PartSlimeBoss", MODEL_CONFIG{ 0.041f, 180.f, 4.1f });
+	m_ModelConfigs.emplace("SlimeBoss", MODEL_CONFIG{ 0.044f, 180.f, 4.4f });
+	m_ModelConfigs.emplace("PartSlimeBoss", MODEL_CONFIG{ 0.044f, 180.f, 4.4f });
 	m_ModelConfigs.emplace("Sniper", MODEL_CONFIG{ 0.025f, 0.f, 2.6f, 3 });
 	m_ModelConfigs.emplace("Soldier", MODEL_CONFIG{ 0.025f, 0.f, 2.6f, 5 });
 	m_ModelConfigs.emplace("Trabuchet", MODEL_CONFIG{ 0.03f, 0.f, 2.6f, 2 });
@@ -452,11 +467,26 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degaree, NewScale, RootIndex
 	m_ModelConfigs.emplace("Scythe", MODEL_CONFIG{ 0.22f, 0.f, 0.22f });
 	m_ModelConfigs.emplace("Spear", MODEL_CONFIG{ 6.4f, 0.f, 6.4f });
 
-	m_ModelConfigs.emplace("Knife", MODEL_CONFIG{ 8.f, 0.f, 8.f });
-	m_ModelConfigs.emplace("NotOpen", MODEL_CONFIG{ 3.9f, 0.f, 3.9f });
+	/* Level_GamePlay */
+	m_ModelConfigs.emplace("ballistaArrow", MODEL_CONFIG{ 9.f, 0.f, 9.f });
+	m_ModelConfigs.emplace("ballistaBase", MODEL_CONFIG{ 9.f, 0.f, 9.f });
+	m_ModelConfigs.emplace("ballistaRotator", MODEL_CONFIG{ 9.f, 0.f, 9.f });
+	m_ModelConfigs.emplace("SkullCrossBow", MODEL_CONFIG{ 0.07f, 0.f, 7.f });
+	m_ModelConfigs.emplace("Kart", MODEL_CONFIG{ 7.f, 0.f, 7.f });
+	m_ModelConfigs.emplace("crateBoxPotion", MODEL_CONFIG{ 6.f, 0.f, 6.f });
+	m_ModelConfigs.emplace("Rail", MODEL_CONFIG{ 5.8f, 180.f, 5.8f });
+	m_ModelConfigs.emplace("RailLeft60", MODEL_CONFIG{ 5.8f, 180.f, 5.8f });
+	m_ModelConfigs.emplace("RailLeft90", MODEL_CONFIG{ 5.8f, 180.f, 5.8f });
+	m_ModelConfigs.emplace("RailRight60", MODEL_CONFIG{ 5.8f, 180.f, 5.8f });
+	m_ModelConfigs.emplace("RailRight90", MODEL_CONFIG{ 5.8f, 180.f, 5.8f });
+
+	/* Level_SlimeBoss */
+	m_ModelConfigs.emplace("Knife", MODEL_CONFIG{ 8.2f, 0.f, 8.2f });
+	m_ModelConfigs.emplace("NotOpen", MODEL_CONFIG{ 4.1f, 0.f, 4.1f });
 	m_ModelConfigs.emplace("cemeteryPillar", MODEL_CONFIG{ 6.5f, 0.f, 6.5f });
 	m_ModelConfigs.emplace("SlimeBossHead", MODEL_CONFIG{ 10.f, 0.f, 10.f });
 	m_ModelConfigs.emplace("SlimeDamageZone", MODEL_CONFIG{ 6.f, 0.f, 6.f });
+	m_ModelConfigs.emplace("cemeteryFence1", MODEL_CONFIG{ 4.3f, 0.f, 4.3f });
 }
 
 void CLoader::TraverseAnimModels(LEVEL eLevel, const wstring& rootFolderPath)

@@ -11,6 +11,7 @@ BEGIN(Client)
 
 class CPillar : public CGameObject
 {
+	enum COLLIDER { COLLIDER_GROUND, COLLIDER_WALL, COLLIDER_END };
 private:
 	CPillar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CPillar(const CPillar& rhs);
@@ -29,7 +30,7 @@ private:
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
-	CCollider* m_pColliderCom = { nullptr };
+	CCollider* m_pColliderCom[COLLIDER_END] = {nullptr};
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);

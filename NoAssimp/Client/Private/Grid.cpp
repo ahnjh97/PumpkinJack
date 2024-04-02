@@ -20,14 +20,15 @@ HRESULT CGrid::Initialize_Prototype()
 HRESULT CGrid::Initialize(void* pArg)
 {
 	GRID_DESC		GridDesc{};
-
+	if (pArg)
+		GridDesc = *(GRID_DESC*)pArg;
 	GridDesc.fSpeedPerSec = 10.f;
 	GridDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
 	if (FAILED(__super::Initialize(&GridDesc)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components(GridDesc.wstrFileName)))
+	if (FAILED(Add_Components(GridDesc.wstrCurLevel)))
 		return E_FAIL;
 
 	return S_OK;
@@ -63,7 +64,7 @@ HRESULT CGrid::Render()
 	return S_OK;
 }
 
-HRESULT CGrid::Add_Components(const wstring& wstrFileName)
+HRESULT CGrid::Add_Components(const wstring& wstrCurLevel)
 {
 	/* For.Com_Shader */
 	if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_Shader_VtxNorTex"),
@@ -85,8 +86,13 @@ HRESULT CGrid::Add_Components(const wstring& wstrFileName)
 		TEXT("Com_Texture_Brush"), (CComponent**)&m_pTextureCom[TYPE_BRUSH])))
 		return E_FAIL;
 
+	wstring wstrLevelName = wstrCurLevel.substr(6);
+	if (wstrLevelName == L"GamePlay2")
+		wstrLevelName = L"GamePlay";
+	else if (wstrLevelName == L"GamePlay3")
+		wstrLevelName = L"GamePlay";
 	/* For.Com_VIBuffer */
-	if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_VIBuffer_Terrain_HM"),
+	if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_VIBuffer_Terrain_" + wstrLevelName),
 		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
 

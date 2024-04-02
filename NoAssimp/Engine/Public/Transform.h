@@ -68,6 +68,7 @@ public:
 	void Set_WorldMatrix(_float4x4 _matWorld) { m_WorldMatrix = _matWorld; }
 	void Reset_Jump() { m_fJumpTime = 0.f; m_fJumpPower = 0.f; }
 	void Set_GroundCol(_bool bGroundCol) { m_bGroundCol = bGroundCol; }
+	void Set_WallCol(_bool bWallCol) { m_bWallCol = bWallCol; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -101,6 +102,7 @@ private:
 	_float					m_fJumpTime = { 0.f };
 	_float					m_fGravity = { 300.f };
 	_bool					m_bGroundCol = { false };
+	_bool					m_bWallCol = { false };
 
 public:
 	static CTransform* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

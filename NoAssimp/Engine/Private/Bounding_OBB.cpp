@@ -7,6 +7,19 @@ CBounding_OBB::CBounding_OBB(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 
 }
 
+_float3 CBounding_OBB::Get_ColliderLook()
+{
+	_vector vQuaternion = XMLoadFloat4(&m_pBoundingDesc->Orientation);
+	_matrix matRotation = XMMatrixRotationQuaternion(vQuaternion);
+	_vector vLook = matRotation.r[2]; // Zรเ
+	vLook = XMVectorSetY(vLook, 0.f);
+	vLook = XMVector3Normalize(vLook);
+	_float3 vResult{};
+	XMStoreFloat3(&vResult, vLook);
+
+	return vResult;
+}
+
 HRESULT CBounding_OBB::Initialize(CBounding::BOUNDING_DESC* pBoundingDesc)
 {
 	BOUNDING_OBB_DESC* pDesc = (BOUNDING_OBB_DESC*)pBoundingDesc;
