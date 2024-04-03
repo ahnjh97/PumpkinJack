@@ -36,6 +36,8 @@ private:
 	class CBounding*	m_pBounding = { nullptr };
 	_bool				m_bDisabled = { false };
 
+	unordered_set<CCollider*> m_CollidedColliders; // 충돌한 콜라이더 저장
+
 #ifdef _DEBUG
 private:
 	PrimitiveBatch<VertexPositionColor>* m_pBatch = { nullptr };

@@ -11,6 +11,7 @@ BEGIN(Client)
 
 class CPlayer final : public CGameObject
 {
+	enum NAVIGATION { DEFAULT, SLIMEBOSSROOM, NAVIGATION_END };
 private:
 	CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CPlayer(const CPlayer& rhs);
@@ -59,6 +60,7 @@ private:
 	WEAPON m_eWeapon = {};
 	_uint m_iLastAttack = {};
 	vector<string> m_vecWeaponName = { "Spear", "Rifle", "Scythe", "WPN_END" };
+	NAVIGATION m_eNavigation = {};
 
 	_bool m_bIsJumping = { false };
 	_bool m_bIsAttacking = { false };
@@ -86,7 +88,7 @@ private:
 	map<const wstring, CPart*> m_Parts;
 	CCamera_Jack* m_pCamera = { nullptr };
 	CCollider* m_pColliderCom = { nullptr };
-	CNavigation* m_pNavigationCom = { nullptr };
+	CNavigation* m_pNavigationCom[NAVIGATION_END] = { nullptr, nullptr };
 
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

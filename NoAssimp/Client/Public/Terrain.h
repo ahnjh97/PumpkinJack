@@ -16,6 +16,7 @@ class CTerrain final : public CGameObject
 {
 public:
 	enum TEXTURETYPE { TYPE_DIFFUSE, TYPE_MASK, TYPE_BRUSH, TYPE_END };
+	enum NAVIGATION { DEFAULT, SLIMEBOSSROOM, NAVIGATION_END };
 public:
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{
@@ -43,7 +44,7 @@ private:
 	CShader*				m_pShaderCom = { nullptr };
 	CTexture*				m_pTextureCom[TYPE_END] = {nullptr};
 	CVIBuffer_Terrain*		m_pVIBufferCom = { nullptr };
-	CNavigation*			m_pNavigationCom = { nullptr };
+	CNavigation*			m_pNavigationCom[NAVIGATION_END] = {nullptr};
 	
 private:
 	HRESULT Add_Components(LEVEL eLevel);

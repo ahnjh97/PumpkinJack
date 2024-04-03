@@ -24,19 +24,21 @@ HRESULT CGrid::Initialize(void* pArg)
 		GridDesc = *(GRID_DESC*)pArg;
 	GridDesc.fSpeedPerSec = 10.f;
 	GridDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-
+	m_iGridIndex = GridDesc.iGridIndex;
+	
 	if (FAILED(__super::Initialize(&GridDesc)))
 		return E_FAIL;
 
 	if (FAILED(Add_Components(GridDesc.wstrCurLevel)))
 		return E_FAIL;
 
+	m_pTransformCom->Set_WorldMatrix(GridDesc.matWorld);
 	return S_OK;
 }
 
 void CGrid::Tick(_float fTimeDelta)
 {
-		
+	
 }
 
 void CGrid::Late_Tick(_float fTimeDelta)
@@ -86,15 +88,25 @@ HRESULT CGrid::Add_Components(const wstring& wstrCurLevel)
 		TEXT("Com_Texture_Brush"), (CComponent**)&m_pTextureCom[TYPE_BRUSH])))
 		return E_FAIL;
 
-	wstring wstrLevelName = wstrCurLevel.substr(6);
-	if (wstrLevelName == L"GamePlay2")
-		wstrLevelName = L"GamePlay";
-	else if (wstrLevelName == L"GamePlay3")
-		wstrLevelName = L"GamePlay";
-	/* For.Com_VIBuffer */
-	if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_VIBuffer_Terrain_" + wstrLevelName),
-		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
-		return E_FAIL;
+	if (m_iGridIndex == 1)
+	{
+		/* For.Com_VIBuffer */
+		if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_VIBuffer_Terrain_SlimeBoss"),
+			TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
+			return E_FAIL;
+	}
+	else
+	{
+		wstring wstrLevelName = wstrCurLevel.substr(6);
+		if (wstrLevelName == L"GamePlay2")
+			wstrLevelName = L"GamePlay";
+		else if (wstrLevelName == L"GamePlay3")
+			wstrLevelName = L"GamePlay";
+		/* For.Com_VIBuffer */
+		if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_VIBuffer_Terrain_" + wstrLevelName),
+			TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }

@@ -36,8 +36,11 @@ HRESULT CTerrain::Initialize(void * pArg)
 
 void CTerrain::Tick(_float fTimeDelta)
 {
-	if(m_pNavigationCom != nullptr)
-		m_pNavigationCom->Tick(m_pTransformCom->Get_WorldMatrix());
+	for (_int i = 0; i < NAVIGATION_END; i++)
+	{
+		if (m_pNavigationCom[i] != nullptr)
+			m_pNavigationCom[i]->Tick(m_pTransformCom->Get_WorldMatrix());
+	}
 }
 
 void CTerrain::Late_Tick(_float fTimeDelta)
@@ -64,9 +67,11 @@ HRESULT CTerrain::Render()
 		return E_FAIL;
 
 #ifdef _DEBUG
-
-	if(m_pNavigationCom != nullptr && m_pGameInstance->Get_NavigationMode() == false)
-		m_pNavigationCom->Render();
+	for (_int i = 0; i < NAVIGATION_END; i++)
+	{
+		if (m_pNavigationCom[i] != nullptr && m_pGameInstance->Get_NavigationMode() == false)
+			m_pNavigationCom[i]->Render();
+	}
 #endif
 
 	return S_OK;
@@ -104,11 +109,16 @@ HRESULT CTerrain::Add_Components(LEVEL eLevel)
 	if (FAILED(__super::Add_Component(eLevel, wstrVIBufferTerrain, TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
 
-
 	/* For.Com_Navigation */
 	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Navigation" + to_wstring(eLevel)), 
-		TEXT("Com_Navigation"), (CComponent**)&m_pNavigationCom)))
+		TEXT("Com_Navigation"), (CComponent**)&m_pNavigationCom[DEFAULT])))
 		return E_FAIL;
+
+	if (eLevel == LEVEL_SLIMEBOSS) {
+		if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Navigation_SlimeBossRoom"),
+			TEXT("Com_Navigation_SlimeBossRoom"), (CComponent**)&m_pNavigationCom[SLIMEBOSSROOM])))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -174,9 +184,10 @@ void CTerrain::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pNavigationCom);
+	for (size_t i = 0; i < NAVIGATION_END; i++)
+		Safe_Release(m_pNavigationCom[i]);
 	Safe_Release(m_pShaderCom);
-	for (size_t i = 0; i < TYPE_END; i++)
-		Safe_Release(m_pTextureCom[i]);
+	for (size_t j = 0; j < TYPE_END; j++)
+		Safe_Release(m_pTextureCom[j]);
 	Safe_Release(m_pVIBufferCom);
 }

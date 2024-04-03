@@ -474,7 +474,7 @@ HRESULT CModel::Ready_Animations()
 	}
 	m_iNumAnimations = m_Animations.size();
 
-	if (m_strModelName == "Jack")
+	if (m_strModelName == "Jack" || m_strModelName == "Soldier")
 	{
 		for (size_t i = 0; i < m_iNumAnimations; i++)
 		{
@@ -482,6 +482,7 @@ HRESULT CModel::Ready_Animations()
 			m_AnimIndex.emplace(strName, i);
 		}
 	}
+
 	return S_OK;
 }
 

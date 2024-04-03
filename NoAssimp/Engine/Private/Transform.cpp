@@ -125,8 +125,11 @@ void CTransform::Move(_float fTimeDelta, _fvector vTargetDir, CNavigation* pNavi
 		Set_State(STATE_POSITION, vPosition);
 	else
 	{
-		if(true == pNavigation->isMove(vPosition) || m_fJumpTime != 0.f)
+		_bool bIsMovable = pNavigation->IsMovable(vPosition);
+		if (true == bIsMovable || m_fJumpTime != 0.f)
 			Set_State(STATE_POSITION, vPosition);
+		else if (false == bIsMovable)
+			Slide(fTimeDelta, XMLoadFloat3(&pNavigation->Get_LineDir()), pNavigation);
 	}
 }
 
@@ -172,10 +175,21 @@ void CTransform::Look_At(_fvector vAt)
 	Set_State(STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
 }
 
+void CTransform::Get_Look_LandObject(_fvector vAt, _Out_ _float4& _vRight, _Out_ _float4& _vLook)
+{
+	_vector		vUp = Get_State_Vector(STATE_UP);
+	_vector		vLook = vAt - Get_State_Vector(STATE_POSITION);
+	_vector		vRight = XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLook);
+	vLook = XMVector3Cross(vRight, vUp);
+
+	_float3		vScaled = Get_Scaled();
+
+	XMStoreFloat4(&_vRight, XMVector3Normalize(vRight) * vScaled.x);
+	XMStoreFloat4(&_vLook, XMVector3Normalize(vLook) * vScaled.z);
+}
+
 void CTransform::Look_At_ForLandObject(_fvector vAt)
 {
-	// XMMatrixDecompose();
-
 	_vector		vUp = Get_State_Vector(STATE_UP);
 	_vector		vLook = vAt - Get_State_Vector(STATE_POSITION);
 	_vector		vRight = XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLook);
@@ -189,12 +203,15 @@ void CTransform::Look_At_ForLandObject(_fvector vAt)
 
 void CTransform::Move_toTarget(_fvector vTargetPos, _float fTimeDelta, _float fMinDistance)
 {
+	_vector vTemp = XMVectorSetW(vTargetPos, 1.f);
 	_vector		vPosition = Get_State_Vector(STATE_POSITION);
 
-	_vector		vLook = vTargetPos - vPosition;
-
-	if(fMinDistance <= XMVector3Length(vLook).m128_f32[0])
+	_vector		vLook = vTemp - vPosition;
+	_float fLength = XMVector3Length(vLook).m128_f32[0];
+	if(fMinDistance <= fLength)
 		vPosition += XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;
+
+	Set_State(CTransform::STATE_POSITION, vPosition);
 }
 
 void CTransform::Turn(_fvector vAxis, _float fTimeDelta)
@@ -230,6 +247,27 @@ void CTransform::Rotation(_fvector vAxis, _float fRadian)
 	}
 }
 
+void CTransform::Slide(_float fTimeDelta, _fvector _vSlideDir, CNavigation* pNavigation)
+{
+	if(XMVector3Equal(_vSlideDir, XMVectorSet(0.f, 0.f, 0.f, 0.f)))
+		return;
+
+	_vector vLook = Get_State_Vector(STATE_LOOK);
+	vLook = XMVector3Normalize(XMVectorSetY(vLook, 0.f));
+
+	_vector vSlideDir = XMVector3Normalize(XMVectorSetY(_vSlideDir, 0.f));
+
+	_float fAngle = ::XMVectorGetX(::XMVector3AngleBetweenVectors(vLook, vSlideDir));
+	_float fY = ::XMVectorGetY(::XMVector3Cross(vLook, vSlideDir));
+	if (fY < 0)
+		fAngle = -fAngle;
+
+	_vector	vPosition = Get_State_Vector(STATE_POSITION);
+	vPosition += XMVector3Normalize(vSlideDir) * cosf(fAngle) * m_fSpeedPerSec * fTimeDelta;
+	if(pNavigation->IsMovable(vPosition))
+		Set_State(STATE_POSITION, vPosition);
+}
+
 CTransform * CTransform::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
 	CTransform*		pInstance = new CTransform(pDevice, pContext);
@@ -261,5 +299,4 @@ CComponent * CTransform::Clone(void * pArg)
 void CTransform::Free()
 {
 	__super::Free();
-
 }

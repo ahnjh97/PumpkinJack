@@ -155,14 +155,23 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 	for (auto& Pair : m_Parts)
 		Pair.second->Late_Tick(fTimeDelta);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+
+	for (_int i = 0; i < NAVIGATION_END; i++)
+	{
+		if (m_pNavigationCom[i] != nullptr)
+			m_pNavigationCom[i]->Late_Tick();
+	}
 }
 
 HRESULT CPlayer::Render()
 {
 #ifdef _DEBUG
 	m_pColliderCom->Render();
-	if (m_pNavigationCom != nullptr && m_pGameInstance->Get_NavigationMode() == true)
-		m_pNavigationCom->Render();
+	for (_int i = 0; i < NAVIGATION_END; i++)
+	{
+		if (m_pNavigationCom[i] != nullptr && m_pGameInstance->Get_NavigationMode() == true)
+			m_pNavigationCom[i]->Render();
+	}
 #endif
 	return S_OK;
 }
@@ -185,6 +194,11 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 	auto iter = m_Parts.find(TEXT("Part_Body"));
 	CModel* pBodyModel = dynamic_cast<CModel*>(iter->second->Get_Component(TEXT("Com_Model")));
 
+	if (m_bInSlimeBossRoom)
+		m_eNavigation = SLIMEBOSSROOM;
+	else
+		m_eNavigation = DEFAULT;
+
 	if (!(m_pGameInstance->Get_DIKeyState(DIK_LSHIFT) & 0x80) && m_pGameInstance->KeyDown(DIK_TAB) && m_eState == IDLE)
 	{
 		m_eWeapon = (WEAPON)((_uint)(m_eWeapon)+1);
@@ -200,7 +214,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 	}
 
 	if(m_eState == ROLL)
-		m_pTransformCom->Move(fTimeDelta * 1.5f, ::XMLoadFloat3(&m_vDirection), m_pNavigationCom);
+		m_pTransformCom->Move(fTimeDelta * 1.5f, ::XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
 
 	if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) || (m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80)
 		|| (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80) || (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80))
@@ -208,22 +222,16 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 		if (!m_bIsAttacking && !m_bIsRolling && !m_bKartCol)
 		{
 			if(m_bIsJumping)
-				m_pTransformCom->Move(fTimeDelta * 0.85f, ::XMLoadFloat3(&m_vDirection), m_pNavigationCom);
+				m_pTransformCom->Move(fTimeDelta * 0.85f, ::XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
 			else
-				m_pTransformCom->Move(fTimeDelta, ::XMLoadFloat3(&m_vDirection), m_pNavigationCom);
+				m_pTransformCom->Move(fTimeDelta, ::XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
 		}
 			
 		if(!m_bIsJumping && !m_bIsAttacking && !m_bIsRolling && !m_bIsPushingKart)
 			m_eState = RUN;
 	}
 
-	if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) && m_bKartCol)
-	{
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPushPos);
-		m_pTransformCom->Move(fTimeDelta * 0.24f, XMLoadFloat3(&m_vKartLook), m_pNavigationCom);
-		m_bIsPushingKart = true;
-		m_eState = PUSHING;
-	}
+
 
 	if (m_pGameInstance->KeyDown(DIK_SPACE) && !m_bIsAttacking && !m_bIsRolling && (m_iJumpCount > 0))
 	{
@@ -259,6 +267,15 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 		}
 		m_bIsAttacking = true;
 	}
+
+	if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) && m_bKartCol)
+	{
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPushPos);
+		m_bIsPushingKart = true;
+		m_eState = PUSHING;
+	}
+	else
+		m_bIsPushingKart = false;
 
 	if (!(m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) && !(m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80) &&
 		!(m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80) && !(m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80) && 
@@ -470,7 +487,7 @@ _bool CPlayer::Check_SlimeBossPortal(_float fTimeDelta)
 		{
 			_vector vPortalCenter = XMLoadFloat3(&pPortalCollider->Get_Center(CCollider::TYPE_OBB));
 			XMVectorSetW(vPortalCenter, 1);
-			m_pTransformCom->Move_toTarget(vPortalCenter, fTimeDelta * 30.f, 2.f);
+			m_pTransformCom->Move_toTarget(vPortalCenter, fTimeDelta * 0.25f, 1.5f);
 			m_fHighFallTime += fTimeDelta;
 			return true;
 		}
@@ -558,6 +575,12 @@ HRESULT CPlayer::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Navigation") + to_wstring(eLevel),
 		TEXT("Com_Navigation"), (CComponent**)&m_pNavigationCom, &NavigationDesc)))
 		return E_FAIL;
+
+	if (eLevel == LEVEL_SLIMEBOSS) {
+		if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Navigation_SlimeBossRoom"),
+			TEXT("Com_Navigation_SlimeBossRoom"), (CComponent**)&m_pNavigationCom[SLIMEBOSSROOM])))
+			return E_FAIL;
+	}
 	return S_OK;
 }
 
@@ -659,7 +682,8 @@ CGameObject* CPlayer::Clone(void* pArg)
 void CPlayer::Free()
 {
 	__super::Free();
-	Safe_Release(m_pNavigationCom);
+	for(_int i = 0; i <NAVIGATION_END; i++)
+		Safe_Release(m_pNavigationCom[i]);
 	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pCamera);
 	for (auto& Pair : m_Parts)

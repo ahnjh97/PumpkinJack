@@ -12,6 +12,8 @@ BEGIN(Client)
 
 class CSoldier final : public CGameObject
 {
+	enum SOLDIER_COLLIDER { DEFAULT, RANGE, COLLIDER_END };
+
 private:
 	CSoldier(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CSoldier(const CSoldier& rhs);
@@ -26,11 +28,28 @@ public:
 
 private:
 	void Get_PlayerWorldMatPtr();
+	void LinkState();
+	void StateToAnimation();
+	void Soldier_AnimSpeed();
+	void DeathEffect();
+
+	_bool IsPlayerInRange();
+
+private:
+	SOLDIER m_eState = {};
+
+	_bool m_bSpinAttack = { false };
+
+	_int m_iHp = { 100 };
+	
+	_float m_fIdleTime = {};
+	_float m_fTurnTime = {100.f};
 
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
-	CCollider* m_pColliderCom = { nullptr };
+	CCollider* m_pColliderCom[COLLIDER_END] = {nullptr};
+	CGameObject* m_pPlayer = { nullptr };
 	const _float4x4* m_pPlayerWorldMat = { nullptr };
 
 private:

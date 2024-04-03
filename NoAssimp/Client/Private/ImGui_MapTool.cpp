@@ -29,6 +29,7 @@ static _int NonAnimModelIdx = -1;
 static _int iLevelIndex = 0;
 static _int AnimationIdx = -1;
 static _int iNavigationIndex = 0;
+static _float fSlimeBossRoomOffset = -155.f;
 
 HRESULT CImGui_MapTool::Initialize()
 {
@@ -84,6 +85,17 @@ void CImGui_MapTool::Tick(_float fTimeDelta)
 				{
 					Safe_Release(pCell);
 					vecCells[iCellIndex] = nullptr;
+				}
+
+				if (strCurLevel == "Level_SlimeBoss" && nullptr == pCell)
+				{
+					_int iSBRCellIndex{};
+					CCell* pSBRCell = Pick_SlimeBossRoomCell(iSBRCellIndex);
+					if(pSBRCell != nullptr)
+					{
+						Safe_Release(pSBRCell);
+						vecSlimeBossRoomCells[iSBRCellIndex] = nullptr;
+					}
 				}
 			}
 		}
@@ -181,12 +193,13 @@ HRESULT CImGui_MapTool::Render()
 				cell->Render();
 		}
 
-		/*for (auto& cell : vecCells)
-		{
-			if (cell != nullptr)
-				cell->ColliderRender();
-		}*/
-		
+		if (strCurLevel == "Level_SlimeBoss") {
+			for (auto& SBRcell : vecSlimeBossRoomCells)
+			{
+				if (SBRcell != nullptr)
+					SBRcell->Render();
+			}
+		}
 	}
 
 	return S_OK;
@@ -225,7 +238,6 @@ void CImGui_MapTool::OnRightClick_ObjectMode()
 				tempDesc.iLevel = i;
 		}
 				
-			
 		wstring wstrPrototypeTag = TEXT("Prototype_GameObject_Tool_NonAnim");
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Parse"), wstrPrototypeTag, &tempDesc)))
 			return;
@@ -397,19 +409,29 @@ void CImGui_MapTool::OptionChange()
 			m_iMode = 0;
 	}
 
-	CGrid* pGrid = dynamic_cast<CGrid*>(m_pGameInstance->Get_GameObject(LEVEL_MAPTOOL, TEXT("Layer_Grid"), TEXT("Prototype_GameObject_Grid")));
-	if (m_iMode == 0) // SOLID
+	list<CGameObject*> gridList = m_pGameInstance->Get_ObjectList(LEVEL_MAPTOOL, TEXT("Layer_Grid"));
+	if (gridList.empty())
+		return;
+
+	for (auto& grid : gridList)
 	{
-		pGrid->Set_PassIndex(0);
-		pGrid->Set_Hide(false);
+		if (grid == nullptr)
+			continue;
+
+		CGrid* pGrid = dynamic_cast<CGrid*>(grid);
+		if (m_iMode == 0) // SOLID
+		{
+			pGrid->Set_PassIndex(0);
+			pGrid->Set_Hide(false);
+		}
+		else if (m_iMode == 1) // WIREFRAME
+		{
+			pGrid->Set_PassIndex(1);
+			pGrid->Set_Hide(false);
+		}
+		else if (m_iMode == 2) // CELL
+			pGrid->Set_Hide(true);
 	}
-	else if (m_iMode == 1) // WIREFRAME
-	{
-		pGrid->Set_PassIndex(1);
-		pGrid->Set_Hide(false);
-	}
-	else if (m_iMode == 2) // CELL
-		pGrid->Set_Hide(true);
 }
 
 _bool CImGui_MapTool::Menu_Level()
@@ -579,7 +601,7 @@ void CImGui_MapTool::Menu_Navigation()
 	ImGui::SameLine();
 	if (ImGui::Button("Load", ImVec2(100, 40)))
 		Load_Cells();
-
+		
 	ImGui::SeparatorText("LeftClickPos");
 	ImGui::Text("	%.2f, %.2f, %.2f ", m_vLeftClickPos.x, m_vLeftClickPos.y, m_vLeftClickPos.z);
 
@@ -618,7 +640,13 @@ void CImGui_MapTool::Load_Level()
 	tGridDesc.iLevel = LEVEL_MAPTOOL;
 	tGridDesc.wstrCurLevel = m_pGameInstance->StrToWstr(strCurLevel);
 	m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Grid"), TEXT("Prototype_GameObject_Grid"), &tGridDesc);
-
+	if (strCurLevel == "Level_SlimeBoss")
+	{
+		tGridDesc.iGridIndex = 1;
+		tGridDesc.matWorld._42 = fSlimeBossRoomOffset;
+		m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Grid"), TEXT("Prototype_GameObject_Grid"), &tGridDesc);
+	}
+		
 	string strFileName = "../../../objects_txt/" + strCurLevel + ".txt";
 
 	fstream fileStream(strFileName, ios::in | ios::binary);
@@ -687,7 +715,7 @@ void CImGui_MapTool::Save_Cells()
 	}
 		
 	string strCurLevel = vecLevelName[iLevelIndex + (_int)(LEVEL_GAMEPLAY)];
-
+	
 	string tempFileName = "temp_" + strCurLevel + "_Cells.txt";
 	ofstream outputFile(tempFileName, ios::out | ios::binary);
 	if (!outputFile.is_open()) // 임시파일 열렸는지 확인
@@ -701,8 +729,6 @@ void CImGui_MapTool::Save_Cells()
 	CVIBuffer_Terrain* pTerrainBuffer = dynamic_cast<CVIBuffer_Terrain*>(pGrid->Get_Component(TEXT("Com_VIBuffer")));
 	_int iX = pTerrainBuffer->Get_NumVerticesX();
 	_int iZ = pTerrainBuffer->Get_NumVerticesZ();
-
-
 
 	for (auto& cell : vecCells)
 	{
@@ -718,7 +744,6 @@ void CImGui_MapTool::Save_Cells()
 			 ::XMStoreFloat3(&vPoint, cell->Get_Point((CCell::POINT)i));
 			 outputFile.write(reinterpret_cast<const char*>(&vPoint), sizeof(vPoint));
 		}
-
 
 		_int iNeighborIndex[3] = { -1, -1, -1 };
 		for (_int j = 0; j < 3; j++)
@@ -857,6 +882,202 @@ void CImGui_MapTool::Save_Cells()
 	}
 
 	MB(strCurLevel + "_Cells.txt Saved.");
+	if (strCurLevel == "Level_SlimeBoss")
+		Save_SlimeBossRoomCells();
+}
+
+void CImGui_MapTool::Save_SlimeBossRoomCells()
+{
+	if (vecSlimeBossRoomCells.empty())
+		return;
+
+	for (_uint i = 0; i < vecSlimeBossRoomCells.size(); i++)
+	{
+		vecSlimeBossRoomCells[i]->Set_CellIndex(i);
+		vecSlimeBossRoomCells[i]->Reset_NeighborIndex();
+	}
+
+	string tempFileName = "temp_SlimeBossRoom_Cells.txt";
+	ofstream outputFile(tempFileName, ios::out | ios::binary);
+	if (!outputFile.is_open()) // 임시파일 열렸는지 확인
+	{
+		string tempstr = "Failed to Open: " + tempFileName;
+		MB(tempstr);
+		return;
+	}
+
+	CGrid* pGrid = { nullptr };
+	list<CGameObject*> gridList = m_pGameInstance->Get_ObjectList(LEVEL_MAPTOOL, TEXT("Layer_Grid"));
+	for (auto& grid : gridList)
+	{
+		if (nullptr == grid)
+			continue;
+
+		CGrid* pTempGrid = dynamic_cast<CGrid*>(grid);
+		
+		if (pTempGrid->Get_GridIndex() == 1)
+		{
+			pGrid = pTempGrid;
+			break;
+		}
+	}
+
+	CVIBuffer_Terrain* pTerrainBuffer = dynamic_cast<CVIBuffer_Terrain*>(pGrid->Get_Component(TEXT("Com_VIBuffer")));
+	_int iX = pTerrainBuffer->Get_NumVerticesX();
+	_int iZ = pTerrainBuffer->Get_NumVerticesZ();
+
+	for (auto& cell : vecSlimeBossRoomCells)
+	{
+		if (cell == nullptr)
+			continue;
+
+		_int iTerrainIndex = cell->Get_TerrainIndex();
+
+		outputFile.write(reinterpret_cast<const char*>(&iTerrainIndex), sizeof(iTerrainIndex));
+		for (_int i = 0; i < 3; i++)
+		{
+			_float3 vPoint{};
+			::XMStoreFloat3(&vPoint, cell->Get_Point((CCell::POINT)i));
+			vPoint = _float3(vPoint.x, vPoint.y - fSlimeBossRoomOffset, vPoint.z);
+			outputFile.write(reinterpret_cast<const char*>(&vPoint), sizeof(vPoint));
+		}
+
+		_int iNeighborIndex[3] = { -1, -1, -1 };
+		for (_int j = 0; j < 3; j++)
+			iNeighborIndex[j] = cell->Get_NeighborIndex((CCell::LINE)j);
+
+		if (iNeighborIndex[0] == -1 || iNeighborIndex[1] || -1 && iNeighborIndex[2] || -1) // NeighborIndex가 하나라도 -1인 경우
+		{
+			if (iTerrainIndex % 2 == 0) // 아래쪽 삼각형이면
+			{
+				if (iNeighborIndex[0] == -1) // iTerrainIndex + 1  -> 필연적으로 존재
+				{
+					_int iAB_Index = Check_PotentialNeighbor(iTerrainIndex + 1);
+
+					if (iAB_Index != -1)
+					{
+						cell->Set_NeighborIndex(CCell::LINE_AB, iAB_Index);
+						vecCells[iAB_Index]->Set_NeighborIndex(CCell::LINE_CA, cell->Get_Index());
+					}
+				}
+
+				if (iTerrainIndex >= (iX - 1) * 2) // 가장 아랫줄에 있지 않은 경우
+				{
+					if (iNeighborIndex[1] == -1) // iTerrainIndex - (iX-1) * 2 + 1  -> 
+					{
+						_int iBC_Index = Check_PotentialNeighbor(iTerrainIndex - (iX - 1) * 2 + 1);
+
+						if (iBC_Index != -1)
+						{
+							cell->Set_NeighborIndex(CCell::LINE_BC, iBC_Index);
+							vecCells[iBC_Index]->Set_NeighborIndex(CCell::LINE_AB, cell->Get_Index());
+						}
+					}
+
+				}
+
+				if (iTerrainIndex % ((iX - 1) * 2) != 0)
+				{
+					if (iNeighborIndex[2] == -1) // iTerrainIndex - 1  ->  가장 왼쪽에 있을 경우 존재하지 않음
+					{
+						_int iCA_Index = Check_PotentialNeighbor(iTerrainIndex - 1);
+
+						if (iCA_Index != -1)
+						{
+							cell->Set_NeighborIndex(CCell::LINE_CA, iCA_Index);
+							vecCells[iCA_Index]->Set_NeighborIndex(CCell::LINE_BC, cell->Get_Index());
+						}
+					}
+				}
+			}
+			else		// 위쪽 삼각형이면
+			{
+				if (iTerrainIndex < (iX - 1) * 2 * (iZ - 2)) // 가장 윗줄에 있지 않은 경우
+				{
+					if (iNeighborIndex[0] == -1)
+					{
+						_int iAB_Index2 = Check_PotentialNeighbor(iTerrainIndex + (iX - 1) * 2 - 1);
+
+						if (iAB_Index2 != -1)
+						{
+							cell->Set_NeighborIndex(CCell::LINE_AB, iAB_Index2);
+							vecCells[iAB_Index2]->Set_NeighborIndex(CCell::LINE_BC, cell->Get_Index());
+						}
+					}
+				}
+
+				if ((iTerrainIndex + 1) % (iX - 1) != 0) // 가장 오른쪽에 있지 않은 경우
+				{
+					if (iNeighborIndex[1] == -1)
+					{
+						_int iBC_Index2 = Check_PotentialNeighbor(iTerrainIndex + 1);
+
+						if (iBC_Index2 != -1)
+						{
+							cell->Set_NeighborIndex(CCell::LINE_BC, iBC_Index2);
+							vecCells[iBC_Index2]->Set_NeighborIndex(CCell::LINE_CA, cell->Get_Index());
+						}
+					}
+				}
+
+				if (iNeighborIndex[2] == -1) // 필연적으로 존재 
+				{
+					_int iCA_Index2 = Check_PotentialNeighbor(iTerrainIndex - 1);
+
+					if (iCA_Index2 != -1)
+					{
+						cell->Set_NeighborIndex(CCell::LINE_CA, iCA_Index2);
+						vecCells[iCA_Index2]->Set_NeighborIndex(CCell::LINE_AB, cell->Get_Index());
+					}
+				}
+			}
+		}
+
+		for (_int ii = 0; ii < 3; ii++)
+		{
+			iNeighborIndex[ii] = cell->Get_NeighborIndex((CCell::LINE)ii);
+			outputFile.write(reinterpret_cast<const char*>(&iNeighborIndex[ii]), sizeof(iNeighborIndex[ii]));
+		}
+	}
+
+	outputFile.close();
+
+	if (!outputFile)
+	{
+		string errorStr = "Failed to write data to " + tempFileName;
+		MB(errorStr);
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return;
+	}
+
+	// 현재시간 받아오기
+	auto now = chrono::system_clock::now();
+	time_t currentTime = chrono::system_clock::to_time_t(now);
+
+	struct tm timeinfo;
+	localtime_s(&timeinfo, &currentTime);
+
+	// 현재 시간을 문자열로 변환
+	char buffer[80];
+	strftime(buffer, sizeof(buffer), "%H%M%S", &timeinfo);
+
+	string fileName_Time = "../../../objects_txt/" + string(buffer) + "_SlimeBossRoom_Cells.txt";
+	string fileName = "../../../objects_txt/SlimeBossRoom_Cells.txt";
+	if (rename(fileName.c_str(), fileName_Time.c_str()) != 0)
+	{
+		MB("Failed to rename original file.");
+		return;
+	}
+
+	if (rename(tempFileName.c_str(), fileName.c_str()) != 0) // 임시파일 이름을 level 이름으로 변경
+	{
+		string errorStr2 = "Failed to rename " + tempFileName;
+		MB(errorStr2);
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return;
+	}
+
+	MB("SlimeBossRoom_Cells.txt Saved.");
 }
 
 void CImGui_MapTool::Load_Cells()
@@ -869,7 +1090,7 @@ void CImGui_MapTool::Load_Cells()
 	fstream fileStream(strFileName, ios::in | ios::binary);
 	if (fileStream.is_open() == false)
 	{
-		MB("Failed to open CurLevel_Cells.txt");
+		MB("Failed to open : CurLevel_Cells.txt");
 		return;
 	}
 
@@ -897,6 +1118,49 @@ void CImGui_MapTool::Load_Cells()
 	}
 	fileStream.close();
 	bCellMode = true;
+	if (strCurLevel == "Level_SlimeBoss")
+		Load_SlimeBossRoomCells();
+}
+
+void CImGui_MapTool::Load_SlimeBossRoomCells()
+{
+	for (auto& SBRcell : vecSlimeBossRoomCells)
+		Safe_Release(SBRcell);
+	vecSlimeBossRoomCells.clear();
+	
+	string strFileName = "../../../objects_txt/SlimeBossRoom_Cells.txt";
+	fstream fileStream(strFileName, ios::in | ios::binary);
+	if (fileStream.is_open() == false)
+	{
+		MB("Failed to open : SlimeBossRoom_Cells.txt");
+		return;
+	}
+	_int iTerrainIndex = -1;
+	_float3 vPoints[3];
+	_int iNeighborIndices[3];
+	while (!fileStream.eof())
+	{
+		fileStream.read(reinterpret_cast<char*>(&iTerrainIndex), sizeof(iTerrainIndex));
+
+		for (_int i = 0; i < 3; i++)
+			fileStream.read(reinterpret_cast<char*>(&vPoints[i]), sizeof(vPoints[i]));
+
+		for (_int j = 0; j < 3; j++)
+			fileStream.read(reinterpret_cast<char*>(&iNeighborIndices[j]), sizeof(iNeighborIndices[j]));
+
+		if (fileStream.eof())
+			break;
+
+		for (_int k = 0; k < 3; k++)
+			vPoints[k] = _float3(vPoints[k].x, vPoints[k].y + fSlimeBossRoomOffset, vPoints[k].z);
+
+		CCell* pSBRCell = CCell::Create(m_pDevice, m_pContext, iTerrainIndex, vPoints, iNeighborIndices, vecSlimeBossRoomCells.size());
+		if (nullptr == pSBRCell)
+			break;
+
+		vecSlimeBossRoomCells.emplace_back(pSBRCell);
+	}
+	fileStream.close();
 }
 
 CCell* CImGui_MapTool::Pick_Cell(_Out_ _int& iIndex)
@@ -929,29 +1193,103 @@ CCell* CImGui_MapTool::Pick_Cell(_Out_ _int& iIndex)
 			return vecCells[i];
 		}
 	}
-
 	return nullptr; 
+}
+
+CCell* CImGui_MapTool::Pick_SlimeBossRoomCell(_int& iIndex)
+{
+	if (vecSlimeBossRoomCells.empty())
+		return nullptr;
+	list<CGameObject*> gridList = m_pGameInstance->Get_ObjectList(LEVEL_MAPTOOL, TEXT("Layer_Grid"));
+	if (gridList.empty())
+		return nullptr;
+
+	CGrid* pGrid = nullptr;
+	for (auto& grid : gridList)
+	{
+		if (grid == nullptr)
+			continue;
+
+		CGrid* pTempGrid = dynamic_cast<CGrid*>(grid);
+		if (pTempGrid->Get_GridIndex() == 1)
+		{
+			pGrid = pTempGrid;
+			break;
+		}
+	}
+
+	if (nullptr == pGrid)
+		return nullptr;
+
+	CTransform* pGridTransform = dynamic_cast<CTransform*>(pGrid->Get_Component(g_strTransformTag));
+
+	_float3 vRayDir, vRayPos;
+	m_pGameInstance->Transform_PickingToLocalSpace(pGridTransform, &vRayDir, &vRayPos);
+
+	_vector vPoints[3];
+	_float fDis{};
+
+	for (_int i = 0; i < vecSlimeBossRoomCells.size(); i++)
+	{
+		if (vecSlimeBossRoomCells[i] == nullptr)
+			continue;
+
+		for (_int j = 0; j < CCell::POINT_END; j++)
+		{
+			vPoints[j] = vecSlimeBossRoomCells[i]->Get_Point((CCell::POINT)j);
+			_float fOriginY = XMVectorGetY(vPoints[j]);
+			vPoints[j] = XMVectorSetY(vPoints[j], fOriginY - fSlimeBossRoomOffset);
+		}
+
+		_vector vecRayDir = ::XMVector3Normalize(::XMLoadFloat3(&vRayDir));
+		_vector vecRayPos = ::XMLoadFloat3(&vRayPos);
+		if (::TriangleTests::Intersects(vecRayPos, vecRayDir, vPoints[0], vPoints[1], vPoints[2], fDis))
+		{
+			iIndex = i;
+			return vecSlimeBossRoomCells[i];
+		}
+	}
+	return nullptr;
 }
 
 void CImGui_MapTool::Add_Cells()
 {
-	CGameObject* pGrid = m_pGameInstance->Get_GameObject(LEVEL_MAPTOOL, TEXT("Layer_Grid"), TEXT("Prototype_GameObject_Grid"));
-	CVIBuffer_Terrain* pTerrainBuffer = dynamic_cast<CVIBuffer_Terrain*>(pGrid->Get_Component(TEXT("Com_VIBuffer")));
-	CTransform* pGridTransform = dynamic_cast<CTransform*>(pGrid->Get_Component(g_strTransformTag));	
-	//if (vecCellOptions.empty())
-	//	vecCellOptions.resize(pTerrainBuffer->Get_NumVerticesX() * pTerrainBuffer->Get_NumVerticesZ() * 2);
-
-	_float3 vPoints[3];
-	_int iTriangleIndex = pTerrainBuffer->Get_TriangleIndex(pGridTransform, vPoints[0], vPoints[1], vPoints[2]);
-	if (iTriangleIndex == -1)
+	list<CGameObject*> gridList = m_pGameInstance->Get_ObjectList(LEVEL_MAPTOOL, TEXT("Layer_Grid"));
+	if (gridList.empty())
 		return;
+	for (auto& grid : gridList)
+	{
+		if (nullptr == grid)
+			continue;
 
-	if (Check_ExistingCell(vPoints[0], vPoints[1], vPoints[2]) == true)
-		return;
-	
-	_int iNeighborIndices[3] = { -1,-1,-1 };
-	CCell* pCell = CCell::Create(m_pDevice, m_pContext, iTriangleIndex, vPoints, iNeighborIndices, vecCells.size());
-	vecCells.emplace_back(pCell);
+		CVIBuffer_Terrain* pTerrainBuffer = dynamic_cast<CVIBuffer_Terrain*>(grid->Get_Component(TEXT("Com_VIBuffer")));
+		CTransform* pGridTransform = dynamic_cast<CTransform*>(grid->Get_Component(g_strTransformTag));
+		_float3 vPoints[3];
+		_int iTriangleIndex = pTerrainBuffer->Get_TriangleIndex(pGridTransform, vPoints[0], vPoints[1], vPoints[2]);
+		if (iTriangleIndex == -1)
+			continue;
+
+		if (Check_ExistingCell(vPoints[0], vPoints[1], vPoints[2]) == true)
+			return;
+
+		_int iNeighborIndices[3] = { -1,-1,-1 };
+		CGrid* pGrid = dynamic_cast<CGrid*>(grid);
+		if (pGrid->Get_GridIndex() == 1)
+		{
+			for (_int i = 0; i < 3; i++)
+				vPoints[i] = _float3(vPoints[i].x, vPoints[i].y + fSlimeBossRoomOffset, vPoints[i].z);
+
+			CCell* pCell = CCell::Create(m_pDevice, m_pContext, iTriangleIndex, vPoints, iNeighborIndices, vecSlimeBossRoomCells.size());
+			vecSlimeBossRoomCells.emplace_back(pCell);
+			return;
+		}
+		else
+		{
+			CCell* pCell = CCell::Create(m_pDevice, m_pContext, iTriangleIndex, vPoints, iNeighborIndices, vecCells.size());
+			vecCells.emplace_back(pCell);
+			return;
+		}
+	}
 }
 
 _bool CImGui_MapTool::Check_ExistingCell(_float3 fA, _float3 fB, _float3 fC)
@@ -971,6 +1309,26 @@ _bool CImGui_MapTool::Check_ExistingCell(_float3 fA, _float3 fB, _float3 fC)
 			continue;
 
 		return true;
+	}
+
+	if (strCurLevel == "Level_SlimeBoss")
+	{
+		if (vecSlimeBossRoomCells.empty())
+			return false;
+
+		for (auto& SBRcell : vecSlimeBossRoomCells)
+		{
+			if (SBRcell == nullptr)
+				continue;
+			if (::XMVector3Equal(SBRcell->Get_Point(CCell::POINT_A), ::XMLoadFloat3(&fA)) == false)
+				continue;
+			if (::XMVector3Equal(SBRcell->Get_Point(CCell::POINT_B), ::XMLoadFloat3(&fB)) == false)
+				continue;
+			if (::XMVector3Equal(SBRcell->Get_Point(CCell::POINT_C), ::XMLoadFloat3(&fC)) == false)
+				continue;
+
+			return true;
+		}
 	}
 	return _bool();
 }
@@ -1004,6 +1362,17 @@ void CImGui_MapTool::Erase_NullPointers()
 		else
 			cell++;
 	}
+
+	if (strCurLevel == "Level_SlimeBoss")
+	{
+		for (auto& SBRcell = vecSlimeBossRoomCells.begin(); SBRcell != vecSlimeBossRoomCells.end();)
+		{
+			if (*SBRcell == nullptr)
+				SBRcell = vecSlimeBossRoomCells.erase(SBRcell);
+			else
+				SBRcell++;
+		}
+	}
 }
 
 CImGui_MapTool* CImGui_MapTool::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -1023,7 +1392,12 @@ void CImGui_MapTool::Free()
 {
 	__super::Free();
 	Safe_Release(m_pShader);
+
 	for (auto& cell : vecCells)
 		Safe_Release(cell);
 	vecCells.clear();
+
+	for (auto& SBRcell : vecSlimeBossRoomCells)
+		Safe_Release(SBRcell);
+	vecSlimeBossRoomCells.clear();
 }

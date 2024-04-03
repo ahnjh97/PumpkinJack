@@ -89,10 +89,13 @@ public:
 	void AirAttack_End() { m_fJumpTime = 0.55f / 1.3f + 0.45f; }
 
 	void Look_At(_fvector vPosition);
+	void Get_Look_LandObject(_fvector vAt, _Out_ _float4& _vRight, _Out_ _float4& _vLook);
 	void Look_At_ForLandObject(_fvector vPosition);
 	void Move_toTarget(_fvector vTargetPos, _float fTimeDelta, _float fMinDistance = 0.f);	
 	void Turn(_fvector vAxis, _float fTimeDelta);
 	void Rotation(_fvector vAxis, _float fRadian);
+
+	void Slide(_float fTimeDelta, _fvector _vSlideDir, CNavigation* pNavigation = nullptr);
 
 private:
 	_float4x4				m_WorldMatrix;

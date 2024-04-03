@@ -315,6 +315,10 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../objects_txt/Level_SlimeBoss_Cells.txt")))))
 		return E_FAIL;
 
+	wstrNavigationTag = TEXT("Prototype_Component_Navigation_SlimeBossRoom");
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrNavigationTag,
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../objects_txt/SlimeBossRoom_Cells.txt")))))
+		return E_FAIL;
 	TraverseAnimModels(eLevel, L"../../../model_txt/Anim/");
 	TraverseNonAnimModels(eLevel, L"../../../model_txt/NonAnim/");
 

@@ -126,10 +126,15 @@ _bool CCollider::Intersect(CCollider* pTargetCollider)
 	if (m_bDisabled)
 		return false;
 
-	if(pTargetCollider != nullptr)
-		return m_pBounding->Intersect(pTargetCollider->m_eType, pTargetCollider->m_pBounding);
+	_bool bIntersect = false;
+	if (pTargetCollider != nullptr)
+	{
+		bIntersect = m_pBounding->Intersect(pTargetCollider->m_eType, pTargetCollider->m_pBounding);
+		if (true == bIntersect)
+			m_CollidedColliders.insert(pTargetCollider);
+	}
 
-	return false;
+	return bIntersect;
 }
 
 _bool CCollider::Intersect_Ray(_fvector vRayOrigin, _fvector vRayDir, _float& fDis)
@@ -206,5 +211,6 @@ void CCollider::Free()
 
 #endif
 
+	m_CollidedColliders.clear();
 	Safe_Release(m_pBounding);
 }

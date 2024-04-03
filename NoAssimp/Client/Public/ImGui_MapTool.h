@@ -42,8 +42,11 @@ public:
 
 	// Cells
 	void				Save_Cells();
+	void				Save_SlimeBossRoomCells();
 	void				Load_Cells();
+	void				Load_SlimeBossRoomCells();
 	CCell*				Pick_Cell(_Out_ _int& iIndex);
+	CCell*				Pick_SlimeBossRoomCell(_Out_ _int& iIndex);
 	void				Add_Cells();
 	_bool				Check_ExistingCell(_float3 fA, _float3 fB, _float3 fC);
 	_int				Check_PotentialNeighbor(_int iPotentialNeighbor);
@@ -71,6 +74,7 @@ private:
 	vector<string>				vecMode = { "Objects", "Navigation", "None" };
 
 	vector<CCell*>				vecCells;
+	vector<CCell*>				vecSlimeBossRoomCells;
 
 	CModel*						pNonAnimModel = { nullptr };
 

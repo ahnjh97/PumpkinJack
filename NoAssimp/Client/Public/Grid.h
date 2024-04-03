@@ -21,8 +21,10 @@ public:
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{
 		wstring wstrCurLevel = L"";
+		_int iGridIndex = 0;
 	}GRID_DESC;
 
+	_int Get_GridIndex() { return m_iGridIndex; }
 	void Set_PassIndex(_int iPassIndex) { m_iPassIndex = iPassIndex; }
 
 private:
@@ -39,6 +41,7 @@ public:
 
 private:
 	_uint m_iPassIndex = {};
+	_int m_iGridIndex = {};
 
 private:
 	CShader* m_pShaderCom = { nullptr };

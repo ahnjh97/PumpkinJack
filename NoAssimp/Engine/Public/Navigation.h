@@ -18,12 +18,14 @@ private:
 
 public:
 	_int Get_CurrentIndex() { return m_iCurrentIndex; }
+	_float3 Get_LineDir() { return m_vLineDir; }
 
 public:
 	virtual HRESULT Initialize_Prototype(const wstring& strDataFile);
 	virtual HRESULT Initialize(void* pArg) override;
 	void Tick(_fmatrix WorldMatrix);
-	_bool isMove(_fvector vPosition);
+	void Late_Tick();
+	_bool IsMovable(_fvector vPosition);
 
 #ifdef _DEBUG
 public:
@@ -31,12 +33,14 @@ public:
 #endif
 
 private:
-	vector<class CCell*>				m_Cells;
+	vector<class CCell*>	m_Cells;
 
-	static _float4x4					m_WorldMatrix;
+	static _float4x4		m_WorldMatrix;
 
 	/* 이 네비게이션을 이용하는 객체가 어떤 셀에 존재하는가?! */
-	_int								m_iCurrentIndex = { -1 };
+	_int					m_iCurrentIndex = { -1 };
+	_int					m_iPreviousIndex = { -1 };
+	_float3					m_vLineDir = {};
 
 #ifdef _DEBUG
 private:

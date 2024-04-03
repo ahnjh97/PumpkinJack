@@ -72,6 +72,7 @@ _bool CCell::IsIn(_fvector vPosition, _fmatrix TerrainWorldMatrix, _int* pNeighb
 		if (0 < XMVectorGetX(XMVector3Dot(vSourDir, vDestDir)))
 		{
 			*pNeighborIndex = m_iNeighborIndices[i];
+			XMStoreFloat3(&m_vLineDir, vDir);
 			return false;
 		}
 	}

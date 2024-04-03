@@ -32,8 +32,10 @@ HRESULT CSoldier::Initialize(void* pArg)
 	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel), GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
 
-	m_pModelCom->Set_Animation(10, false); // SPAWN
+	if (m_pModelCom != nullptr)
+		Soldier_AnimSpeed();
 
+	m_pModelCom->Set_Animation(10, false); // SPAWN
 	return S_OK;
 }
 
@@ -45,7 +47,59 @@ void CSoldier::Tick(_float fTimeDelta)
 	if (nullptr == m_pPlayerWorldMat)
 		return;
 
-	m_pTransformCom->Look_At_ForLandObject(XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1));
+	if (true == m_pModelCom->isFinished())
+		m_eState = SOLDIER_IDLE;
+
+	if (m_eState == SOLDIER_IDLE)
+		m_fIdleTime += fTimeDelta;
+	else
+		m_fIdleTime = 0.f;
+
+	LinkState();
+	StateToAnimation();
+
+	if (m_eState == SOLDIER_IDLE || m_eState == SOLDIER_RUN || m_eState == SOLDIER_SPAWN || m_eState == SOLDIER_SPIN)
+	{
+		if (true == m_pModelCom->Get_IsLerping())
+		{
+			_float4 vRightFloat{}, vLookFloat{};
+			m_pTransformCom->Get_Look_LandObject(XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1), vRightFloat, vLookFloat);
+
+			_vector	vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+			_float fAngle = ::XMVectorGetX(::XMVector3AngleBetweenVectors(vLook, XMLoadFloat4(&vLookFloat)));
+			_float fY = ::XMVectorGetY(::XMVector3Cross(vLook, XMLoadFloat4(&vLookFloat)));
+			if (fY < 0)
+				fAngle = -fAngle;
+			if (abs(fAngle) >= XMConvertToRadians(2.f))
+				m_pTransformCom->Turn(::XMVectorSet(0, 1, 0, 0), fTimeDelta * fAngle * 5.f);
+		}
+		else
+		{
+			if (m_eState == SOLDIER_SPIN)
+			{
+				_float fPlayRatio = m_pModelCom->Get_AnimPlayRatio(14);
+				if (fPlayRatio >= 0.4f && fPlayRatio <= 0.7f)
+					m_pTransformCom->Look_At_ForLandObject(XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1));
+			}
+			else
+				m_pTransformCom->Look_At_ForLandObject(XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1));
+		}
+			
+	}
+
+	
+	if (m_eState == SOLDIER_RUN)
+		m_pTransformCom->Move(fTimeDelta * 2.8f, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
+	else if (m_eState == SOLDIER_SPIN)
+	{
+		_float fPlayRatio = m_pModelCom->Get_AnimPlayRatio(14);
+		if(fPlayRatio >= 0.4f && fPlayRatio <= 0.7f)
+			m_pTransformCom->Move(fTimeDelta * 1.9f, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
+	}
+		
+
+	for(_int i = 0; i < COLLIDER_END; i++)
+		m_pColliderCom[i]->Tick(m_pTransformCom->Get_WorldMatrix());
 }
 
 void CSoldier::Late_Tick(_float fTimeDelta)
@@ -76,18 +130,115 @@ HRESULT CSoldier::Render()
 		m_pModelCom->Render(i);
 	}
 
+#ifdef _DEBUG
+	for (_int i = 0; i < COLLIDER_END; i++)
+		m_pColliderCom[i]->Render();
+#endif
+
 	return S_OK;
 }
 
 void CSoldier::Get_PlayerWorldMatPtr()
 {
-	CGameObject* pPlayer = m_pGameInstance->Get_Player(LEVEL_GAMEPLAY);
-	if (nullptr == pPlayer)
+	m_pPlayer = m_pGameInstance->Get_Player(LEVEL_GAMEPLAY);
+	if (nullptr == m_pPlayer)
 		return;
-	CTransform* pPlayerTransform = dynamic_cast<CTransform*>(pPlayer->Get_Component(g_strTransformTag));
+	CTransform* pPlayerTransform = dynamic_cast<CTransform*>(m_pPlayer->Get_Component(g_strTransformTag));
 	if (nullptr == pPlayerTransform)
 		return;
 	m_pPlayerWorldMat = pPlayerTransform->Get_WorldFloat4x4_Ptr();
+}
+
+void CSoldier::LinkState()
+{
+	if (m_eState == SOLDIER_DEATH && m_pModelCom->isFinished())
+	{
+		DeathEffect();
+		Set_Dead();
+	}
+
+	if (m_iHp <= 0)
+	{
+		m_eState = SOLDIER_DEATH;
+		return;
+	}
+		
+	if (m_fIdleTime >= 0.2f)
+		m_eState = SOLDIER_RUN;
+
+	if (m_eState == SOLDIER_RUN && true == IsPlayerInRange())
+	{
+		if (!m_bSpinAttack)
+		{
+			m_eState = SOLDIER_ATTACK;
+			m_bSpinAttack = true;
+		}
+		else
+		{
+			m_eState = SOLDIER_SPIN;
+			m_bSpinAttack = false;
+		}
+	}
+
+	if ((m_eState == SOLDIER_ATTACK || m_eState == SOLDIER_SPIN) && m_pModelCom->isFinished())
+		m_eState = SOLDIER_IDLE;
+}
+
+void CSoldier::StateToAnimation()
+{
+	string strAnim;
+	switch (m_eState)
+	{
+	case Client::SOLDIER_SPAWN:
+		strAnim = "Chevalier_SPAWN";
+		break;
+	case Client::SOLDIER_IDLE:
+		strAnim = "chevalier_Anim_idle";
+		break;
+	case Client::SOLDIER_RUN:
+		strAnim = "chevalier_Anim_run";
+		break;
+	case Client::SOLDIER_ATTACK:
+		strAnim = "chevalier_Anim_attack";
+		break;
+	case Client::SOLDIER_SPIN:
+		strAnim = "chevalier_tourbilol";
+		break;
+	case Client::SOLDIER_HIT:
+		strAnim = "chevalier_Anim_hit";
+		break;
+	case Client::SOLDIER_DEATH:
+		strAnim = "chevalier_Anim_Death";
+		break;
+	}
+
+	_bool bLoop;
+	if (m_eState == SOLDIER_RUN || m_eState == SOLDIER_IDLE)
+		bLoop = true;
+	else
+		bLoop = false;
+
+	m_pModelCom->Change_Animation(strAnim, bLoop);
+}
+
+void CSoldier::Soldier_AnimSpeed()
+{
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("chevalier_Anim_attack"), 1.5f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("chevalier_tourbilol"), 1.1f);
+}
+
+void CSoldier::DeathEffect()
+{
+}
+
+_bool CSoldier::IsPlayerInRange()
+{
+	CCollider* pPlayerCollider = dynamic_cast<CCollider*>(m_pPlayer->Get_Component(TEXT("Com_Collider")));
+
+	if (m_pColliderCom[RANGE]->Intersect(pPlayerCollider))
+		return true;
+
+	return _bool();
 }
 
 HRESULT CSoldier::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
@@ -99,6 +250,20 @@ HRESULT CSoldier::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 
 	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxAnimModel");
 	if (FAILED(__super::Add_Component(eLevel, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+		return E_FAIL;
+
+	CBounding_OBB::BOUNDING_OBB_DESC		ColliderDesc{};
+	ColliderDesc.vSize = _float3(5.5f, 9.f, 5.5f);
+	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, 0.f);
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"),
+		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom[DEFAULT], &ColliderDesc)))
+		return E_FAIL;
+
+	CBounding_Sphere::BOUNDING_SPHERE_DESC	RangeColliderDesc{};
+	RangeColliderDesc.fRadius = 11.8f;
+	RangeColliderDesc.vCenter = _float3(0.f, RangeColliderDesc.fRadius * 0.5f, 0.f);
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
+		TEXT("Com_Collider_Range"), (CComponent**)&m_pColliderCom[RANGE], &RangeColliderDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -128,7 +293,6 @@ HRESULT CSoldier::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))
 		return E_FAIL;
 
@@ -168,7 +332,9 @@ void CSoldier::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pColliderCom);
+	Safe_Release(m_pPlayer);
+	for(_int i = 0; i<COLLIDER_END; i++)
+		Safe_Release(m_pColliderCom[i]);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
 }

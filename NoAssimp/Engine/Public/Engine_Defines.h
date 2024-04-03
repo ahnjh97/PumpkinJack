@@ -38,6 +38,7 @@ namespace Engine
 
 using namespace DirectX;
 
+#include <unordered_set>
 #include <algorithm>
 #include <string>
 #include <vector>

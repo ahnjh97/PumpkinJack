@@ -29,6 +29,8 @@ public:
 	_int Get_TerrainIndex() { return m_iTerrainIndex; }
 	void Set_TerrainIndex(_uint iTerrainIndex) { m_iTerrainIndex = iTerrainIndex; }
 
+	_float3 Get_LineDir() { return m_vLineDir; }
+
 public:
 	HRESULT Initialize(_int iTerrainIndex, const _float3* pPoints, const _int* pNeighborIndices, _uint iIndex);
 	_bool IsIn(_fvector vPosition, _fmatrix TerrainWorldMatrix, _int* pNeighborIndex);
@@ -52,6 +54,7 @@ private:
 
 	_int			m_iNeighborIndices[LINE_END] = { -1, -1, -1 };
 	_uint			m_iTerrainIndex = {};
+	_float3			m_vLineDir = {};
 
 #ifdef _DEBUG
 

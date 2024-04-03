@@ -142,9 +142,11 @@ void CBody::StateToAnimation()
 	case HIGHFALL:
 		strWeapon = "";
 		strState = "HighFall";
+		break;
 	case PUSHING:
 		strWeapon = "";
 		strState = "Pushing";
+		break;
 	}
 
 	_bool bLoop;
