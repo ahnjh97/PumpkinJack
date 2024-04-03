@@ -100,22 +100,10 @@ _bool CNavigation::IsMovable(_fvector vPosition)
 	/* 밖으로 나갔다. */
 	else
 	{
-		_int iTempTemp = { -1 };
-		for (_int i = 0; i < 3; i++)
-		{
-			_int iTempNeighbor = m_Cells[m_iCurrentIndex]->Get_NeighborIndex((CCell::LINE)i);
-
-			if (iTempNeighbor != -1)
-			{
-				if (true == m_Cells[iTempNeighbor]->IsIn(vPosition, XMLoadFloat4x4(&m_WorldMatrix), &iTempTemp))
-					return true;
-			}
-		}
-
 		/* 나간 방향에 이웃이 없었다. */
 		if (-1 == iNeighborIndex)
 		{	
-			if (m_iPreviousIndex == m_iCurrentIndex)
+			/*if (m_iPreviousIndex == m_iCurrentIndex)*/
 				m_vLineDir = m_Cells[m_iCurrentIndex]->Get_LineDir();
 			return false;
 		}
@@ -127,7 +115,7 @@ _bool CNavigation::IsMovable(_fvector vPosition)
 			{
 				if (-1 == iNeighborIndex)
 				{
-					if (m_iPreviousIndex == m_iCurrentIndex)
+					/*if (m_iPreviousIndex == m_iCurrentIndex)*/
 						m_vLineDir = m_Cells[m_iCurrentIndex]->Get_LineDir();
 					return false;
 				}

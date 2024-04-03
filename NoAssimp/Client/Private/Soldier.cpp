@@ -55,6 +55,8 @@ void CSoldier::Tick(_float fTimeDelta)
 	else
 		m_fIdleTime = 0.f;
 
+	Check_KartCol(fTimeDelta);
+
 	LinkState();
 	StateToAnimation();
 
@@ -223,7 +225,7 @@ void CSoldier::StateToAnimation()
 
 void CSoldier::Soldier_AnimSpeed()
 {
-	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("chevalier_Anim_attack"), 1.5f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("chevalier_Anim_attack"), 1.1f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("chevalier_tourbilol"), 1.1f);
 }
 
@@ -238,6 +240,30 @@ _bool CSoldier::IsPlayerInRange()
 	if (m_pColliderCom[RANGE]->Intersect(pPlayerCollider))
 		return true;
 
+	return _bool();
+}
+
+_bool CSoldier::Check_KartCol(_float fTimeDelta)
+{
+	CGameObject* pKart = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Kart"), TEXT("Prototype_GameObject_Kart"));
+	if (nullptr == pKart)
+		return false;
+
+	CCollider* pKartCollider = dynamic_cast<CCollider*>(pKart->Get_Component(TEXT("Com_Collider_Wall")));
+	if (nullptr == pKartCollider)
+		return false;
+
+	_float3 vSrcPosFloat = m_pColliderCom[DEFAULT]->Get_Center(CCollider::TYPE_OBB);
+	_vector vSrsPos = XMLoadFloat3(&vSrcPosFloat);
+	if (m_pColliderCom[DEFAULT]->Intersect(pKartCollider))
+	{
+		_float3 vDstPosFloat = pKartCollider->Get_Center(CCollider::TYPE_OBB);
+		_vector vDstPos = XMLoadFloat3(&vDstPosFloat);
+
+		_vector vDir = XMVector3Normalize(vSrsPos - vDstPos);
+
+		m_pTransformCom->Move(fTimeDelta * 3.f, vDir);
+	}
 	return _bool();
 }
 

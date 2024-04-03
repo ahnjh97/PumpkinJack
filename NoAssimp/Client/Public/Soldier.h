@@ -34,6 +34,7 @@ private:
 	void DeathEffect();
 
 	_bool IsPlayerInRange();
+	_bool Check_KartCol(_float fTimeDelta);
 
 private:
 	SOLDIER m_eState = {};

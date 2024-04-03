@@ -55,7 +55,7 @@ void CSlime::Tick(_float fTimeDelta)
 		Set_Dead();
 
 	Check_SlimeCol(fTimeDelta);
-	Check_WallCol(fTimeDelta);
+	Check_KartCol(fTimeDelta);
 
 	_vector vPlayerPos = XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1);
 	m_pTransformCom->Look_At_ForLandObject(vPlayerPos);
@@ -172,7 +172,7 @@ void CSlime::Check_SlimeCol(_float fTimeDelta)
 	}
 }
 
-void CSlime::Check_WallCol(_float fTimeDelta)
+void CSlime::Check_KartCol(_float fTimeDelta)
 {
 	list<CGameObject*> pillarList = m_pGameInstance->Get_ObjectList(LEVEL_SLIMEBOSS, TEXT("Layer_Pillar"));
 
