@@ -139,8 +139,8 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 		if (m_pModelCom->isFinished())
 		{
 			//SlimeSpawn();
-			//PillarSpawn();
-			//PortalSpawn();
+			PillarSpawn();
+			PortalSpawn();
 			m_eState = SLIMEBOSS_IDLE;
 		}
 	}	
@@ -148,7 +148,8 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 	{
 		if (m_pModelCom->Get_AnimPlayCount(SLIMEBOSS_IDLE) >= 1)
 		{
-			m_eState = m_vecSlimeBossPattern[0];
+			m_iCurPattern = 1;
+			m_eState = m_vecSlimeBossPattern[m_iCurPattern];
 			m_pModelCom->Reset_AnimPlayCount(SLIMEBOSS_IDLE);
 		}
 	}
@@ -157,7 +158,7 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 		if (m_eState == SLIMEBOSS_FORK || m_eState == SLIMEBOSS_INVOKE_BEGIN
 			|| m_eState == SLIMEBOSS_PILLAR_SPAWN || m_eState == SLIMEBOSS_MEGASPAWN)
 		{
-			if (m_eState == SLIMEBOSS_FORK)
+			if (m_eState == SLIMEBOSS_INVOKE_BEGIN && m_pModelCom->Get_AnimPlayRatio(SLIMEBOSS_INVOKE_BEGIN) > 0.32f)
 			{
 				if (m_pPlayer->Get_SlimeBossRoomEscapeCount() >= 1 && m_bSlimeDamageZoneSpawn == false)
 				{
@@ -225,15 +226,6 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 				m_iLightningCount = 0;
 			}
 		}
-		/*else if (m_eState == SLIMEBOSS_IDLE)
-		{
-			if (m_pModelCom->Get_AnimPlayCount(SLIMEBOSS_IDLE) >= 1)
-			{
-				m_eState = m_vecSlimeBossPattern[++m_iCurPattern];
-				m_pModelCom->Reset_AnimPlayCount(SLIMEBOSS_IDLE);
-
-			}
-		}*/
 	}
 	m_ePreState = m_eState;
 }
@@ -301,7 +293,7 @@ void CSlimeBoss::PortalSpawn()
 	tDesc.iLevel = LEVEL_SLIMEBOSS;
 	tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
 	tDesc.matWorld._41 = vPortalPos.x;
-	tDesc.matWorld._42 = vPortalPos.y + 10.f;
+	tDesc.matWorld._42 = vPortalPos.y + 13.f;
 	tDesc.matWorld._43 = vPortalPos.z;
 	
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, wstrLayer, wstrPrototype, &tDesc)))

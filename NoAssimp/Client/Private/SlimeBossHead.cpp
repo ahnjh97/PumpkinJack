@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "SlimeBossHead.h"
-#include <Player.h>
+#include "Player.h"
 
 CSlimeBossHead::CSlimeBossHead(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -38,8 +38,16 @@ HRESULT CSlimeBossHead::Initialize(void* pArg)
 
 void CSlimeBossHead::Tick(_float fTimeDelta)
 {
-	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_SLIMEBOSS));
-	m_bInSlimeBossRoom = pPlayer->Get_InSlimeBossRoom();
+	if (m_pPlayer == nullptr)
+	{
+		m_pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_SLIMEBOSS));
+		m_pPlayerWorldMat = m_pPlayer->Get_PlayerWorldMatrixPtr();
+	}
+
+	if (m_pPlayer == nullptr)
+		return;
+
+	m_bInSlimeBossRoom = m_pPlayer->Get_InSlimeBossRoom();
 
 	if (m_bInSlimeBossRoom == false && m_bPreInSlimeBossRoom == true) // 플레이어가 SlimeBossRoom 탈출시
 	{
@@ -59,14 +67,14 @@ void CSlimeBossHead::Tick(_float fTimeDelta)
 
 	m_bCollision = { false };
 
-	if (pPlayer && m_eState == HEAD_DASH)
+	if (m_pPlayer && m_eState == HEAD_DASH)
 	{
-		CCollider* pPlayerCollider = dynamic_cast<CCollider*>(pPlayer->Get_Component(TEXT("Com_Collider")));
+		CCollider* pPlayerCollider = dynamic_cast<CCollider*>(m_pPlayer->Get_Component(TEXT("Com_Collider")));
 		if (m_pColliderCom->Intersect(pPlayerCollider))
 		{
 			if (m_fDamageTime >= 1.f)
 			{
-				pPlayer->Reduce_HP(20);
+				m_pPlayer->Reduce_HP(20);
 				m_fDamageTime = 0.f;
 				m_bCollision = true;
 			}
@@ -94,7 +102,7 @@ void CSlimeBossHead::Tick(_float fTimeDelta)
 	if (m_bCollision) // 방 밖으로 못가도록 제한시켜야함 
 		m_eState = HEAD_IDLE;
 
-	if (m_fIdleTime >= 1.8f)
+	if (m_fIdleTime >= 1.5f)
 		m_eState = HEAD_TURN;
 
 	StateToAction(fTimeDelta);
@@ -142,7 +150,7 @@ void CSlimeBossHead::StateToAction(_float fTimeDelta)
 		if (m_ePreState != HEAD_IDLE)
 		{
 			m_pTransformCom->Turn(XMVectorSet(0, 1, 0, 0), fAngle * 0.5f);
-			m_fShakeTime = 0.15f;
+			m_fShakeTime = 0.1f;
 			m_fShakeDir = -1.f;
 		}
 			
@@ -157,21 +165,20 @@ void CSlimeBossHead::StateToAction(_float fTimeDelta)
 	else if (m_eState == HEAD_TURN) // 회전
 	{
 		m_pTransformCom->Turn(XMVectorSet(0, 1, 0, 0), fTimeDelta * 2.f);
-
-		CCollider* pPlayerCollider = dynamic_cast<CCollider*>(pPlayer->Get_Component(TEXT("Com_Collider")));
-		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 		_vector vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-		_float fY = {};
-		for (_int i = -30; i < 31; i++)
+		_vector vPlayerPos = XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1.f);
+
+		_float4 vTargetRight, vTargetLook;
+		m_pTransformCom->Get_Look_LandObject(vPlayerPos, vTargetRight, vTargetLook);
+
+		_float fAngle = ::XMVectorGetX(::XMVector3AngleBetweenVectors(vLook, XMLoadFloat4(&vTargetLook)));
+		_float fY = ::XMVectorGetY(::XMVector3Cross(vLook, XMLoadFloat4(&vTargetLook)));
+		if (fY < 0)
+			fAngle = -fAngle;
+		if (abs(fAngle) <= XMConvertToRadians(2.f))
 		{
-			_matrix matRotation = XMMatrixRotationZ(XMConvertToRadians(i));
-			_vector vNewLook = XMVector3Transform(vLook, matRotation); // 위아래로 회전시킨 Look을 검사
-			vNewLook = XMVectorSetW(vNewLook, 0.f);
-			if (pPlayerCollider->Intersect_Ray(vPos, XMVector3Normalize(vNewLook), fY))
-			{
-				XMStoreFloat4(&m_vDashDir, XMVector3Normalize(vNewLook));
-				m_eState = HEAD_DASH;
-			}
+			m_eState = HEAD_DASH;
+			m_pTransformCom->Look_At(vPlayerPos);
 		}
 	}
 
@@ -179,7 +186,7 @@ void CSlimeBossHead::StateToAction(_float fTimeDelta)
 	{
 		_float fMaxSpeed = 52.f;
 		m_fDashTime += fTimeDelta;
-		m_pTransformCom->Move(cos(m_fDashTime * 0.7f) * fMaxSpeed * fTimeDelta, XMLoadFloat4(&m_vDashDir));
+		m_pTransformCom->Move(cos(m_fDashTime * 0.7f) * fMaxSpeed * fTimeDelta, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
 
 		if (m_fDashTime >= 1.f || m_bCollision)
 		{
@@ -257,6 +264,8 @@ void CSlimeBossHead::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pPlayer);
+	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);

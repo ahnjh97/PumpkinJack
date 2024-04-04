@@ -2,6 +2,7 @@
 #include "Level_SlimeBoss.h"
 #include "ImGui_Client.h"
 #include "Inven.h"
+#include "Terrain.h"
 
 CLevel_SlimeBoss::CLevel_SlimeBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -125,9 +126,16 @@ HRESULT CLevel_SlimeBoss::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
 	CGameObject::GAMEOBJECT_DESC tDesc{};
 	tDesc.iLevel = LEVEL_SLIMEBOSS;
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, strLayerTag, TEXT("Prototype_GameObject_Terrain"), &tDesc)))
-		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, strLayerTag, TEXT("Prototype_GameObject_Sky"), &tDesc)))
+		return E_FAIL;
+
+	CTerrain::TERRAIN_DESC terrainDesc{};
+	terrainDesc.iLevel = LEVEL_SLIMEBOSS;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, strLayerTag, TEXT("Prototype_GameObject_Terrain"), &terrainDesc)))
+		return E_FAIL;
+
+	terrainDesc.matWorld._42 = -155.f;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, strLayerTag, TEXT("Prototype_GameObject_Terrain_SlimeBossRoom"), &terrainDesc)))
 		return E_FAIL;
 	return S_OK;
 }

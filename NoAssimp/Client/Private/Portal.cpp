@@ -130,7 +130,7 @@ HRESULT CPortal::Add_Components(LEVEL eLevel)
 
 	/* For.Com_Collider */
 	CBounding_Sphere::BOUNDING_SPHERE_DESC	 ColliderDesc{};
-	ColliderDesc.fRadius = 18;
+	ColliderDesc.fRadius = 24;
 	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.fRadius * 0.5f + fHeight, 0.f);
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom, &ColliderDesc)))

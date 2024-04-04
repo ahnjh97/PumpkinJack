@@ -5,6 +5,7 @@
 BEGIN(Engine)
 class CModel;
 class CShader;
+class CNavigation;
 END
 
 BEGIN(Client)
@@ -49,6 +50,9 @@ private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 	CCollider* m_pColliderCom = { nullptr };
+	CNavigation* m_pNavigationCom = { nullptr };
+	class CPlayer* m_pPlayer = { nullptr };
+	const _float4x4* m_pPlayerWorldMat = { nullptr };
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);

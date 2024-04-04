@@ -24,7 +24,7 @@ static _bool IsMouseTrigger = false;
 static _int iSettingTransformSelct = { 0 };	/* 위치, 회전, 크기 인덱스 :: Transform용 */
 static _int iSelectTileSetting = { 0 };		/* 라디오 버튼 인덱스 :: 타일용 */
 
-static _int AnimModelIdx = 0;
+static _int AnimModelIdx = -1;
 static _int NonAnimModelIdx = -1;
 static _int iLevelIndex = 0;
 static _int AnimationIdx = -1;
@@ -101,8 +101,6 @@ void CImGui_MapTool::Tick(_float fTimeDelta)
 		}
 	}
 	
-	
-
 
 	if (!ImGui::IsAnyItemHovered() && m_pGameInstance->MouseDown(DIMKS_LBUTTON) && !(m_pGameInstance->Get_DIKeyState(DIK_LSHIFT) & 0x80))
 	{
@@ -207,6 +205,8 @@ HRESULT CImGui_MapTool::Render()
 
 void CImGui_MapTool::OnRightClick_ObjectMode()
 {
+	if (AnimModelIdx == -1 && NonAnimModelIdx == -1)
+		return;
 	CGameObject* pGrid = m_pGameInstance->Get_GameObject(LEVEL_MAPTOOL, TEXT("Layer_Grid"), TEXT("Prototype_GameObject_Grid"));
 	CVIBuffer_Terrain* pTerrainBuf = dynamic_cast<CVIBuffer_Terrain*>(pGrid->Get_Component(TEXT("Com_VIBuffer")));
 	const CTransform* pTransform = dynamic_cast<const CTransform*>(pGrid->Get_Component(g_strTransformTag));
@@ -380,6 +380,8 @@ void CImGui_MapTool::On_DIK_Escape()
 		AnimationIdx = -1;
 	}
 
+	AnimModelIdx = -1;
+	NonAnimModelIdx = -1;
 	m_pPickedObject = nullptr;
 }
 
@@ -952,7 +954,7 @@ void CImGui_MapTool::Save_SlimeBossRoomCells()
 			{
 				if (iNeighborIndex[0] == -1) // iTerrainIndex + 1  -> 필연적으로 존재
 				{
-					_int iAB_Index = Check_PotentialNeighbor(iTerrainIndex + 1);
+					_int iAB_Index = Check_PotentialNeighbor(iTerrainIndex + 1, 1);
 
 					if (iAB_Index != -1)
 					{
@@ -965,7 +967,7 @@ void CImGui_MapTool::Save_SlimeBossRoomCells()
 				{
 					if (iNeighborIndex[1] == -1) // iTerrainIndex - (iX-1) * 2 + 1  -> 
 					{
-						_int iBC_Index = Check_PotentialNeighbor(iTerrainIndex - (iX - 1) * 2 + 1);
+						_int iBC_Index = Check_PotentialNeighbor(iTerrainIndex - (iX - 1) * 2 + 1, 1);
 
 						if (iBC_Index != -1)
 						{
@@ -980,7 +982,7 @@ void CImGui_MapTool::Save_SlimeBossRoomCells()
 				{
 					if (iNeighborIndex[2] == -1) // iTerrainIndex - 1  ->  가장 왼쪽에 있을 경우 존재하지 않음
 					{
-						_int iCA_Index = Check_PotentialNeighbor(iTerrainIndex - 1);
+						_int iCA_Index = Check_PotentialNeighbor(iTerrainIndex - 1, 1);
 
 						if (iCA_Index != -1)
 						{
@@ -996,7 +998,7 @@ void CImGui_MapTool::Save_SlimeBossRoomCells()
 				{
 					if (iNeighborIndex[0] == -1)
 					{
-						_int iAB_Index2 = Check_PotentialNeighbor(iTerrainIndex + (iX - 1) * 2 - 1);
+						_int iAB_Index2 = Check_PotentialNeighbor(iTerrainIndex + (iX - 1) * 2 - 1, 1);
 
 						if (iAB_Index2 != -1)
 						{
@@ -1010,7 +1012,7 @@ void CImGui_MapTool::Save_SlimeBossRoomCells()
 				{
 					if (iNeighborIndex[1] == -1)
 					{
-						_int iBC_Index2 = Check_PotentialNeighbor(iTerrainIndex + 1);
+						_int iBC_Index2 = Check_PotentialNeighbor(iTerrainIndex + 1, 1);
 
 						if (iBC_Index2 != -1)
 						{
@@ -1022,7 +1024,7 @@ void CImGui_MapTool::Save_SlimeBossRoomCells()
 
 				if (iNeighborIndex[2] == -1) // 필연적으로 존재 
 				{
-					_int iCA_Index2 = Check_PotentialNeighbor(iTerrainIndex - 1);
+					_int iCA_Index2 = Check_PotentialNeighbor(iTerrainIndex - 1, 1);
 
 					if (iCA_Index2 != -1)
 					{
@@ -1269,22 +1271,22 @@ void CImGui_MapTool::Add_Cells()
 		if (iTriangleIndex == -1)
 			continue;
 
-		if (Check_ExistingCell(vPoints[0], vPoints[1], vPoints[2]) == true)
-			return;
-
 		_int iNeighborIndices[3] = { -1,-1,-1 };
 		CGrid* pGrid = dynamic_cast<CGrid*>(grid);
 		if (pGrid->Get_GridIndex() == 1)
 		{
 			for (_int i = 0; i < 3; i++)
 				vPoints[i] = _float3(vPoints[i].x, vPoints[i].y + fSlimeBossRoomOffset, vPoints[i].z);
-
+			if (Check_ExistingCell(vPoints[0], vPoints[1], vPoints[2], 1) == true)
+				return;
 			CCell* pCell = CCell::Create(m_pDevice, m_pContext, iTriangleIndex, vPoints, iNeighborIndices, vecSlimeBossRoomCells.size());
 			vecSlimeBossRoomCells.emplace_back(pCell);
 			return;
 		}
 		else
 		{
+			if (Check_ExistingCell(vPoints[0], vPoints[1], vPoints[2], 1) == true)
+				return;
 			CCell* pCell = CCell::Create(m_pDevice, m_pContext, iTriangleIndex, vPoints, iNeighborIndices, vecCells.size());
 			vecCells.emplace_back(pCell);
 			return;
@@ -1292,61 +1294,87 @@ void CImGui_MapTool::Add_Cells()
 	}
 }
 
-_bool CImGui_MapTool::Check_ExistingCell(_float3 fA, _float3 fB, _float3 fC)
+_bool CImGui_MapTool::Check_ExistingCell(_float3 fA, _float3 fB, _float3 fC, _int iGridIndex)
 {
 	if (vecCells.empty())
 		return false;
 
-	for (auto& cell : vecCells)
+	if (iGridIndex == 0)
 	{
-		if (cell == nullptr)
-			continue;
-		if (::XMVector3Equal(cell->Get_Point(CCell::POINT_A), ::XMLoadFloat3(&fA)) == false)
-			continue;
-		if (::XMVector3Equal(cell->Get_Point(CCell::POINT_B), ::XMLoadFloat3(&fB)) == false)
-			continue;
-		if (::XMVector3Equal(cell->Get_Point(CCell::POINT_C), ::XMLoadFloat3(&fC)) == false)
-			continue;
-
-		return true;
-	}
-
-	if (strCurLevel == "Level_SlimeBoss")
-	{
-		if (vecSlimeBossRoomCells.empty())
-			return false;
-
-		for (auto& SBRcell : vecSlimeBossRoomCells)
+		for (auto& cell : vecCells)
 		{
-			if (SBRcell == nullptr)
+			if (cell == nullptr)
 				continue;
-			if (::XMVector3Equal(SBRcell->Get_Point(CCell::POINT_A), ::XMLoadFloat3(&fA)) == false)
+			if (::XMVector3Equal(cell->Get_Point(CCell::POINT_A), ::XMLoadFloat3(&fA)) == false)
 				continue;
-			if (::XMVector3Equal(SBRcell->Get_Point(CCell::POINT_B), ::XMLoadFloat3(&fB)) == false)
+			if (::XMVector3Equal(cell->Get_Point(CCell::POINT_B), ::XMLoadFloat3(&fB)) == false)
 				continue;
-			if (::XMVector3Equal(SBRcell->Get_Point(CCell::POINT_C), ::XMLoadFloat3(&fC)) == false)
+			if (::XMVector3Equal(cell->Get_Point(CCell::POINT_C), ::XMLoadFloat3(&fC)) == false)
 				continue;
 
 			return true;
 		}
 	}
+	else
+	{
+		if (strCurLevel == "Level_SlimeBoss")
+		{
+			if (vecSlimeBossRoomCells.empty())
+				return false;
+
+			for (auto& SBRcell : vecSlimeBossRoomCells)
+			{
+				if (SBRcell == nullptr)
+					continue;
+				if (::XMVector3Equal(SBRcell->Get_Point(CCell::POINT_A), ::XMLoadFloat3(&fA)) == false)
+					continue;
+				if (::XMVector3Equal(SBRcell->Get_Point(CCell::POINT_B), ::XMLoadFloat3(&fB)) == false)
+					continue;
+				if (::XMVector3Equal(SBRcell->Get_Point(CCell::POINT_C), ::XMLoadFloat3(&fC)) == false)
+					continue;
+
+				return true;
+			}
+		}
+	}
+
 	return _bool();
 }
 
-_int CImGui_MapTool::Check_PotentialNeighbor(_int iPotentialNeighbor)
+_int CImGui_MapTool::Check_PotentialNeighbor(_int iPotentialNeighbor, _int iGridIndex)
 {
-	for (auto& cell : vecCells)
+	if (iGridIndex == 0)
 	{
-		if (cell == nullptr)
-			continue;
-
-		if (iPotentialNeighbor == cell->Get_TerrainIndex())
+		for (auto& cell : vecCells)
 		{
-			_int iTerrainIndex = cell->Get_TerrainIndex();
-			if (iTerrainIndex % 2 == iPotentialNeighbor % 2)
-				return cell->Get_Index();
-			else
-				break;
+			if (cell == nullptr)
+				continue;
+
+			if (iPotentialNeighbor == cell->Get_TerrainIndex())
+			{
+				_int iTerrainIndex = cell->Get_TerrainIndex();
+				if (iTerrainIndex % 2 == iPotentialNeighbor % 2)
+					return cell->Get_Index();
+				else
+					break;
+			}
+		}
+	}
+	else
+	{
+		for (auto& SBRcell : vecSlimeBossRoomCells)
+		{
+			if (SBRcell == nullptr)
+				continue;
+
+			if (iPotentialNeighbor == SBRcell->Get_TerrainIndex())
+			{
+				_int iSBRTerrainIndex = SBRcell->Get_TerrainIndex();
+				if (iSBRTerrainIndex % 2 == iPotentialNeighbor % 2)
+					return SBRcell->Get_Index();
+				else
+					break;
+			}
 		}
 	}
 

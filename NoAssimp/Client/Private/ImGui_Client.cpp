@@ -108,6 +108,10 @@ void CImGui_Client::ConvertToString()
 
 	CNavigation* pPlayerNavigation = dynamic_cast<CNavigation*>(m_pPlayer->Get_Component(TEXT("Com_Navigation")));
 	string strCellIndex = "CurrentCell : " + to_string(pPlayerNavigation->Get_CurrentIndex());
+	CNavigation* pPlayerNavigationSBR = dynamic_cast<CNavigation*>(m_pPlayer->Get_Component(TEXT("Com_Navigation_SlimeBossRoom")));
+	string strCellIndexSBR;
+	if(pPlayerNavigationSBR != nullptr)
+		strCellIndexSBR = "CurrentCell_SBR : " + to_string(pPlayerNavigationSBR->Get_CurrentIndex());
 	ImGui::Text(strPlayerPos.c_str());
 	ImGui::Text(strCamPos.c_str());
 	ImGui::Text(strWeaponPos.c_str());
@@ -118,6 +122,8 @@ void CImGui_Client::ConvertToString()
 	ImGui::Text(strAttack.c_str());
 	ImGui::Text(strIsJumping.c_str());
 	ImGui::Text(strCellIndex.c_str());
+	if (pPlayerNavigationSBR != nullptr)
+		ImGui::Text(strCellIndexSBR.c_str());
 }
 
 CImGui_Client* CImGui_Client::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

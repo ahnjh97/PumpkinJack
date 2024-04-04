@@ -13,6 +13,9 @@ class CKart : public CGameObject
 {
 	enum KART_COLLIDER { COLLIDER_PUSH, COLLIDER_WALL, COLLIDER_FRONT, COLLIDER_REAR, COLLIDER_END };
 
+public:
+	void Set_Push(_bool bPush) { m_bPush = bPush; }
+
 private:
 	CKart(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CKart(const CKart& rhs);

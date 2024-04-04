@@ -54,6 +54,7 @@ private:
 	_bool Check_SlimeBossPortal(_float fTimeDelta);
 	_bool Check_Kart();
 	void Check_GoBackUp();
+	void Update_KartPush(_bool bPush);
 
 private:
 	STATE m_eState = { PLAYER_END };

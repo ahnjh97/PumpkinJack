@@ -8,7 +8,7 @@ class ENGINE_DLL CNavigation final : public CComponent
 public:
 	typedef struct
 	{
-		_int			iCurrentIndex = { 0 };
+		_int			iCurrentIndex = { -1 };
 	}NAVIGATION_DESC;
 
 private:
@@ -18,6 +18,7 @@ private:
 
 public:
 	_int Get_CurrentIndex() { return m_iCurrentIndex; }
+	void Set_CurrentIndex(_int iCurIndex) { m_iCurrentIndex = iCurIndex; }
 	_float3 Get_LineDir() { return m_vLineDir; }
 
 public:
@@ -42,6 +43,7 @@ private:
 	_int					m_iPreviousIndex = { -1 };
 	_float3					m_vLineDir = {};
 
+	_int					m_iGridIndex = { };
 #ifdef _DEBUG
 private:
 	class CShader* m_pShader = { nullptr };

@@ -48,8 +48,8 @@ public:
 	CCell*				Pick_Cell(_Out_ _int& iIndex);
 	CCell*				Pick_SlimeBossRoomCell(_Out_ _int& iIndex);
 	void				Add_Cells();
-	_bool				Check_ExistingCell(_float3 fA, _float3 fB, _float3 fC);
-	_int				Check_PotentialNeighbor(_int iPotentialNeighbor);
+	_bool				Check_ExistingCell(_float3 fA, _float3 fB, _float3 fC, _int iGridIndex = 0);
+	_int				Check_PotentialNeighbor(_int iPotentialNeighbor, _int iGridIndex = 0);
 	void				Erase_NullPointers();
 
 private:

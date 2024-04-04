@@ -20,8 +20,8 @@ public:
 public:
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{
-		wstring wstrCurLevel = L"";
 		_int iGridIndex = 0;
+		wstring wstrCurLevel;
 	}GRID_DESC;
 
 	_int Get_GridIndex() { return m_iGridIndex; }

@@ -55,22 +55,27 @@ void CKart::Tick(_float fTimeDelta)
 					crateBox->Set_Dead();
 			}
 		}
+		CGameObject* pMinePlatform = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_MinePlatform"), TEXT("Prototype_GameObject_Monster"));
+		if (pMinePlatform != nullptr)
+			pMinePlatform->Set_Dead();
+
+		CGameObject* pBallistaBase = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_BallistaBase"), TEXT("Prototype_GameObject_Monster"));
+		if (pBallistaBase != nullptr)
+			pBallistaBase->Set_Dead();
+
+		CGameObject* pBallista = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Ballista"), TEXT("Prototype_GameObject_Ballista"));
+		if (pBallista != nullptr)
+			pBallista->Set_Dead();
+
+		CGameObject* pBallistaRotator = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_BallistaRotator"), TEXT("Prototype_GameObject_BallistaRotator"));
+		if (pBallistaRotator != nullptr)
+			pBallistaRotator->Set_Dead();
+	
+		CGameObject* pSkullCrossBow = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_SkullCrossBow"), TEXT("Prototype_GameObject_SkullCrossBow"));
+		if (pSkullCrossBow != nullptr)
+			pSkullCrossBow->Set_Dead();
 
 		Set_Dead();
-	}
-		
-
-	m_bPush = false;
-	m_bCollision = false;
-
-	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_GAMEPLAY));
-	if (pPlayer)
-	{
-		CCollider* pPlayerCollider = dynamic_cast<CCollider*>(pPlayer->Get_Component(TEXT("Com_Collider")));
-		if (m_pColliderCom[COLLIDER_WALL]->Intersect(pPlayerCollider))
-			m_bCollision = true;
-		if (m_pColliderCom[COLLIDER_PUSH]->Intersect(pPlayerCollider))
-			m_bPush = true;
 	}
 
 	for (_int i = 0; i < COLLIDER_END; i++)

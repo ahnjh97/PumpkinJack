@@ -121,12 +121,12 @@ void CTransform::Move(_float fTimeDelta, _fvector vTargetDir, CNavigation* pNavi
 	if (m_bWallCol == true)
 		return;
 
-	if(nullptr == pNavigation)
+	if(nullptr == pNavigation || m_bPortalCol)
 		Set_State(STATE_POSITION, vPosition);
 	else
 	{
 		_bool bIsMovable = pNavigation->IsMovable(vPosition);
-		if (true == bIsMovable || m_fJumpTime != 0.f)
+		if (true == bIsMovable)
 			Set_State(STATE_POSITION, vPosition);
 		else if (false == bIsMovable)
 			Slide(fTimeDelta, XMLoadFloat3(&pNavigation->Get_LineDir()), pNavigation);

@@ -202,6 +202,7 @@
     <ClInclude Include="..\Public\Slime_Slime.h" />
     <ClInclude Include="..\Public\Soldier.h" />
     <ClInclude Include="..\Public\Terrain.h" />
+    <ClInclude Include="..\Public\Terrain_SlimeBossRoom.h" />
     <ClInclude Include="..\Public\TongMap_GamePlay.h" />
     <ClInclude Include="..\Public\TongMap_SlimeBoss.h" />
     <ClInclude Include="..\Public\Tool_Anim.h" />
@@ -254,6 +255,7 @@
     <ClCompile Include="..\Private\Slime_Slime.cpp" />
     <ClCompile Include="..\Private\Soldier.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
+    <ClCompile Include="..\Private\Terrain_SlimeBossRoom.cpp" />
     <ClCompile Include="..\Private\TongMap_GamePlay.cpp" />
     <ClCompile Include="..\Private\TongMap_SlimeBoss.cpp" />
     <ClCompile Include="..\Private\Tool_Anim.cpp" />

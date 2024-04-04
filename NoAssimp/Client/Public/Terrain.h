@@ -16,11 +16,11 @@ class CTerrain final : public CGameObject
 {
 public:
 	enum TEXTURETYPE { TYPE_DIFFUSE, TYPE_MASK, TYPE_BRUSH, TYPE_END };
-	enum NAVIGATION { DEFAULT, SLIMEBOSSROOM, NAVIGATION_END };
 public:
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{
-		wstring wstrFileName = L"";
+		wstring wstrFileName;
+		_int iGridIndex;
 	}TERRAIN_DESC;
 
 	void Set_PassIndex(_int iPassIndex) { m_iPassIndex = iPassIndex; }
@@ -39,17 +39,17 @@ public:
 
 private:
 	_uint m_iPassIndex = {};
+	_int m_iGridIndex = {};
 
 private:
 	CShader*				m_pShaderCom = { nullptr };
 	CTexture*				m_pTextureCom[TYPE_END] = {nullptr};
 	CVIBuffer_Terrain*		m_pVIBufferCom = { nullptr };
-	CNavigation*			m_pNavigationCom[NAVIGATION_END] = {nullptr};
+	CNavigation*			m_pNavigationCom = {nullptr};
 	
 private:
 	HRESULT Add_Components(LEVEL eLevel);
 	HRESULT Bind_ShaderResources();
-
 
 
 public:

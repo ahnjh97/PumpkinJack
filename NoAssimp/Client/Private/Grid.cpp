@@ -91,7 +91,7 @@ HRESULT CGrid::Add_Components(const wstring& wstrCurLevel)
 	if (m_iGridIndex == 1)
 	{
 		/* For.Com_VIBuffer */
-		if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_VIBuffer_Terrain_SlimeBoss"),
+		if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_VIBuffer_Terrain_SlimeBossRoom"),
 			TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
 			return E_FAIL;
 	}

@@ -142,6 +142,9 @@
     <Filter Include="02.GameObjects\Monster\Soldier">
       <UniqueIdentifier>{b43b9c15-5169-45c0-9fed-3a7fb94555a7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Terrain\Terrain_SlimeBossRoom">
+      <UniqueIdentifier>{9ce42e70-5595-4d2b-8ac0-bde47ff87a0b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -297,6 +300,9 @@
     <ClInclude Include="..\Public\Soldier.h">
       <Filter>02.GameObjects\Monster\Soldier</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Terrain_SlimeBossRoom.h">
+      <Filter>02.GameObjects\Terrain\Terrain_SlimeBossRoom</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -442,6 +448,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Soldier.cpp">
       <Filter>02.GameObjects\Monster\Soldier</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Terrain_SlimeBossRoom.cpp">
+      <Filter>02.GameObjects\Terrain\Terrain_SlimeBossRoom</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -18,7 +18,7 @@ CNavigation::CNavigation(const CNavigation& rhs)
 
 #endif
 {
-
+	
 #ifdef _DEBUG
 	Safe_AddRef(m_pShader);
 #endif
@@ -60,7 +60,6 @@ HRESULT CNavigation::Initialize_Prototype(const wstring& strDataFile)
 	if (nullptr == m_pShader)
 		return E_FAIL;
 #endif
-
 
 	return S_OK;
 }
@@ -154,7 +153,7 @@ HRESULT CNavigation::Render()
 		return E_FAIL;
 
 	m_pShader->Begin(0);
-
+	
 	if (-1 == m_iCurrentIndex)
 	{
 		for (auto& pCell : m_Cells)

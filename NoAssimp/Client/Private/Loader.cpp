@@ -38,6 +38,7 @@
 #include "Slime.h"
 #include "Slime_Slime.h"
 #include "SlimeDamageZone.h"
+#include "Terrain_SlimeBossRoom.h"
 
 //#include "Effect.h"
 #include "Sky.h"
@@ -239,7 +240,12 @@ HRESULT CLoader::Loading_For_MapTool(LEVEL eLevel)
 
 	/* Prototype_Component_VIBuffer_Terrain_SlimeBoss */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_SlimeBoss"),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_SlimeBosss.bmp")))))
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_SlimeBoss.bmp")))))
+		return E_FAIL;
+
+	/* Prototype_Component_VIBuffer_Terrain_SlimeBossRoom */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_SlimeBossRoom"),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/SlimeBossRoom.bmp")))))
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
@@ -306,7 +312,12 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 
 	/* Prototype_Component_VIBuffer_Terrain_SlimeBoss */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_SlimeBoss"),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_SlimeBosss.bmp")))))
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_SlimeBoss.bmp")))))
+		return E_FAIL;
+
+	/* Prototype_Component_VIBuffer_Terrain_SlimeBossRoom */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_SlimeBossRoom"),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/SlimeBossRoom.bmp")))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Navigation */
@@ -319,6 +330,7 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrNavigationTag,
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../objects_txt/SlimeBossRoom_Cells.txt")))))
 		return E_FAIL;
+
 	TraverseAnimModels(eLevel, L"../../../model_txt/Anim/");
 	TraverseNonAnimModels(eLevel, L"../../../model_txt/NonAnim/");
 
@@ -340,6 +352,7 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Slime"), CSlime);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Slime_Slime"), CSlime_Slime);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SlimeDamageZone"), CSlimeDamageZone);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Terrain_SlimeBossRoom"), CTerrain_SlimeBossRoom);
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
@@ -493,6 +506,7 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degaree, NewScale, RootIndex
 	m_ModelConfigs.emplace("RailLeft90", MODEL_CONFIG{ 5.8f, 180.f, 5.8f });
 	m_ModelConfigs.emplace("RailRight60", MODEL_CONFIG{ 5.8f, 180.f, 5.8f });
 	m_ModelConfigs.emplace("RailRight90", MODEL_CONFIG{ 5.8f, 180.f, 5.8f });
+	m_ModelConfigs.emplace("MinePlatform", MODEL_CONFIG{ 4.2f, 0.f, 4.2f });
 
 	/* Level_SlimeBoss */
 	m_ModelConfigs.emplace("Knife", MODEL_CONFIG{ 8.2f, 0.f, 8.2f });

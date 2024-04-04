@@ -33,7 +33,11 @@ HRESULT CPillar_SlimeBossRoom::Initialize(void* pArg)
 	if (FAILED(Add_Components(GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
 
-	m_pTransformCom->Rotation(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(m_pGameInstance->RandomNumber(0, 360)));
+	//m_pTransformCom->Rotation(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(m_pGameInstance->RandomNumber(0, 360)));
+	m_pTransformCom->Turn(XMVectorSet(1, 0, 1, 0), 0.1f);
+	m_pTransformCom->Turn(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(m_pGameInstance->RandomNumber(0, 360) / 90.f));
+	m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), XMConvertToRadians(m_pGameInstance->RandomNumber(0, 360) / 90.f));
+
 	return S_OK;
 }
 

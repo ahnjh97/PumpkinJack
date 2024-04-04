@@ -76,7 +76,6 @@ void CPlayer::Tick(_float fTimeDelta)
 		Safe_AddRef(m_pCamera);
 	}
 
-
 	_bool bPortalCol = Check_SlimeBossPortal(fTimeDelta);
 	if(bPortalCol)
 		m_eState = HIGHFALL;
@@ -114,6 +113,10 @@ void CPlayer::Tick(_float fTimeDelta)
 		m_fHighFallTime = 0.f;
 		m_eState = IDLE;
 		m_bInSlimeBossRoom = true;
+		m_eNavigation = SLIMEBOSSROOM;
+		// curCell 다시검사
+		m_pNavigationCom[m_eNavigation]->Set_CurrentIndex(0);
+		m_pTransformCom->Move(0.f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
 	}
 
 	if (m_pTransformCom->Get_GroundCol())
@@ -167,11 +170,10 @@ HRESULT CPlayer::Render()
 {
 #ifdef _DEBUG
 	m_pColliderCom->Render();
-	for (_int i = 0; i < NAVIGATION_END; i++)
-	{
-		if (m_pNavigationCom[i] != nullptr && m_pGameInstance->Get_NavigationMode() == true)
-			m_pNavigationCom[i]->Render();
-	}
+	
+	if (m_pNavigationCom[m_eNavigation] != nullptr && m_pGameInstance->Get_NavigationMode() == true)
+		m_pNavigationCom[m_eNavigation]->Render();
+	
 #endif
 	return S_OK;
 }
@@ -199,6 +201,20 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 	else
 		m_eNavigation = DEFAULT;
 
+	if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) && m_bKartCol)
+	{
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPushPos);
+		m_bIsPushingKart = true;
+		m_eState = PUSHING;
+	}
+	else
+		m_bIsPushingKart = false;
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80)
+		m_bIsPushingKart = false;
+
+	Update_KartPush(m_bIsPushingKart);
+
 	if (!(m_pGameInstance->Get_DIKeyState(DIK_LSHIFT) & 0x80) && m_pGameInstance->KeyDown(DIK_TAB) && m_eState == IDLE)
 	{
 		m_eWeapon = (WEAPON)((_uint)(m_eWeapon)+1);
@@ -207,7 +223,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 			m_eWeapon = (WEAPON)0;
 	}
 
-	if (m_pGameInstance->KeyDown(DIK_LCONTROL) && !m_bIsAttacking && !m_bIsJumping)
+	if (m_pGameInstance->KeyDown(DIK_LCONTROL) && !m_bIsAttacking && !m_bIsJumping && !m_bIsPushingKart)
 	{
 		m_eState = ROLL;
 		m_bIsRolling = true;
@@ -219,7 +235,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 	if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) || (m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80)
 		|| (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80) || (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80))
 	{
-		if (!m_bIsAttacking && !m_bIsRolling && !m_bKartCol)
+		if (!m_bIsAttacking && !m_bIsRolling && !m_bIsPushingKart)
 		{
 			if(m_bIsJumping)
 				m_pTransformCom->Move(fTimeDelta * 0.85f, ::XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
@@ -231,9 +247,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 			m_eState = RUN;
 	}
 
-
-
-	if (m_pGameInstance->KeyDown(DIK_SPACE) && !m_bIsAttacking && !m_bIsRolling && (m_iJumpCount > 0))
+	if (m_pGameInstance->KeyDown(DIK_SPACE) && !m_bIsAttacking && !m_bIsRolling && !m_bIsPushingKart && (m_iJumpCount > 0) )
 	{
 		m_pTransformCom->Reset_Jump();
 		m_eState = JUMP;
@@ -242,7 +256,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 		pBodyModel->Reset_Animation(m_vecWeaponName[m_eWeapon] + "_Jump");
 	}
 
-	if (m_pGameInstance->MouseDown(DIMKS_LBUTTON) && !m_bIsAttacking && !m_bIsRolling)
+	if (m_pGameInstance->MouseDown(DIMKS_LBUTTON) && !m_bIsAttacking && !m_bIsRolling && !m_bIsPushingKart)
 	{
 		if (m_fRollEndTime < 0.5f && !m_bIsJumping)
 			m_eState = ROLL_ATTACK;
@@ -267,15 +281,6 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 		}
 		m_bIsAttacking = true;
 	}
-
-	if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) && m_bKartCol)
-	{
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPushPos);
-		m_bIsPushingKart = true;
-		m_eState = PUSHING;
-	}
-	else
-		m_bIsPushingKart = false;
 
 	if (!(m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) && !(m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80) &&
 		!(m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80) && !(m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80) && 
@@ -489,8 +494,11 @@ _bool CPlayer::Check_SlimeBossPortal(_float fTimeDelta)
 			XMVectorSetW(vPortalCenter, 1);
 			m_pTransformCom->Move_toTarget(vPortalCenter, fTimeDelta * 0.25f, 1.5f);
 			m_fHighFallTime += fTimeDelta;
+			m_pTransformCom->Set_PortalCol(true);
 			return true;
 		}
+		else
+			m_pTransformCom->Set_PortalCol(false);
 	}
 	
 	return false;
@@ -556,8 +564,21 @@ void CPlayer::Check_GoBackUp()
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vTeleportPos);
 			m_bInSlimeBossRoom = false;
 			m_iSlimeBossRoomEscapeCount++;
+			m_eNavigation = DEFAULT;
+			// curCell 다시검사
+			m_pNavigationCom[m_eNavigation]->Set_CurrentIndex(0);
+			m_pTransformCom->Move(0.f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
 		}
 	}
+}
+
+void CPlayer::Update_KartPush(_bool bPush)
+{
+	CKart* pKart = dynamic_cast<CKart*>(m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Kart"), TEXT("Prototype_GameObject_Kart")));
+	if (pKart == nullptr)
+		return;
+
+	pKart->Set_Push(bPush);
 }
 
 HRESULT CPlayer::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
@@ -573,12 +594,12 @@ HRESULT CPlayer::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 	CNavigation::NAVIGATION_DESC			NavigationDesc{};
 	NavigationDesc.iCurrentIndex = 0;
 	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Navigation") + to_wstring(eLevel),
-		TEXT("Com_Navigation"), (CComponent**)&m_pNavigationCom, &NavigationDesc)))
+		TEXT("Com_Navigation"), (CComponent**)&m_pNavigationCom[DEFAULT], &NavigationDesc)))
 		return E_FAIL;
 
 	if (eLevel == LEVEL_SLIMEBOSS) {
 		if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Navigation_SlimeBossRoom"),
-			TEXT("Com_Navigation_SlimeBossRoom"), (CComponent**)&m_pNavigationCom[SLIMEBOSSROOM])))
+			TEXT("Com_Navigation_SlimeBossRoom"), (CComponent**)&m_pNavigationCom[SLIMEBOSSROOM], &NavigationDesc)))
 			return E_FAIL;
 	}
 	return S_OK;
