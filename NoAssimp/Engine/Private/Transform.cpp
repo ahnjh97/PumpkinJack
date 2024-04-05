@@ -23,6 +23,13 @@ void CTransform::Set_Scaled(_float fScaleX, _float fScaleY, _float fScaleZ)
 		
 }
 
+void CTransform::Set_Height(_float fHeight)
+{
+	_float4 vPos = Get_State_Float4(CTransform::STATE_POSITION);
+	vPos.y = fHeight;
+	Set_State(CTransform::STATE_POSITION, vPos);
+}
+
 HRESULT CTransform::Initialize_Prototype()
 {
 	XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());
@@ -152,15 +159,15 @@ void CTransform::Jump(_float fTimeDelta)
 	Set_State(STATE_POSITION, vPosition);
 }
 
-void CTransform::Gravity(_float fTimeDelta)
-{
-	if (m_bGroundCol)
-		return;
-	_vector vDir = XMVectorSet(0, 1, 0, 0);
-	_vector	vPosition = Get_State_Vector(STATE_POSITION);
-	vPosition -= XMVector3Normalize(vDir) * m_fGravity * fTimeDelta * fTimeDelta * 0.5f;
-	Set_State(STATE_POSITION, vPosition);
-}
+//void CTransform::Gravity(_float fTimeDelta)
+//{
+//	if (m_bGroundCol)
+//		return;
+//	_vector vDir = XMVectorSet(0, 1, 0, 0);
+//	_vector	vPosition = Get_State_Vector(STATE_POSITION);
+//	vPosition -= XMVector3Normalize(vDir) * m_fGravity * fTimeDelta * fTimeDelta * 0.5f;
+//	Set_State(STATE_POSITION, vPosition);
+//}
 
 void CTransform::Look_At(_fvector vAt)
 {

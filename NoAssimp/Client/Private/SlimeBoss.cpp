@@ -76,10 +76,16 @@ void CSlimeBoss::Tick(_float fTimeDelta)
 	Link_Animation(fTimeDelta);
 	StateToAnimation();
 
+	m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
+
 	for (auto& Pair : m_Parts)
 		Pair.second->Tick(fTimeDelta);
 	if (m_pModelCom->Get_Shrinked())
+	{
+		DeathEffect();
 		Set_Dead();
+	}
+
 }
 
 void CSlimeBoss::Late_Tick(_float fTimeDelta)
@@ -116,19 +122,25 @@ HRESULT CSlimeBoss::Render()
 
 		m_pModelCom->Render(i);
 	}
-
+#ifdef _DEBUG
+	m_pColliderCom->Render();
+#endif
 	return S_OK;
 }
 
 void CSlimeBoss::Link_Animation(_float fTimeDelta)
 {
-	if (m_iHp <= 0)
+	if (m_iHp <= 100)
 		m_eState = SLIMEBOSS_DEATH;
 
 	if (m_eState == SLIMEBOSS_DEATH)
 	{
 		if (m_pModelCom->isFinished())
+		{
+			_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 			m_pModelCom->Shrink();
+			m_pTransformCom->Move_toTarget(XMVectorSet(vPos.x, 50.f, vPos.z, 1.f), fTimeDelta * 1.3f, 2.f);
+		}
 	}
 
 	if (m_eState == SLIMEBOSS_HIT && m_pModelCom->isFinished())
@@ -139,8 +151,8 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 		if (m_pModelCom->isFinished())
 		{
 			//SlimeSpawn();
-			PillarSpawn();
-			PortalSpawn();
+			//PillarSpawn();
+			//PortalSpawn();
 			m_eState = SLIMEBOSS_IDLE;
 		}
 	}	
@@ -293,7 +305,7 @@ void CSlimeBoss::PortalSpawn()
 	tDesc.iLevel = LEVEL_SLIMEBOSS;
 	tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
 	tDesc.matWorld._41 = vPortalPos.x;
-	tDesc.matWorld._42 = vPortalPos.y + 13.f;
+	tDesc.matWorld._42 = vPortalPos.y + 10.f;
 	tDesc.matWorld._43 = vPortalPos.z;
 	
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, wstrLayer, wstrPrototype, &tDesc)))
@@ -310,11 +322,10 @@ void CSlimeBoss::SlimeSpawn()
 	CGameObject::GAMEOBJECT_DESC tDesc{};
 	tDesc.iLevel = LEVEL_SLIMEBOSS;
 	tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Slime");
-	_int iSlimeNum = 10;
-	_float fDis = 35.f;
+	_int iSlimeNum = 12;
+	_float fDis = 38.f;
 	for (_int i = 0; i < iSlimeNum; i++)
 	{
-		
 		tDesc.matWorld._41 = XMVectorGetX(vPos) + cosf(i * XM_2PI / iSlimeNum) * fDis;
 		tDesc.matWorld._42 = 0;
 		tDesc.matWorld._43 = XMVectorGetZ(vPos) + sinf(i * XM_2PI / iSlimeNum) * fDis;
@@ -347,6 +358,10 @@ void CSlimeBoss::SlimeDamageZoneSpawn(_uint iNum)
 	}
 }
 
+void CSlimeBoss::DeathEffect()
+{
+}
+
 HRESULT CSlimeBoss::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 {
 	/* For.Com_Model */
@@ -356,6 +371,14 @@ HRESULT CSlimeBoss::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 
 	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxAnimModel");
 	if (FAILED(__super::Add_Component(eLevel, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+		return E_FAIL;
+
+	/* For.Com_Collider */
+	CBounding_Sphere::BOUNDING_SPHERE_DESC	ColliderDesc{};
+	ColliderDesc.fRadius = 24.f;
+	ColliderDesc.vCenter = _float3(0.f, 0, 0.f);
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
+		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom, &ColliderDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -436,6 +459,7 @@ void CSlimeBoss::Free()
 {
 	__super::Free();
 	Safe_Release(m_pPlayer);
+	Safe_Release(m_pColliderCom);
 	for (auto& Pair : m_Parts)
 		Safe_Release(Pair.second);
 	m_Parts.clear();

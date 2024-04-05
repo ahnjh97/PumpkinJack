@@ -74,7 +74,7 @@ void CSlimeBossHead::Tick(_float fTimeDelta)
 		{
 			if (m_fDamageTime >= 1.f)
 			{
-				m_pPlayer->Reduce_HP(20);
+				m_pPlayer->Change_HP(20);
 				m_fDamageTime = 0.f;
 				m_bCollision = true;
 			}

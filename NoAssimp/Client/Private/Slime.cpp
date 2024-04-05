@@ -47,6 +47,7 @@ HRESULT CSlime::Initialize(void* pArg)
 
 void CSlime::Tick(_float fTimeDelta)
 {
+	m_fTime += fTimeDelta;
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_SLIMEBOSS));
 
 	if (m_eState == SLIME_ATTACK && m_pModelCom->isFinished())
@@ -55,7 +56,8 @@ void CSlime::Tick(_float fTimeDelta)
 		Set_Dead();
 
 	Check_SlimeCol(fTimeDelta);
-	Check_KartCol(fTimeDelta);
+	Check_PillarCol(fTimeDelta);
+	Check_SlimeBossCol(fTimeDelta);
 
 	_vector vPlayerPos = XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1);
 	m_pTransformCom->Look_At_ForLandObject(vPlayerPos);
@@ -147,7 +149,7 @@ void CSlime::Check_SlimeCol(_float fTimeDelta)
 	if (slimeList.empty())
 		return;
 
-	_float3 vSrcPosFloat = m_pColliderCom[DEFAULT]->Get_Center(CCollider::TYPE_OBB);
+	_float3 vSrcPosFloat = m_pColliderCom[DEFAULT]->Get_Center(CCollider::TYPE_SPHERE);
 	_vector vSrsPos = XMLoadFloat3(&vSrcPosFloat);
 
 	for (auto& slime : slimeList)
@@ -162,7 +164,7 @@ void CSlime::Check_SlimeCol(_float fTimeDelta)
 
 		if (m_pColliderCom[DEFAULT]->Intersect(pSlimeCollider))
 		{
-			_float3 vDstPosFloat = pSlimeCollider->Get_Center(CCollider::TYPE_OBB);
+			_float3 vDstPosFloat = pSlimeCollider->Get_Center(CCollider::TYPE_SPHERE);
 			_vector vDstPos = XMLoadFloat3(&vDstPosFloat);
 
 			_vector vDir = XMVector3Normalize(vSrsPos - vDstPos);
@@ -172,14 +174,14 @@ void CSlime::Check_SlimeCol(_float fTimeDelta)
 	}
 }
 
-void CSlime::Check_KartCol(_float fTimeDelta)
+void CSlime::Check_PillarCol(_float fTimeDelta)
 {
 	list<CGameObject*> pillarList = m_pGameInstance->Get_ObjectList(LEVEL_SLIMEBOSS, TEXT("Layer_Pillar"));
 
 	if (pillarList.empty())
 		return;
 
-	_float3 vSrcPosFloat = m_pColliderCom[DEFAULT]->Get_Center(CCollider::TYPE_OBB);
+	_float3 vSrcPosFloat = m_pColliderCom[DEFAULT]->Get_Center(CCollider::TYPE_SPHERE);
 	_vector vSrsPos = XMLoadFloat3(&vSrcPosFloat);
 
 
@@ -207,6 +209,30 @@ void CSlime::Check_KartCol(_float fTimeDelta)
 	}
 }
 
+void CSlime::Check_SlimeBossCol(_float fTimeDelta)
+{
+	CGameObject* pSlimeBoss = m_pGameInstance->Get_GameObject(LEVEL_SLIMEBOSS, TEXT("Layer_SlimeBoss"), TEXT("Prototype_GameObject_SlimeBoss"));
+	if (pSlimeBoss == nullptr)
+		return;
+
+	CCollider* pSlimeBossCollider = dynamic_cast<CCollider*>(pSlimeBoss->Get_Component(TEXT("Com_Collider")));
+
+	if (pSlimeBossCollider == nullptr)
+		return;
+
+	if (m_pColliderCom[DEFAULT]->Intersect(pSlimeBossCollider))
+	{
+		_float3 vSrcPosFloat = m_pColliderCom[DEFAULT]->Get_Center(CCollider::TYPE_SPHERE);
+		_vector vSrsPos = XMLoadFloat3(&vSrcPosFloat);
+
+		_float3 vDstPosFloat = pSlimeBossCollider->Get_Center(CCollider::TYPE_SPHERE);
+		_vector vDstPos = XMLoadFloat3(&vDstPosFloat);
+
+		_vector vDir = XMVector3Normalize(vSrsPos - vDstPos);
+
+		m_pTransformCom->Move(fTimeDelta * 2.f, vDir);
+	}
+}
 
 HRESULT CSlime::Add_Components(const wstring& _wstrModelTag)
 {

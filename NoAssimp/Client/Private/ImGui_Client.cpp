@@ -96,6 +96,12 @@ void CImGui_Client::ConvertToString()
 	string strWeapon = "Weapon : " + m_vecWeapon[eWeapon];
 	_uint iLastAttack = m_pPlayer->Get_Attack();
 	string strAttack = "Attack : Attack" + to_string(iLastAttack);
+	_bool bGroundCol = m_pPlayer->Get_GroundCol();
+	string strGroundCol = "GroundCol : ";
+	if (bGroundCol)
+		strGroundCol += "TRUE";
+	else
+		strGroundCol += "FALSE";
 	_bool bIsJumping = m_pPlayer->Get_IsJumping();
 	string strIsJumping = "IsJumping : ";
 	if (bIsJumping)
@@ -120,6 +126,7 @@ void CImGui_Client::ConvertToString()
 	ImGui::Text(strState.c_str());
 	ImGui::Text(strWeapon.c_str());
 	ImGui::Text(strAttack.c_str());
+	ImGui::Text(strGroundCol.c_str());
 	ImGui::Text(strIsJumping.c_str());
 	ImGui::Text(strCellIndex.c_str());
 	if (pPlayerNavigationSBR != nullptr)

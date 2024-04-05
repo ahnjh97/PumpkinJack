@@ -27,6 +27,42 @@ CNavigation::CNavigation(const CNavigation& rhs)
 		Safe_AddRef(pCell);
 }
 
+_float CNavigation::Get_PlaneHeight(_float4 vPos)
+{
+	if (m_Cells.empty() || m_iCurrentIndex >= m_Cells.size() || m_iCurrentIndex < 0)
+		return _float();
+
+	_vector vPointA = m_Cells[m_iCurrentIndex]->Get_Point(CCell::POINT_A);
+	_vector vPointB = m_Cells[m_iCurrentIndex]->Get_Point(CCell::POINT_B);
+	_vector vPointC = m_Cells[m_iCurrentIndex]->Get_Point(CCell::POINT_C);
+	_vector vPlane = ::XMPlaneFromPoints(vPointA, vPointB, vPointC);
+	_float4 vPlaneFloat{};
+	XMStoreFloat4(&vPlaneFloat, vPlane);
+
+	if (vPlaneFloat.y == 0)
+		return _float();
+
+	_float fY = (-vPlaneFloat.x * vPos.x - vPlaneFloat.z * vPos.z - vPlaneFloat.w) / vPlaneFloat.y;
+	fY += m_WorldMatrix._42;
+	return fY;
+}
+
+void CNavigation::Find_CurrentIndex(_vector vPos)
+{
+	if (m_Cells.empty())
+		return;
+
+	_int		iNeighborIndex = { -1 };
+	for (_int i = 0; i < m_Cells.size(); i++)
+	{
+		if (true == m_Cells[i]->IsIn(vPos, XMLoadFloat4x4(&m_WorldMatrix), &iNeighborIndex))
+		{
+			m_iCurrentIndex = i;
+			return;
+		}
+	}
+}
+
 HRESULT CNavigation::Initialize_Prototype(const wstring& strDataFile)
 {
 	_ulong		dwByte = { 0 };

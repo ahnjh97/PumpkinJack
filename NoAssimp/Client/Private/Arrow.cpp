@@ -51,7 +51,7 @@ void CArrow::Tick(_float fTimeDelta)
 		if (m_pColliderCom->Intersect(pPlayerCollider))
 		{
 			if (m_bDamaged == false)
-				pPlayer->Reduce_HP(20);
+				pPlayer->Change_HP(20);
 			m_bDamaged = true;
 		}
 	}

@@ -248,7 +248,7 @@ void CImGui_MapTool::OnRightClick_ObjectMode()
 
 void CImGui_MapTool::OnLeftClick_ObjectMode()
 {
-	CGameObject* pObj = m_pGameInstance->Select_ModelByPicking(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Parse"));
+	CGameObject* pObj = m_pGameInstance->Select_ModelByPicking(LEVEL_MAPTOOL, TEXT("Layer_Parse"));
 	if (pObj == nullptr)
 		return;
 
@@ -1420,6 +1420,15 @@ void CImGui_MapTool::Free()
 {
 	__super::Free();
 	Safe_Release(m_pShader);
+
+	for (auto& animation : vecAnimations)
+		Safe_Release(animation);
+	vecAnimations.clear();
+
+	Safe_Release(pNonAnimModel);
+	Safe_Release(pAnimModel);
+	Safe_Release(pAnimObject);
+
 
 	for (auto& cell : vecCells)
 		Safe_Release(cell);

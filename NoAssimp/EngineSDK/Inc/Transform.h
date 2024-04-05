@@ -37,8 +37,8 @@ public:
 
 	_float3 Get_Scaled() const {
 		_matrix		WorldMatrix = XMLoadFloat4x4(&m_WorldMatrix);
-		return _float3(XMVectorGetX(XMVector3Length(WorldMatrix.r[STATE_RIGHT])), 
-			XMVectorGetX(XMVector3Length(WorldMatrix.r[STATE_UP])), 
+		return _float3(XMVectorGetX(XMVector3Length(WorldMatrix.r[STATE_RIGHT])),
+			XMVectorGetX(XMVector3Length(WorldMatrix.r[STATE_UP])),
 			XMVectorGetX(XMVector3Length(WorldMatrix.r[STATE_LOOK])));
 	}
 
@@ -61,15 +61,15 @@ public:
 		memcpy(&m_WorldMatrix.m[eState], &vTemp, sizeof(_float4));
 	}
 	_float Get_JumpTime() { return m_fJumpTime; }
-	_bool Get_GroundCol() { return m_bGroundCol; }
+	_float Get_JumpPower() { return m_fJumpPower; }
 
 	void Set_State(STATE eState, const _float4& vState) { memcpy(&m_WorldMatrix.m[eState], &vState, sizeof(_float4)); }
 	void Set_Scaled(_float fScaleX, _float fScaleY, _float fScaleZ);
 	void Set_WorldMatrix(_float4x4 _matWorld) { m_WorldMatrix = _matWorld; }
 	void Reset_Jump() { m_fJumpTime = 0.f; m_fJumpPower = 0.f; }
-	void Set_GroundCol(_bool bGroundCol) { m_bGroundCol = bGroundCol; }
 	void Set_WallCol(_bool bWallCol) { m_bWallCol = bWallCol; }
 	void Set_PortalCol(_bool bPortalCol) { m_bPortalCol = bPortalCol; }
+	void Set_Height(_float fHeight);
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -86,7 +86,7 @@ public:
 	void Move(_float fTimeDelta, _fvector vTargetDir, class CNavigation* pNavigation = nullptr);
 	void Fall(_float fTimeDelta);
 	void Jump(_float fTimeDelta);
-	void Gravity(_float fTimeDelta);
+	//void Gravity(_float fTimeDelta);
 	void AirAttack_End() { m_fJumpTime = 0.55f / 1.3f + 0.45f; }
 
 	void Look_At(_fvector vPosition);
@@ -105,7 +105,7 @@ private:
 	_float					m_fJumpPower = { 0.f };
 	_float					m_fJumpTime = { 0.f };
 	_float					m_fGravity = { 300.f };
-	_bool					m_bGroundCol = { false };
+	//_bool					m_bGroundCol = { false };
 	_bool					m_bWallCol = { false };
 	_bool					m_bPortalCol = { false };
 

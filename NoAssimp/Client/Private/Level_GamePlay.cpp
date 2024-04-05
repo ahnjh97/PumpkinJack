@@ -292,6 +292,6 @@ CLevel_GamePlay * CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceCon
 
 void CLevel_GamePlay::Free()
 {
-	m_pGameInstance->Release_ImGui();
 	__super::Free();
+	m_pGameInstance->Release_ImGui();
 }

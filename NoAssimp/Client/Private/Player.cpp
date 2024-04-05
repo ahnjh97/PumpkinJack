@@ -65,6 +65,8 @@ HRESULT CPlayer::Initialize(void* pArg)
 	if (FAILED(Add_PartObjects((LEVEL)GameObjectDesc.iLevel)))
 		return E_FAIL;
 
+	m_pNavigationCom[DEFAULT]->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
+
 	return S_OK;
 }
 
@@ -79,10 +81,6 @@ void CPlayer::Tick(_float fTimeDelta)
 	_bool bPortalCol = Check_SlimeBossPortal(fTimeDelta);
 	if(bPortalCol)
 		m_eState = HIGHFALL;
-	_bool bGroundCol = Check_TerrainCol();
-	m_pTransformCom->Set_GroundCol(bGroundCol);
-	if (m_bIsPushingKart)
-		bGroundCol = true;
 
 	_bool bWallCol = false;
 	if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_GAMEPLAY)
@@ -98,34 +96,36 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	m_pTransformCom->Set_WallCol(bWallCol);
 
-	if (!bGroundCol && !m_bIsJumping && !bPortalCol)
+	m_bGroundCol = Check_TerrainCol();
+
+	if (m_bGroundCol)
+	{
+		m_bIsJumping = false;
+		m_pTransformCom->Reset_Jump();
+		m_iJumpCount = 2;
+	}
+
+	if (!m_bGroundCol && !m_bIsJumping && !bPortalCol && !m_bIsPushingKart)
 	{
 		m_fGravityTime += fTimeDelta;
 		m_pTransformCom->Fall(m_fGravityTime * 0.05f); // 임시 자유낙하
 	}
 	else
 		m_fGravityTime = 0;
-		
+
 	if (m_fHighFallTime >= 2.f)
 	{
-		_vector vSlimeBossRoom = ::XMVectorSet(205, -150, 150, 1);
+		_vector vSlimeBossRoom = ::XMVectorSet(205, -130, 150, 1);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vSlimeBossRoom);
 		m_fHighFallTime = 0.f;
 		m_eState = IDLE;
 		m_bInSlimeBossRoom = true;
 		m_eNavigation = SLIMEBOSSROOM;
 		// curCell 다시검사
-		m_pNavigationCom[m_eNavigation]->Set_CurrentIndex(0);
-		m_pTransformCom->Move(0.f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
+		m_pNavigationCom[m_eNavigation]->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
+		m_pNavigationCom[m_eNavigation]->Get_PlaneHeight(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION));
 	}
 
-	if (m_pTransformCom->Get_GroundCol())
-	{
-		m_bIsJumping = false;
-		m_pTransformCom->Reset_Jump();
-		m_iJumpCount = 2;
-	}
-		
 	Check_GoBackUp();
 
 	if (!m_bIsRolling)
@@ -133,6 +133,7 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	Link_Animation();
 	OnKeyInput(fTimeDelta);
+
 	if (m_bIsJumping)
 	{
 		if (m_eState != AIR_ATTACK)
@@ -144,6 +145,9 @@ void CPlayer::Tick(_float fTimeDelta)
 		}
 	}
 		
+	if (m_bGroundCol)
+		m_pTransformCom->Set_Height(m_fPlaneHeight);
+
 	Update_PositionToCam();
 	Turn_Body(fTimeDelta);
 
@@ -164,6 +168,7 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 		if (m_pNavigationCom[i] != nullptr)
 			m_pNavigationCom[i]->Late_Tick();
 	}
+	m_bPreInSlimeBossRoom = m_bInSlimeBossRoom;
 }
 
 HRESULT CPlayer::Render()
@@ -173,8 +178,8 @@ HRESULT CPlayer::Render()
 	
 	if (m_pNavigationCom[m_eNavigation] != nullptr && m_pGameInstance->Get_NavigationMode() == true)
 		m_pNavigationCom[m_eNavigation]->Render();
-	
 #endif
+
 	return S_OK;
 }
 
@@ -206,6 +211,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPushPos);
 		m_bIsPushingKart = true;
 		m_eState = PUSHING;
+		m_bGroundCol = true;
 	}
 	else
 		m_bIsPushingKart = false;
@@ -373,18 +379,32 @@ void CPlayer::Link_Animation()
 
 _bool CPlayer::Check_TerrainCol()
 {
+	_float fJumpTime = m_pTransformCom->Get_JumpTime();
+
+	if (m_bIsJumping && fJumpTime <= 0.3f && fJumpTime > 0.f)
+		return false;
+
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	if (m_bInSlimeBossRoom == false)
 	{
-		if (vPos.y <= -0.f)
+		_float fPlaneHeight = m_pNavigationCom[DEFAULT]->Get_PlaneHeight(vPos);
+		if (vPos.y <= fPlaneHeight)
+		{
+			m_fPlaneHeight = fPlaneHeight;
 			return true;
+		}
+			
 		else if (Check_GroundColliders())
 			return true;
 	}
 	else
 	{
-		if (vPos.y <= -150.f)
+		_float fSBR_PlaneHeight = m_pNavigationCom[SLIMEBOSSROOM]->Get_PlaneHeight(vPos);
+		if (vPos.y <= fSBR_PlaneHeight)
+		{
+			m_fPlaneHeight = fSBR_PlaneHeight;
 			return true;
+		}
 	}
 
 	return false;
@@ -409,8 +429,15 @@ _bool CPlayer::Check_GroundColliders()
 		if (pPillarGroundCollider == nullptr)
 			continue;
 
-		if (m_pColliderCom->Intersect(pPillarGroundCollider) && m_pColliderCom->Get_HightestPoint(CCollider::TYPE_OBB) > fY)
-			return true;
+		if (m_pColliderCom->Intersect(pPillarGroundCollider))
+		{
+			_float fPillarGroundColliderHeight = pPillarGroundCollider->Get_HightestPoint(CCollider::TYPE_OBB);
+			if (fPillarGroundColliderHeight <= fY + 2.0f && m_pTransformCom->Get_JumpPower() <= 0.f)
+			{
+				m_fPlaneHeight = fPillarGroundColliderHeight - 1.5f;
+				return true;
+			}
+		}
 	}
 	
 	return false;
@@ -566,8 +593,7 @@ void CPlayer::Check_GoBackUp()
 			m_iSlimeBossRoomEscapeCount++;
 			m_eNavigation = DEFAULT;
 			// curCell 다시검사
-			m_pNavigationCom[m_eNavigation]->Set_CurrentIndex(0);
-			m_pTransformCom->Move(0.f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
+			m_pNavigationCom[m_eNavigation]->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 		}
 	}
 }

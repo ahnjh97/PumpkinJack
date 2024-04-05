@@ -20,6 +20,9 @@ public:
 	_int Get_CurrentIndex() { return m_iCurrentIndex; }
 	void Set_CurrentIndex(_int iCurIndex) { m_iCurrentIndex = iCurIndex; }
 	_float3 Get_LineDir() { return m_vLineDir; }
+	_float Get_PlaneHeight(_float4 vPos);
+
+	void Find_CurrentIndex(_vector vPos);
 
 public:
 	virtual HRESULT Initialize_Prototype(const wstring& strDataFile);

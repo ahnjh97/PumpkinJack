@@ -103,8 +103,8 @@ HRESULT CPillar::Add_Components(const wstring& _wstrModelTag)
 
 	/* For.Com_Collider */
 	CBounding_OBB::BOUNDING_OBB_DESC		ColliderDesc{};
-	ColliderDesc.vSize = _float3(10, 1, 8);
-	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f + 39, 0.f);
+	ColliderDesc.vSize = _float3(10, 3, 8);
+	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f + 37, 0.f);
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"),
 		TEXT("Com_Collider_Ground"), (CComponent**)&m_pColliderCom[COLLIDER_GROUND], &ColliderDesc)))
 		return E_FAIL;

@@ -239,6 +239,6 @@ CLevel_SlimeBoss* CLevel_SlimeBoss::Create(ID3D11Device* pDevice, ID3D11DeviceCo
 
 void CLevel_SlimeBoss::Free()
 {
-	m_pGameInstance->Release_ImGui();
 	__super::Free();
+	m_pGameInstance->Release_ImGui();
 }

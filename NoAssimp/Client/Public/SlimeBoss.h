@@ -32,6 +32,7 @@ private:
 	void PortalSpawn();
 	void SlimeSpawn();
 	void SlimeDamageZoneSpawn(_uint iNum);
+	void DeathEffect();
 
 private:
 	CModel* m_pModelCom = { nullptr };
@@ -39,6 +40,7 @@ private:
 	map<const wstring, CPart*> m_Parts;
 	class CPlayer* m_pPlayer = { nullptr };
 	const _float4x4* m_pPlayerWorldMatrix = { nullptr };
+	CCollider* m_pColliderCom = { nullptr };
 
 	SLIMEBOSS m_eState = { SLIMEBOSS_SPAWN };
 	SLIMEBOSS m_ePreState = { SLIMEBOSS_SPAWN };

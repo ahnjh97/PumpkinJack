@@ -5,6 +5,7 @@
 BEGIN(Engine)
 class CModel;
 class CShader;
+class CNavigation;
 END
 
 BEGIN(Client)

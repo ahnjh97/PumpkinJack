@@ -29,8 +29,9 @@ public:
 		else { return m_pTransformCom->Get_WorldFloat4x4_Ptr(); }}
 	_bool Get_InSlimeBossRoom() { return m_bInSlimeBossRoom; }
 	_uint Get_SlimeBossRoomEscapeCount() { return m_iSlimeBossRoomEscapeCount; }
+	_bool Get_GroundCol() { return m_bGroundCol; }
 
-	void Reduce_HP(_float fDamage) { ; }
+	void Change_HP(_float fDamage) { ; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -63,10 +64,12 @@ private:
 	vector<string> m_vecWeaponName = { "Spear", "Rifle", "Scythe", "WPN_END" };
 	NAVIGATION m_eNavigation = {};
 
+	_bool m_bGroundCol = { false };
 	_bool m_bIsJumping = { false };
 	_bool m_bIsAttacking = { false };
 	_bool m_bIsRolling = { false };
 	_bool m_bInSlimeBossRoom = { false };
+	_bool m_bPreInSlimeBossRoom = { false };
 	_bool m_bIsPushingKart = { false };
 	_bool m_bKartCol = { false };
 
@@ -76,6 +79,7 @@ private:
 	_float m_fRollEndTime = {};
 	_float m_fHighFallTime = {};
 	_float m_fGravityTime = {};
+	_float m_fPlaneHeight = {};
 
 	_float3	m_vDirection = {};
 	_float3 m_vKartLook = {};

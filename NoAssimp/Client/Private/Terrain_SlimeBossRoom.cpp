@@ -68,23 +68,26 @@ HRESULT CTerrain_SlimeBossRoom::Render()
 	if (m_bHide)
 		return S_OK;
 
-	if (FAILED(Bind_ShaderResources()))
-		return E_FAIL;
+	if (m_pGameInstance->Get_NavigationMode() == false)
+	{
+		if (FAILED(Bind_ShaderResources()))
+			return E_FAIL;
 
-	/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-	if (FAILED(m_pShaderCom->Begin(m_iPassIndex)))
-		return E_FAIL;
+		///* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
+		if (FAILED(m_pShaderCom->Begin(m_iPassIndex)))
+			return E_FAIL;
 
-	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
-		return E_FAIL;
+		if (FAILED(m_pVIBufferCom->Bind_Buffers()))
+			return E_FAIL;
 
-	if (FAILED(m_pVIBufferCom->Render()))
-		return E_FAIL;
+		/*if (FAILED(m_pVIBufferCom->Render()))
+			return E_FAIL;*/
 
-#ifdef _DEBUG
-	if (m_pNavigationCom != nullptr && m_pGameInstance->Get_NavigationMode() == false)
-		m_pNavigationCom->Render();
-#endif
+		#ifdef _DEBUG
+		if (m_pNavigationCom != nullptr)
+			m_pNavigationCom->Render();
+		#endif
+	}
 
 	return S_OK;
 }
