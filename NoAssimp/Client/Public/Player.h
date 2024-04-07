@@ -30,8 +30,7 @@ public:
 	_bool Get_InSlimeBossRoom() { return m_bInSlimeBossRoom; }
 	_uint Get_SlimeBossRoomEscapeCount() { return m_iSlimeBossRoomEscapeCount; }
 	_bool Get_GroundCol() { return m_bGroundCol; }
-
-	void Change_HP(_float fDamage) { ; }
+	_float Get_PlayerHpRatio() { return m_iHp * 0.01f; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -52,10 +51,17 @@ private:
 	_bool Check_WallColliders(list<CGameObject*> objList, CCollider::TYPE eColliderType, const wstring& wstrColliderTag = TEXT("Com_Collider_Wall"));
 	_bool Check_WallColliders_LevelSlimeBoss();
 	_bool Check_WallColliders_LevelGamePlay();
-	_bool Check_SlimeBossPortal(_float fTimeDelta);
+	_bool Check_SlimeBossPortalCol(_float fTimeDelta);
 	_bool Check_Kart();
+
+	void Check_GoToSlimeBossRoom();
 	void Check_GoBackUp();
 	void Update_KartPush(_bool bPush);
+	void Reset_WeaponCollider(WEAPON eWeapon);
+	void TargetNearestEnemy();
+	void Check_EnemyDistance(LEVEL eLevel, const wstring& wstrLayerTag, CCollider::TYPE eColliderType, const wstring& wstrColliderTag = TEXT("Com_Collider"));
+	void SetUp_Damage();
+	void Activate_Weapon();
 
 private:
 	STATE m_eState = { PLAYER_END };
@@ -63,6 +69,8 @@ private:
 	_uint m_iLastAttack = {};
 	vector<string> m_vecWeaponName = { "Spear", "Rifle", "Scythe", "WPN_END" };
 	NAVIGATION m_eNavigation = {};
+	CCollider* m_pNearestEnemyCollider = { nullptr };
+	CCollider::TYPE m_eEnemyColliderType = {};
 
 	_bool m_bGroundCol = { false };
 	_bool m_bIsJumping = { false };
@@ -72,14 +80,17 @@ private:
 	_bool m_bPreInSlimeBossRoom = { false };
 	_bool m_bIsPushingKart = { false };
 	_bool m_bKartCol = { false };
+	_bool m_bScytheRifleRollAttack = { true };
 
 	_uint m_iJumpCount = { 2 };
 	_uint m_iSlimeBossRoomEscapeCount = {};
+	_uint m_iDamage = {};
 
-	_float m_fRollEndTime = {};
+	_float m_fRollEndTime = { 1.f };
 	_float m_fHighFallTime = {};
 	_float m_fGravityTime = {};
 	_float m_fPlaneHeight = {};
+	_float m_fEnemyDistance = {};
 
 	_float3	m_vDirection = {};
 	_float3 m_vKartLook = {};
@@ -92,9 +103,9 @@ private:
 private:
 	map<const wstring, CPart*> m_Parts;
 	CCamera_Jack* m_pCamera = { nullptr };
-	CCollider* m_pColliderCom = { nullptr };
+	CCollider* m_pColliderCom = {nullptr};
 	CNavigation* m_pNavigationCom[NAVIGATION_END] = { nullptr, nullptr };
-
+	
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

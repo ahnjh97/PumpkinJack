@@ -36,19 +36,17 @@ HRESULT CSoldier::Initialize(void* pArg)
 		Soldier_AnimSpeed();
 
 	m_pModelCom->Set_Animation(10, false); // SPAWN
+	m_iPreHp = m_iHp = 40;
 	return S_OK;
 }
 
 void CSoldier::Tick(_float fTimeDelta)
-{
+{		
 	if (nullptr == m_pPlayerWorldMat)
 		Get_PlayerWorldMatPtr();
 	
 	if (nullptr == m_pPlayerWorldMat)
 		return;
-
-	if (true == m_pModelCom->isFinished())
-		m_eState = SOLDIER_IDLE;
 
 	if (m_eState == SOLDIER_IDLE)
 		m_fIdleTime += fTimeDelta;
@@ -79,7 +77,7 @@ void CSoldier::Tick(_float fTimeDelta)
 		{
 			if (m_eState == SOLDIER_SPIN)
 			{
-				_float fPlayRatio = m_pModelCom->Get_AnimPlayRatio(14);
+				_float fPlayRatio = m_pModelCom->Get_AnimPlayRatio();
 				if (fPlayRatio >= 0.4f && fPlayRatio <= 0.7f)
 					m_pTransformCom->Look_At_ForLandObject(XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1));
 			}
@@ -89,17 +87,15 @@ void CSoldier::Tick(_float fTimeDelta)
 			
 	}
 
-	
 	if (m_eState == SOLDIER_RUN)
 		m_pTransformCom->Move(fTimeDelta * 2.8f, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
 	else if (m_eState == SOLDIER_SPIN)
 	{
-		_float fPlayRatio = m_pModelCom->Get_AnimPlayRatio(14);
+		_float fPlayRatio = m_pModelCom->Get_AnimPlayRatio();
 		if(fPlayRatio >= 0.4f && fPlayRatio <= 0.7f)
 			m_pTransformCom->Move(fTimeDelta * 1.9f, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
 	}
 		
-
 	for(_int i = 0; i < COLLIDER_END; i++)
 		m_pColliderCom[i]->Tick(m_pTransformCom->Get_WorldMatrix());
 }
@@ -108,6 +104,7 @@ void CSoldier::Late_Tick(_float fTimeDelta)
 {
 	m_pModelCom->Play_Animation(fTimeDelta);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	m_iPreHp = m_iHp;
 }
 
 HRESULT CSoldier::Render()
@@ -133,8 +130,7 @@ HRESULT CSoldier::Render()
 	}
 
 #ifdef _DEBUG
-	for (_int i = 0; i < COLLIDER_END; i++)
-		m_pColliderCom[i]->Render();
+	m_pColliderCom[DEFAULT]->Render();
 #endif
 
 	return S_OK;
@@ -153,19 +149,36 @@ void CSoldier::Get_PlayerWorldMatPtr()
 
 void CSoldier::LinkState()
 {
-	if (m_eState == SOLDIER_DEATH && m_pModelCom->isFinished())
+	if (m_eState == SOLDIER_DEATH)
 	{
-		DeathEffect();
-		Set_Dead();
+		if (m_pModelCom->isFinished())
+		{
+			DeathEffect();
+			Set_Dead();
+		}
+		return;
 	}
 
-	if (m_iHp <= 0)
+	if (m_iHp<=0)
 	{
 		m_eState = SOLDIER_DEATH;
 		return;
 	}
-		
-	if (m_fIdleTime >= 0.2f)
+
+	if (m_iPreHp != m_iHp)
+	{
+		if (SOLDIER_HIT == m_eState)
+			m_pModelCom->Reset_Animation(string("chevalier_Anim_hit"));
+
+		if (SOLDIER_SPIN == m_eState) {
+			if(m_pModelCom->Get_AnimPlayRatio() > 0.7f)
+				m_eState = SOLDIER_HIT;
+		}
+		else
+			m_eState = SOLDIER_HIT;
+	}
+
+	if (m_eState == SOLDIER_IDLE && m_fIdleTime >= 0.2f && m_iHp > 0)
 		m_eState = SOLDIER_RUN;
 
 	if (m_eState == SOLDIER_RUN && true == IsPlayerInRange())
@@ -182,7 +195,7 @@ void CSoldier::LinkState()
 		}
 	}
 
-	if ((m_eState == SOLDIER_ATTACK || m_eState == SOLDIER_SPIN) && m_pModelCom->isFinished())
+	if ((m_eState == SOLDIER_ATTACK || m_eState == SOLDIER_SPIN || m_eState == SOLDIER_SPAWN || m_eState == SOLDIER_HIT) && m_pModelCom->isFinished())
 		m_eState = SOLDIER_IDLE;
 }
 
@@ -210,7 +223,7 @@ void CSoldier::StateToAnimation()
 		strAnim = "chevalier_Anim_hit";
 		break;
 	case Client::SOLDIER_DEATH:
-		strAnim = "chevalier_Anim_Death";
+		strAnim = "chevalier_Anim_death";
 		break;
 	}
 

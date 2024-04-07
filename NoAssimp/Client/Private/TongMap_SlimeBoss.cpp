@@ -157,7 +157,7 @@ HRESULT CTongMap_SlimeBoss::Bind_ShaderResources()
 	if (FAILED(m_pTextureCom[TEX_CAUSTIC]->Bind_ShaderResource(m_pShaderCom[SLIMEBOSSROOM], "g_CausticTexture", 0)))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom[SLIMEBOSSROOM]->Bind_RawValue("g_Offset_Y", &m_fOffset_Y, sizeof(_float))))
+	if (FAILED(m_pShaderCom[SLIMEBOSSROOM]->Bind_RawValue("g_fOffset_Y", &m_fOffset_Y, sizeof(_float))))
 		return E_FAIL;
 	return S_OK;
 }

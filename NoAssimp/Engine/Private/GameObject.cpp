@@ -115,21 +115,6 @@ HRESULT CGameObject::Add_Component(_uint iLevelIndex, const wstring & strPrototy
 	return S_OK;
 }
 
-HRESULT CGameObject::Deactivate_BackFaceCulling()
-{
-	// 후면컬링 끄기
-	ID3D11RasterizerState* raterizerState;
-	D3D11_RASTERIZER_DESC rasterizerDesc;
-	ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
-	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	rasterizerDesc.CullMode = D3D11_CULL_NONE;
-	rasterizerDesc.FrontCounterClockwise = FALSE;
-	if (FAILED(m_pDevice->CreateRasterizerState(&rasterizerDesc, &raterizerState)))
-		return E_FAIL;
-	m_pContext->RSSetState(raterizerState);
-	return S_OK;
-}
-
 void CGameObject::Free()
 {
 	__super::Free();

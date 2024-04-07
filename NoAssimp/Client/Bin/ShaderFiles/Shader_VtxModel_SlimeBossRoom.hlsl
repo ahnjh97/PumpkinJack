@@ -5,7 +5,7 @@
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 texture2D	g_Texture, g_WaterTexture, g_CausticTexture;
-float g_Offset_Y;
+float g_fOffset_Y;
 
 struct VS_IN
 {
@@ -56,7 +56,7 @@ float3 slimeLightGreen = float3(0.4, 1.0, 0.4); // 슬라임의 밝은 부분
 PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
-    In.vTexcoord.y += g_Offset_Y;
+    In.vTexcoord.y += g_fOffset_Y;
     In.vTexcoord.y = fmod(In.vTexcoord.y, 1.0);
 	
     vector vDiffuseColor = g_WaterTexture.Sample(LinearSampler, In.vTexcoord);

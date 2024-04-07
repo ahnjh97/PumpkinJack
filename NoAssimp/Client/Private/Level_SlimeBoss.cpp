@@ -137,6 +137,16 @@ HRESULT CLevel_SlimeBoss::Ready_Layer_BackGround(const wstring& strLayerTag)
 	terrainDesc.matWorld._42 = -155.f;
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, strLayerTag, TEXT("Prototype_GameObject_Terrain_SlimeBossRoom"), &terrainDesc)))
 		return E_FAIL;
+
+	tDesc.matWorld._11 = 15.f;
+	tDesc.matWorld._22 = 15.f;
+	tDesc.matWorld._33 = 15.f;
+	tDesc.matWorld._41 = 200.f;
+	tDesc.matWorld._42 = 10.f;
+	tDesc.matWorld._43 = 100.f;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_Portal"), TEXT("Prototype_GameObject_Portal"), &tDesc)))
+	//	return E_FAIL;
+
 	return S_OK;
 }
 

@@ -28,11 +28,12 @@ public:
 	_int Get_AnimIndex(const string& strAnimName);
 	_bool Get_IsLerping() { return m_bIsLerping; }
 	_uint Get_AnimPlayCount(_uint iAnimIndex) { return m_Animations[iAnimIndex]->Get_PlayCount(); }
-	_float Get_AnimPlayRatio(_uint iAnimIndex) { return m_Animations[iAnimIndex]->Get_PlayRatio(); }
+	_float Get_AnimPlayRatio() { return m_Animations[m_iCurrentAnimIndex]->Get_PlayRatio(); }
 	_bool Get_Shrinked() {
 		if (abs(m_vOriginalScale.x / m_vScale.x) > 33.f) { return true; }
 	else { return false; }}
 	vector<_uint> Get_MeshShaderType() { return m_vecMeshShaderType; }
+	_float Get_LerpRatio() { return m_fLerpRatio; }
 
 	void Set_Animation(_uint iAnimIndex, _bool isLoop) {
 		if (m_bIsNonAnimVersion) return;

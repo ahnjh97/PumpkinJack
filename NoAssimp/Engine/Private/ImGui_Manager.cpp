@@ -77,6 +77,6 @@ CImGui_Manager* CImGui_Manager::Create(CMyImGui* pImGui)
 
 void CImGui_Manager::Free()
 {
-	Safe_Release(m_pImGui);
 	__super::Free();
+	Safe_Release(m_pImGui);
 }

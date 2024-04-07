@@ -30,6 +30,26 @@ void CTransform::Set_Height(_float fHeight)
 	Set_State(CTransform::STATE_POSITION, vPos);
 }
 
+_vector CTransform::Get_Pos_Vector()
+{
+	return Get_State_Vector(STATE_POSITION);
+}
+
+_float4 CTransform::Get_Pos_Float4()
+{
+	return Get_State_Float4(STATE_POSITION);
+}
+
+void CTransform::Set_Pos(const _float4& vPos)
+{
+	Set_State(STATE_POSITION, vPos);
+}
+
+void CTransform::Set_Pos(_fvector vPos)
+{
+	Set_State(STATE_POSITION, vPos);
+}
+
 HRESULT CTransform::Initialize_Prototype()
 {
 	XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());

@@ -42,6 +42,8 @@ void CSlimeBossHead::Tick(_float fTimeDelta)
 	{
 		m_pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_SLIMEBOSS));
 		m_pPlayerWorldMat = m_pPlayer->Get_PlayerWorldMatrixPtr();
+		if (m_pPlayer != nullptr)
+			Safe_AddRef(m_pPlayer);
 	}
 
 	if (m_pPlayer == nullptr)
@@ -74,7 +76,7 @@ void CSlimeBossHead::Tick(_float fTimeDelta)
 		{
 			if (m_fDamageTime >= 1.f)
 			{
-				m_pPlayer->Change_HP(20);
+				m_pPlayer->Deduct_HP(20);
 				m_fDamageTime = 0.f;
 				m_bCollision = true;
 			}
@@ -186,7 +188,7 @@ void CSlimeBossHead::StateToAction(_float fTimeDelta)
 	{
 		_float fMaxSpeed = 52.f;
 		m_fDashTime += fTimeDelta;
-		m_pTransformCom->Move(cos(m_fDashTime * 0.7f) * fMaxSpeed * fTimeDelta, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
+		m_pTransformCom->Move(cos(m_fDashTime * 0.7f) * fMaxSpeed * fTimeDelta, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), m_pNavigationCom);
 
 		if (m_fDashTime >= 1.f || m_bCollision)
 		{
@@ -216,6 +218,14 @@ HRESULT CSlimeBossHead::Add_Components(const wstring& _wstrModelTag)
 	ColliderDesc.vCenter = _float3(0.f, 0, 0.f);
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom, &ColliderDesc)))
+		return E_FAIL;
+
+	/* For.Com_Navigation */
+	CNavigation::NAVIGATION_DESC	NavigationDesc{};
+	NavigationDesc.iCurrentIndex = 0;
+
+	if (FAILED(__super::Add_Component(LEVEL_SLIMEBOSS, TEXT("Prototype_Component_Navigation_SlimeBossRoom"),
+		TEXT("Com_Navigation_SlimeBossRoom"), (CComponent**)&m_pNavigationCom, &NavigationDesc)))
 		return E_FAIL;
 
 	return S_OK;

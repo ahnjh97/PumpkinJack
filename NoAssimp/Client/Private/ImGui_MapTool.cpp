@@ -167,13 +167,14 @@ HRESULT CImGui_MapTool::Render()
 	if (!Is_IMGUI_Switch || !bCellMode)
 		return S_OK;
 
+#ifdef _DEBUG
 	CGrid* pGrid = dynamic_cast<CGrid*>(m_pGameInstance->Get_GameObject(LEVEL_MAPTOOL, TEXT("Layer_Grid"), TEXT("Prototype_GameObject_Grid")));
-	if (pGrid != nullptr) 
+	if (pGrid != nullptr)
 	{
 		if (m_pShader == nullptr)
 			return S_OK;
 		CTransform* pGridTransform = dynamic_cast<CTransform*>(pGrid->Get_Component(g_strTransformTag));
-		
+
 		if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", pGridTransform->Get_WorldFloat4x4_Ptr())))
 			return E_FAIL;
 
@@ -199,6 +200,7 @@ HRESULT CImGui_MapTool::Render()
 			}
 		}
 	}
+#endif 
 
 	return S_OK;
 }
@@ -1421,14 +1423,13 @@ void CImGui_MapTool::Free()
 	__super::Free();
 	Safe_Release(m_pShader);
 
-	for (auto& animation : vecAnimations)
-		Safe_Release(animation);
-	vecAnimations.clear();
+	/*for (auto& anim : vecAnimations)
+		Safe_Release(anim);
+	vecAnimations.clear();*/
 
-	Safe_Release(pNonAnimModel);
-	Safe_Release(pAnimModel);
-	Safe_Release(pAnimObject);
-
+	pNonAnimModel = nullptr;
+	pAnimModel = nullptr;
+	pAnimObject = nullptr;
 
 	for (auto& cell : vecCells)
 		Safe_Release(cell);

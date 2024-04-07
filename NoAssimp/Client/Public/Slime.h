@@ -32,6 +32,9 @@ private:
 	void Check_PillarCol(_float fTimeDelta);
 	void Check_SlimeBossCol(_float fTimeDelta);
 
+	void DeathEffect();
+	void ExplodeEffect();
+
 private:
 	SLIME m_eState = { SLIME_MOVE };
 
@@ -45,7 +48,10 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	map<const wstring, CPart*> m_Parts;
 	CCollider* m_pColliderCom[COLLIDER_END] = {nullptr};
+	class CPlayer* m_pPlayer = { nullptr };
 	const _float4x4* m_pPlayerWorldMat = { nullptr };
+	CCollider* m_pPlayerCollider = { nullptr };
+	CCollider* m_pSlimeBossCollider = { nullptr };
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);

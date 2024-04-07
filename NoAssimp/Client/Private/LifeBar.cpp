@@ -44,12 +44,6 @@ HRESULT CLifeBar::Initialize(void* pArg)
 		m_fX -= 430;
 		m_fY += 290;
 	}
-	//else if (m_fZ == fZ_LifeBar)
-	//{
-	//	m_fSizeX = m_fSizeY = 340;
-	//	m_fX -= 430;
-	//	m_fY += 300;
-	//}
 	else if (m_fZ == fZ_CrowLifeBar)
 	{
 		m_fSizeX = 323.5f;
@@ -86,6 +80,20 @@ void CLifeBar::Tick(_float fTimeDelta)
 	}
 
 	m_fOffset_Y += 0.002f;
+	m_fTime += fTimeDelta * 2.f;
+	m_fPreHpRatio = m_fHpRatio;
+
+	if (m_fZ == fZ_LifeBarMask)
+		m_fHpRatio = m_pPlayer->Get_PlayerHpRatio();
+
+	if (m_fHpRatio != m_fPreHpRatio)
+	{
+		m_fHpDifference = m_fRenderedHpRatio - m_fHpRatio;
+		m_fTime = 0.f;
+	}
+
+	if (m_fTime >= 0 && m_fTime <= 1.f)
+		Lerp_Hp(fTimeDelta);
 }
 
 void CLifeBar::Late_Tick(_float fTimeDelta)
@@ -109,6 +117,18 @@ HRESULT CLifeBar::Render()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CLifeBar::Lerp_Hp(_float fTimeDelta)
+{
+	if (m_fHpDifference >= 1.f)
+		m_fHpDifference = 1.f;
+
+	_float decreaseRate = (1 - cosf(m_fTime * XM_PI)) * m_fHpDifference * 2.f;
+
+	m_fRenderedHpRatio -= decreaseRate * fTimeDelta;
+
+	m_fRenderedHpRatio = fmax(0.0f, m_fRenderedHpRatio);
 }
 
 HRESULT CLifeBar::Add_Components()
@@ -151,8 +171,6 @@ HRESULT CLifeBar::Bind_ShaderResources()
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
-	//if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
-	//	return E_FAIL;
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
@@ -166,7 +184,9 @@ HRESULT CLifeBar::Bind_ShaderResources()
 	{
 		if (FAILED(m_pTextureCom[TYPE_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0)))
 			return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_Offset_Y", &m_fOffset_Y, sizeof(_float))))
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fOffset_Y", &m_fOffset_Y, sizeof(_float))))
+			return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fHpRatio", &m_fRenderedHpRatio, sizeof(_float))))
 			return E_FAIL;
 	}
 

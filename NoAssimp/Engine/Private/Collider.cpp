@@ -71,6 +71,14 @@ _float3 CCollider::Get_ColliderLook()
 	return m_pBounding->Get_ColliderLook();
 }
 
+_bool CCollider::Check_AlreadyCollided(CCollider* pEnemyCollider)
+{
+	if (m_CollidedColliders.find(pEnemyCollider) != m_CollidedColliders.end())
+		return true;
+
+	return _bool();
+}
+
 HRESULT CCollider::Initialize_Prototype(TYPE eType)
 {
 	m_eType = eType;
@@ -142,6 +150,7 @@ _bool CCollider::Intersect_Ray(_fvector vRayOrigin, _fvector vRayDir, _float& fD
 	return m_pBounding->Intersect_Ray(vRayOrigin, vRayDir, fDis);
 }
 
+#ifdef _DEBUG
 HRESULT CCollider::Render()
 {
 	if (!m_pGameInstance->Get_Toggle())
@@ -166,6 +175,7 @@ HRESULT CCollider::Render()
 
 	return S_OK;
 }
+#endif // DEBUG
 
 CCollider* CCollider::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType)
 {

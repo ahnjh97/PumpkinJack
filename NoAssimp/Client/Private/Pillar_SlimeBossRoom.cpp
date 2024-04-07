@@ -37,17 +37,14 @@ HRESULT CPillar_SlimeBossRoom::Initialize(void* pArg)
 	m_pTransformCom->Turn(XMVectorSet(1, 0, 1, 0), 0.1f);
 	m_pTransformCom->Turn(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(m_pGameInstance->RandomNumber(0, 360) / 90.f));
 	m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), XMConvertToRadians(m_pGameInstance->RandomNumber(0, 360) / 90.f));
-
+	m_iHp = 40;
 	return S_OK;
 }
 
 void CPillar_SlimeBossRoom::Tick(_float fTimeDelta)
 {
-	if(m_iHP <=0)
+	if(m_iHp <=0)
 		Set_Dead();
-
-	if (Check_PlayerAtkCol())
-		m_iHP--;
 
 	if (Check_HeadCol())
 		Set_Dead();
@@ -83,11 +80,6 @@ HRESULT CPillar_SlimeBossRoom::Render()
 #endif
 
 	return S_OK;
-}
-
-_bool CPillar_SlimeBossRoom::Check_PlayerAtkCol()
-{
-	return _bool();
 }
 
 _bool CPillar_SlimeBossRoom::Check_HeadCol()

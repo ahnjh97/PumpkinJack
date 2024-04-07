@@ -27,6 +27,7 @@ public:
 	void Set_Dead() { m_bDead = true; }
 	_uint Get_Level() { return m_iLevel; }
 	void Set_Hide(_bool bHide) { m_bHide = bHide; }
+	void Deduct_HP(_int iDamage) { m_iHp -= iDamage; }
 
 public:
 	class CComponent* Get_Component(const wstring& strComTag);
@@ -50,14 +51,14 @@ protected:
 
 protected:
 	HRESULT Add_Component(_uint iLevelIndex, const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut, void* pArg = nullptr);
-	
-	HRESULT Deactivate_BackFaceCulling();
 
 protected:
 	_bool m_bHide = { false };
 	_bool m_bDead = false;
 	wstring wstrPrototypeTag = {};
 	_uint m_iLevel = {};
+	_int m_iHp = {};
+	_uint* m_pCurLevel = { nullptr };
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

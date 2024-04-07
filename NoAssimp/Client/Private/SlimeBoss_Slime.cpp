@@ -30,6 +30,7 @@ HRESULT CSlimeBoss_Slime::Initialize(void* pArg)
 
 	m_pModelCom->Set_Animation(SLIMEBOSS_SPAWN, false);
 	m_pModelCom->Set_LerpTime(0.2f);
+	m_pModelCom->Set_AnimSpeed(SLIMEBOSS_MEGASPAWN, 0.7f);
 	return S_OK;
 }
 

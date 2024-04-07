@@ -35,6 +35,13 @@ RasterizerState RS_Sky
 	FrontCounterClockwise = false;
 };
 
+RasterizerState RS_NoCull
+{
+    FillMode = Solid;
+    CullMode = None;
+    FrontCounterClockwise = false;
+};
+
 DepthStencilState DSS_Default
 {
 	DepthEnable = true;

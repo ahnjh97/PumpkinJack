@@ -20,6 +20,9 @@ private:
 	virtual ~CSoldier() = default;
 
 public:
+	SOLDIER Get_SoldierState() { return m_eState; }
+
+public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Tick(_float fTimeDelta) override;
@@ -41,8 +44,8 @@ private:
 
 	_bool m_bSpinAttack = { false };
 
-	_int m_iHp = { 100 };
-	
+	_int m_iPreHp = {};
+
 	_float m_fIdleTime = {};
 	_float m_fTurnTime = {100.f};
 

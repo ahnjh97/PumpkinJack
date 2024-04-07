@@ -210,6 +210,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_MinePlatform"), TEXT("Prototype_GameObject_Monster"), &tempDesc)))
 				return E_FAIL;
 		}
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_waterPlane"))
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Water"), TEXT("Prototype_GameObject_Water"), &tempDesc)))
+				return E_FAIL;
+		}
 		else
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Monster"), &tempDesc)))

@@ -26,6 +26,7 @@
 #include "CrateBox.h"
 #include "Trigger.h"
 #include "Soldier.h"
+#include "Water.h"
 
 #include "SlimeBoss.h"
 #include "SlimeBoss_Slime.h"
@@ -202,6 +203,7 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CrateBox"), CCrateBox);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Trigger"), CTrigger);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Soldier"), CSoldier);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Water"), CWater);
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
 	m_isFinished = true;
@@ -429,6 +431,14 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_AlphaTex.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 		return E_FAIL;
 
+	if (eLevel == LEVEL_GAMEPLAY)
+	{
+		/* For.Prototype_Component_Shader_VtxModel_Water */
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_Water"),
+			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_Water.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+			return E_FAIL;
+	}
+
 	if (eLevel == LEVEL_SLIMEBOSS)
 	{
 		/* For.Prototype_Component_Shader_VtxModel_Knife */
@@ -439,6 +449,11 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 		/* For.Prototype_Component_Shader_VtxModel_SlimeBossRoom */
 		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_SlimeBossRoom"),
 			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_SlimeBossRoom.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+			return E_FAIL;
+
+		/* For.Prototype_Component_Shader_VtxPosTex_Portal */
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxPosTex_Portal"),
+			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex_Portal.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
 			return E_FAIL;
 	}
 

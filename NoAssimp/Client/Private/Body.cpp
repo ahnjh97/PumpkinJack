@@ -169,7 +169,7 @@ void CBody::Initialize_AnimSpeed()
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_AirAttack_End"), 3.f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_Roll"), 1.8f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_Roll"), 3.2f);
-	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Roll"), 2.4f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Roll"), 1.8f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Roll"), 3.8f);
 	
 	for(int i = 1; i< 4; i++)
@@ -221,7 +221,6 @@ HRESULT CBody::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))
 		return E_FAIL;
 

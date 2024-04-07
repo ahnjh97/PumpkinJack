@@ -29,27 +29,9 @@ HRESULT CCell::Initialize(_int iTerrainIndex, const _float3* vPoints, const _int
 	m_iIndex = iIndex;
 
 #ifdef _DEBUG
-
 	m_pVIBuffer = CVIBuffer_Cell::Create(m_pDevice, m_pContext, m_vPoints);
 	if (nullptr == m_pVIBuffer)
 		return E_FAIL;
-
-	CGameInstance* pGameInstance =  CGameInstance::Get_Instance();
-	if (*pGameInstance->Get_CurrentLevelID() == Level_MapTool)
-	{
-		CBounding_Sphere::BOUNDING_SPHERE_DESC		ColliderDesc{};
-		ColliderDesc.fRadius = 1;
-		ColliderDesc.vCenter = _float3(0.f, 0.f, 0.f);
-		m_pCollider = CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_SPHERE);
-		m_pCollider->Initialize(&ColliderDesc);
-
-		_float AvgX = (m_vPoints[0].x + m_vPoints[1].x + m_vPoints[2].x) / 3.f;
-		_float AvgY = (m_vPoints[0].y + m_vPoints[1].y + m_vPoints[2].y) / 3.f;
-		_float AvgZ = (m_vPoints[0].z + m_vPoints[1].z + m_vPoints[2].z) / 3.f;
-		_fmatrix matCell = XMMatrixTranslationFromVector(XMVectorSet(AvgX, AvgY, AvgZ, 1));
-		m_pCollider->Tick(matCell);
-	}
-
 #endif
 
 	return S_OK;
@@ -121,14 +103,6 @@ HRESULT CCell::Render()
 	return m_pVIBuffer->Render();
 }
 
-HRESULT CCell::ColliderRender()
-{
-	if (m_pCollider != nullptr)
-		return S_OK;
-
-	return m_pCollider->Render();
-}
-
 #endif
 
 CCell* CCell::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _int iTerrainIndex, const _float3* pPoints, const _int* pNeighborIndices, _uint iIndex)
@@ -148,7 +122,6 @@ CCell* CCell::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _int 
 void CCell::Free()
 {
 #ifdef _DEBUG
-	Safe_Release(m_pCollider);
 	Safe_Release(m_pVIBuffer);
 #endif
 

@@ -33,6 +33,9 @@ HRESULT CSlime_Slime::Initialize(void* pArg)
 
 void CSlime_Slime::Tick(_float fTimeDelta)
 {
+	if (*m_pState == SLIME_DEATH)
+		Set_Dead();
+
 	if (*m_pState == SLIME_ATTACK && m_pModelCom->isFinished())
 		Set_Dead();
 
@@ -72,9 +75,12 @@ HRESULT CSlime_Slime::Render()
 
 void CSlime_Slime::StateToAnimation()
 {
+	if (SLIME_DEATH == *m_pState)
+		return;
+
 	_bool bLoop = true;
 	_uint iIndex = *m_pState;
-	if (*m_pState == SLIME_ATTACK || *m_pState == SLIME_DEATH)
+	if (*m_pState == SLIME_ATTACK)
 		bLoop = false;
 	m_pModelCom->Change_Animation_ByIndex(iIndex, bLoop);
 }

@@ -39,21 +39,50 @@ HRESULT CSlime::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pModelCom->Set_LerpTime(0.2f);
-
-	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_SLIMEBOSS));
-	m_pPlayerWorldMat = pPlayer->Get_PlayerWorldMatrixPtr();
+	m_iHp = 10;
 	return S_OK;
 }
 
 void CSlime::Tick(_float fTimeDelta)
 {
-	m_fTime += fTimeDelta;
-	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_SLIMEBOSS));
+	if (m_pPlayer == nullptr || m_pPlayerWorldMat == nullptr || m_pPlayerCollider == nullptr)
+	{
+		m_pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_SLIMEBOSS));
+		if (m_pPlayer != nullptr)
+		{
+			Safe_AddRef(m_pPlayer);
+			m_pPlayerWorldMat = m_pPlayer->Get_PlayerWorldMatrixPtr();
+			m_pPlayerCollider = dynamic_cast<CCollider*>(m_pPlayer->Get_Component(TEXT("Com_Collider")));
+			if(m_pPlayerCollider != nullptr)
+				Safe_AddRef(m_pPlayerCollider);
+		}
+	}
 
-	if (m_eState == SLIME_ATTACK && m_pModelCom->isFinished())
+	if (m_pPlayer == nullptr)
+		return;
+
+	if (m_iHp <= 0)
+		m_eState = SLIME_DEATH;
+
+	if (SLIME_DEATH == m_eState)
+	{
+		DeathEffect();
 		Set_Dead();
-	if (pPlayer->Get_InSlimeBossRoom())
+	}
+
+	m_fTime += fTimeDelta;
+
+	if (m_eState == SLIME_ATTACK && m_pModelCom->isFinished()) // 자폭공격
+	{
+		ExplodeEffect();
 		Set_Dead();
+	}
+	
+	if (m_pPlayer->Get_InSlimeBossRoom())
+		Set_Dead();
+
+	if (m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y <= 0)
+		m_pTransformCom->Fall(-fTimeDelta * 1.1f);
 
 	Check_SlimeCol(fTimeDelta);
 	Check_PillarCol(fTimeDelta);
@@ -63,8 +92,7 @@ void CSlime::Tick(_float fTimeDelta)
 	m_pTransformCom->Look_At_ForLandObject(vPlayerPos);
 	m_pTransformCom->Move(fTimeDelta * 2.f, XMVector3Normalize(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK)));
 
-	CCollider* pPlayerCollider = dynamic_cast<CCollider*>(pPlayer->Get_Component(TEXT("Com_Collider")));
-	if(m_pColliderCom[DEFAULT]->Intersect(pPlayerCollider))
+	if(m_pColliderCom[DEFAULT]->Intersect(m_pPlayerCollider))
 		m_bAttackTrigger = true;
 
 	if (m_bAttackTrigger == true)
@@ -123,9 +151,12 @@ HRESULT CSlime::Render()
 
 void CSlime::StateToAnimation()
 {
+	if (SLIME_DEATH == m_eState)
+		return;
+
 	_bool bLoop = true;
 	_uint iIndex = m_eState;
-	if (m_eState == SLIME_ATTACK || m_eState == SLIME_DEATH)
+	if (m_eState == SLIME_ATTACK)
 		bLoop = false;
 	m_pModelCom->Change_Animation_ByIndex(iIndex, bLoop);
 }
@@ -133,7 +164,6 @@ void CSlime::StateToAnimation()
 _bool CSlime::Check_DeathTrigger()
 {
 	_bool bDeathTrigger = { false };
-	// 플레이어 공격 체크
 
 	// 슬라임보스 칼 체크
 	if (m_pGameInstance->Check_Collision(LEVEL_SLIMEBOSS, TEXT("Layer_Knife"), m_pColliderCom[DEFAULT]))
@@ -184,7 +214,6 @@ void CSlime::Check_PillarCol(_float fTimeDelta)
 	_float3 vSrcPosFloat = m_pColliderCom[DEFAULT]->Get_Center(CCollider::TYPE_SPHERE);
 	_vector vSrsPos = XMLoadFloat3(&vSrcPosFloat);
 
-
 	for (auto& pillar : pillarList)
 	{
 		if (pillar == nullptr)
@@ -211,27 +240,39 @@ void CSlime::Check_PillarCol(_float fTimeDelta)
 
 void CSlime::Check_SlimeBossCol(_float fTimeDelta)
 {
-	CGameObject* pSlimeBoss = m_pGameInstance->Get_GameObject(LEVEL_SLIMEBOSS, TEXT("Layer_SlimeBoss"), TEXT("Prototype_GameObject_SlimeBoss"));
-	if (pSlimeBoss == nullptr)
+	if (m_pSlimeBossCollider == nullptr)
+	{
+		CGameObject* pSlimeBoss = m_pGameInstance->Get_GameObject(LEVEL_SLIMEBOSS, TEXT("Layer_SlimeBoss"), TEXT("Prototype_GameObject_SlimeBoss"));
+		if (pSlimeBoss == nullptr)
+			return;
+		m_pSlimeBossCollider = dynamic_cast<CCollider*>(pSlimeBoss->Get_Component(TEXT("Com_Collider")));
+		if (m_pSlimeBossCollider != nullptr)
+			Safe_AddRef(m_pSlimeBossCollider);
+	}
+
+	if (m_pSlimeBossCollider == nullptr)
 		return;
 
-	CCollider* pSlimeBossCollider = dynamic_cast<CCollider*>(pSlimeBoss->Get_Component(TEXT("Com_Collider")));
-
-	if (pSlimeBossCollider == nullptr)
-		return;
-
-	if (m_pColliderCom[DEFAULT]->Intersect(pSlimeBossCollider))
+	if (m_pColliderCom[DEFAULT]->Intersect(m_pSlimeBossCollider))
 	{
 		_float3 vSrcPosFloat = m_pColliderCom[DEFAULT]->Get_Center(CCollider::TYPE_SPHERE);
 		_vector vSrsPos = XMLoadFloat3(&vSrcPosFloat);
 
-		_float3 vDstPosFloat = pSlimeBossCollider->Get_Center(CCollider::TYPE_SPHERE);
+		_float3 vDstPosFloat = m_pSlimeBossCollider->Get_Center(CCollider::TYPE_SPHERE);
 		_vector vDstPos = XMLoadFloat3(&vDstPosFloat);
 
 		_vector vDir = XMVector3Normalize(vSrsPos - vDstPos);
 
 		m_pTransformCom->Move(fTimeDelta * 2.f, vDir);
 	}
+}
+
+void CSlime::DeathEffect()
+{
+}
+
+void CSlime::ExplodeEffect()
+{
 }
 
 HRESULT CSlime::Add_Components(const wstring& _wstrModelTag)
@@ -248,7 +289,7 @@ HRESULT CSlime::Add_Components(const wstring& _wstrModelTag)
 
 	/* For.Com_Collider */
 	CBounding_Sphere::BOUNDING_SPHERE_DESC		ColliderDesc{};
-	ColliderDesc.fRadius = 4.f;
+	ColliderDesc.fRadius = 4.6f;
 	ColliderDesc.vCenter = _float3(0.f, 0, 0.f);
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom[DEFAULT], &ColliderDesc)))
@@ -318,6 +359,9 @@ void CSlime::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pSlimeBossCollider);
+	Safe_Release(m_pPlayerCollider);
+	Safe_Release(m_pPlayer);
 	for (auto& Pair : m_Parts)
 		Safe_Release(Pair.second);
 	m_Parts.clear();

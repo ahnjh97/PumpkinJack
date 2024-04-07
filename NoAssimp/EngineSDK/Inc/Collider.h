@@ -18,6 +18,8 @@ public:
 	_bool Get_Disabled() { return m_bDisabled; }
 	void Set_Disabled(_bool bDisabled) { m_bDisabled = bDisabled; }
 	_float3 Get_ColliderLook();
+	void Clear_CollidedColliders() { m_CollidedColliders.clear(); }
+	_bool Check_AlreadyCollided(CCollider* pEnemyCollider);
 
 public:
 	virtual HRESULT Initialize_Prototype(TYPE eType);
@@ -44,8 +46,6 @@ private:
 	BasicEffect* m_pEffect = { nullptr };
 	ID3D11InputLayout* m_pInputLayout = { nullptr };
 #endif
-
-
 
 public:
 	static CCollider* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType);

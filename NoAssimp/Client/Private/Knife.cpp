@@ -61,7 +61,7 @@ void CKnife::Tick(_float fTimeDelta)
 		if (m_pColliderCom->Intersect(pPlayerCollider))
 		{
 			if(m_bDamaged == false)
-				pPlayer->Change_HP(20);
+				pPlayer->Deduct_HP(20);
 			m_bDamaged = true;
 		}
 	}

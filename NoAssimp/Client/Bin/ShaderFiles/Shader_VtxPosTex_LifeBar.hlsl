@@ -5,8 +5,8 @@ matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 texture2D	g_DiffuseTexture[2];
 texture2D	g_MaskTexture;
-float		g_Offset_Y;
-
+float		g_fOffset_Y;
+float       g_fHpRatio;
 
 struct VS_IN
 {
@@ -56,26 +56,46 @@ PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 	vector vMask = g_MaskTexture.Sample(PointSampler, In.vTexcoord2);
-    In.vTexcoord.y += g_Offset_Y * 3.f;
-    In.vTexcoord3.y += g_Offset_Y * 1.6f;
+    In.vTexcoord.y += g_fOffset_Y * 3.f;
+    In.vTexcoord3.y += g_fOffset_Y * 1.6f;
     In.vTexcoord.y = fmod(In.vTexcoord.y / 3.f, 1.0);
     In.vTexcoord3.y = fmod(In.vTexcoord3.y / 3.f, 1.f);
     vector vDstDiffuse = g_DiffuseTexture[0].Sample(LinearSampler, In.vTexcoord);
     vector vSrcDiffuse = g_DiffuseTexture[1].Sample(LinearSampler, In.vTexcoord3);
-	
-    float3 lightGreenColor = float3(0.3, 0.9, 0.3); // 밝은 초록색
-    float3 darkGreenColor = float3(0, 0.5, 0); // 진한 초록색
+    
     float lerpFactor = saturate(vDstDiffuse.r * 1.2f); // 색상 변환 가중치, 0 ~ 1 범위로 제한
     float lerpFactor2 = saturate(vSrcDiffuse.r * 0.7f);
+    
+    float3 lightGreenColor = float3(0.3, 0.9, 0.3); // 밝은 초록색
+    float3 darkGreenColor = float3(0, 0.5, 0); // 진한 초록색
+    
+    float3 darkRedColor = float3(0.5, 0, 0); // 어두운 빨간색
+    float3 blackColor = float3(0.1, 0.1, 0.1); // 검은색
+    
     float3 newColor = lerp(lightGreenColor, darkGreenColor, lerpFactor);
     float3 newColor2 = lerp(lightGreenColor, darkGreenColor, lerpFactor2);
+
+    if (In.vTexcoord.x > g_fHpRatio)
+    {
+        newColor = lerp(darkRedColor, blackColor, lerpFactor);
+        newColor2 = lerp(darkRedColor, blackColor, lerpFactor2);
+    }
 
     vector vNewColor1 = vector(newColor, vDstDiffuse.a); // 알파 값은 변경하지 않음
     vector vNewColor2 = vector(newColor2, vSrcDiffuse.a);
     vector vDiffuse = vNewColor1 * vMask * vNewColor2;
     Out.vColor = vDiffuse;
-    if (Out.vColor.g <= 0.1f)
-        discard;
+    
+    if (In.vTexcoord.x < g_fHpRatio)
+    {
+        if (Out.vColor.g <= 0.1f)
+            discard;
+    }
+    else
+    {
+        if (vMask.g <= 0.1f)
+            discard;
+    }
 
      return Out;
 }

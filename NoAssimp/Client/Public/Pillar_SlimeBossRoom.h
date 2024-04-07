@@ -24,12 +24,10 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	_bool Check_PlayerAtkCol();
 	_bool Check_HeadCol();
 
 private:
 	_float m_fTime = {};
-	_int m_iHP = { 5 };
 
 private:
 	CModel* m_pModelCom = { nullptr };

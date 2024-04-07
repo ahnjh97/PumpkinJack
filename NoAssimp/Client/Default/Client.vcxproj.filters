@@ -67,36 +67,6 @@
     <Filter Include="01.Levels\SlimeBoss">
       <UniqueIdentifier>{94e6e0d5-20a5-469f-9fc1-b657d034cb3a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\SlimeBoss">
-      <UniqueIdentifier>{4aa7cc76-a207-452b-b071-fee6bb68994c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\SlimeBoss\Part_SlimeBoss">
-      <UniqueIdentifier>{4bd183c5-abbb-4768-8e59-0bce6d955da6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\SlimeBoss\Knife">
-      <UniqueIdentifier>{12d7815e-e351-420a-9d1a-1c9732d1c368}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\TongMap">
-      <UniqueIdentifier>{498efa8d-cab0-4f0e-a224-df381af38efc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\SlimeBoss\Pillar">
-      <UniqueIdentifier>{366cb4af-d02a-4290-95b4-92b68db42690}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\SlimeBoss\Portal">
-      <UniqueIdentifier>{cf0a68f4-a85d-417d-8f2f-15a2bf4a4377}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\SlimeBoss\SlimeBossHead">
-      <UniqueIdentifier>{a6e76243-75ab-45cc-a229-09e4ee3d6e25}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\SlimeBoss\Slime">
-      <UniqueIdentifier>{648a160a-7c63-49a0-b820-4ba862557ace}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\SlimeBoss\Slime\Part_Slime">
-      <UniqueIdentifier>{36a44a1c-3991-4319-977a-dddd21ee109c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\SlimeBoss\SlimeDamageZone">
-      <UniqueIdentifier>{b75b9b11-437e-434b-ba83-9f97fb384393}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\UI">
       <UniqueIdentifier>{a3660a24-62fb-47bf-91ab-fe5bb344bfa2}</UniqueIdentifier>
     </Filter>
@@ -115,35 +85,71 @@
     <Filter Include="02.GameObjects\Sky">
       <UniqueIdentifier>{07a2a48e-6ad3-457b-8eb8-6f0a333df334}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Ballista">
-      <UniqueIdentifier>{b6020dd5-18c0-4a4b-889f-b0b7bd041d49}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Ballista\Arrow">
-      <UniqueIdentifier>{f828f593-9917-48d7-b5a0-ab822a9dca31}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Ballista\BallistaRotator">
-      <UniqueIdentifier>{9bf095a1-35d9-4e12-acbf-0c14b26f6173}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Ballista\SkullCrossBow">
-      <UniqueIdentifier>{28bce0e1-5d2e-48e7-88e2-342597485dc3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Kart">
-      <UniqueIdentifier>{7d1ee032-fc9f-4574-8621-cb8cf4bdbc72}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Kart\Rail">
-      <UniqueIdentifier>{0f177822-6350-466d-ae58-af50a5a288f1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Kart\CrateBox">
-      <UniqueIdentifier>{52cc2442-0c78-4514-a237-df5d1e5c7c5a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Kart\Trigger">
-      <UniqueIdentifier>{f9354dee-2d61-4df4-9a68-b8eecde6a044}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Monster\Soldier">
-      <UniqueIdentifier>{b43b9c15-5169-45c0-9fed-3a7fb94555a7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Terrain\Terrain_SlimeBossRoom">
       <UniqueIdentifier>{9ce42e70-5595-4d2b-8ac0-bde47ff87a0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay">
+      <UniqueIdentifier>{4e0719bc-e992-4be5-9a06-2d416c049cb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay\Soldier">
+      <UniqueIdentifier>{b43b9c15-5169-45c0-9fed-3a7fb94555a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay\CrateBox">
+      <UniqueIdentifier>{52cc2442-0c78-4514-a237-df5d1e5c7c5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay\Rail">
+      <UniqueIdentifier>{0f177822-6350-466d-ae58-af50a5a288f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay\Trigger">
+      <UniqueIdentifier>{f9354dee-2d61-4df4-9a68-b8eecde6a044}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay\Water">
+      <UniqueIdentifier>{c2c02c03-d225-4337-88cb-bc090bde9cbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay\Kart">
+      <UniqueIdentifier>{7d1ee032-fc9f-4574-8621-cb8cf4bdbc72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_SlimeBoss">
+      <UniqueIdentifier>{4aa7cc76-a207-452b-b071-fee6bb68994c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_SlimeBoss\Part_SlimeBoss">
+      <UniqueIdentifier>{4bd183c5-abbb-4768-8e59-0bce6d955da6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_SlimeBoss\Knife">
+      <UniqueIdentifier>{12d7815e-e351-420a-9d1a-1c9732d1c368}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_SlimeBoss\Pillar">
+      <UniqueIdentifier>{366cb4af-d02a-4290-95b4-92b68db42690}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_SlimeBoss\Portal">
+      <UniqueIdentifier>{cf0a68f4-a85d-417d-8f2f-15a2bf4a4377}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_SlimeBoss\SlimeBossHead">
+      <UniqueIdentifier>{a6e76243-75ab-45cc-a229-09e4ee3d6e25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_SlimeBoss\Slime">
+      <UniqueIdentifier>{648a160a-7c63-49a0-b820-4ba862557ace}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_SlimeBoss\Slime\Part_Slime">
+      <UniqueIdentifier>{36a44a1c-3991-4319-977a-dddd21ee109c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_SlimeBoss\SlimeDamageZone">
+      <UniqueIdentifier>{b75b9b11-437e-434b-ba83-9f97fb384393}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_SlimeBoss\SlimeBoss">
+      <UniqueIdentifier>{e3011246-c527-479d-8d79-e5c3892ab976}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay\Ballista">
+      <UniqueIdentifier>{b6020dd5-18c0-4a4b-889f-b0b7bd041d49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay\Arrow">
+      <UniqueIdentifier>{f828f593-9917-48d7-b5a0-ab822a9dca31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay\BallistaRotator">
+      <UniqueIdentifier>{9bf095a1-35d9-4e12-acbf-0c14b26f6173}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay\SkullCrossBow">
+      <UniqueIdentifier>{28bce0e1-5d2e-48e7-88e2-342597485dc3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -225,38 +231,32 @@
     <ClInclude Include="..\Public\Level_SlimeBoss.h">
       <Filter>01.Levels\SlimeBoss</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\SlimeBoss.h">
-      <Filter>02.GameObjects\SlimeBoss</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Slime.h">
-      <Filter>02.GameObjects\SlimeBoss\Slime</Filter>
+      <Filter>02.GameObjects\Level_SlimeBoss\Slime</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SlimeBoss_Slime.h">
-      <Filter>02.GameObjects\SlimeBoss\Part_SlimeBoss</Filter>
+      <Filter>02.GameObjects\Level_SlimeBoss\Part_SlimeBoss</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Slime_Slime.h">
-      <Filter>02.GameObjects\SlimeBoss\Slime\Part_Slime</Filter>
+      <Filter>02.GameObjects\Level_SlimeBoss\Slime\Part_Slime</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Knife.h">
-      <Filter>02.GameObjects\SlimeBoss\Knife</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\TongMap_SlimeBoss.h">
-      <Filter>02.GameObjects\TongMap</Filter>
+      <Filter>02.GameObjects\Level_SlimeBoss\Knife</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Pillar.h">
-      <Filter>02.GameObjects\SlimeBoss\Pillar</Filter>
+      <Filter>02.GameObjects\Level_SlimeBoss\Pillar</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Pillar_SlimeBossRoom.h">
-      <Filter>02.GameObjects\SlimeBoss\Pillar</Filter>
+      <Filter>02.GameObjects\Level_SlimeBoss\Pillar</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Portal.h">
-      <Filter>02.GameObjects\SlimeBoss\Portal</Filter>
+      <Filter>02.GameObjects\Level_SlimeBoss\Portal</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SlimeBossHead.h">
-      <Filter>02.GameObjects\SlimeBoss\SlimeBossHead</Filter>
+      <Filter>02.GameObjects\Level_SlimeBoss\SlimeBossHead</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SlimeDamageZone.h">
-      <Filter>02.GameObjects\SlimeBoss\SlimeDamageZone</Filter>
+      <Filter>02.GameObjects\Level_SlimeBoss\SlimeDamageZone</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Inven.h">
       <Filter>02.GameObjects\UI\Inven</Filter>
@@ -270,38 +270,47 @@
     <ClInclude Include="..\Public\Sky.h">
       <Filter>02.GameObjects\Sky</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\TongMap_GamePlay.h">
-      <Filter>02.GameObjects\TongMap</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Ballista.h">
-      <Filter>02.GameObjects\Ballista</Filter>
+      <Filter>02.GameObjects\Level_GamePlay\Ballista</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Arrow.h">
-      <Filter>02.GameObjects\Ballista\Arrow</Filter>
+      <Filter>02.GameObjects\Level_GamePlay\Arrow</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BallistaRotator.h">
-      <Filter>02.GameObjects\Ballista\BallistaRotator</Filter>
+      <Filter>02.GameObjects\Level_GamePlay\BallistaRotator</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SkullCrossBow.h">
-      <Filter>02.GameObjects\Ballista\SkullCrossBow</Filter>
+      <Filter>02.GameObjects\Level_GamePlay\SkullCrossBow</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kart.h">
-      <Filter>02.GameObjects\Kart</Filter>
+      <Filter>02.GameObjects\Level_GamePlay\Kart</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Rail.h">
-      <Filter>02.GameObjects\Kart\Rail</Filter>
+      <Filter>02.GameObjects\Level_GamePlay\Rail</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\CrateBox.h">
-      <Filter>02.GameObjects\Kart\CrateBox</Filter>
+      <Filter>02.GameObjects\Level_GamePlay\CrateBox</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Trigger.h">
-      <Filter>02.GameObjects\Kart\Trigger</Filter>
+      <Filter>02.GameObjects\Level_GamePlay\Trigger</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Soldier.h">
-      <Filter>02.GameObjects\Monster\Soldier</Filter>
+      <Filter>02.GameObjects\Level_GamePlay\Soldier</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Terrain_SlimeBossRoom.h">
       <Filter>02.GameObjects\Terrain\Terrain_SlimeBossRoom</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Water.h">
+      <Filter>02.GameObjects\Level_GamePlay\Water</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SlimeBoss.h">
+      <Filter>02.GameObjects\Level_SlimeBoss\SlimeBoss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TongMap_GamePlay.h">
+      <Filter>02.GameObjects\Level_GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TongMap_SlimeBoss.h">
+      <Filter>02.GameObjects\Level_SlimeBoss</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -374,38 +383,32 @@
     <ClCompile Include="..\Private\Level_SlimeBoss.cpp">
       <Filter>01.Levels\SlimeBoss</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\SlimeBoss.cpp">
-      <Filter>02.GameObjects\SlimeBoss</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Slime.cpp">
-      <Filter>02.GameObjects\SlimeBoss\Slime</Filter>
+      <Filter>02.GameObjects\Level_SlimeBoss\Slime</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SlimeBoss_Slime.cpp">
-      <Filter>02.GameObjects\SlimeBoss\Part_SlimeBoss</Filter>
+      <Filter>02.GameObjects\Level_SlimeBoss\Part_SlimeBoss</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Slime_Slime.cpp">
-      <Filter>02.GameObjects\SlimeBoss\Slime\Part_Slime</Filter>
+      <Filter>02.GameObjects\Level_SlimeBoss\Slime\Part_Slime</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Knife.cpp">
-      <Filter>02.GameObjects\SlimeBoss\Knife</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\TongMap_SlimeBoss.cpp">
-      <Filter>02.GameObjects\TongMap</Filter>
+      <Filter>02.GameObjects\Level_SlimeBoss\Knife</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Pillar.cpp">
-      <Filter>02.GameObjects\SlimeBoss\Pillar</Filter>
+      <Filter>02.GameObjects\Level_SlimeBoss\Pillar</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Pillar_SlimeBossRoom.cpp">
-      <Filter>02.GameObjects\SlimeBoss\Pillar</Filter>
+      <Filter>02.GameObjects\Level_SlimeBoss\Pillar</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Portal.cpp">
-      <Filter>02.GameObjects\SlimeBoss\Portal</Filter>
+      <Filter>02.GameObjects\Level_SlimeBoss\Portal</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SlimeBossHead.cpp">
-      <Filter>02.GameObjects\SlimeBoss\SlimeBossHead</Filter>
+      <Filter>02.GameObjects\Level_SlimeBoss\SlimeBossHead</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SlimeDamageZone.cpp">
-      <Filter>02.GameObjects\SlimeBoss\SlimeDamageZone</Filter>
+      <Filter>02.GameObjects\Level_SlimeBoss\SlimeDamageZone</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Inven.cpp">
       <Filter>02.GameObjects\UI\Inven</Filter>
@@ -419,38 +422,47 @@
     <ClCompile Include="..\Private\Sky.cpp">
       <Filter>02.GameObjects\Sky</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\TongMap_GamePlay.cpp">
-      <Filter>02.GameObjects\TongMap</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Ballista.cpp">
-      <Filter>02.GameObjects\Ballista</Filter>
+      <Filter>02.GameObjects\Level_GamePlay\Ballista</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Arrow.cpp">
-      <Filter>02.GameObjects\Ballista\Arrow</Filter>
+      <Filter>02.GameObjects\Level_GamePlay\Arrow</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BallistaRotator.cpp">
-      <Filter>02.GameObjects\Ballista\BallistaRotator</Filter>
+      <Filter>02.GameObjects\Level_GamePlay\BallistaRotator</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SkullCrossBow.cpp">
-      <Filter>02.GameObjects\Ballista\SkullCrossBow</Filter>
+      <Filter>02.GameObjects\Level_GamePlay\SkullCrossBow</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kart.cpp">
-      <Filter>02.GameObjects\Kart</Filter>
+      <Filter>02.GameObjects\Level_GamePlay\Kart</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Rail.cpp">
-      <Filter>02.GameObjects\Kart\Rail</Filter>
+      <Filter>02.GameObjects\Level_GamePlay\Rail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\CrateBox.cpp">
-      <Filter>02.GameObjects\Kart\CrateBox</Filter>
+      <Filter>02.GameObjects\Level_GamePlay\CrateBox</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Trigger.cpp">
-      <Filter>02.GameObjects\Kart\Trigger</Filter>
+      <Filter>02.GameObjects\Level_GamePlay\Trigger</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Soldier.cpp">
-      <Filter>02.GameObjects\Monster\Soldier</Filter>
+      <Filter>02.GameObjects\Level_GamePlay\Soldier</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Terrain_SlimeBossRoom.cpp">
       <Filter>02.GameObjects\Terrain\Terrain_SlimeBossRoom</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Water.cpp">
+      <Filter>02.GameObjects\Level_GamePlay\Water</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SlimeBoss.cpp">
+      <Filter>02.GameObjects\Level_SlimeBoss\SlimeBoss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TongMap_GamePlay.cpp">
+      <Filter>02.GameObjects\Level_GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TongMap_SlimeBoss.cpp">
+      <Filter>02.GameObjects\Level_SlimeBoss</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -504,6 +516,12 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCube.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex_Portal.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Water.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

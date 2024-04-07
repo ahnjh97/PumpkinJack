@@ -239,9 +239,7 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 		m_fLerpRatio += fTimeDelta / m_fLerpTime;
 
 		if (m_fLerpRatio < 1.f)
-		{
 			m_Animations[m_iCurrentAnimIndex]->Lerp_Animation(m_Bones, m_FinalKeyFrames, m_fLerpRatio);
-		}
 		else
 			m_bIsLerping = false;		
 	}
@@ -261,7 +259,7 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 	// 0번 노드의 변환행렬 
 	_matrix RootLocalTransform = XMLoadFloat4x4(m_Bones[0]->Get_TransformationMatrix());
 	RootLocalTransform = XMMatrixScalingFromVector(XMLoadFloat4(&m_vScale)) * XMMatrixRotationQuaternion(XMLoadFloat4(&m_vRotation)) * RootLocalTransform;
-	XMStoreFloat4x4(&m_TransformMatrix, RootLocalTransform);
+	::XMStoreFloat4x4(&m_TransformMatrix, RootLocalTransform);
 
 	for (auto& pBone : m_Bones)
 		pBone->Update_CombinedTransformationMatrix(m_Bones, RootLocalTransform, m_tConfig.iRealRoot);

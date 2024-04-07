@@ -44,14 +44,16 @@ private:
 
 	SLIMEBOSS m_eState = { SLIMEBOSS_SPAWN };
 	SLIMEBOSS m_ePreState = { SLIMEBOSS_SPAWN };
+
 	_bool m_bPillarSpawn = { false };
 	_bool m_bPortalSpawn = { false };
 	_bool m_bSlimeSpawn = { false };
 	_bool m_bSlimeDamageZoneSpawn = { false };
 	_bool m_bTurnToPlayer = { false };
-	_int m_iHp = { 100 };
+
 	_int m_iCurPattern = { -1};
 	_int m_iLightningCount = {};
+
 	_float4 m_vLightningPos = {};
 
 	vector<SLIMEBOSS> m_vecSlimeBossPattern = { SLIMEBOSS_FORK, SLIMEBOSS_INVOKE_BEGIN, SLIMEBOSS_INVOKE

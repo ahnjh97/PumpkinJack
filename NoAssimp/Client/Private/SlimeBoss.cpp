@@ -2,6 +2,7 @@
 #include "SlimeBoss.h"
 #include "SlimeBoss_Slime.h"
 #include "Player.h"
+#include "Portal.h"
 
 CSlimeBoss::CSlimeBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -39,6 +40,8 @@ HRESULT CSlimeBoss::Initialize(void* pArg)
 
 	m_pModelCom->Set_Animation(SLIMEBOSS_SPAWN, false);
 	m_pModelCom->Set_LerpTime(0.2f);
+	m_pModelCom->Set_AnimSpeed(SLIMEBOSS_MEGASPAWN, 0.7f);
+	m_iHp = 100;
 	return S_OK;
 }
 
@@ -46,10 +49,9 @@ void CSlimeBoss::Tick(_float fTimeDelta)
 {
 	if (m_pPlayer == nullptr)
 	{
-		CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(LEVEL_SLIMEBOSS, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Player")));
-		if (pPlayer != nullptr)
+		m_pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_SLIMEBOSS));
+		if (m_pPlayer != nullptr)
 		{
-			m_pPlayer = pPlayer;
 			Safe_AddRef(m_pPlayer);
 			m_pPlayerWorldMatrix = m_pPlayer->Get_PlayerWorldMatrixPtr();
 		}
@@ -123,15 +125,15 @@ HRESULT CSlimeBoss::Render()
 		m_pModelCom->Render(i);
 	}
 #ifdef _DEBUG
-	m_pColliderCom->Render();
+	//m_pColliderCom->Render();
 #endif
 	return S_OK;
 }
 
 void CSlimeBoss::Link_Animation(_float fTimeDelta)
 {
-	if (m_iHp <= 100)
-		m_eState = SLIMEBOSS_DEATH;
+	/*if (m_iHp <= 0)
+		m_eState = SLIMEBOSS_DEATH;*/
 
 	if (m_eState == SLIMEBOSS_DEATH)
 	{
@@ -150,9 +152,9 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 	{
 		if (m_pModelCom->isFinished())
 		{
-			//SlimeSpawn();
-			//PillarSpawn();
-			//PortalSpawn();
+			SlimeSpawn();
+			PillarSpawn();
+			PortalSpawn();
 			m_eState = SLIMEBOSS_IDLE;
 		}
 	}	
@@ -170,7 +172,7 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 		if (m_eState == SLIMEBOSS_FORK || m_eState == SLIMEBOSS_INVOKE_BEGIN
 			|| m_eState == SLIMEBOSS_PILLAR_SPAWN || m_eState == SLIMEBOSS_MEGASPAWN)
 		{
-			if (m_eState == SLIMEBOSS_INVOKE_BEGIN && m_pModelCom->Get_AnimPlayRatio(SLIMEBOSS_INVOKE_BEGIN) > 0.32f)
+			if (m_eState == SLIMEBOSS_INVOKE_BEGIN && m_pModelCom->Get_AnimPlayRatio() > 0.32f)
 			{
 				if (m_pPlayer->Get_SlimeBossRoomEscapeCount() >= 1 && m_bSlimeDamageZoneSpawn == false)
 				{
@@ -212,7 +214,7 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 		{
 			XMStoreFloat4(&m_vLightningPos, XMVectorSet(m_pPlayerWorldMatrix->_41, m_pPlayerWorldMatrix->_42, m_pPlayerWorldMatrix->_43, 1));
 
-			_float fPlayRatio = m_pModelCom->Get_AnimPlayRatio(SLIMEBOSS_LIGHTNING);
+			_float fPlayRatio = m_pModelCom->Get_AnimPlayRatio();
 			if (m_iLightningCount == m_pModelCom->Get_AnimPlayCount(SLIMEBOSS_LIGHTNING) && fPlayRatio > 0.6f)
 			{
 				CGameObject::GAMEOBJECT_DESC tDesc{};
@@ -301,14 +303,12 @@ void CSlimeBoss::PortalSpawn()
 	wstring wstrLayer = TEXT("Layer_Portal");
 	wstring wstrPrototype = TEXT("Prototype_GameObject_Portal");
 
-	CGameObject::GAMEOBJECT_DESC tDesc{};
-	tDesc.iLevel = LEVEL_SLIMEBOSS;
-	tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
-	tDesc.matWorld._41 = vPortalPos.x;
-	tDesc.matWorld._42 = vPortalPos.y + 10.f;
-	tDesc.matWorld._43 = vPortalPos.z;
-	
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, wstrLayer, wstrPrototype, &tDesc)))
+	CPortal::PORTAL_DESC portalDesc{};
+	portalDesc.pPortalBone = m_pModelCom->Get_BonePtr("tongue1");
+	portalDesc.iLevel = LEVEL_SLIMEBOSS;
+	portalDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	portalDesc.matWorld._43 = 0.3f;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, wstrLayer, wstrPrototype, &portalDesc)))
 		return;
 }
 
@@ -327,7 +327,7 @@ void CSlimeBoss::SlimeSpawn()
 	for (_int i = 0; i < iSlimeNum; i++)
 	{
 		tDesc.matWorld._41 = XMVectorGetX(vPos) + cosf(i * XM_2PI / iSlimeNum) * fDis;
-		tDesc.matWorld._42 = 0;
+		tDesc.matWorld._42 = -10;
 		tDesc.matWorld._43 = XMVectorGetZ(vPos) + sinf(i * XM_2PI / iSlimeNum) * fDis;
 		if (m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, wstrLayer, wstrPrototype, &tDesc))
 			return;

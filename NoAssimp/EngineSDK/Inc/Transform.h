@@ -71,6 +71,11 @@ public:
 	void Set_PortalCol(_bool bPortalCol) { m_bPortalCol = bPortalCol; }
 	void Set_Height(_float fHeight);
 
+	_vector Get_Pos_Vector();
+	_float4 Get_Pos_Float4();
+	void Set_Pos(const _float4& vPos);
+	void Set_Pos(_fvector vPos);
+
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;

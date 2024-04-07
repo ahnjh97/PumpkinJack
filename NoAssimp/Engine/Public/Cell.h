@@ -40,13 +40,11 @@ public:
 #ifdef _DEBUG
 public:
 	virtual HRESULT Render();
-	virtual HRESULT ColliderRender();
 #endif
 
 private:
 	ID3D11Device*			m_pDevice = { nullptr };
 	ID3D11DeviceContext*	m_pContext = { nullptr };
-	class CCollider*		m_pCollider = { nullptr };
 
 private:
 	_float3			m_vPoints[POINT_END];

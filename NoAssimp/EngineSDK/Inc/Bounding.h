@@ -34,7 +34,7 @@ protected:
 	ID3D11Device* m_pDevice = { nullptr };
 	ID3D11DeviceContext* m_pContext = { nullptr };
 
-	_bool					m_isCollision = { false };
+	_bool				m_isCollision = { false };
 
 public:
 	virtual void Free() override;

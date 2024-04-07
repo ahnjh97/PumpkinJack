@@ -66,19 +66,31 @@ HRESULT CPlayer::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pNavigationCom[DEFAULT]->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
-
+	m_pCurLevel = m_pGameInstance->Get_CurrentLevelID();
+	m_iHp = 80;
 	return S_OK;
 }
 
 void CPlayer::Tick(_float fTimeDelta)
 {
+	if (m_pGameInstance->KeyDown(DIK_1))
+		Deduct_HP(20);
+	if(m_pGameInstance->KeyDown(DIK_2))
+		Deduct_HP(-20);
+
+	if (m_iHp <= 0)
+		m_iHp = 0;
+	if (m_iHp >= 100)
+		m_iHp = 100;
+
 	if (m_pCamera == nullptr)
 	{
 		m_pCamera = dynamic_cast<CCamera_Jack*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Jack")));
-		Safe_AddRef(m_pCamera);
+		if(m_pCamera != nullptr)
+			Safe_AddRef(m_pCamera);
 	}
 
-	_bool bPortalCol = Check_SlimeBossPortal(fTimeDelta);
+	_bool bPortalCol = Check_SlimeBossPortalCol(fTimeDelta);
 	if(bPortalCol)
 		m_eState = HIGHFALL;
 
@@ -113,19 +125,7 @@ void CPlayer::Tick(_float fTimeDelta)
 	else
 		m_fGravityTime = 0;
 
-	if (m_fHighFallTime >= 2.f)
-	{
-		_vector vSlimeBossRoom = ::XMVectorSet(205, -130, 150, 1);
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vSlimeBossRoom);
-		m_fHighFallTime = 0.f;
-		m_eState = IDLE;
-		m_bInSlimeBossRoom = true;
-		m_eNavigation = SLIMEBOSSROOM;
-		// curCell 다시검사
-		m_pNavigationCom[m_eNavigation]->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
-		m_pNavigationCom[m_eNavigation]->Get_PlaneHeight(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION));
-	}
-
+	Check_GoToSlimeBossRoom();
 	Check_GoBackUp();
 
 	if (!m_bIsRolling)
@@ -148,8 +148,15 @@ void CPlayer::Tick(_float fTimeDelta)
 	if (m_bGroundCol)
 		m_pTransformCom->Set_Height(m_fPlaneHeight);
 
+	if (m_bIsAttacking)
+		TargetNearestEnemy();
+
 	Update_PositionToCam();
 	Turn_Body(fTimeDelta);
+
+	SetUp_Damage();
+	if (m_bIsAttacking)
+		Activate_Weapon();
 
 	for (auto& Pair : m_Parts)
 		Pair.second->Tick(fTimeDelta);
@@ -168,6 +175,15 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 		if (m_pNavigationCom[i] != nullptr)
 			m_pNavigationCom[i]->Late_Tick();
 	}
+
+	auto iter = m_Parts.find(TEXT("Part_Body"));
+	CModel* pBodyModel = dynamic_cast<CModel*>(iter->second->Get_Component(TEXT("Com_Model")));
+	if (pBodyModel == nullptr)
+		return;
+
+	if (m_bIsAttacking && pBodyModel->isFinished())
+		Reset_WeaponCollider(m_eWeapon);
+
 	m_bPreInSlimeBossRoom = m_bInSlimeBossRoom;
 }
 
@@ -175,7 +191,7 @@ HRESULT CPlayer::Render()
 {
 #ifdef _DEBUG
 	m_pColliderCom->Render();
-	
+
 	if (m_pNavigationCom[m_eNavigation] != nullptr && m_pGameInstance->Get_NavigationMode() == true)
 		m_pNavigationCom[m_eNavigation]->Render();
 #endif
@@ -227,6 +243,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 		m_iLastAttack = 0;
 		if (m_eWeapon == WPN_END)
 			m_eWeapon = (WEAPON)0;
+		Reset_WeaponCollider(m_eWeapon);
 	}
 
 	if (m_pGameInstance->KeyDown(DIK_LCONTROL) && !m_bIsAttacking && !m_bIsJumping && !m_bIsPushingKart)
@@ -311,21 +328,21 @@ void CPlayer::Update_Direction(_fvector vCamLook, _fvector vCamRight)
 	vRight = ::XMVectorSetY(vRight, 0.f);
 
 	if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) && (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80))
-		XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(vLook - vRight));
+		::XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(vLook - vRight));
 	else if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) && (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80))
-		XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(vLook + vRight));
+		::XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(vLook + vRight));
 	else if ((m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80) && (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80))
-		XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(-vLook - vRight));
+		::XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(-vLook - vRight));
 	else if ((m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80) && (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80))
-		XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(-vLook + vRight));
+		::XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(-vLook + vRight));
 	else if (m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80)
-		XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(vLook));
+		::XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(vLook));
 	else if (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80)
-		XMStoreFloat3(&m_vDirection, XMVector3Normalize(-vRight));
+		::XMStoreFloat3(&m_vDirection, XMVector3Normalize(-vRight));
 	else if (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80)
-		XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(vRight));
+		::XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(vRight));
 	else if (m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80)
-		XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(-vLook));
+		::XMStoreFloat3(&m_vDirection, ::XMVector3Normalize(-vLook));
 }
 
 void CPlayer::Update_PositionToCam()
@@ -499,7 +516,7 @@ _bool CPlayer::Check_WallColliders_LevelGamePlay()
 	return Check_WallColliders(crateBoxList, CCollider::TYPE_OBB);
 }
 
-_bool CPlayer::Check_SlimeBossPortal(_float fTimeDelta)
+_bool CPlayer::Check_SlimeBossPortalCol(_float fTimeDelta)
 {
 	CCollider* pPortalCollider = { nullptr };
 	list<CGameObject*> objList = m_pGameInstance->Get_ObjectList(LEVEL_SLIMEBOSS, TEXT("Layer_Portal"));
@@ -518,7 +535,7 @@ _bool CPlayer::Check_SlimeBossPortal(_float fTimeDelta)
 		if (m_pColliderCom->Intersect(pPortalCollider))
 		{
 			_vector vPortalCenter = XMLoadFloat3(&pPortalCollider->Get_Center(CCollider::TYPE_OBB));
-			XMVectorSetW(vPortalCenter, 1);
+			::XMVectorSetW(vPortalCenter, 1);
 			m_pTransformCom->Move_toTarget(vPortalCenter, fTimeDelta * 0.25f, 1.5f);
 			m_fHighFallTime += fTimeDelta;
 			m_pTransformCom->Set_PortalCol(true);
@@ -558,12 +575,28 @@ _bool CPlayer::Check_Kart()
 			XMStoreFloat3(&m_vKartLook, pKartTransform->Get_State_Vector(CTransform::STATE_LOOK));
 			_vector vKartPos = pKartTransform->Get_State_Vector(CTransform::STATE_POSITION);
 			_vector vKartLook = pKartTransform->Get_State_Vector(CTransform::STATE_LOOK);
-			XMStoreFloat4(&m_vPushPos, vKartPos - vKartLook * 6.f - XMVectorSet(0, 1.15f, 0, 0));
+			XMStoreFloat4(&m_vPushPos, vKartPos - vKartLook * 6.f - ::XMVectorSet(0, 1.15f, 0, 0));
 			return true;
 		}
 	}
 
 	return _bool();
+}
+
+void CPlayer::Check_GoToSlimeBossRoom()
+{
+	if (m_fHighFallTime >= 1.7f)
+	{
+		_vector vSlimeBossRoom = ::XMVectorSet(205, -145, 150, 1);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vSlimeBossRoom);
+		m_fHighFallTime = 0.f;
+		m_eState = IDLE;
+		m_bInSlimeBossRoom = true;
+		m_eNavigation = SLIMEBOSSROOM;
+		// curCell 다시검사
+		m_pNavigationCom[m_eNavigation]->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
+		m_pNavigationCom[m_eNavigation]->Get_PlaneHeight(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION));
+	}
 }
 
 void CPlayer::Check_GoBackUp()
@@ -572,7 +605,7 @@ void CPlayer::Check_GoBackUp()
 	{
 		list<CGameObject*> objList = m_pGameInstance->Get_ObjectList(LEVEL_SLIMEBOSS, TEXT("Layer_Pillar2"));
 		_bool bNullPointers = { true };
-		_vector vTeleportPos = XMVectorSet(180, 0, 65, 1);
+		_vector vTeleportPos = ::XMVectorSet(180, 0, 65, 1);
 
 		if (!objList.empty())
 		{
@@ -605,6 +638,230 @@ void CPlayer::Update_KartPush(_bool bPush)
 		return;
 
 	pKart->Set_Push(bPush);
+}
+
+void CPlayer::Reset_WeaponCollider(WEAPON eWeapon)
+{
+	wstring wstrWeapon = L"Part_";
+	if (eWeapon == WPN_SPEAR)
+		wstrWeapon += L"Spear";
+	if (eWeapon == WPN_RIFLE)
+		wstrWeapon += L"Rifle";
+	if (eWeapon == WPN_SCYTHE)
+		wstrWeapon += L"Scythe";
+
+	auto iter = m_Parts.find(wstrWeapon);
+	if (iter != m_Parts.end())
+	{
+		CWeapon* pWeapon = dynamic_cast<CWeapon*>(iter->second);
+		if(pWeapon != nullptr)
+			pWeapon->Reset_Damagable();
+	}
+}
+
+void CPlayer::TargetNearestEnemy()
+{
+	m_pNearestEnemyCollider = nullptr;
+	m_fEnemyDistance = 50.f;
+	
+	if (LEVEL_GAMEPLAY == *m_pCurLevel)
+	{
+		Check_EnemyDistance(LEVEL_GAMEPLAY, TEXT("Layer_Soldier"), CCollider::TYPE_OBB);
+	}
+	else if (LEVEL_GAMEPLAY2 == *m_pCurLevel)
+	{
+
+	}
+	else if(LEVEL_GAMEPLAY3 == *m_pCurLevel)
+	{
+
+	}
+	else if (LEVEL_SLIMEBOSS == *m_pCurLevel)
+	{
+		if (!m_bInSlimeBossRoom)
+			Check_EnemyDistance(LEVEL_SLIMEBOSS, TEXT("Layer_Slime"), CCollider::TYPE_SPHERE);
+		else
+			Check_EnemyDistance(LEVEL_SLIMEBOSS, TEXT("Layer_Pillar2"), CCollider::TYPE_OBB);
+	}
+
+	if (nullptr == m_pNearestEnemyCollider)
+		return;
+
+	_float3 vCenterPos = m_pNearestEnemyCollider->Get_Center(m_eEnemyColliderType);
+
+	_float4 vRightFloat, vLookFloat;
+	m_pTransformCom->Get_Look_LandObject(XMVectorSet(vCenterPos.x, vCenterPos.y, vCenterPos.z, 1), vRightFloat, vLookFloat);
+
+	_vector vLook = XMVector3Normalize(XMLoadFloat4(&vLookFloat));
+	::XMStoreFloat3(&m_vDirection, vLook);
+}
+
+void CPlayer::Check_EnemyDistance(LEVEL eLevel, const wstring& wstrLayerTag, CCollider::TYPE eColliderType, const wstring& wstrColliderTag)
+{
+	_vector vPlayerPos = m_pTransformCom->Get_Pos_Vector();
+
+	list<CGameObject*> enemyList = m_pGameInstance->Get_ObjectList(eLevel, wstrLayerTag);
+	if (enemyList.empty())
+		return;
+
+	for (auto& enemy : enemyList)
+	{
+		if (nullptr == enemy)
+			continue;
+
+		CCollider* pEnemyCollider = dynamic_cast<CCollider*>(enemy->Get_Component(wstrColliderTag));
+		if (nullptr == pEnemyCollider)
+			continue;
+
+		_float3 vCenter = pEnemyCollider->Get_Center(eColliderType);
+
+		_vector vResult = vPlayerPos - XMLoadFloat3(&vCenter);
+		_float fDis = ::XMVectorGetX(::XMVector3Length(vResult));
+
+		if (fDis < m_fEnemyDistance) 
+		{
+			m_pNearestEnemyCollider = pEnemyCollider;
+			m_eEnemyColliderType = eColliderType;
+		}
+	}
+}
+
+void CPlayer::SetUp_Damage()
+{
+	if (WPN_SPEAR == m_eWeapon)
+	{
+		if (m_eState == AIR_ATTACK)
+			m_iDamage = 15;
+		else
+			m_iDamage = 10;
+	}
+	else if (WPN_RIFLE == m_eWeapon)
+	{
+		if (m_eState == AIR_ATTACK)
+			m_iDamage = 15;
+		else if (m_eState == ROLL_ATTACK)
+			m_iDamage = 5;
+		else
+			m_iDamage = 10;
+	}
+	else if (WPN_SCYTHE == m_eWeapon)
+	{
+		if (m_eState == AIR_ATTACK_END)
+			m_iDamage = 20;
+		else if (m_eState == ROLL_ATTACK)
+			m_iDamage = 10;
+		else
+			m_iDamage = 15;
+	}
+}
+
+void CPlayer::Activate_Weapon()
+{
+	CWeapon* pWeapon = { nullptr };
+	CModel* pBodyModel = dynamic_cast<CModel*>(Get_Part(TEXT("Part_Body"))->Get_Component(TEXT("Com_Model")));
+	_float fAnimPlayRatio = pBodyModel->Get_AnimPlayRatio();
+	if (WPN_SPEAR == m_eWeapon)
+	{
+		pWeapon = dynamic_cast<CWeapon*>(Get_Part(TEXT("Part_Spear")));
+		pWeapon->DeActivate_WeaponCollider();
+
+		if (ATTACK1 == m_eState)
+		{
+			if (fAnimPlayRatio > 0.25f && fAnimPlayRatio < 0.35f)
+				pWeapon->Activate_WeaponCollider();
+		}
+		else if (ATTACK2 == m_eState)
+		{
+			if (fAnimPlayRatio > 0.32f && fAnimPlayRatio < 0.42f)
+				pWeapon->Activate_WeaponCollider();
+		}
+		else if (ATTACK3 == m_eState || ROLL_ATTACK == m_eState) {
+			if (fAnimPlayRatio > 0.3f && fAnimPlayRatio < 0.55f)
+				pWeapon->Activate_WeaponCollider();
+		}
+		else if (AIR_ATTACK_END == m_eState) {
+			if (fAnimPlayRatio < 0.2f)
+				pWeapon->Activate_WeaponCollider();
+		}
+	}
+
+	else if (WPN_RIFLE == m_eWeapon)
+	{
+		pWeapon = dynamic_cast<CWeapon*>(Get_Part(TEXT("Part_Rifle")));
+		pWeapon->DeActivate_WeaponCollider();
+
+		if (ATTACK1 == m_eState) {
+			if (fAnimPlayRatio > 0.22f && fAnimPlayRatio < 0.27f)
+				pWeapon->Activate_WeaponCollider();
+		}
+		else if (ATTACK2 == m_eState) {
+			if (fAnimPlayRatio > 0.15f && fAnimPlayRatio < 0.35f)
+				pWeapon->Activate_WeaponCollider();
+		}
+		else if(ATTACK3 == m_eState) {
+			if (fAnimPlayRatio > 0.22f && fAnimPlayRatio < 0.35f)
+				pWeapon->Activate_WeaponCollider();
+		}
+		else if (AIR_ATTACK == m_eState) {
+			if (fAnimPlayRatio > 0.3f && fAnimPlayRatio < 0.4f)
+				pWeapon->Activate_WeaponCollider();
+		}
+		else if (ROLL_ATTACK == m_eState) {
+			if ((fAnimPlayRatio > 0.07f && fAnimPlayRatio < 0.115f) || (fAnimPlayRatio > 0.27f && fAnimPlayRatio < 0.31f)
+				|| (fAnimPlayRatio > 0.48f && fAnimPlayRatio < 0.52f) || (fAnimPlayRatio > 0.68f && fAnimPlayRatio < 0.72f))
+				pWeapon->Activate_WeaponCollider();
+
+			if((fAnimPlayRatio > 0.25f && fAnimPlayRatio < 0.27f) || (fAnimPlayRatio > 0.46f && fAnimPlayRatio < 0.48f) || (fAnimPlayRatio > 0.66f && fAnimPlayRatio < 0.68f))
+				pWeapon->Reset_Damagable();
+		}
+	}
+
+	else if (WPN_SCYTHE == m_eWeapon)
+	{
+		pWeapon = dynamic_cast<CWeapon*>(Get_Part(TEXT("Part_Scythe")));
+		pWeapon->DeActivate_WeaponCollider();
+
+		if (ATTACK1 == m_eState) {
+			if (fAnimPlayRatio > 0.3f && fAnimPlayRatio < 0.5f)
+				pWeapon->Activate_WeaponCollider();
+		}
+		else if (ATTACK2 == m_eState) {
+			if (fAnimPlayRatio > 0.3f && fAnimPlayRatio < 0.4f)
+				pWeapon->Activate_WeaponCollider();
+		}
+		else if (ATTACK3 == m_eState) {
+			if (fAnimPlayRatio > 0.3f && fAnimPlayRatio < 0.45f)
+				pWeapon->Activate_WeaponCollider();
+		}
+		else if (AIR_ATTACK_END == m_eState) {
+			if (fAnimPlayRatio < 0.2f)
+				pWeapon->Activate_WeaponCollider();
+		}
+		else if (ROLL_ATTACK == m_eState) {
+			if ((fAnimPlayRatio > 0.15f && fAnimPlayRatio < 0.7f))
+				pWeapon->Activate_WeaponCollider();
+
+			if ((fAnimPlayRatio > 0.25f && fAnimPlayRatio < 0.3f) || (fAnimPlayRatio > 0.5f && fAnimPlayRatio < 0.55f))
+			{
+				if (m_bScytheRifleRollAttack)
+				{
+					pWeapon->Reset_Damagable();
+					m_bScytheRifleRollAttack = false;
+				}
+			}
+
+			else if (fAnimPlayRatio > 0.4f && fAnimPlayRatio < 0.45f)
+			{
+				if (!m_bScytheRifleRollAttack)
+				{
+					pWeapon->Reset_Damagable();
+					m_bScytheRifleRollAttack = true;
+				}
+			}
+			else if (fAnimPlayRatio > 0.7f)
+				m_bScytheRifleRollAttack = true;
+		}
+	}
 }
 
 HRESULT CPlayer::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
@@ -660,6 +917,7 @@ HRESULT CPlayer::Add_PartObjects(LEVEL eLevel)
 	RifleDesc.pSocket = pModel->Get_BonePtr("RightHandIndex1");
 	RifleDesc.pState = &m_eState;
 	RifleDesc.pWeapon = &m_eWeapon;
+	RifleDesc.pDamage = &m_iDamage;
 	RifleDesc.iLevel = eLevel;
 	RifleDesc.wstrModelTag = TEXT("Prototype_Component_Model_Rifle");
 	pRifle = dynamic_cast<CPart*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Part_Rifle"), &RifleDesc));
@@ -674,6 +932,7 @@ HRESULT CPlayer::Add_PartObjects(LEVEL eLevel)
 	SpearDesc.pSocket = pModel->Get_BonePtr("RightHandIndex1");
 	SpearDesc.pState = &m_eState;
 	SpearDesc.pWeapon = &m_eWeapon;
+	SpearDesc.pDamage = &m_iDamage;
 	SpearDesc.iLevel = eLevel;
 	SpearDesc.wstrModelTag = TEXT("Prototype_Component_Model_Spear");
 	pSpear = dynamic_cast<CPart*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Part_Spear"), &SpearDesc));
@@ -688,6 +947,7 @@ HRESULT CPlayer::Add_PartObjects(LEVEL eLevel)
 	ScytheDesc.pSocket = pModel->Get_BonePtr("LeftHandIndex1");
 	ScytheDesc.pState = &m_eState;
 	ScytheDesc.pWeapon = &m_eWeapon;
+	ScytheDesc.pDamage = &m_iDamage;
 	ScytheDesc.iLevel = eLevel;
 	ScytheDesc.wstrModelTag = TEXT("Prototype_Component_Model_Scythe");
 	pScythe = dynamic_cast<CPart*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Part_Scythe"), &ScytheDesc));
@@ -729,10 +989,14 @@ CGameObject* CPlayer::Clone(void* pArg)
 void CPlayer::Free()
 {
 	__super::Free();
-	for(_int i = 0; i <NAVIGATION_END; i++)
+	m_pNearestEnemyCollider = nullptr;
+
+	for(_int i = 0; i < NAVIGATION_END; i++)
 		Safe_Release(m_pNavigationCom[i]);
+
 	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pCamera);
+
 	for (auto& Pair : m_Parts)
 		Safe_Release(Pair.second);
 	m_Parts.clear();
