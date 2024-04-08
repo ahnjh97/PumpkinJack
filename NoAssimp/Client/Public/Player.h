@@ -31,6 +31,7 @@ public:
 	_uint Get_SlimeBossRoomEscapeCount() { return m_iSlimeBossRoomEscapeCount; }
 	_bool Get_GroundCol() { return m_bGroundCol; }
 	_float Get_PlayerHpRatio() { return m_iHp * 0.01f; }
+	CModel* Get_BodyModel();
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -62,6 +63,8 @@ private:
 	void Check_EnemyDistance(LEVEL eLevel, const wstring& wstrLayerTag, CCollider::TYPE eColliderType, const wstring& wstrColliderTag = TEXT("Com_Collider"));
 	void SetUp_Damage();
 	void Activate_Weapon();
+	void SpearRollAttackDash(_float fTimeDelta);
+	void RifleRecoil(_float fTimeDelta);
 
 private:
 	STATE m_eState = { PLAYER_END };
@@ -89,6 +92,7 @@ private:
 	_float m_fRollEndTime = { 1.f };
 	_float m_fHighFallTime = {};
 	_float m_fGravityTime = {};
+	_float m_fDashTime = {};
 	_float m_fPlaneHeight = {};
 	_float m_fEnemyDistance = {};
 

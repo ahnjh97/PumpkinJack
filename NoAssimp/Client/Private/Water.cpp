@@ -37,7 +37,7 @@ HRESULT CWater::Initialize(void* pArg)
 
 void CWater::Tick(_float fTimeDelta)
 {
-	m_fOffset_Y -= 0.0001f;
+	m_fOffset_Y -= 0.00015f;
 }
 
 void CWater::Late_Tick(_float fTimeDelta)
@@ -47,21 +47,21 @@ void CWater::Late_Tick(_float fTimeDelta)
 
 HRESULT CWater::Render()
 {
-	if (FAILED(Bind_ShaderResources()))
-		return E_FAIL;
+	//if (FAILED(Bind_ShaderResources()))
+	//	return E_FAIL;
 
-	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+	//_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
-	for (size_t i = 0; i < iNumMeshes; i++)
-	{
-		m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", i, aiTextureType_DIFFUSE);
+	//for (size_t i = 0; i < iNumMeshes; i++)
+	//{
+	//	m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", i, aiTextureType_DIFFUSE);
 
-		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(0)))
-			return E_FAIL;
+	//	/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
+	//	if (FAILED(m_pShaderCom->Begin(0)))
+	//		return E_FAIL;
 
-		m_pModelCom->Render(i);
-	}
+	//	m_pModelCom->Render(i);
+	//}
 
 	return S_OK;
 }

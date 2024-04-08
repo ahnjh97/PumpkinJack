@@ -6,6 +6,7 @@
 BEGIN(Engine)
 class CModel;
 class CShader;
+class CPart;
 END
 
 BEGIN(Client)
@@ -35,16 +36,21 @@ private:
 	void StateToAnimation();
 	void Soldier_AnimSpeed();
 	void DeathEffect();
+	void ActivateSoldierWeapon();
 
 	_bool IsPlayerInRange();
 	_bool Check_KartCol(_float fTimeDelta);
+
+	_float CalculateDistanceFromPlayer();
 
 private:
 	SOLDIER m_eState = {};
 
 	_bool m_bSpinAttack = { false };
+	_bool m_bResetSpinAttack = { true };
 
 	_int m_iPreHp = {};
+	_uint m_iDamage = { };
 
 	_float m_fIdleTime = {};
 	_float m_fTurnTime = {100.f};
@@ -55,9 +61,11 @@ private:
 	CCollider* m_pColliderCom[COLLIDER_END] = {nullptr};
 	CGameObject* m_pPlayer = { nullptr };
 	const _float4x4* m_pPlayerWorldMat = { nullptr };
+	CPart* m_pPart_Weapon = { nullptr };
 
 private:
 	HRESULT Add_Components(LEVEL eLevel, const wstring& _wstrModelTag);
+	HRESULT Add_PartObjects(LEVEL eLevel);
 	HRESULT Bind_ShaderResources();
 
 public:

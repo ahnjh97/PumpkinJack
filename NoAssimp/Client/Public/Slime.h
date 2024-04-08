@@ -33,7 +33,7 @@ private:
 	void Check_SlimeBossCol(_float fTimeDelta);
 
 	void DeathEffect();
-	void ExplodeEffect();
+	void AttackEffect();
 
 private:
 	SLIME m_eState = { SLIME_MOVE };

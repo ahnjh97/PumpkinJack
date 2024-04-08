@@ -6,10 +6,10 @@ matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 matrix g_BoneMatrices[512];
 
-vector g_vLightDir = vector(1.f, -1.f, 1.f, 0.f);
-vector g_vLightDiffuse = vector(1.f, 1.f, 1.f, 1.f);
-vector g_vLightAmbient = vector(1.f, 1.f, 1.f, 1.f);
-vector g_vLightSpecular = vector(1.f, 1.f, 1.f, 1.f);
+vector g_vLightDir; // = vector(1.f, -1.f, 1.f, 0.f);
+vector g_vLightDiffuse; // = vector(1.f, 1.f, 1.f, 1.f);
+vector g_vLightAmbient; // = vector(1.f, 1.f, 1.f, 1.f);
+vector g_vLightSpecular; // = vector(1.f, 1.f, 1.f, 1.f);
 
 texture2D g_DiffuseTexture, g_EmitTexture;
 vector g_vMtrlAmbient = vector(0.4f, 0.4f, 0.4f, 1.f);

@@ -79,6 +79,9 @@ void CLifeBar::Tick(_float fTimeDelta)
 		}
 	}
 
+	if (nullptr == m_pPlayer)
+		return;
+
 	m_fOffset_Y += 0.002f;
 	m_fTime += fTimeDelta * 2.f;
 	m_fPreHpRatio = m_fHpRatio;

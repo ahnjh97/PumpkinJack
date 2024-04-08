@@ -40,6 +40,7 @@ HRESULT CSlime::Initialize(void* pArg)
 
 	m_pModelCom->Set_LerpTime(0.2f);
 	m_iHp = 10;
+	m_pModelCom->Set_AnimSpeed(SLIME_ATTACK, 2.5f);
 	return S_OK;
 }
 
@@ -61,7 +62,7 @@ void CSlime::Tick(_float fTimeDelta)
 	if (m_pPlayer == nullptr)
 		return;
 
-	if (m_iHp <= 0)
+	if (m_eState != SLIME_ATTACK && m_iHp <= 0)
 		m_eState = SLIME_DEATH;
 
 	if (SLIME_DEATH == m_eState)
@@ -74,7 +75,7 @@ void CSlime::Tick(_float fTimeDelta)
 
 	if (m_eState == SLIME_ATTACK && m_pModelCom->isFinished()) // ÀÚÆø°ø°Ý
 	{
-		ExplodeEffect();
+		AttackEffect();
 		Set_Dead();
 	}
 	
@@ -90,7 +91,8 @@ void CSlime::Tick(_float fTimeDelta)
 
 	_vector vPlayerPos = XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1);
 	m_pTransformCom->Look_At_ForLandObject(vPlayerPos);
-	m_pTransformCom->Move(fTimeDelta * 2.f, XMVector3Normalize(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK)));
+	if(m_eState != SLIME_ATTACK)
+		m_pTransformCom->Move(fTimeDelta * 2.f, XMVector3Normalize(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK)));
 
 	if(m_pColliderCom[DEFAULT]->Intersect(m_pPlayerCollider))
 		m_bAttackTrigger = true;
@@ -174,6 +176,9 @@ _bool CSlime::Check_DeathTrigger()
 
 void CSlime::Check_SlimeCol(_float fTimeDelta)
 {
+	if (SLIME_ATTACK == m_eState)
+		return;
+
 	list<CGameObject*> slimeList = m_pGameInstance->Get_ObjectList(LEVEL_SLIMEBOSS, TEXT("Layer_Slime"));
 
 	if (slimeList.empty())
@@ -271,7 +276,7 @@ void CSlime::DeathEffect()
 {
 }
 
-void CSlime::ExplodeEffect()
+void CSlime::AttackEffect()
 {
 }
 
@@ -289,10 +294,15 @@ HRESULT CSlime::Add_Components(const wstring& _wstrModelTag)
 
 	/* For.Com_Collider */
 	CBounding_Sphere::BOUNDING_SPHERE_DESC		ColliderDesc{};
-	ColliderDesc.fRadius = 4.6f;
+	ColliderDesc.fRadius = 5.2f;
 	ColliderDesc.vCenter = _float3(0.f, 0, 0.f);
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom[DEFAULT], &ColliderDesc)))
+		return E_FAIL;
+
+	ColliderDesc.fRadius = 15.f;
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
+		TEXT("Com_Collider_Range"), (CComponent**)&m_pColliderCom[DAMAGE_RANGE], &ColliderDesc)))
 		return E_FAIL;
 
 	return S_OK;

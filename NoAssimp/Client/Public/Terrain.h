@@ -15,7 +15,7 @@ BEGIN(Client)
 class CTerrain final : public CGameObject
 {
 public:
-	enum TEXTURETYPE { TYPE_DIFFUSE, TYPE_MASK, TYPE_BRUSH, TYPE_END };
+	enum TEXTURETYPE { TYPE_DIFFUSE, TYPE_MASK, TYPE_WATER, TYPE_END };
 public:
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{

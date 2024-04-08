@@ -153,38 +153,31 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 		tempDesc.wstrModelTag = wcharModelTag;
 		tempDesc.iLevel = LEVEL_GAMEPLAY;
 
-		if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Jack"))
-		{
+		if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Jack")){
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Player"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_LevelGamePlay"))
-		{
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_LevelGamePlay")){
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Map"), TEXT("Prototype_GameObject_TongMap_GamePlay"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Ballista"))
-		{
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Ballista")){
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Ballista"), TEXT("Prototype_GameObject_Ballista"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_ballistaRotator"))
-		{
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_ballistaRotator")){
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_BallistaRotator"), TEXT("Prototype_GameObject_BallistaRotator"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_ballistaBase"))
-		{
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_ballistaBase")){
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_BallistaBase"), TEXT("Prototype_GameObject_Monster"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_SkullCrossBow"))
-		{
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_SkullCrossBow"))	{
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_SkullCrossBow"), TEXT("Prototype_GameObject_SkullCrossBow"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Kart"))
-		{
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Kart")){
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Kart"), TEXT("Prototype_GameObject_Kart"), &tempDesc)))
 				return E_FAIL;
 		}
@@ -195,28 +188,23 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Rail"), TEXT("Prototype_GameObject_Rail"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_crateBoxPotion"))
-		{
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_crateBoxPotion"))	{
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_CrateBox"), TEXT("Prototype_GameObject_CrateBox"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_fenceStack_SmallCol"))
-		{
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_fenceStack_SmallCol")) {
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_MinePlatform"))
-		{
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_MinePlatform")){
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_MinePlatform"), TEXT("Prototype_GameObject_Monster"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_waterPlane"))
-		{
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_waterPlane"))	{
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Water"), TEXT("Prototype_GameObject_Water"), &tempDesc)))
 				return E_FAIL;
 		}
-		else
-		{
+		else {
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Monster"), &tempDesc)))
 				return E_FAIL;
 		}
@@ -227,12 +215,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_Effect(const wstring & strLayerTag)
 {
-	/*for (size_t i = 0; i < 20; i++)
-	{
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Effect"))))
-			return E_FAIL;
-	}*/
-
 	return S_OK;
 }
 
@@ -260,8 +242,6 @@ HRESULT CLevel_GamePlay::Ready_UI(const wstring& strLayerTag)
 			return E_FAIL;
 	}
 
-
-
 	return S_OK;
 }
 
@@ -276,7 +256,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring & strLayerTag)
 	terrainDesc.iLevel = LEVEL_GAMEPLAY;
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Terrain"), &terrainDesc)))
 		return E_FAIL;
-
 
 	return S_OK;
 }

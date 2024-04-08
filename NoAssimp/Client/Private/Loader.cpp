@@ -15,34 +15,36 @@
 #include "Tool_NonAnim.h"
 #include "Body.h"
 #include "Weapon.h"
+#include "Sky.h"
 
 #include "TongMap_GamePlay.h"
-#include "Ballista.h"
-#include "Arrow.h"
 #include "BallistaRotator.h"
 #include "SkullCrossBow.h"
-#include "Kart.h"
-#include "Rail.h"
+#include "SoldierWeapon.h"
+#include "Ballista.h"
 #include "CrateBox.h"
 #include "Trigger.h"
 #include "Soldier.h"
+#include "Arrow.h"
 #include "Water.h"
+#include "Kart.h"
+#include "Rail.h"
 
-#include "SlimeBoss.h"
-#include "SlimeBoss_Slime.h"
-#include "Knife.h"
+#include "Terrain_SlimeBossRoom.h"
+#include "Pillar_SlimeBossRoom.h"
 #include "TongMap_SlimeBoss.h"
+#include "SlimeBoss_Slime.h"
+#include "SlimeDamageZone.h"
+#include "SlimeBossHead.h"
+#include "Slime_Slime.h"
+#include "SlimeBoss.h"
 #include "Pillar.h"
 #include "Portal.h"
-#include "Pillar_SlimeBossRoom.h"
-#include "SlimeBossHead.h"
+#include "Knife.h"
 #include "Slime.h"
-#include "Slime_Slime.h"
-#include "SlimeDamageZone.h"
-#include "Terrain_SlimeBossRoom.h"
 
 //#include "Effect.h"
-#include "Sky.h"
+
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -150,9 +152,9 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Grass", "Terrain/grassTile%d.dds", 2)))
 		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Mask", "Terrain/Mask.png")))
+	if (FAILED(Add_Texture(eLevel, "Mask", "Terrain/WaterMask.bmp")))
 		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Brush", "Terrain/Brush.png")))
+	if (FAILED(Add_Texture(eLevel, "Water", "Terrain/Water.dds")))
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
@@ -203,6 +205,7 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CrateBox"), CCrateBox);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Trigger"), CTrigger);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Soldier"), CSoldier);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_SoldierWeapon"), CSoldierWeapon);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Water"), CWater);
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
@@ -226,7 +229,7 @@ HRESULT CLoader::Loading_For_MapTool(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Mask", "Terrain/Mask.png")))
 		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Brush", "Terrain/Brush.png")))
+	if (FAILED(Add_Texture(eLevel, "Water", "Terrain/Water.dds")))
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("컴포넌트를(을) 로딩 중 입니다.");
@@ -248,6 +251,11 @@ HRESULT CLoader::Loading_For_MapTool(LEVEL eLevel)
 	/* Prototype_Component_VIBuffer_Terrain_SlimeBossRoom */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_SlimeBossRoom"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/SlimeBossRoom.bmp")))))
+		return E_FAIL;
+
+	/* Prototype_Component_VIBuffer_Terrain_Wizard */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_Wizard"),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_Wizard.bmp")))))
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
@@ -292,8 +300,6 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 	if (FAILED(Add_Texture(eLevel, "Grass", "Terrain/grassTile%d.dds", 2)))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Mask", "Terrain/Mask.png")))
-		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Brush", "Terrain/Brush.png")))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "SlimeBoss_Emit", "CommonTextures/slimeBossTex_Emit.dds")))
 		return E_FAIL;
@@ -360,6 +366,16 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 
 	m_isFinished = true;
 
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
+{
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_Death(LEVEL eLevel)
+{
 	return S_OK;
 }
 
@@ -441,6 +457,11 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 
 	if (eLevel == LEVEL_SLIMEBOSS)
 	{
+		/* For.Prototype_Component_Shader_VtxNorTex_LevelSlimeBoss */
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxNorTex_LevelSlimeBoss"),
+			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex_LevelSlimeBoss.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
+			return E_FAIL;
+
 		/* For.Prototype_Component_Shader_VtxModel_Knife */
 		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_Knife"),
 			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_Knife.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
@@ -587,20 +608,16 @@ void CLoader::TraverseNonAnimModels(LEVEL eLevel, const wstring& rootFolderPath)
 		{
 			switch (eLevel) // 해당 레벨의 맵 Model만 불러오기를 하도록 
 			{
-			case Client::LEVEL_GAMEPLAY:
+			case LEVEL_GAMEPLAY:
 				if (strModelName != "LevelGamePlay")
 					continue;
 				break;
-			case Client::LEVEL_GAMEPLAY2:
-				if (strModelName != "LevelGamePlay2")
-					continue;
-				break;
-			case Client::LEVEL_GAMEPLAY3:
-				if (strModelName != "LevelGamePlay3")
-					continue;
-				break;
-			case Client::LEVEL_SLIMEBOSS:
+			case LEVEL_SLIMEBOSS:
 				if (strModelName != "LevelSlimeBoss")
+					continue;
+				break;
+			case LEVEL_WIZARD:
+				if (strModelName != "LevelWizard")
 					continue;
 				break;
 			}

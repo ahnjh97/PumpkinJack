@@ -183,6 +183,7 @@
     <ClInclude Include="..\Public\Level_Logo.h" />
     <ClInclude Include="..\Public\Level_MapTool.h" />
     <ClInclude Include="..\Public\Level_SlimeBoss.h" />
+    <ClInclude Include="..\Public\Level_Wizard.h" />
     <ClInclude Include="..\Public\LifeBar.h" />
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\public\MainApp.h" />
@@ -201,16 +202,19 @@
     <ClInclude Include="..\Public\SlimeDamageZone.h" />
     <ClInclude Include="..\Public\Slime_Slime.h" />
     <ClInclude Include="..\Public\Soldier.h" />
+    <ClInclude Include="..\Public\SoldierWeapon.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\Terrain_SlimeBossRoom.h" />
     <ClInclude Include="..\Public\TongMap_GamePlay.h" />
     <ClInclude Include="..\Public\TongMap_SlimeBoss.h" />
+    <ClInclude Include="..\Public\TongMap_Wizard.h" />
     <ClInclude Include="..\Public\Tool_Anim.h" />
     <ClInclude Include="..\Public\Tool_NonAnim.h" />
     <ClInclude Include="..\Public\Trigger.h" />
     <ClInclude Include="..\Public\UI_Weapon.h" />
     <ClInclude Include="..\Public\Water.h" />
     <ClInclude Include="..\Public\Weapon.h" />
+    <ClInclude Include="..\Public\Wizard.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -237,6 +241,7 @@
     <ClCompile Include="..\Private\Level_Logo.cpp" />
     <ClCompile Include="..\Private\Level_MapTool.cpp" />
     <ClCompile Include="..\Private\Level_SlimeBoss.cpp" />
+    <ClCompile Include="..\Private\Level_Wizard.cpp" />
     <ClCompile Include="..\Private\LifeBar.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
@@ -255,16 +260,19 @@
     <ClCompile Include="..\Private\SlimeDamageZone.cpp" />
     <ClCompile Include="..\Private\Slime_Slime.cpp" />
     <ClCompile Include="..\Private\Soldier.cpp" />
+    <ClCompile Include="..\Private\SoldierWeapon.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\Terrain_SlimeBossRoom.cpp" />
     <ClCompile Include="..\Private\TongMap_GamePlay.cpp" />
     <ClCompile Include="..\Private\TongMap_SlimeBoss.cpp" />
+    <ClCompile Include="..\Private\TongMap_Wizard.cpp" />
     <ClCompile Include="..\Private\Tool_Anim.cpp" />
     <ClCompile Include="..\Private\Tool_NonAnim.cpp" />
     <ClCompile Include="..\Private\Trigger.cpp" />
     <ClCompile Include="..\Private\UI_Weapon.cpp" />
     <ClCompile Include="..\Private\Water.cpp" />
     <ClCompile Include="..\Private\Weapon.cpp" />
+    <ClCompile Include="..\Private\Wizard.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -293,6 +301,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_LevelSlimeBoss.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex_CrowLifeBar.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex_Inven.hlsl" />

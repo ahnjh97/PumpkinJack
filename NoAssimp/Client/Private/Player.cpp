@@ -42,6 +42,19 @@ _float4 CPlayer::Get_WeaponPos(WEAPON eWeapon)
 	return _float4();
 }
 
+CModel* CPlayer::Get_BodyModel()
+{
+	auto iter = m_Parts.find(TEXT("Part_Body"));
+	if (iter == m_Parts.end())
+		return nullptr;
+
+	CModel* pBodyModel = dynamic_cast<CModel*>(iter->second->Get_Component(TEXT("Com_Model")));
+	if (pBodyModel == nullptr)
+		return nullptr;
+
+	return pBodyModel;
+}
+
 HRESULT CPlayer::Initialize_Prototype()
 {
 	return S_OK;
@@ -153,10 +166,16 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	Update_PositionToCam();
 	Turn_Body(fTimeDelta);
-
 	SetUp_Damage();
-	if (m_bIsAttacking)
+
+	if (m_bIsAttacking)	
 		Activate_Weapon();
+
+	if (WPN_RIFLE == m_eWeapon)
+		RifleRecoil(fTimeDelta);
+
+	if (WPN_SPEAR == m_eWeapon && ROLL_ATTACK == m_eState)
+		SpearRollAttackDash(fTimeDelta);
 
 	for (auto& Pair : m_Parts)
 		Pair.second->Tick(fTimeDelta);
@@ -176,8 +195,7 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 			m_pNavigationCom[i]->Late_Tick();
 	}
 
-	auto iter = m_Parts.find(TEXT("Part_Body"));
-	CModel* pBodyModel = dynamic_cast<CModel*>(iter->second->Get_Component(TEXT("Com_Model")));
+	CModel* pBodyModel = Get_BodyModel();
 	if (pBodyModel == nullptr)
 		return;
 
@@ -203,8 +221,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 {
 	if (m_pCamera == nullptr)
 		return;
-	if (m_eState == HIGHFALL)
-	{
+	if (m_eState == HIGHFALL) {
 		m_bIsJumping = false;
 		return;
 	}
@@ -214,16 +231,14 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 		return;
 	_vector vCamLook = pCamTransform->Get_State_Vector(CTransform::STATE_LOOK);
 	_vector vCamRight = pCamTransform->Get_State_Vector(CTransform::STATE_RIGHT);
-	auto iter = m_Parts.find(TEXT("Part_Body"));
-	CModel* pBodyModel = dynamic_cast<CModel*>(iter->second->Get_Component(TEXT("Com_Model")));
+	CModel* pBodyModel = Get_BodyModel();
 
 	if (m_bInSlimeBossRoom)
 		m_eNavigation = SLIMEBOSSROOM;
 	else
 		m_eNavigation = DEFAULT;
 
-	if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) && m_bKartCol)
-	{
+	if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) && m_bKartCol && !m_bIsRolling)	{
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPushPos);
 		m_bIsPushingKart = true;
 		m_eState = PUSHING;
@@ -237,8 +252,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 
 	Update_KartPush(m_bIsPushingKart);
 
-	if (!(m_pGameInstance->Get_DIKeyState(DIK_LSHIFT) & 0x80) && m_pGameInstance->KeyDown(DIK_TAB) && m_eState == IDLE)
-	{
+	if (!(m_pGameInstance->Get_DIKeyState(DIK_LSHIFT) & 0x80) && m_pGameInstance->KeyDown(DIK_TAB) && m_eState == IDLE)	{
 		m_eWeapon = (WEAPON)((_uint)(m_eWeapon)+1);
 		m_iLastAttack = 0;
 		if (m_eWeapon == WPN_END)
@@ -246,8 +260,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 		Reset_WeaponCollider(m_eWeapon);
 	}
 
-	if (m_pGameInstance->KeyDown(DIK_LCONTROL) && !m_bIsAttacking && !m_bIsJumping && !m_bIsPushingKart)
-	{
+	if (m_pGameInstance->KeyDown(DIK_LCONTROL) && !m_bIsAttacking && !m_bIsJumping && !m_bIsPushingKart) {
 		m_eState = ROLL;
 		m_bIsRolling = true;
 	}
@@ -270,8 +283,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 			m_eState = RUN;
 	}
 
-	if (m_pGameInstance->KeyDown(DIK_SPACE) && !m_bIsAttacking && !m_bIsRolling && !m_bIsPushingKart && (m_iJumpCount > 0) )
-	{
+	if (m_pGameInstance->KeyDown(DIK_SPACE) && !m_bIsAttacking && !m_bIsRolling && !m_bIsPushingKart && (m_iJumpCount > 0) )	{
 		m_pTransformCom->Reset_Jump();
 		m_eState = JUMP;
 		m_bIsJumping = true;
@@ -668,20 +680,15 @@ void CPlayer::TargetNearestEnemy()
 	{
 		Check_EnemyDistance(LEVEL_GAMEPLAY, TEXT("Layer_Soldier"), CCollider::TYPE_OBB);
 	}
-	else if (LEVEL_GAMEPLAY2 == *m_pCurLevel)
-	{
-
-	}
-	else if(LEVEL_GAMEPLAY3 == *m_pCurLevel)
-	{
-
-	}
 	else if (LEVEL_SLIMEBOSS == *m_pCurLevel)
 	{
 		if (!m_bInSlimeBossRoom)
 			Check_EnemyDistance(LEVEL_SLIMEBOSS, TEXT("Layer_Slime"), CCollider::TYPE_SPHERE);
 		else
 			Check_EnemyDistance(LEVEL_SLIMEBOSS, TEXT("Layer_Pillar2"), CCollider::TYPE_OBB);
+	}
+	else if(LEVEL_WIZARD == *m_pCurLevel)
+	{ 
 	}
 
 	if (nullptr == m_pNearestEnemyCollider)
@@ -758,21 +765,22 @@ void CPlayer::SetUp_Damage()
 void CPlayer::Activate_Weapon()
 {
 	CWeapon* pWeapon = { nullptr };
-	CModel* pBodyModel = dynamic_cast<CModel*>(Get_Part(TEXT("Part_Body"))->Get_Component(TEXT("Com_Model")));
+	CModel* pBodyModel = Get_BodyModel();
+	if (pBodyModel == nullptr)
+		return;
+
 	_float fAnimPlayRatio = pBodyModel->Get_AnimPlayRatio();
 	if (WPN_SPEAR == m_eWeapon)
 	{
 		pWeapon = dynamic_cast<CWeapon*>(Get_Part(TEXT("Part_Spear")));
 		pWeapon->DeActivate_WeaponCollider();
 
-		if (ATTACK1 == m_eState)
-		{
-			if (fAnimPlayRatio > 0.25f && fAnimPlayRatio < 0.35f)
+		if (ATTACK1 == m_eState) {
+			if (fAnimPlayRatio > 0.2f && fAnimPlayRatio < 0.35f)
 				pWeapon->Activate_WeaponCollider();
 		}
-		else if (ATTACK2 == m_eState)
-		{
-			if (fAnimPlayRatio > 0.32f && fAnimPlayRatio < 0.42f)
+		else if (ATTACK2 == m_eState) {
+			if (fAnimPlayRatio > 0.24f && fAnimPlayRatio < 0.42f)
 				pWeapon->Activate_WeaponCollider();
 		}
 		else if (ATTACK3 == m_eState || ROLL_ATTACK == m_eState) {
@@ -841,19 +849,15 @@ void CPlayer::Activate_Weapon()
 			if ((fAnimPlayRatio > 0.15f && fAnimPlayRatio < 0.7f))
 				pWeapon->Activate_WeaponCollider();
 
-			if ((fAnimPlayRatio > 0.25f && fAnimPlayRatio < 0.3f) || (fAnimPlayRatio > 0.5f && fAnimPlayRatio < 0.55f))
-			{
-				if (m_bScytheRifleRollAttack)
-				{
+			if ((fAnimPlayRatio > 0.25f && fAnimPlayRatio < 0.3f) || (fAnimPlayRatio > 0.5f && fAnimPlayRatio < 0.55f))	{
+				if (m_bScytheRifleRollAttack) {
 					pWeapon->Reset_Damagable();
 					m_bScytheRifleRollAttack = false;
 				}
 			}
 
-			else if (fAnimPlayRatio > 0.4f && fAnimPlayRatio < 0.45f)
-			{
-				if (!m_bScytheRifleRollAttack)
-				{
+			else if (fAnimPlayRatio > 0.4f && fAnimPlayRatio < 0.45f) {
+				if (!m_bScytheRifleRollAttack) {
 					pWeapon->Reset_Damagable();
 					m_bScytheRifleRollAttack = true;
 				}
@@ -862,6 +866,60 @@ void CPlayer::Activate_Weapon()
 				m_bScytheRifleRollAttack = true;
 		}
 	}
+}
+
+void CPlayer::SpearRollAttackDash(_float fTimeDelta)
+{
+	CModel* pBodyModel = Get_BodyModel();
+	if (pBodyModel == nullptr)
+		return;
+
+	_float fAnimPlayRatio = pBodyModel->Get_AnimPlayRatio();
+
+	if (fAnimPlayRatio > 0.2f && fAnimPlayRatio < 0.4f) {
+		m_fDashTime += fTimeDelta;
+		m_pTransformCom->Move(cosf(m_fDashTime) * 0.075f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
+	}
+		
+	if (pBodyModel->isFinished())
+		m_fDashTime = 0.f;
+}
+
+void CPlayer::RifleRecoil(_float fTimeDelta)
+{
+	CModel* pBodyModel = Get_BodyModel();
+	if (pBodyModel == nullptr)
+		return;
+
+	_float fAnimPlayRatio = pBodyModel->Get_AnimPlayRatio();
+
+	if (ATTACK1 == m_eState) {
+		if (fAnimPlayRatio > 0.28f && fAnimPlayRatio < 0.305f){
+			m_fDashTime += fTimeDelta * 4.f;
+			m_pTransformCom->Move(-cosf(m_fDashTime) * 0.065f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
+		}
+	}
+	else if (ATTACK2 == m_eState) {
+		if (fAnimPlayRatio > 0.3f && fAnimPlayRatio < 0.325f) {
+			m_fDashTime += fTimeDelta * 4.f;
+			m_pTransformCom->Move(-cosf(m_fDashTime) * 0.065f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
+		}
+	}
+	else if (ATTACK3 == m_eState) {
+		if (fAnimPlayRatio > 0.34f && fAnimPlayRatio < 0.365f) {
+			m_fDashTime += fTimeDelta * 4.f;
+			m_pTransformCom->Move(-cosf(m_fDashTime) * 0.065f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
+		}
+	}
+	else if (AIR_ATTACK == m_eState) {
+		if (fAnimPlayRatio > 0.37f && fAnimPlayRatio < 0.395f) {
+			m_fDashTime += fTimeDelta * 4.f;
+			m_pTransformCom->Move(-cosf(m_fDashTime) * 0.035f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
+		}
+	}
+
+	if (pBodyModel->isFinished())
+		m_fDashTime = 0.f;
 }
 
 HRESULT CPlayer::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)

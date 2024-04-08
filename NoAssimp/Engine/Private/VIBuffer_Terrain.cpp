@@ -163,6 +163,12 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const wstring& strHeightMapFileP
 	m_BufferDesc.MiscFlags = 0;
 	m_BufferDesc.StructureByteStride = m_iVertexStride;
 
+	_float fDivideBy{};
+	if (strHeightMapFilePath == TEXT("../../../Resources/Textures/Terrain/Level_GamePlay.bmp"))
+		fDivideBy = 18.8f;
+	else
+		fDivideBy = 4.7f;
+
 	VTXNORTEX*		pVertices = new VTXNORTEX[m_iNumVertices];
 	ZeroMemory(pVertices, sizeof(VTXNORTEX) * m_iNumVertices);
 	m_pVerticesPos = new _float3[m_iNumVertices];
@@ -172,7 +178,7 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const wstring& strHeightMapFileP
 		{
 			_uint	iIndex = i * m_iNumVerticesX + j;
 
-			m_pVerticesPos[iIndex] = pVertices[iIndex].vPosition = _float3(j * 10.f, (pPixel[iIndex] & 0x000000ff) / 4.7f, i * 10.f);
+			m_pVerticesPos[iIndex] = pVertices[iIndex].vPosition = _float3(j * 10.f, (pPixel[iIndex] & 0x000000ff) / fDivideBy, i * 10.f);
 			pVertices[iIndex].vNormal = _float3(0.0f, 0.f, 0.f);
 			pVertices[iIndex].vTexcoord = _float2(j / (m_iNumVerticesX - 1.f), i / (m_iNumVerticesZ - 1.f));
 		}

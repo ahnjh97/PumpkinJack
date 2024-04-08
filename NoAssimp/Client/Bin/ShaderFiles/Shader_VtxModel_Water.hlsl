@@ -3,10 +3,10 @@
 /* 전역변수 : 쉐이더 외부에 있는 데이터를 쉐이더 안으로 받아온다. */
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
-vector g_vLightDir = vector(1.f, -1.f, 1.f, 0.f);
-vector g_vLightDiffuse = vector(1.f, 1.f, 1.f, 1.f);
-vector g_vLightAmbient = vector(1.f, 1.f, 1.f, 1.f);
-vector g_vLightSpecular = vector(1.f, 1.f, 1.f, 1.f);
+vector g_vLightDir;//= vector(1.f, -1.f, 1.f, 0.f);
+vector g_vLightDiffuse;//= vector(1.f, 1.f, 1.f, 1.f);
+vector g_vLightAmbient;//= vector(1.f, 1.f, 1.f, 1.f);
+vector g_vLightSpecular;//= vector(1.f, 1.f, 1.f, 1.f);
 vector g_vMtrlAmbient = vector(0.4f, 0.4f, 0.4f, 1.f);
 vector g_vMtrlSpecular = vector(1.f, 1.f, 1.f, 1.f);
 vector g_vCamPosition;

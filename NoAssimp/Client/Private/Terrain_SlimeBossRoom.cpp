@@ -109,9 +109,9 @@ HRESULT CTerrain_SlimeBossRoom::Add_Components(LEVEL eLevel)
 		TEXT("Com_Texture_Mask"), (CComponent**)&m_pTextureCom[TYPE_MASK])))
 		return E_FAIL;
 
-	/* For.Com_Texture_Brush */
-	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_Brush"),
-		TEXT("Com_Texture_Brush"), (CComponent**)&m_pTextureCom[TYPE_BRUSH])))
+	/* For.Com_Texture_Water */
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_Water"),
+		TEXT("Com_Texture_Water"), (CComponent**)&m_pTextureCom[TYPE_WATER])))
 		return E_FAIL;
 
 	wstring wstrVIBufferTerrain = TEXT("Prototype_Component_VIBuffer_Terrain_SlimeBossRoom");
@@ -146,7 +146,7 @@ HRESULT CTerrain_SlimeBossRoom::Bind_ShaderResources()
 	if (FAILED(m_pTextureCom[TYPE_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0)))
 		return E_FAIL;
 
-	if (FAILED(m_pTextureCom[TYPE_BRUSH]->Bind_ShaderResource(m_pShaderCom, "g_BrushTexture", 0)))
+	if (FAILED(m_pTextureCom[TYPE_WATER]->Bind_ShaderResource(m_pShaderCom, "g_WaterTexture", 0)))
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))

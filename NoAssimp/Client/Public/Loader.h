@@ -42,6 +42,8 @@ private:
 	HRESULT Loading_For_GamePlay(LEVEL eLevel);
 	HRESULT Loading_For_MapTool(LEVEL eLevel);
 	HRESULT Loading_For_SlimeBoss(LEVEL eLevel);
+	HRESULT Loading_For_Wizard(LEVEL eLevel);
+	HRESULT Loading_For_Death(LEVEL eLevel);
 
 	HRESULT Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName);
 	HRESULT Add_Models_GamePlay();

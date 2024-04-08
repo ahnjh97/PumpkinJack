@@ -43,7 +43,7 @@ void CTongMap_GamePlay::Tick(_float fTimeDelta)
 
 void CTongMap_GamePlay::Late_Tick(_float fTimeDelta)
 {
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this); // 알파값 있는 애들때문에 객체 분리해야될거같음
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this); // 알파값 있는 애들때문에 객체 분리해야될거같음
 }
 
 HRESULT CTongMap_GamePlay::Render()

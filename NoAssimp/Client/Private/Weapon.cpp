@@ -15,7 +15,13 @@ CWeapon::CWeapon(const CWeapon& rhs)
 void CWeapon::Reset_Damagable()
 {
 	if (m_pColliderCom != nullptr)
-		m_pColliderCom->Clear_CollidedColliders();
+	{
+		for (_int i = 0; i < 2; i++)
+		{
+			if(m_pColliderCom[i] != nullptr)
+				m_pColliderCom[i]->Clear_CollidedColliders();
+		}
+	}
 }
 
 HRESULT CWeapon::Initialize_Prototype()
@@ -40,20 +46,17 @@ HRESULT CWeapon::Initialize(void* pArg)
 		return E_FAIL;
 
 	
-	if (m_pModelCom->Get_ModelName() == "Spear")
-	{
+	if (m_pModelCom->Get_ModelName() == "Spear")	{
 		m_pTransformCom->Rotation(XMVectorSet(0, 0, 1, 0), -XM_PIDIV2 + 0.1f);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0, 0, 0, 1));
 	}
 		
-	if (m_pModelCom->Get_ModelName() == "Rifle")
-	{
+	if (m_pModelCom->Get_ModelName() == "Rifle")	{
 		m_pTransformCom->Rotation(XMVectorSet(0, 0, 1, 0), -XM_PIDIV2);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0, 0, -1, 1));
 	}
 		
-	if (m_pModelCom->Get_ModelName() == "Scythe")
-	{
+	if (m_pModelCom->Get_ModelName() == "Scythe")	{
 		m_pTransformCom->Rotation(XMVectorSet(0, 0, 1, 0), XM_PIDIV2);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0, -0.25f, 0.3f, 1));
 	}
@@ -69,8 +72,7 @@ void CWeapon::Tick(_float fTimeDelta)
 	if (!m_bCorrectWeapon)
 		return;
 
-	if (m_bActivated)
-	{
+	if (m_bActivated) {
 		Check_SlimeCol();
 		Check_SlimeBossRoomPillarCol();
 		Check_SoldierCol();
@@ -99,7 +101,11 @@ void CWeapon::Late_Tick(_float fTimeDelta)
 
 	if (m_bCorrectWeapon)
 	{
-		m_pColliderCom->Tick(XMLoadFloat4x4(&m_WorldMatrix));
+		for (_int i = 0; i < 2; i++) {
+			if (m_pColliderCom[i] != nullptr)
+				m_pColliderCom[i]->Tick(XMLoadFloat4x4(&m_WorldMatrix));
+		}
+
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	}
 }
@@ -127,15 +133,20 @@ HRESULT CWeapon::Render()
 	}
 
 	if (m_bActivated)
-		m_pColliderCom->Render();
-
+	{
+		for (_int i = 0; i < 2; i++)
+		{
+			if (m_pColliderCom[i] != nullptr)
+				m_pColliderCom[i]->Render();
+		}
+	}
+	
 	return S_OK;
 }
 
 _bool CWeapon::Check_CorrectWeapon()
 {
-	if (m_pModelCom != nullptr)
-	{
+	if (m_pModelCom != nullptr)	{
 		if (*m_pWeapon == WPN_SPEAR && m_pModelCom->Get_ModelName() == "Spear")
 			return true;
 		if (*m_pWeapon == WPN_SCYTHE && m_pModelCom->Get_ModelName() == "Scythe")
@@ -165,10 +176,10 @@ void CWeapon::Check_SlimeCol()
 		if (pSlimeCollider == nullptr)
 			continue;
 
-		if (m_pColliderCom->Check_AlreadyCollided(pSlimeCollider))
+		if (m_pColliderCom[0]->Check_AlreadyCollided(pSlimeCollider) || m_pColliderCom[1]->Check_AlreadyCollided(pSlimeCollider))
 			continue;
 
-		if (m_pColliderCom->Intersect(pSlimeCollider))
+		if (m_pColliderCom[0]->Intersect(pSlimeCollider) || m_pColliderCom[1]->Intersect(pSlimeCollider))
 			slime->Deduct_HP(*m_pDamage);
 	}
 }
@@ -191,10 +202,10 @@ void CWeapon::Check_SlimeBossRoomPillarCol()
 		if (pSBR_Pillar_Collider == nullptr)
 			continue;
 
-		if (m_pColliderCom->Check_AlreadyCollided(pSBR_Pillar_Collider))
+		if (m_pColliderCom[0]->Check_AlreadyCollided(pSBR_Pillar_Collider) || m_pColliderCom[1]->Check_AlreadyCollided(pSBR_Pillar_Collider))
 			continue;
 
-		if (m_pColliderCom->Intersect(pSBR_Pillar_Collider))
+		if (m_pColliderCom[0]->Intersect(pSBR_Pillar_Collider) || m_pColliderCom[1]->Intersect(pSBR_Pillar_Collider))
 			SBR_Pillar->Deduct_HP(*m_pDamage);
 	}
 }
@@ -217,10 +228,10 @@ void CWeapon::Check_SoldierCol()
 		if (pSoliderCollider == nullptr)
 			continue;
 
-		if (m_pColliderCom->Check_AlreadyCollided(pSoliderCollider))
+		if (m_pColliderCom[0]->Check_AlreadyCollided(pSoliderCollider) || m_pColliderCom[1]->Check_AlreadyCollided(pSoliderCollider))
 			continue;
 
-		if (m_pColliderCom->Intersect(pSoliderCollider))
+		if (m_pColliderCom[0]->Intersect(pSoliderCollider) || m_pColliderCom[1]->Intersect(pSoliderCollider))
 			soldier->Deduct_HP(*m_pDamage);
 	}
 }
@@ -243,17 +254,34 @@ HRESULT CWeapon::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 	ColliderDesc.vCenter = _float3(0.f, 0, 0.f);
 	if (m_pModelCom->Get_ModelName() == "Spear")
 		ColliderDesc.vCenter = _float3(0.f, 10, 0.f);
-	else if (m_pModelCom->Get_ModelName() == "Rifle")
-	{
+	else if (m_pModelCom->Get_ModelName() == "Rifle") {
 		ColliderDesc.fRadius = 9.2f;
 		ColliderDesc.vCenter = _float3(0.f, 0, 14.5f);
 	}
-
 	else if (m_pModelCom->Get_ModelName() == "Scythe")
 		ColliderDesc.vCenter = _float3(0.f, 10, 0.f);
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
-		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom, &ColliderDesc)))
+		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom[0], &ColliderDesc)))
+		return E_FAIL;
+
+	/* For.Com_Collider_Sub */
+	CBounding_OBB::BOUNDING_OBB_DESC SubColliderDesc{};
+	if (m_pModelCom->Get_ModelName() == "Spear") {
+		SubColliderDesc.vSize = _float3(1, 9, 1);
+		SubColliderDesc.vCenter = _float3(0, 2, 0);
+	}
+	else if (m_pModelCom->Get_ModelName() == "Rifle") {
+		SubColliderDesc.vSize = _float3(1, 1, 4);
+		SubColliderDesc.vCenter = _float3(0, 0, 4);
+	}
+	else if (m_pModelCom->Get_ModelName() == "Scythe") {
+		SubColliderDesc.vSize = _float3(1, 6, 1);
+		SubColliderDesc.vCenter = _float3(0, 3, 0);
+	}
+
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"),
+		TEXT("Com_Collider_Sub"), (CComponent**)&m_pColliderCom[1], &SubColliderDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -263,14 +291,13 @@ HRESULT CWeapon::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -306,7 +333,8 @@ void CWeapon::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pColliderCom);
+	for(_int i = 0; i < 2; i++)
+		Safe_Release(m_pColliderCom[i]);
 	Safe_Release(m_pSocket);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);

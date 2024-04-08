@@ -91,9 +91,16 @@ HRESULT CTerrain::Render()
 HRESULT CTerrain::Add_Components(LEVEL eLevel)
 {
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Shader_VtxNorTex"),
-		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
-		return E_FAIL;
+	if (LEVEL_SLIMEBOSS == eLevel) {
+		if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Shader_VtxNorTex_LevelSlimeBoss"),
+			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+			return E_FAIL;
+	}
+	else {
+		if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Shader_VtxNorTex"),
+			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+			return E_FAIL;
+	}
 
 	/* For.Com_Texture_Diffuse */
 	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_Ground"),
@@ -105,9 +112,9 @@ HRESULT CTerrain::Add_Components(LEVEL eLevel)
 		TEXT("Com_Texture_Mask"), (CComponent**)&m_pTextureCom[TYPE_MASK])))
 		return E_FAIL;
 
-	/* For.Com_Texture_Brush */
-	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_Brush"),
-		TEXT("Com_Texture_Brush"), (CComponent**)&m_pTextureCom[TYPE_BRUSH])))
+	/* For.Com_Texture_Water */
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_Water"),
+		TEXT("Com_Texture_Water"), (CComponent**)&m_pTextureCom[TYPE_WATER])))
 		return E_FAIL;
 	
 	wstring wstrVIBufferTerrain = TEXT("Prototype_Component_VIBuffer_Terrain");
@@ -115,6 +122,8 @@ HRESULT CTerrain::Add_Components(LEVEL eLevel)
 		wstrVIBufferTerrain += TEXT("_GamePlay");
 	else if (eLevel == LEVEL_SLIMEBOSS)
 		wstrVIBufferTerrain += TEXT("_SlimeBoss");
+	else if(eLevel == LEVEL_WIZARD)
+		wstrVIBufferTerrain += TEXT("_Wizard");
 
 	/* For.Com_VIBuffer */
 	if (FAILED(__super::Add_Component(eLevel, wstrVIBufferTerrain, TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
@@ -147,7 +156,7 @@ HRESULT CTerrain::Bind_ShaderResources()
 	if (FAILED(m_pTextureCom[TYPE_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0)))
 		return E_FAIL;
 
-	if (FAILED(m_pTextureCom[TYPE_BRUSH]->Bind_ShaderResource(m_pShaderCom, "g_BrushTexture", 0)))
+	if (FAILED(m_pTextureCom[TYPE_WATER]->Bind_ShaderResource(m_pShaderCom, "g_WaterTexture", 0)))
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))

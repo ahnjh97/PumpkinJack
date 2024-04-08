@@ -178,23 +178,19 @@ HRESULT CLevel_SlimeBoss::Ready_Layer_Monster(const wstring& strLayerTag)
 		tempDesc.matWorld = matWorld;
 		tempDesc.wstrModelTag = wcharModelTag;
 		tempDesc.iLevel = LEVEL_SLIMEBOSS;
-		if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Jack"))
-		{
+		if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Jack")){
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Player"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_SlimeBoss"))
-		{
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_SlimeBoss")){
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_SlimeBoss"), TEXT("Prototype_GameObject_SlimeBoss"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if(tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_LevelSlimeBoss"))
-		{
+		else if(tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_LevelSlimeBoss")){
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_Map"), TEXT("Prototype_GameObject_TongMap_SlimeBoss"), &tempDesc)))
 				return E_FAIL;
 		}
-		else
-		{
+		else{
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, strLayerTag, TEXT("Prototype_GameObject_Monster"), &tempDesc)))
 				return E_FAIL;
 		}

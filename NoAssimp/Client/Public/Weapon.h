@@ -57,7 +57,7 @@ private:
 	const WEAPON* m_pWeapon = {};
 	const STATE* m_pState = {};
 	const _uint* m_pDamage = {};
-	CCollider* m_pColliderCom = { nullptr };
+	CCollider* m_pColliderCom[2] = {nullptr};
 
 private:
 	HRESULT Add_Components(LEVEL eLevel, const wstring& _wstrModelTag);

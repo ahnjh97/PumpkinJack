@@ -58,12 +58,6 @@
     <Filter Include="02.GameObjects\Player">
       <UniqueIdentifier>{f536d6a1-b841-49e8-9585-b965b6f55737}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Player\Body">
-      <UniqueIdentifier>{48b8254c-1435-4716-b1d6-f21b638a2498}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Player\Weapon">
-      <UniqueIdentifier>{4569359c-bf45-4398-b9d7-4dd78585945f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Levels\SlimeBoss">
       <UniqueIdentifier>{94e6e0d5-20a5-469f-9fc1-b657d034cb3a}</UniqueIdentifier>
     </Filter>
@@ -112,9 +106,6 @@
     <Filter Include="02.GameObjects\Level_SlimeBoss">
       <UniqueIdentifier>{4aa7cc76-a207-452b-b071-fee6bb68994c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Level_SlimeBoss\Part_SlimeBoss">
-      <UniqueIdentifier>{4bd183c5-abbb-4768-8e59-0bce6d955da6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Level_SlimeBoss\Knife">
       <UniqueIdentifier>{12d7815e-e351-420a-9d1a-1c9732d1c368}</UniqueIdentifier>
     </Filter>
@@ -150,6 +141,27 @@
     </Filter>
     <Filter Include="02.GameObjects\Level_GamePlay\SkullCrossBow">
       <UniqueIdentifier>{28bce0e1-5d2e-48e7-88e2-342597485dc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\Wizard">
+      <UniqueIdentifier>{8e8e492d-8b96-44f8-87db-3cdcc41bc460}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_Wizard">
+      <UniqueIdentifier>{bfd47f8a-60d3-4cd6-a9a5-77f4fe5a323f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_Wizard\Wizard">
+      <UniqueIdentifier>{439d7498-aa80-4c8e-8c29-c2a57d9653a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay\Soldier\Part_Weapon">
+      <UniqueIdentifier>{c502e2f4-093f-44e0-b27f-52fa65850827}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Player\Part_Body">
+      <UniqueIdentifier>{48b8254c-1435-4716-b1d6-f21b638a2498}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Player\Part_Weapon">
+      <UniqueIdentifier>{4569359c-bf45-4398-b9d7-4dd78585945f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_SlimeBoss\SlimeBoss\Part_SlimeBoss">
+      <UniqueIdentifier>{4bd183c5-abbb-4768-8e59-0bce6d955da6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -220,10 +232,10 @@
       <Filter>_MyImGui</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Weapon.h">
-      <Filter>02.GameObjects\Player\Weapon</Filter>
+      <Filter>02.GameObjects\Player\Part_Weapon</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Body.h">
-      <Filter>02.GameObjects\Player\Body</Filter>
+      <Filter>02.GameObjects\Player\Part_Body</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LifeBar.h">
       <Filter>02.GameObjects\UI\LifeBar</Filter>
@@ -235,7 +247,7 @@
       <Filter>02.GameObjects\Level_SlimeBoss\Slime</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SlimeBoss_Slime.h">
-      <Filter>02.GameObjects\Level_SlimeBoss\Part_SlimeBoss</Filter>
+      <Filter>02.GameObjects\Level_SlimeBoss\SlimeBoss\Part_SlimeBoss</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Slime_Slime.h">
       <Filter>02.GameObjects\Level_SlimeBoss\Slime\Part_Slime</Filter>
@@ -312,6 +324,18 @@
     <ClInclude Include="..\Public\TongMap_SlimeBoss.h">
       <Filter>02.GameObjects\Level_SlimeBoss</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Wizard.h">
+      <Filter>02.GameObjects\Level_Wizard\Wizard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TongMap_Wizard.h">
+      <Filter>02.GameObjects\Level_Wizard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Wizard.h">
+      <Filter>01.Levels\Wizard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SoldierWeapon.h">
+      <Filter>02.GameObjects\Level_GamePlay\Soldier\Part_Weapon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -372,10 +396,10 @@
       <Filter>_MyImGui</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Weapon.cpp">
-      <Filter>02.GameObjects\Player\Weapon</Filter>
+      <Filter>02.GameObjects\Player\Part_Weapon</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Body.cpp">
-      <Filter>02.GameObjects\Player\Body</Filter>
+      <Filter>02.GameObjects\Player\Part_Body</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LifeBar.cpp">
       <Filter>02.GameObjects\UI\LifeBar</Filter>
@@ -387,7 +411,7 @@
       <Filter>02.GameObjects\Level_SlimeBoss\Slime</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SlimeBoss_Slime.cpp">
-      <Filter>02.GameObjects\Level_SlimeBoss\Part_SlimeBoss</Filter>
+      <Filter>02.GameObjects\Level_SlimeBoss\SlimeBoss\Part_SlimeBoss</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Slime_Slime.cpp">
       <Filter>02.GameObjects\Level_SlimeBoss\Slime\Part_Slime</Filter>
@@ -464,6 +488,18 @@
     <ClCompile Include="..\Private\TongMap_SlimeBoss.cpp">
       <Filter>02.GameObjects\Level_SlimeBoss</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Wizard.cpp">
+      <Filter>02.GameObjects\Level_Wizard\Wizard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TongMap_Wizard.cpp">
+      <Filter>02.GameObjects\Level_Wizard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Wizard.cpp">
+      <Filter>01.Levels\Wizard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SoldierWeapon.cpp">
+      <Filter>02.GameObjects\Level_GamePlay\Soldier\Part_Weapon</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -522,6 +558,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Water.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_LevelSlimeBoss.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

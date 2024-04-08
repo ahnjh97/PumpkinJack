@@ -69,7 +69,7 @@ private:
 	_int						m_iTerrainIndex = { -1 };
 	
 	vector<string>				vecLevelName = {"Level_Static", "Level_Loading", "Level_Logo", "Level_MapTool", 
-		"Level_GamePlay", "Level_GamePlay2","Level_GamePlay3", "Level_SlimeBoss", "Level_End"};
+		"Level_GamePlay", "Level_SlimeBoss", "Level_Wizard", "Level_Death", "Level_End"};
 	vector<CAnimation*>			vecAnimations;
 	vector<string>				vecMode = { "Objects", "Navigation", "None" };
 

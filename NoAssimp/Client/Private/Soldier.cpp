@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Soldier.h"
+#include "SoldierWeapon.h"
 
 CSoldier::CSoldier(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -30,6 +31,9 @@ HRESULT CSoldier::Initialize(void* pArg)
 		return E_FAIL;
 
 	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel), GameObjectDesc.wstrModelTag)))
+		return E_FAIL;
+
+	if (FAILED(Add_PartObjects(LEVEL(GameObjectDesc.iLevel))))
 		return E_FAIL;
 
 	if (m_pModelCom != nullptr)
@@ -89,22 +93,41 @@ void CSoldier::Tick(_float fTimeDelta)
 
 	if (m_eState == SOLDIER_RUN)
 		m_pTransformCom->Move(fTimeDelta * 2.8f, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
+
 	else if (m_eState == SOLDIER_SPIN)
 	{
 		_float fPlayRatio = m_pModelCom->Get_AnimPlayRatio();
-		if(fPlayRatio >= 0.4f && fPlayRatio <= 0.7f)
-			m_pTransformCom->Move(fTimeDelta * 1.9f, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
+		if (fPlayRatio >= 0.4f && fPlayRatio <= 0.7f) {
+			if(CalculateDistanceFromPlayer() > 5.f)
+				m_pTransformCom->Move(fTimeDelta * 1.9f, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
+		}
 	}
-		
+	
+	if (SOLDIER_ATTACK == m_eState)
+		m_iDamage = 10;
+	else if (SOLDIER_SPIN == m_eState)
+		m_iDamage = 5;
+	
+	if(SOLDIER_ATTACK == m_eState || SOLDIER_SPIN == m_eState)
+		ActivateSoldierWeapon();
+
+	m_pPart_Weapon->Tick(fTimeDelta);
+
 	for(_int i = 0; i < COLLIDER_END; i++)
 		m_pColliderCom[i]->Tick(m_pTransformCom->Get_WorldMatrix());
 }
 
 void CSoldier::Late_Tick(_float fTimeDelta)
 {
+	m_pPart_Weapon->Late_Tick(fTimeDelta);
 	m_pModelCom->Play_Animation(fTimeDelta);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_iPreHp = m_iHp;
+
+	if ((SOLDIER_ATTACK == m_eState || SOLDIER_SPIN == m_eState) && m_pModelCom->isFinished()) {
+		CSoldierWeapon* pSoldierWeapon = dynamic_cast<CSoldierWeapon*>(m_pPart_Weapon);
+		pSoldierWeapon->Reset_Damagable();
+	}
 }
 
 HRESULT CSoldier::Render()
@@ -246,6 +269,42 @@ void CSoldier::DeathEffect()
 {
 }
 
+void CSoldier::ActivateSoldierWeapon()
+{
+	CSoldierWeapon* pSoldierWeapon = dynamic_cast<CSoldierWeapon*>(m_pPart_Weapon);
+	pSoldierWeapon->DeActivate_WeaponCollider();
+	_float fAnimPlayRatio = m_pModelCom->Get_AnimPlayRatio();
+
+	if (SOLDIER_ATTACK == m_eState)
+	{
+		if (fAnimPlayRatio > 0.2f && fAnimPlayRatio < 0.24f)
+			pSoldierWeapon->Activate_WeaponCollider();
+	}
+	else if (SOLDIER_SPIN == m_eState)
+	{
+		if (fAnimPlayRatio < 0.3f)
+			m_bResetSpinAttack = true;
+
+		if (fAnimPlayRatio > 0.32f && fAnimPlayRatio < 0.75f) // 0.5f 마다 초기화. 총 7번 초기화
+			pSoldierWeapon->Activate_WeaponCollider();
+
+		if ((fAnimPlayRatio > 0.38f && fAnimPlayRatio < 0.43f) || (fAnimPlayRatio > 0.48f && fAnimPlayRatio < 0.53f)
+			|| (fAnimPlayRatio > 0.58f && fAnimPlayRatio < 0.63f) || (fAnimPlayRatio > 0.68f && fAnimPlayRatio < 0.73f)) {
+			if (m_bResetSpinAttack) {
+				pSoldierWeapon->Reset_Damagable();
+				m_bResetSpinAttack = false;
+			}
+		}
+		else if ((fAnimPlayRatio > 0.43f && fAnimPlayRatio < 0.48f) || (fAnimPlayRatio > 0.53f && fAnimPlayRatio < 0.58f)
+			|| (fAnimPlayRatio > 0.63f && fAnimPlayRatio < 0.68f)) {
+			if (!m_bResetSpinAttack) {
+				pSoldierWeapon->Reset_Damagable();
+				m_bResetSpinAttack = true;
+			}
+		}
+	}
+}
+
 _bool CSoldier::IsPlayerInRange()
 {
 	CCollider* pPlayerCollider = dynamic_cast<CCollider*>(m_pPlayer->Get_Component(TEXT("Com_Collider")));
@@ -280,6 +339,17 @@ _bool CSoldier::Check_KartCol(_float fTimeDelta)
 	return _bool();
 }
 
+_float CSoldier::CalculateDistanceFromPlayer()
+{
+	_vector vPlayerPos = XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1);
+	_vector vSoldierPos = m_pTransformCom->Get_Pos_Vector();
+
+	_vector vSubtraction = vPlayerPos - vSoldierPos;
+
+	_float fDis = XMVectorGetX(XMVector3Length(vSubtraction));
+	return fDis;
+}
+
 HRESULT CSoldier::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 {
 	/* For.Com_Model */
@@ -305,6 +375,24 @@ HRESULT CSoldier::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 		TEXT("Com_Collider_Range"), (CComponent**)&m_pColliderCom[RANGE], &RangeColliderDesc)))
 		return E_FAIL;
 
+	return S_OK;
+}
+
+HRESULT CSoldier::Add_PartObjects(LEVEL eLevel)
+{
+	/* For.Part_SoldierWeapon */
+	CPart* pSoldierWeapon = { nullptr };
+	CSoldierWeapon::SOLDIER_WEAPON_DESC	SoldierWeaponDesc{};
+	SoldierWeaponDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	SoldierWeaponDesc.pSocket = m_pModelCom->Get_BonePtr("arme");
+	SoldierWeaponDesc.pState = &m_eState;
+	SoldierWeaponDesc.pDamage = &m_iDamage;
+	SoldierWeaponDesc.iLevel = eLevel;
+	pSoldierWeapon = dynamic_cast<CPart*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Part_SoldierWeapon"), &SoldierWeaponDesc));
+	if (nullptr == pSoldierWeapon)
+		return E_FAIL;
+
+	m_pPart_Weapon = pSoldierWeapon;
 	return S_OK;
 }
 
@@ -372,6 +460,7 @@ void CSoldier::Free()
 	__super::Free();
 
 	Safe_Release(m_pPlayer);
+	Safe_Release(m_pPart_Weapon);
 	for(_int i = 0; i<COLLIDER_END; i++)
 		Safe_Release(m_pColliderCom[i]);
 	Safe_Release(m_pShaderCom);

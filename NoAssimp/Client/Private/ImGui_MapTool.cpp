@@ -442,13 +442,13 @@ _bool CImGui_MapTool::Menu_Level()
 {
 	ImGui::SeparatorText("Level");
 
-	for (_int i = LEVEL_GAMEPLAY; i < LEVEL_END; i++)
+	for (_int i = LEVEL_GAMEPLAY; i < LEVEL_DEATH; i++)
 	{
 		if (ImGui::RadioButton(vecLevelName[i].c_str(), iLevelIndex == i - LEVEL_GAMEPLAY))
 		{
 			iLevelIndex = i - LEVEL_GAMEPLAY; // 선택 시 실행할 로직 추가
 		}
-		if (i % 2 == 0)
+		if (i  == LEVEL_GAMEPLAY)
 			ImGui::SameLine();
 	}
 	if (ImGui::Button("Save", ImVec2(125, 40)))
@@ -557,7 +557,6 @@ void CImGui_MapTool::Edit_Object()
 			{
 				_float4x4 tempMatrix = pAnimTransform->Get_WorldFloat4x4();
 				EditGuizmo(tempMatrix); // 선택한 Anim모델의 월드행렬 위치만 보기
-				//pAnimTransform->Set_WorldMatrix(tempMatrix);
 			}
 		}
 		else
@@ -620,7 +619,7 @@ void CImGui_MapTool::Menu_Navigation()
 void CImGui_MapTool::Save_Level()
 {
 	_uint iCurLevel = { LEVEL_GAMEPLAY };
-	for (_uint i = LEVEL_GAMEPLAY; i < LEVEL_END; i++)
+	for (_uint i = LEVEL_GAMEPLAY; i < LEVEL_DEATH; i++)
 	{
 		if (strCurLevel == vecLevelName[i])
 		{

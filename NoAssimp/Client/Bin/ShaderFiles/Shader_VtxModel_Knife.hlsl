@@ -6,7 +6,7 @@ matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 float g_fAlpha;
 vector g_vLightDir = vector(1.f, -1.f, 1.f, 0.f);
-vector g_vLightDiffuse = vector(1.f, 1.f, 1.f, 1.f);
+vector g_vLightDiffuse= vector(1.f, 1.f, 1.f, 1.f);
 vector g_vLightAmbient = vector(1.f, 1.f, 1.f, 1.f);
 vector g_vLightSpecular = vector(1.f, 1.f, 1.f, 1.f);
 

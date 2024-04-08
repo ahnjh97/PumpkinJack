@@ -83,9 +83,9 @@ HRESULT CGrid::Add_Components(const wstring& wstrCurLevel)
 		TEXT("Com_Texture_Mask"), (CComponent**)&m_pTextureCom[TYPE_MASK])))
 		return E_FAIL;
 
-	/* For.Com_Texture_Brush */
-	if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_Texture_Brush"),
-		TEXT("Com_Texture_Brush"), (CComponent**)&m_pTextureCom[TYPE_BRUSH])))
+	/* For.Com_Texture_Water */
+	if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_Texture_Water"),
+		TEXT("Com_Texture_Water"), (CComponent**)&m_pTextureCom[TYPE_WATER])))
 		return E_FAIL;
 
 	if (m_iGridIndex == 1)
@@ -98,10 +98,6 @@ HRESULT CGrid::Add_Components(const wstring& wstrCurLevel)
 	else
 	{
 		wstring wstrLevelName = wstrCurLevel.substr(6);
-		if (wstrLevelName == L"GamePlay2")
-			wstrLevelName = L"GamePlay";
-		else if (wstrLevelName == L"GamePlay3")
-			wstrLevelName = L"GamePlay";
 		/* For.Com_VIBuffer */
 		if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_VIBuffer_Terrain_" + wstrLevelName),
 			TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
@@ -130,7 +126,7 @@ HRESULT CGrid::Bind_ShaderResources()
 	if (FAILED(m_pTextureCom[TYPE_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0)))
 		return E_FAIL;
 
-	if (FAILED(m_pTextureCom[TYPE_BRUSH]->Bind_ShaderResource(m_pShaderCom, "g_BrushTexture", 0)))
+	if (FAILED(m_pTextureCom[TYPE_WATER]->Bind_ShaderResource(m_pShaderCom, "g_WaterTexture", 0)))
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))
