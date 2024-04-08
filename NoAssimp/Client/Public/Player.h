@@ -82,6 +82,7 @@ private:
 	_bool m_bInSlimeBossRoom = { false };
 	_bool m_bPreInSlimeBossRoom = { false };
 	_bool m_bIsPushingKart = { false };
+	_bool m_bPreIsPushingKart = { false };
 	_bool m_bKartCol = { false };
 	_bool m_bScytheRifleRollAttack = { true };
 

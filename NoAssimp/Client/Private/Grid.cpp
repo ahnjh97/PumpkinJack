@@ -68,10 +68,20 @@ HRESULT CGrid::Render()
 
 HRESULT CGrid::Add_Components(const wstring& wstrCurLevel)
 {
-	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_Shader_VtxNorTex"),
-		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
-		return E_FAIL;
+	///* For.Com_Shader */
+	//if (wstrCurLevel == TEXT("Level_GamePlay"))
+	//{
+	//	if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_Shader_VtxNorTex_"),
+	//		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+	//		return E_FAIL;
+	//}
+	//else {
+		if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_Shader_VtxNorTex"),
+			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+			return E_FAIL;
+	//}
+
+
 
 	/* For.Com_Texture_Diffuse */
 	if (FAILED(__super::Add_Component(LEVEL_MAPTOOL, TEXT("Prototype_Component_Texture_Ground"),

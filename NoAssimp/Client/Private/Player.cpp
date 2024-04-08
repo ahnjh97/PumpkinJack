@@ -116,7 +116,7 @@ void CPlayer::Tick(_float fTimeDelta)
 			m_bIsPushingKart = false;
 	}
 		
-	else if(*m_pGameInstance->Get_CurrentLevelID() == LEVEL_SLIMEBOSS)
+	else if(*m_pCurLevel == LEVEL_SLIMEBOSS)
 		bWallCol = Check_WallColliders_LevelSlimeBoss();
 
 	m_pTransformCom->Set_WallCol(bWallCol);
@@ -146,6 +146,9 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	Link_Animation();
 	OnKeyInput(fTimeDelta);
+
+	if (m_bPreIsPushingKart && !m_bIsPushingKart)
+		m_pNavigationCom[DEFAULT]->Find_CurrentIndex(m_pTransformCom->Get_Pos_Vector());
 
 	if (m_bIsJumping)
 	{
@@ -203,6 +206,7 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 		Reset_WeaponCollider(m_eWeapon);
 
 	m_bPreInSlimeBossRoom = m_bInSlimeBossRoom;
+	m_bPreIsPushingKart = m_bIsPushingKart;
 }
 
 HRESULT CPlayer::Render()

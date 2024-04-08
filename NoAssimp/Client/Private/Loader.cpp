@@ -227,16 +227,12 @@ HRESULT CLoader::Loading_For_MapTool(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Grass", "Terrain/grassTile%d.dds", 2)))
 		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Mask", "Terrain/Mask.png")))
+	if (FAILED(Add_Texture(eLevel, "Mask", "Terrain/WaterMask.bmp")))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Water", "Terrain/Water.dds")))
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("컴포넌트를(을) 로딩 중 입니다.");
-	///* Prototype_Component_VIBuffer_Terrain */
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_MAPTOOL, TEXT("Prototype_Component_VIBuffer_Grid"),
-	//	CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 400, 400))))
-	//	return E_FAIL;
 
 	/* Prototype_Component_VIBuffer_Terrain_GamePlay */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_GamePlay"),
