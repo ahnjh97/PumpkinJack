@@ -7,6 +7,7 @@ BEGIN(Engine)
 class CModel;
 class CShader;
 class CPart;
+class CNavigation;
 END
 
 BEGIN(Client)
@@ -59,6 +60,7 @@ private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 	CCollider* m_pColliderCom[COLLIDER_END] = {nullptr};
+	CNavigation* m_pNavigationCom = { nullptr };
 	CGameObject* m_pPlayer = { nullptr };
 	const _float4x4* m_pPlayerWorldMat = { nullptr };
 	CPart* m_pPart_Weapon = { nullptr };

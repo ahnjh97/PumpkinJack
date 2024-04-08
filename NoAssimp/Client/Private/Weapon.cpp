@@ -132,6 +132,7 @@ HRESULT CWeapon::Render()
 		m_pModelCom->Render(i);
 	}
 
+#ifdef _DEBUG
 	if (m_bActivated)
 	{
 		for (_int i = 0; i < 2; i++)
@@ -140,7 +141,8 @@ HRESULT CWeapon::Render()
 				m_pColliderCom[i]->Render();
 		}
 	}
-	
+#endif // _DEBUG
+
 	return S_OK;
 }
 

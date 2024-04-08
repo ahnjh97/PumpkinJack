@@ -375,6 +375,13 @@ HRESULT CSoldier::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 		TEXT("Com_Collider_Range"), (CComponent**)&m_pColliderCom[RANGE], &RangeColliderDesc)))
 		return E_FAIL;
 
+	/* For.Com_Navigation */
+	CNavigation::NAVIGATION_DESC			NavigationDesc{};
+	NavigationDesc.iCurrentIndex = 0;
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Navigation") + to_wstring(eLevel),
+		TEXT("Com_Navigation"), (CComponent**)&m_pNavigationCom, &NavigationDesc)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -460,6 +467,7 @@ void CSoldier::Free()
 	__super::Free();
 
 	Safe_Release(m_pPlayer);
+	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pPart_Weapon);
 	for(_int i = 0; i<COLLIDER_END; i++)
 		Safe_Release(m_pColliderCom[i]);

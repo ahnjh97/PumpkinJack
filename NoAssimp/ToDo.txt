@@ -1,2 +1,4 @@
-- GamePlay HeightMap, NaviMesh
+- Soldier Navigation, PlaneHeight
+- SpearDash MinDistance
+- LevelGamePlay Mask
 - Arrow

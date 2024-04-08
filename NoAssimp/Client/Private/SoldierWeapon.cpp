@@ -68,8 +68,10 @@ void CSoldierWeapon::Late_Tick(_float fTimeDelta)
 
 HRESULT CSoldierWeapon::Render()
 {
+#ifdef _DEBUG
 	if (m_bActivated)
 		m_pColliderCom->Render();
+#endif // _DEBUG
 
 	return S_OK;
 }
