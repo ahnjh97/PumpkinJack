@@ -1,5 +1,6 @@
 #include "ImGui_Manager.h"
 #include "GameInstance.h"
+#include "GameObject.h"
 #include "MyImGui.h"
 
 CImGui_Manager::CImGui_Manager()
@@ -60,6 +61,25 @@ HRESULT CImGui_Manager::Release_ImGui()
 		Safe_Release(m_pImGui);
 
 	return S_OK;
+}
+
+void CImGui_Manager::Hide_ImGui()
+{
+	if (m_pImGui != nullptr)
+	{
+		m_pImGui->Set_Hide(true);
+		m_pImGui->Release_Player();
+	}
+}
+
+void CImGui_Manager::UnHide_ImGui(CGameObject* pPlayer)
+{
+	if (m_pImGui != nullptr)
+	{
+		m_pImGui->Replace_Player(pPlayer);
+		m_pImGui->Set_Hide(false);
+	}
+
 }
 
 CImGui_Manager* CImGui_Manager::Create(CMyImGui* pImGui)

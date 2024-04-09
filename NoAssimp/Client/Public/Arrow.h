@@ -24,7 +24,6 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	_bool m_bDamaged = { false };
 
 	_float m_fTime = {};
 

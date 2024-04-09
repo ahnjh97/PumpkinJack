@@ -43,7 +43,6 @@ public:
 private:
 	void OnKeyInput(_float fTimeDelta);
 	void Update_Direction(_fvector vCamLook, _fvector vCamRight);
-
 	void Update_PositionToCam();
 	void Turn_Body(_float fTimeDelta);
 	void Link_Animation();
@@ -85,6 +84,7 @@ private:
 	_bool m_bPreIsPushingKart = { false };
 	_bool m_bKartCol = { false };
 	_bool m_bScytheRifleRollAttack = { true };
+	_bool m_bIsDashDirDetermined = { false };
 
 	_uint m_iJumpCount = { 2 };
 	_uint m_iSlimeBossRoomEscapeCount = {};

@@ -42,17 +42,18 @@ void CArrow::Tick(_float fTimeDelta)
 	if (m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y <= -15.f)
 		Set_Dead();
 
+	m_pTransformCom->Go_Straight(fTimeDelta * 16.f);
+
 	m_fTime += fTimeDelta;
 
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_GAMEPLAY));
-	if (pPlayer)
+	if (pPlayer) 
 	{
 		CCollider* pPlayerCollider = dynamic_cast<CCollider*>(pPlayer->Get_Component(TEXT("Com_Collider")));
-		if (m_pColliderCom->Intersect(pPlayerCollider))
+		if (!m_pColliderCom->Check_AlreadyCollided(pPlayerCollider)) 
 		{
-			if (m_bDamaged == false)
-				pPlayer->Deduct_HP(20);
-			m_bDamaged = true;
+			if (m_pColliderCom->Intersect(pPlayerCollider))
+				pPlayer->Deduct_HP(15);
 		}
 	}
 
@@ -103,8 +104,8 @@ HRESULT CArrow::Add_Components(const wstring& _wstrModelTag)
 
 	/* For.Com_Collider */
 	CBounding_OBB::BOUNDING_OBB_DESC		ColliderDesc{};
-	ColliderDesc.vSize = _float3(2, 24, 4.5f);
-	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, 0.f);
+	ColliderDesc.vSize = _float3(2, 2, 24.f);
+	ColliderDesc.vCenter = _float3(0.f, 0.f, -ColliderDesc.vSize.z * 0.5f + 6.f);
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"),
 		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom, &ColliderDesc)))
 		return E_FAIL;

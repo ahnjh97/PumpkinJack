@@ -296,6 +296,7 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_AlphaTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Knife.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Lighted.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_ArenaFire.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_SlimeBossRoom.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Water.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

@@ -78,7 +78,9 @@ HRESULT CPlayer::Initialize(void* pArg)
 	if (FAILED(Add_PartObjects((LEVEL)GameObjectDesc.iLevel)))
 		return E_FAIL;
 
-	m_pNavigationCom[DEFAULT]->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
+	XMStoreFloat3(&m_vDirection, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
+	if(m_pNavigationCom[DEFAULT] != nullptr)
+		m_pNavigationCom[DEFAULT]->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 	m_pCurLevel = m_pGameInstance->Get_CurrentLevelID();
 	m_iHp = 80;
 	return S_OK;
@@ -147,7 +149,7 @@ void CPlayer::Tick(_float fTimeDelta)
 	Link_Animation();
 	OnKeyInput(fTimeDelta);
 
-	if (m_bPreIsPushingKart && !m_bIsPushingKart)
+	if (m_bPreIsPushingKart && !m_bIsPushingKart && m_pNavigationCom[DEFAULT] != nullptr)
 		m_pNavigationCom[DEFAULT]->Find_CurrentIndex(m_pTransformCom->Get_Pos_Vector());
 
 	if (m_bIsJumping)
@@ -179,6 +181,11 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	if (WPN_SPEAR == m_eWeapon && ROLL_ATTACK == m_eState)
 		SpearRollAttackDash(fTimeDelta);
+	else {
+		m_bIsDashDirDetermined = false;
+		m_fDashTime = 0.f;
+	}
+
 
 	for (auto& Pair : m_Parts)
 		Pair.second->Tick(fTimeDelta);
@@ -335,7 +342,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 
 void CPlayer::Update_Direction(_fvector vCamLook, _fvector vCamRight)
 {
-	if (m_bIsAttacking || m_bIsRolling)
+	if (m_bIsAttacking || m_bIsRolling || m_fDashTime != 0.f)
 		return;
 
 	_vector vLook = vCamLook;
@@ -420,6 +427,9 @@ _bool CPlayer::Check_TerrainCol()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	if (m_bInSlimeBossRoom == false)
 	{
+		if (m_pNavigationCom[DEFAULT] == nullptr)
+			return true;
+
 		_float fPlaneHeight = m_pNavigationCom[DEFAULT]->Get_PlaneHeight(vPos);
 		if (vPos.y <= fPlaneHeight)
 		{
@@ -610,8 +620,10 @@ void CPlayer::Check_GoToSlimeBossRoom()
 		m_bInSlimeBossRoom = true;
 		m_eNavigation = SLIMEBOSSROOM;
 		// curCell 다시검사
-		m_pNavigationCom[m_eNavigation]->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
-		m_pNavigationCom[m_eNavigation]->Get_PlaneHeight(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION));
+		if (m_pNavigationCom[m_eNavigation] != nullptr) {
+			m_pNavigationCom[m_eNavigation]->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
+			m_pNavigationCom[m_eNavigation]->Get_PlaneHeight(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION));
+		}
 	}
 }
 
@@ -642,7 +654,8 @@ void CPlayer::Check_GoBackUp()
 			m_iSlimeBossRoomEscapeCount++;
 			m_eNavigation = DEFAULT;
 			// curCell 다시검사
-			m_pNavigationCom[m_eNavigation]->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
+			if(m_pNavigationCom[m_eNavigation] != nullptr)
+				m_pNavigationCom[m_eNavigation]->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 		}
 	}
 }
@@ -677,22 +690,22 @@ void CPlayer::Reset_WeaponCollider(WEAPON eWeapon)
 
 void CPlayer::TargetNearestEnemy()
 {
+	if (m_bIsDashDirDetermined)
+		return;
+	
 	m_pNearestEnemyCollider = nullptr;
 	m_fEnemyDistance = 50.f;
 	
-	if (LEVEL_GAMEPLAY == *m_pCurLevel)
-	{
+	if (LEVEL_GAMEPLAY == *m_pCurLevel)	{
 		Check_EnemyDistance(LEVEL_GAMEPLAY, TEXT("Layer_Soldier"), CCollider::TYPE_OBB);
 	}
-	else if (LEVEL_SLIMEBOSS == *m_pCurLevel)
-	{
+	else if (LEVEL_SLIMEBOSS == *m_pCurLevel) {
 		if (!m_bInSlimeBossRoom)
 			Check_EnemyDistance(LEVEL_SLIMEBOSS, TEXT("Layer_Slime"), CCollider::TYPE_SPHERE);
 		else
 			Check_EnemyDistance(LEVEL_SLIMEBOSS, TEXT("Layer_Pillar2"), CCollider::TYPE_OBB);
 	}
-	else if(LEVEL_WIZARD == *m_pCurLevel)
-	{ 
+	else if(LEVEL_WIZARD == *m_pCurLevel) { 
 	}
 
 	if (nullptr == m_pNearestEnemyCollider)
@@ -705,6 +718,8 @@ void CPlayer::TargetNearestEnemy()
 
 	_vector vLook = XMVector3Normalize(XMLoadFloat4(&vLookFloat));
 	::XMStoreFloat3(&m_vDirection, vLook);
+	if (WPN_SPEAR == m_eWeapon && ROLL_ATTACK == m_eState)
+		m_bIsDashDirDetermined = true;
 }
 
 void CPlayer::Check_EnemyDistance(LEVEL eLevel, const wstring& wstrLayerTag, CCollider::TYPE eColliderType, const wstring& wstrColliderTag)
@@ -882,11 +897,14 @@ void CPlayer::SpearRollAttackDash(_float fTimeDelta)
 
 	if (fAnimPlayRatio > 0.2f && fAnimPlayRatio < 0.4f) {
 		m_fDashTime += fTimeDelta;
-		m_pTransformCom->Move(cosf(m_fDashTime) * 0.075f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
+		m_pTransformCom->Move(cosf(m_fDashTime) * 0.075f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);		
 	}
 		
 	if (pBodyModel->isFinished())
+	{
 		m_fDashTime = 0.f;
+		m_bIsDashDirDetermined = false;
+	}
 }
 
 void CPlayer::RifleRecoil(_float fTimeDelta)
@@ -934,6 +952,9 @@ HRESULT CPlayer::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"),
 		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom, &ColliderDesc)))
 		return E_FAIL;
+
+	if (LEVEL_WIZARD == eLevel)
+		return S_OK;
 
 	/* For.Com_Navigation */
 	CNavigation::NAVIGATION_DESC			NavigationDesc{};

@@ -477,6 +477,22 @@ HRESULT CGameInstance::Release_ImGui()
 	return m_pImGui_Manager->Release_ImGui();
 }
 
+void CGameInstance::Hide_ImGui()
+{
+	if (nullptr == m_pImGui_Manager)
+		return;
+
+	m_pImGui_Manager->Hide_ImGui();
+}
+
+void CGameInstance::UnHide_ImGui(CGameObject* pPlayer)
+{
+	if (nullptr == m_pImGui_Manager)
+		return;
+
+	m_pImGui_Manager->UnHide_ImGui(pPlayer);
+}
+
 const LIGHT_DESC* CGameInstance::Get_LightDesc(_uint iIndex)
 {
 	return m_pLight_Manager->Get_LightDesc(iIndex);

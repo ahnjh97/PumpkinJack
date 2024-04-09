@@ -5,6 +5,7 @@
 #include "Level_Loading.h"
 #include "Inven.h"
 #include "Terrain.h"
+
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
 {
@@ -118,7 +119,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 HRESULT CLevel_GamePlay::Ready_LandObject()
 {
 
-	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
+	if (FAILED(Ready_ParsedObjects(TEXT("Layer_Monster"))))
 		return E_FAIL;
 
 	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
@@ -132,7 +133,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring& strLayerTag)
 	return S_OK;
 }
 
-HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring & strLayerTag)
+HRESULT CLevel_GamePlay::Ready_ParsedObjects(const wstring & strLayerTag)
 {
 	wchar_t wcharPrototypeTag[MAX_PATH];
 	wchar_t wcharModelTag[MAX_PATH];
@@ -276,6 +277,6 @@ CLevel_GamePlay * CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceCon
 
 void CLevel_GamePlay::Free()
 {
+	m_pGameInstance->Hide_ImGui();
 	__super::Free();
-	m_pGameInstance->Release_ImGui();
 }

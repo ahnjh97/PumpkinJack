@@ -41,16 +41,17 @@ HRESULT CSoldier::Initialize(void* pArg)
 
 	m_pModelCom->Set_Animation(10, false); // SPAWN
 	m_iPreHp = m_iHp = 40;
+	m_pNavigationCom->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 	return S_OK;
 }
 
 void CSoldier::Tick(_float fTimeDelta)
 {		
-	if (nullptr == m_pPlayerWorldMat)
+	if (nullptr == m_pPlayerWorldMat) {
 		Get_PlayerWorldMatPtr();
-	
-	if (nullptr == m_pPlayerWorldMat)
-		return;
+		if (nullptr == m_pPlayerWorldMat)
+			return;
+	}
 
 	if (m_eState == SOLDIER_IDLE)
 		m_fIdleTime += fTimeDelta;
@@ -91,18 +92,21 @@ void CSoldier::Tick(_float fTimeDelta)
 			
 	}
 
+
 	if (m_eState == SOLDIER_RUN)
-		m_pTransformCom->Move(fTimeDelta * 2.8f, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
+		m_pTransformCom->Move(fTimeDelta * 2.8f, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), m_pNavigationCom);
 
 	else if (m_eState == SOLDIER_SPIN)
 	{
 		_float fPlayRatio = m_pModelCom->Get_AnimPlayRatio();
 		if (fPlayRatio >= 0.4f && fPlayRatio <= 0.7f) {
 			if(CalculateDistanceFromPlayer() > 5.f)
-				m_pTransformCom->Move(fTimeDelta * 1.9f, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
+				m_pTransformCom->Move(fTimeDelta * 1.9f, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), m_pNavigationCom);
 		}
 	}
-	
+
+	m_pTransformCom->Set_Height(m_pNavigationCom);
+
 	if (SOLDIER_ATTACK == m_eState)
 		m_iDamage = 10;
 	else if (SOLDIER_SPIN == m_eState)
@@ -327,14 +331,13 @@ _bool CSoldier::Check_KartCol(_float fTimeDelta)
 
 	_float3 vSrcPosFloat = m_pColliderCom[DEFAULT]->Get_Center(CCollider::TYPE_OBB);
 	_vector vSrsPos = XMLoadFloat3(&vSrcPosFloat);
-	if (m_pColliderCom[DEFAULT]->Intersect(pKartCollider))
-	{
+	if (m_pColliderCom[DEFAULT]->Intersect(pKartCollider))	{
 		_float3 vDstPosFloat = pKartCollider->Get_Center(CCollider::TYPE_OBB);
 		_vector vDstPos = XMLoadFloat3(&vDstPosFloat);
 
 		_vector vDir = XMVector3Normalize(vSrsPos - vDstPos);
 
-		m_pTransformCom->Move(fTimeDelta * 3.f, vDir);
+		m_pTransformCom->Move(fTimeDelta * 3.f, vDir, m_pNavigationCom);
 	}
 	return _bool();
 }

@@ -1,4 +1,10 @@
-- Soldier Navigation, PlaneHeight
-- SpearDash MinDistance
-- LevelGamePlay Mask
-- Arrow
+- Level_Wizard
+
+- Hit Effect
+- Arrow Effect
+- DeathEffect
+- Attack Effect
+- LevelGamePlay TerrainMask
+- LevelGamePlay Props
+- LevelSlimeBoss TerrainMask
+- LevelSlimeBoss Props

@@ -43,6 +43,8 @@
 #include "Knife.h"
 #include "Slime.h"
 
+#include "TongMap_Wizard.h"
+#include "Wizard.h"
 //#include "Effect.h"
 
 
@@ -103,6 +105,12 @@ HRESULT CLoader::Start()
 		break;
 	case LEVEL_SLIMEBOSS:
 		hr = Loading_For_SlimeBoss(LEVEL_SLIMEBOSS);
+		break;
+	case LEVEL_WIZARD:
+		hr = Loading_For_Wizard(LEVEL_WIZARD);
+		break;
+	case LEVEL_DEATH:
+		hr = Loading_For_Death(LEVEL_DEATH);
 		break;
 	}
 
@@ -309,11 +317,6 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 		return E_FAIL;
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 
-	///* Prototype_Component_VIBuffer_Terrain */
-	//if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain"),
-	//	CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 400, 400))))
-	//	return E_FAIL;
-
 	/* Prototype_Component_VIBuffer_Terrain_SlimeBoss */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_SlimeBoss"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_SlimeBoss.bmp")))))
@@ -367,6 +370,31 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 
 HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 {
+	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+
+	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Jack")))
+		return E_FAIL;
+	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "Spear")))
+		return E_FAIL;
+	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "Rifle")))
+		return E_FAIL;
+	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "Scythe")))
+		return E_FAIL;
+	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Wizard")))
+		return E_FAIL;
+	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "LevelWizard")))
+		return E_FAIL;
+
+	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
+
+	Add_Shaders(eLevel);
+
+	m_strLoadingText = TEXT("객체를(을) 로딩 중 입니다.");
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Wizard"), CWizard);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TongMap_Wizard"), CTongMap_Wizard);
+	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
+	m_isFinished = true;
 	return S_OK;
 }
 
@@ -443,16 +471,14 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_AlphaTex.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 		return E_FAIL;
 
-	if (eLevel == LEVEL_GAMEPLAY)
-	{
+	if (eLevel == LEVEL_GAMEPLAY) {
 		/* For.Prototype_Component_Shader_VtxModel_Water */
 		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_Water"),
 			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_Water.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 			return E_FAIL;
 	}
 
-	if (eLevel == LEVEL_SLIMEBOSS)
-	{
+	if (eLevel == LEVEL_SLIMEBOSS) {
 		/* For.Prototype_Component_Shader_VtxNorTex_LevelSlimeBoss */
 		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxNorTex_LevelSlimeBoss"),
 			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex_LevelSlimeBoss.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
@@ -471,6 +497,13 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 		/* For.Prototype_Component_Shader_VtxPosTex_Portal */
 		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxPosTex_Portal"),
 			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex_Portal.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+			return E_FAIL;
+	}
+
+	if (LEVEL_WIZARD == eLevel) {
+		/* For.Prototype_Component_Shader_VtxModel_ArenaFire */
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_ArenaFire"),
+			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_ArenaFire.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 			return E_FAIL;
 	}
 
@@ -547,6 +580,9 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degaree, NewScale, RootIndex
 	m_ModelConfigs.emplace("SlimeBossHead", MODEL_CONFIG{ 10.f, 0.f, 10.f });
 	m_ModelConfigs.emplace("SlimeDamageZone", MODEL_CONFIG{ 6.f, 0.f, 6.f });
 	m_ModelConfigs.emplace("cemeteryFence1", MODEL_CONFIG{ 4.3f, 0.f, 4.3f });
+
+	/* Level_Wizard */
+	m_ModelConfigs.emplace("Wizard", MODEL_CONFIG{ 0.12f, 0.f, 12.f });
 }
 
 void CLoader::TraverseAnimModels(LEVEL eLevel, const wstring& rootFolderPath)

@@ -64,6 +64,8 @@ void CMyImGui::Tick(_float fTimeDelta)
 HRESULT CMyImGui::Render()
 {
     ImGui::EndFrame();
+    if (m_bHide)
+        return S_OK;
     ImGui::Render();
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
@@ -170,7 +172,7 @@ void CMyImGui::EditGuizmo(_float4x4& worldMatrix)
 void CMyImGui::Free()
 {
     __super::Free();
-    Safe_Release(m_pPickedObject);
+    //Safe_Release(m_pPickedObject);
     Safe_Release(m_pDevice);
     Safe_Release(m_pContext);
     Safe_Release(m_pGameInstance);

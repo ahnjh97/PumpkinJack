@@ -14,6 +14,9 @@ public:
 	void Set_Vectors(vector<string> vecAnim, vector<string> vecNonAnim);
 	_float3 Get_PickPos() { return m_vPickPos; }
 	_bool IsPicking() { return m_bIsPicking; }
+	void Set_Hide(_bool bHide) { m_bHide = bHide; }
+	virtual void Release_Player() {};
+	virtual void Replace_Player(CGameObject* pPlayer) {};
 
 public:
 	virtual HRESULT		Initialize(HWND hWnd);
@@ -38,6 +41,7 @@ protected:
 	_float3				m_vPickPos = {};
 	_bool				m_bIsPicking = { false };
 	CGameObject*		m_pPickedObject = { nullptr };
+	_bool				m_bHide = { false };
 
 public:
 	virtual void				Free();

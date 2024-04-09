@@ -18,6 +18,8 @@ public:
 	void					Tick(_float fTimeDelta);
 	HRESULT					Render();
 	HRESULT					Release_ImGui();
+	void					Hide_ImGui();
+	void					UnHide_ImGui(class CGameObject* pPlayer);
 
 public:
 	static CImGui_Manager* Create(class CMyImGui* pImGui);

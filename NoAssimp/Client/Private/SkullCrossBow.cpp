@@ -38,6 +38,8 @@ HRESULT CSkullCrossBow::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pModelCom->Set_Animation(0, true); // 999: 랜덤 애니메이션
+	m_pModelCom->Set_AnimSpeed(2, 0.35f);
+
 	return S_OK;
 }
 
@@ -47,6 +49,18 @@ void CSkullCrossBow::Tick(_float fTimeDelta)
 
 void CSkullCrossBow::Late_Tick(_float fTimeDelta)
 {
+	if (BALLISTA_SHOOT == *m_pState) {
+		m_pModelCom->Change_Animation_ByIndex(0, true);
+		m_pTransformCom->Set_Pos(XMVectorSet(0, 0, 0, 1));
+		m_pTransformCom->Rotation(XMVectorSet(1, 0, 0, 0), 0);
+	}
+
+	else {
+		m_pModelCom->Change_Animation_ByIndex(2, true);
+		m_pTransformCom->Set_Pos(XMVectorSet(0, 5.5f, -2.5f, 1));
+		m_pTransformCom->Rotation(XMVectorSet(1, 0, 0, 0), XM_PIDIV2);
+	}
+
 	_matrix matCombined = XMLoadFloat4x4(m_pSocket->Get_CombinedTransformationMatrix());
 	_vector vScale, vRot, vTrans;
 	XMMatrixDecompose(&vScale, &vRot, &vTrans, matCombined);

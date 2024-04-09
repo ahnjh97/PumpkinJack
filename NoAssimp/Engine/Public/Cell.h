@@ -36,6 +36,7 @@ public:
 	_bool IsIn(_fvector vPosition, _fmatrix TerrainWorldMatrix, _int* pNeighborIndex);
 
 	_bool Compare_Points(_fvector vSourPoint, _fvector vDestPoint);
+	_bool Check_Redundancy(CCell* pCell);
 
 #ifdef _DEBUG
 public:

@@ -95,6 +95,18 @@ _bool CCell::Compare_Points(_fvector vSourPoint, _fvector vDestPoint)
 	return false;
 }
 
+_bool CCell::Check_Redundancy(CCell* pCell)
+{
+	if (!XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_A]), pCell->Get_Point(POINT_A)))
+		return false;
+	if (!XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_B]), pCell->Get_Point(POINT_B)))
+		return false;
+	if (!XMVector3Equal(XMLoadFloat3(&m_vPoints[POINT_C]), pCell->Get_Point(POINT_C)))
+		return false;
+
+	return true;
+}
+
 #ifdef _DEBUG
 
 HRESULT CCell::Render()

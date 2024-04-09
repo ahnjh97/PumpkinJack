@@ -40,26 +40,16 @@ HRESULT CLevel_Wizard::Initialize()
 
 	if (FAILED(Ready_LandObject()))
 		return E_FAIL;
-	/*
-	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
-		return E_FAIL;
-
-	*/
-	if (FAILED(m_pGameInstance->Initialize_ImGui(LEVEL_WIZARD, CImGui_Client::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
 
 	m_InputFile.close();
+
+	m_pGameInstance->UnHide_ImGui(m_pGameInstance->Get_Player(LEVEL_WIZARD));
 	return S_OK;
 }
 
 void CLevel_Wizard::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
-	if (m_pGameInstance->KeyDown(DIK_RETURN))
-	{
-		if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_SLIMEBOSS))))
-			return;
-	}
 }
 
 HRESULT CLevel_Wizard::Render()
@@ -110,7 +100,7 @@ HRESULT CLevel_Wizard::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fDistance = 40.f;
 	CameraDesc.fHeight = 10.f;
 
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Camera_Jack"), &CameraDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, strLayerTag, TEXT("Prototype_GameObject_Camera_Jack"), &CameraDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -119,21 +109,13 @@ HRESULT CLevel_Wizard::Ready_Layer_Camera(const wstring& strLayerTag)
 HRESULT CLevel_Wizard::Ready_LandObject()
 {
 
-	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
-		return E_FAIL;
-
-	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
+	if (FAILED(Ready_ParsedObjects(TEXT("Layer_Monster"))))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CLevel_Wizard::Ready_Layer_Player(const wstring& strLayerTag)
-{
-	return S_OK;
-}
-
-HRESULT CLevel_Wizard::Ready_Layer_Monster(const wstring& strLayerTag)
+HRESULT CLevel_Wizard::Ready_ParsedObjects(const wstring& strLayerTag)
 {
 	wchar_t wcharPrototypeTag[MAX_PATH];
 	wchar_t wcharModelTag[MAX_PATH];
@@ -152,16 +134,20 @@ HRESULT CLevel_Wizard::Ready_Layer_Monster(const wstring& strLayerTag)
 		CGameObject::GAMEOBJECT_DESC tempDesc = {};
 		tempDesc.matWorld = matWorld;
 		tempDesc.wstrModelTag = wcharModelTag;
-		tempDesc.iLevel = LEVEL_GAMEPLAY;
+		tempDesc.iLevel = LEVEL_WIZARD;
 
 		if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Jack")) {
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Player"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_LevelGamePlay")) {
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_LevelWizard")) {
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_Map"), TEXT("Prototype_GameObject_TongMap_Wizard"), &tempDesc)))
 				return E_FAIL;
 		}
+		/*else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Wizard")) {
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_Wizard"), TEXT("Prototype_GameObject_Wizard"), &tempDesc)))
+				return E_FAIL;
+		}*/
 
 		else {
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, strLayerTag, TEXT("Prototype_GameObject_Monster"), &tempDesc)))
@@ -169,11 +155,6 @@ HRESULT CLevel_Wizard::Ready_Layer_Monster(const wstring& strLayerTag)
 		}
 	}
 
-	return S_OK;
-}
-
-HRESULT CLevel_Wizard::Ready_Layer_Effect(const wstring& strLayerTag)
-{
 	return S_OK;
 }
 
@@ -208,10 +189,15 @@ HRESULT CLevel_Wizard::Ready_UI(const wstring& strLayerTag)
 
 HRESULT CLevel_Wizard::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
-	CTerrain::TERRAIN_DESC terrainDesc{};
-	terrainDesc.iLevel = LEVEL_WIZARD;
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, strLayerTag, TEXT("Prototype_GameObject_Terrain"), &terrainDesc)))
+	CGameObject::GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = LEVEL_WIZARD;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, strLayerTag, TEXT("Prototype_GameObject_Sky"), &tDesc)))
 		return E_FAIL;
+
+	//CTerrain::TERRAIN_DESC terrainDesc{};
+	//terrainDesc.iLevel = LEVEL_WIZARD;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, strLayerTag, TEXT("Prototype_GameObject_Terrain"), &terrainDesc)))
+	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -232,6 +218,6 @@ CLevel_Wizard* CLevel_Wizard::Create(ID3D11Device* pDevice, ID3D11DeviceContext*
 
 void CLevel_Wizard::Free()
 {
+	m_pGameInstance->Hide_ImGui();
 	__super::Free();
-	m_pGameInstance->Release_ImGui();
 }

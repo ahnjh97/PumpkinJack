@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include "Level_SlimeBoss.h"
+#include "Level_Loading.h"
 #include "ImGui_Client.h"
-#include "Inven.h"
 #include "Terrain.h"
+#include "Inven.h"
 
 CLevel_SlimeBoss::CLevel_SlimeBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -35,23 +36,17 @@ HRESULT CLevel_SlimeBoss::Initialize()
 
 	if (FAILED(Ready_LandObject()))
 		return E_FAIL;
-	/*
-	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
-		return E_FAIL;
-
-	*/
-	if (FAILED(m_pGameInstance->Initialize_ImGui(LEVEL_SLIMEBOSS, CImGui_Client::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
 
 	m_InputFile.close();
+
+	m_pGameInstance->UnHide_ImGui(m_pGameInstance->Get_Player(LEVEL_SLIMEBOSS));
 	return S_OK;
 }
 
 void CLevel_SlimeBoss::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
-	if (m_pGameInstance->KeyDown(DIK_F) && !m_bPressed)
-	{
+	if (m_pGameInstance->KeyDown(DIK_F) && !m_bPressed)	{
 		m_bPressed = true;
 		CGameObject* pNotOpen = m_pGameInstance->Get_GameObject(LEVEL_SLIMEBOSS, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Monster"));
 		pNotOpen->Set_Dead();
@@ -65,7 +60,12 @@ void CLevel_SlimeBoss::Tick(_float fTimeDelta)
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_SlimeBoss"), TEXT("Prototype_GameObject_SlimeBoss"), &tempDesc)))
 			return;
 	}
-		
+
+	if (m_pGameInstance->KeyDown(DIK_RETURN))
+	{
+		if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_WIZARD))))
+			return;
+	}
 }
 
 HRESULT CLevel_SlimeBoss::Render()
@@ -152,13 +152,13 @@ HRESULT CLevel_SlimeBoss::Ready_Layer_BackGround(const wstring& strLayerTag)
 
 HRESULT CLevel_SlimeBoss::Ready_LandObject()
 {
-	if(FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
+	if(FAILED(Ready_ParsedObjects(TEXT("Layer_Monster"))))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CLevel_SlimeBoss::Ready_Layer_Monster(const wstring& strLayerTag)
+HRESULT CLevel_SlimeBoss::Ready_ParsedObjects(const wstring& strLayerTag)
 {
 	wchar_t wcharPrototypeTag[MAX_PATH];
 	wchar_t wcharModelTag[MAX_PATH];
@@ -245,6 +245,6 @@ CLevel_SlimeBoss* CLevel_SlimeBoss::Create(ID3D11Device* pDevice, ID3D11DeviceCo
 
 void CLevel_SlimeBoss::Free()
 {
+	m_pGameInstance->Hide_ImGui();
 	__super::Free();
-	m_pGameInstance->Release_ImGui();
 }

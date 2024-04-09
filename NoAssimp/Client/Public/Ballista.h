@@ -25,7 +25,16 @@ public:
 	virtual HRESULT Render() override;
 
 private:
+	void Add_Arrow();
+	void Emit_AlarmLight();
+
+private:
 	BALLISTA m_eState = {};
+
+	_uint m_iArrowCount = {};
+
+	_float m_fIdleTime = {};
+
 	_vector m_vOriginalPos = {};
 
 private:

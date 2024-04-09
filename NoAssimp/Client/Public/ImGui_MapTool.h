@@ -51,6 +51,7 @@ public:
 	_bool				Check_ExistingCell(_float3 fA, _float3 fB, _float3 fC, _int iGridIndex = 0);
 	_int				Check_PotentialNeighbor(_int iPotentialNeighbor, _int iGridIndex = 0);
 	void				Erase_NullPointers();
+	void				Remove_RedundantCells();
 
 private:
 	_bool						bCallNewFrame = { false };
@@ -86,7 +87,7 @@ private:
 
 public:
 	static CImGui_MapTool* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	virtual void				Free();
+	virtual void	Free();
 };
 
 END

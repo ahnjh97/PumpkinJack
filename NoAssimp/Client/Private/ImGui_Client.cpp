@@ -54,7 +54,7 @@ void CImGui_Client::Settings(_float fTimeDelta)
 
 	if (m_pPlayer == nullptr)
 	{
-		if (*m_pGameInstance->Get_CurrentLevelID() < LEVEL_GAMEPLAY || *m_pGameInstance->Get_CurrentLevelID() > LEVEL_SLIMEBOSS)
+		if (*m_pGameInstance->Get_CurrentLevelID() < LEVEL_GAMEPLAY || *m_pGameInstance->Get_CurrentLevelID() > LEVEL_WIZARD)
 			return;
 
 		m_pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), TEXT("Prototype_GameObject_Player")));
@@ -113,7 +113,9 @@ void CImGui_Client::ConvertToString()
 		+ to_string(vWeaponPos.y).erase(to_string(vWeaponPos.y).size() - 4) + ", " + to_string(vWeaponPos.z).erase(to_string(vWeaponPos.z).size() - 4);
 
 	CNavigation* pPlayerNavigation = dynamic_cast<CNavigation*>(m_pPlayer->Get_Component(TEXT("Com_Navigation")));
-	string strCellIndex = "CurrentCell : " + to_string(pPlayerNavigation->Get_CurrentIndex());
+	string strCellIndex;
+	if(pPlayerNavigation != nullptr)
+		strCellIndex = "CurrentCell : " + to_string(pPlayerNavigation->Get_CurrentIndex());
 	CNavigation* pPlayerNavigationSBR = dynamic_cast<CNavigation*>(m_pPlayer->Get_Component(TEXT("Com_Navigation_SlimeBossRoom")));
 	string strCellIndexSBR;
 	if(pPlayerNavigationSBR != nullptr)
@@ -133,6 +135,17 @@ void CImGui_Client::ConvertToString()
 		ImGui::Text(strCellIndexSBR.c_str());
 }
 
+void CImGui_Client::Release_Player()
+{
+	Safe_Release(m_pPlayer);
+	m_pPlayer = nullptr;
+}
+
+void CImGui_Client::Replace_Player(CGameObject* pPlayer)
+{
+	m_pPlayer = dynamic_cast<CPlayer*>(pPlayer);
+}
+
 CImGui_Client* CImGui_Client::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CImGui_Client* pInstance = new CImGui_Client(pDevice, pContext);
@@ -148,6 +161,7 @@ CImGui_Client* CImGui_Client::Create(ID3D11Device* pDevice, ID3D11DeviceContext*
 
 void CImGui_Client::Free()
 {
-	Safe_Release(m_pPlayer);
 	__super::Free();
+
+	Safe_Release(m_pPlayer);
 }

@@ -70,6 +70,7 @@ public:
 	void Set_WallCol(_bool bWallCol) { m_bWallCol = bWallCol; }
 	void Set_PortalCol(_bool bPortalCol) { m_bPortalCol = bPortalCol; }
 	void Set_Height(_float fHeight);
+	void Set_Height(class CNavigation* pNavigation);
 
 	_vector Get_Pos_Vector();
 	_float4 Get_Pos_Float4();

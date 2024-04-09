@@ -42,7 +42,6 @@ HRESULT CImGui_MapTool::Initialize()
 	return S_OK;
 }
 
-
 void CImGui_MapTool::Tick(_float fTimeDelta)
 {
 	if (strCurModel == "")
@@ -643,8 +642,7 @@ void CImGui_MapTool::Load_Level()
 	tGridDesc.iLevel = LEVEL_MAPTOOL;
 	tGridDesc.wstrCurLevel = m_pGameInstance->StrToWstr(strCurLevel);
 	m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Grid"), TEXT("Prototype_GameObject_Grid"), &tGridDesc);
-	if (strCurLevel == "Level_SlimeBoss")
-	{
+	if (strCurLevel == "Level_SlimeBoss") {
 		tGridDesc.iGridIndex = 1;
 		tGridDesc.matWorld._42 = fSlimeBossRoomOffset;
 		m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, TEXT("Layer_Grid"), TEXT("Prototype_GameObject_Grid"), &tGridDesc);
@@ -663,8 +661,7 @@ void CImGui_MapTool::Load_Level()
 	wchar_t wcharModelTag[MAX_PATH];
 	_float4x4 matWorld{};
 
-	while (!fileStream.eof())
-	{
+	while (!fileStream.eof()) {
 		fileStream.read(reinterpret_cast<char*>(&wcharPrototypeTag), sizeof(wcharPrototypeTag));
 		fileStream.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
 		fileStream.read(reinterpret_cast<char*>(&wcharModelTag), sizeof(wcharModelTag));
@@ -711,8 +708,10 @@ void CImGui_MapTool::Save_Cells()
 
 	Erase_NullPointers();
 
-	for (_uint i = 0; i < vecCells.size(); i++)
-	{
+	if (vecCells.size() >= 3000) // ¾Ñ ³ªÀÇ ½Ç¼ö
+		Remove_RedundantCells();
+	
+	for (_uint i = 0; i < vecCells.size(); i++)	{
 		vecCells[i]->Set_CellIndex(i);
 		vecCells[i]->Reset_NeighborIndex();
 	}
@@ -884,7 +883,7 @@ void CImGui_MapTool::Save_Cells()
 		return;
 	}
 
-	MB(strCurLevel + "_Cells.txt Saved.");
+	MB(strCurLevel + "_Cells.txt Saved.\nSize: " +  to_string(vecCells.size()));
 	if (strCurLevel == "Level_SlimeBoss")
 		Save_SlimeBossRoomCells();
 }
@@ -1286,7 +1285,7 @@ void CImGui_MapTool::Add_Cells()
 		}
 		else
 		{
-			if (Check_ExistingCell(vPoints[0], vPoints[1], vPoints[2], 1) == true)
+			if (Check_ExistingCell(vPoints[0], vPoints[1], vPoints[2]) == true)
 				return;
 			CCell* pCell = CCell::Create(m_pDevice, m_pContext, iTriangleIndex, vPoints, iNeighborIndices, vecCells.size());
 			vecCells.emplace_back(pCell);
@@ -1402,6 +1401,34 @@ void CImGui_MapTool::Erase_NullPointers()
 				SBRcell++;
 		}
 	}
+}
+
+void CImGui_MapTool::Remove_RedundantCells()
+{
+	vector<CCell*> vecTempCells;
+
+	for (auto& cell : vecCells)
+	{
+		if (!vecTempCells.empty()) {
+			_bool bRedundant = false;
+			for (auto& tempCell : vecTempCells)
+			{
+				if (true == cell->Check_Redundancy(tempCell)) {
+					bRedundant = true;
+					break;
+				}
+			}
+
+			if (bRedundant)
+				Safe_Release(cell);
+			else
+				vecTempCells.emplace_back(cell);
+		}
+		else
+			vecTempCells.emplace_back(cell);
+	}
+
+	vecCells = vecTempCells;
 }
 
 CImGui_MapTool* CImGui_MapTool::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

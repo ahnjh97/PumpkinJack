@@ -34,6 +34,8 @@ public:
 	else { return false; }}
 	vector<_uint> Get_MeshShaderType() { return m_vecMeshShaderType; }
 	_float Get_LerpRatio() { return m_fLerpRatio; }
+	string Get_MeshName(_uint iMeshIndex);
+	string Get_DiffuseTextureName(_uint iMeshIndex);
 
 	void Set_Animation(_uint iAnimIndex, _bool isLoop) {
 		if (m_bIsNonAnimVersion) return;

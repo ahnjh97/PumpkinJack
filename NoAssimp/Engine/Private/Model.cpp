@@ -68,6 +68,18 @@ _int CModel::Get_AnimIndex(const string& strAnimName)
 	return iter->second;
 }
 
+string CModel::Get_MeshName(_uint iMeshIndex)
+{
+	return m_Meshes[iMeshIndex]->Get_MeshName();
+}
+
+string CModel::Get_DiffuseTextureName(_uint iMeshIndex)
+{
+	_uint iMaterialIdx = m_Meshes[iMeshIndex]->Get_MaterialIndex();
+	string strTextureName = m_Materials[iMaterialIdx].MaterialTextures[1]->Get_TextureName(); // DIFFUSE
+	return strTextureName;
+}
+
 void CModel::Save_FinalKeyFrames()
 {
 	_vector vScale, vRot, vTrans;
@@ -382,8 +394,7 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 			m_Materials[iTemp].MaterialTextures[jTemp] = MeshMaterial.MaterialTextures[jTemp];
 	}
 
-	if (m_strModelName == "LevelGamePlay")
-	{
+	if (m_strModelName == "LevelGamePlay")	{
 		m_vecMeshShaderType.resize(m_Meshes.size());
 		for (_int i = 0; i < m_Meshes.size(); i++)
 		{
@@ -410,7 +421,7 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 			
 		}
 
-		// 크기가 더 작은놈을 이펙트용으로 할당
+		// 크기가 더 작은메쉬를 이펙트용으로 할당
 		if (m_Meshes[vecSlimeBossRoom.front()]->Get_OffSetX() < m_Meshes[vecSlimeBossRoom.back()]->Get_OffSetX())
 		{
 			m_vecMeshShaderType[vecSlimeBossRoom.front()] = 2; // SLIMEBOSSROOM

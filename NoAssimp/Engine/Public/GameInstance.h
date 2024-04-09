@@ -79,6 +79,8 @@ public: /* For.ImGui_Manager */
 	_float3 Get_PickPos();
 	_bool IsPicking();
 	HRESULT	Release_ImGui();
+	void Hide_ImGui();
+	void UnHide_ImGui(CGameObject* pPlayer);
 
 public: /* For.Light_Manager */
 	const LIGHT_DESC* Get_LightDesc(_uint iIndex);

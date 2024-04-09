@@ -83,9 +83,6 @@ HRESULT CLevel_MapTool::Ready_Layer_Camera(const wstring& strLayerTag)
 
 HRESULT CLevel_MapTool::Ready_Layer_Grid(const wstring& strLayerTag)
 {
-	/*if (FAILED(m_pGameInstance->Add_Clone(LEVEL_MAPTOOL, strLayerTag, TEXT("Prototype_GameObject_Grid"))))
-		return E_FAIL;*/
-
 	return S_OK;
 }
 
@@ -111,5 +108,4 @@ CLevel_MapTool* CLevel_MapTool::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 void CLevel_MapTool::Free()
 {
 	__super::Free();
-	m_pGameInstance->Release_ImGui();
 }

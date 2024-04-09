@@ -30,6 +30,12 @@ void CTransform::Set_Height(_float fHeight)
 	Set_State(CTransform::STATE_POSITION, vPos);
 }
 
+void CTransform::Set_Height(CNavigation* pNavigation)
+{
+	if (pNavigation)
+		pNavigation->Get_PlaneHeight(Get_Pos_Float4());
+}
+
 _vector CTransform::Get_Pos_Vector()
 {
 	return Get_State_Vector(STATE_POSITION);
@@ -81,7 +87,7 @@ void CTransform::Go_Straight(_float fTimeDelta, _uint iNum, _fvector vCamLook)
 	_vector		vPosition = Get_State_Vector(STATE_POSITION);
 	_vector		vLook = Get_State_Vector(STATE_LOOK);
 
-	if (iNum != 0)
+	if (iNum != 0) // 수평이동
 	{
 		vLook = vCamLook;
 		vLook = XMVectorSetY(vLook, 0);

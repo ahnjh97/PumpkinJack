@@ -38,6 +38,7 @@ HRESULT CBallista::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pModelCom->Set_Animation(0, true); // 999: 랜덤 애니메이션
+	m_pModelCom->Set_AnimSpeed(0, 0.7f);
 
 	return S_OK;
 }
@@ -55,7 +56,31 @@ void CBallista::Tick(_float fTimeDelta)
 	}
 
 	m_pTransformCom->Look_At(XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1.f));
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vOriginalPos);
+	m_pTransformCom->Set_Pos(m_vOriginalPos);
+
+	if (BALLISTA_IDLE == m_eState && m_fIdleTime > 6.5f)
+		m_eState = BALLISTA_SHOOT;
+
+	if (BALLISTA_SHOOT == m_eState) {
+		Emit_AlarmLight();
+
+		_float fAnimPlayRatio = m_pModelCom->Get_AnimPlayRatio();
+		if (m_iArrowCount == m_pModelCom->Get_AnimPlayCount(0))	{
+			Add_Arrow();
+			m_iArrowCount++;
+		}
+
+		if (m_pModelCom->Get_AnimPlayCount(0) >= 6) {
+			m_eState = BALLISTA_IDLE;
+			m_pModelCom->Reset_AnimPlayCount(0);
+			m_iArrowCount = 0;
+		}
+	}
+
+	if (BALLISTA_IDLE == m_eState)
+		m_fIdleTime += fTimeDelta;
+	else
+		m_fIdleTime = 0.f;
 
 	for (auto& Pair : m_Parts)
 		Pair.second->Tick(fTimeDelta);
@@ -63,8 +88,13 @@ void CBallista::Tick(_float fTimeDelta)
 
 void CBallista::Late_Tick(_float fTimeDelta)
 {
-	m_pModelCom->Play_Animation(fTimeDelta);
+	if(BALLISTA_SHOOT == m_eState)
+		m_pModelCom->Play_Animation(fTimeDelta);
+	else
+		m_pModelCom->Play_Animation(0);
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+
 	for (auto& Pair : m_Parts)
 		Pair.second->Late_Tick(fTimeDelta);
 }
@@ -94,6 +124,24 @@ HRESULT CBallista::Render()
 	return S_OK;
 }
 
+void CBallista::Add_Arrow()
+{
+	_float4 vPos = m_pTransformCom->Get_Pos_Float4();
+
+	CGameObject::GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = LEVEL_GAMEPLAY;
+	tDesc.wstrModelTag = TEXT("Prototype_Component_Model_ballistaArrow");
+	//tDesc.matWorld._41 = vPos.x;
+	//tDesc.matWorld._42 = vPos.y;
+	//tDesc.matWorld._43 = vPos.z;
+	tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Arrow"), TEXT("Prototype_GameObject_Arrow"), &tDesc);
+}
+
+void CBallista::Emit_AlarmLight()
+{
+}
+
 HRESULT CBallista::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 {
 	/* For.Com_Model */
@@ -110,9 +158,6 @@ HRESULT CBallista::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 
 HRESULT CBallista::Bind_ShaderResources()
 {
-	if (nullptr == m_pShaderCom)
-		return E_FAIL;
-
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
@@ -135,7 +180,6 @@ HRESULT CBallista::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))
 		return E_FAIL;
 	

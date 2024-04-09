@@ -17,6 +17,8 @@ public:
 	void				Settings(_float fTimeDelta);
 	void				OnKeyInput();
 	void				ConvertToString();
+	void				Release_Player() override;
+	void				Replace_Player(CGameObject* pPlayer) override;
 
 private:
 	_bool				bCallNewFrame = { false };

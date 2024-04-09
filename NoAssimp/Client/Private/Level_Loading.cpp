@@ -1,13 +1,15 @@
 #include "stdafx.h"
-#include "..\Public\Level_Loading.h"
+#include "Level_Loading.h"
 #include "Loader.h"
-
-#include "GameInstance.h"
 #include "GameObject.h"
+#include "GameInstance.h"
+
 #include "Level_Logo.h"
-#include "Level_GamePlay.h"
+#include "Level_Wizard.h"
 #include "Level_MapTool.h"
+#include "Level_GamePlay.h"
 #include "Level_SlimeBoss.h"
+
 #define fZ_LoadingScreen 0.9f
 #define fZ_Holder 0.8f
 #define fZ_Jack 0.7f
@@ -34,8 +36,6 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
 	return S_OK;
 }
 
-
-
 void CLevel_Loading::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
@@ -51,14 +51,17 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 			case LEVEL_LOGO:
 				pLevel = CLevel_Logo::Create(m_pDevice, m_pContext);
 				break;
-			case LEVEL_GAMEPLAY:
-				pLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
-				break;
 			case LEVEL_MAPTOOL:
 				pLevel = CLevel_MapTool::Create(m_pDevice, m_pContext);
 				break;
+			case LEVEL_GAMEPLAY:
+				pLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
+				break;
 			case LEVEL_SLIMEBOSS:
 				pLevel = CLevel_SlimeBoss::Create(m_pDevice, m_pContext);
+				break;
+			case LEVEL_WIZARD:
+				pLevel = CLevel_Wizard::Create(m_pDevice, m_pContext);
 				break;
 			}
 
