@@ -79,8 +79,10 @@ HRESULT CPlayer::Initialize(void* pArg)
 		return E_FAIL;
 
 	XMStoreFloat3(&m_vDirection, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
+
 	if(m_pNavigationCom[DEFAULT] != nullptr)
 		m_pNavigationCom[DEFAULT]->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
+
 	m_pCurLevel = m_pGameInstance->Get_CurrentLevelID();
 	m_iHp = 80;
 	return S_OK;

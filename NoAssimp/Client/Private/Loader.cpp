@@ -149,11 +149,11 @@ HRESULT CLoader::Loading_For_Logo()
 	return S_OK;
 }
 
-HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
+HRESULT CLoader::Loading_For_MapTool(LEVEL eLevel)
 {
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
-
-	/* Prototype_Component_Texture_Terrain */
+	if (FAILED(Add_Texture(eLevel, "Grid", "Terrain/White.png")))
+		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Terrain", "Terrain/Tile0.jpg")))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Ground", "Terrain/groundTile%d.dds", 4)))
@@ -165,13 +165,68 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	if (FAILED(Add_Texture(eLevel, "Water", "Terrain/Water.dds")))
 		return E_FAIL;
 
+
+	m_strLoadingText = TEXT("컴포넌트를(을) 로딩 중 입니다.");
+	/* Prototype_Component_VIBuffer_Terrain_GamePlay */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_GamePlay"),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_GamePlay.bmp")))))
+		return E_FAIL;
+
+	/* Prototype_Component_VIBuffer_Terrain_SlimeBoss */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_SlimeBoss"),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_SlimeBoss.bmp")))))
+		return E_FAIL;
+
+	/* Prototype_Component_VIBuffer_Terrain_SlimeBossRoom */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_SlimeBossRoom"),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/SlimeBossRoom.bmp")))))
+		return E_FAIL;
+
+	/* Prototype_Component_VIBuffer_Terrain_Wizard */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_Wizard"),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_Wizard.bmp")))))
+		return E_FAIL;
+
+
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+	TraverseAnimModels(eLevel, L"../../../model_txt/Anim/");
+	TraverseNonAnimModels(eLevel, L"../../../model_txt/NonAnim/");
 
-	///* Prototype_Component_VIBuffer_Terrain */
-	//if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain"),
-	//	CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 100, 100))))
-	//	return E_FAIL;
 
+	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
+	if (FAILED(Add_Shaders(eLevel)))
+		return E_FAIL;
+
+
+	m_strLoadingText = TEXT("객체를(을) 로딩 중 입니다.");
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Tool_Anim"), CTool_Anim);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Tool_NonAnim"), CTool_NonAnim);
+
+
+	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
+	m_isFinished = true;
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
+{
+	m_strLoadingText = TEXT("Loading Textures..");
+	if (FAILED(Add_Texture(eLevel, "Terrain", "Terrain/Tile0.jpg")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Ground", "Terrain/groundTile%d.dds", 4)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Grass", "Terrain/grassTile%d.dds", 2)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Mask", "Terrain/WaterMask.bmp")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Water", "Terrain/Water.dds")))
+		return E_FAIL;
+
+
+	m_strLoadingText = TEXT("Loading NavigationCells..");
 	/* Prototype_Component_VIBuffer_Terrain_GamePlay */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_GamePlay"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_GamePlay.bmp")))))
@@ -183,16 +238,21 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../objects_txt/Level_GamePlay_Cells.txt")))))
 		return E_FAIL;
 
-	TraverseAnimModels(eLevel, L"../../../model_txt/Anim/");
-	TraverseNonAnimModels(eLevel, L"../../../model_txt/NonAnim/");
+	m_strLoadingText = TEXT("Loading Models..");
+	vector<string> vecAnimModelNames = { "Jack", "Ballista", "Dummy", "SkullCrossBow", "Soldier", "Trabuchet" };
+	vector<string> vecNonAnimModelNames = { "Spear", "Rifle", "Scythe", "LevelGamePlay",
+		"ballistaArrow", "ballistaBase", "ballistaRotator", "crateBoxPotion", "fenceStack_SmallCol", "Kart",
+		"MinePlatform", "Rail", "RailLeft60", "RailLeft90", "RailRight60", "RailRight90" };
 
-	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
+	if (FAILED(Add_Models(eLevel, vecAnimModelNames, vecNonAnimModelNames)))
+		return E_FAIL;
 
+
+	m_strLoadingText = TEXT("Loading Shaders..");
 	Add_Shaders(eLevel);
 
 
-	m_strLoadingText = TEXT("객체를(을) 로딩 중 입니다.");
-	/* For.Prototype_GameObject_Terrain */
+	m_strLoadingText = TEXT("Loading GameObjects..");
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Terrain"), CTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Jack"), CCamera_Jack);
@@ -215,88 +275,20 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Soldier"), CSoldier);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_SoldierWeapon"), CSoldierWeapon);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Water"), CWater);
-	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
+
+
+	m_strLoadingText = TEXT("Loading Complete.");
 
 	m_isFinished = true;
 
 	return S_OK;
 }
 
-HRESULT CLoader::Loading_For_MapTool(LEVEL eLevel)
-{
-	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 
-	/* Prototype_Component_Texture_Grid */
-	if(FAILED(Add_Texture(eLevel, "Grid", "Terrain/White.png")))
-		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Terrain", "Terrain/Tile0.jpg")))
-		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Ground", "Terrain/groundTile%d.dds", 4)))
-		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Grass", "Terrain/grassTile%d.dds", 2)))
-		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Mask", "Terrain/WaterMask.bmp")))
-		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Water", "Terrain/Water.dds")))
-		return E_FAIL;
-
-	m_strLoadingText = TEXT("컴포넌트를(을) 로딩 중 입니다.");
-
-	/* Prototype_Component_VIBuffer_Terrain_GamePlay */
-	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_GamePlay"),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_GamePlay.bmp")))))
-		return E_FAIL;
-
-	/* Prototype_Component_VIBuffer_Terrain_SlimeBoss */
-	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_SlimeBoss"),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_SlimeBoss.bmp")))))
-		return E_FAIL;
-
-	/* Prototype_Component_VIBuffer_Terrain_SlimeBossRoom */
-	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_SlimeBossRoom"),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/SlimeBossRoom.bmp")))))
-		return E_FAIL;
-
-	/* Prototype_Component_VIBuffer_Terrain_Wizard */
-	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_Wizard"),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_Wizard.bmp")))))
-		return E_FAIL;
-
-	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
-
-	TraverseAnimModels(eLevel, L"../../../model_txt/Anim/");
-	TraverseNonAnimModels(eLevel, L"../../../model_txt/NonAnim/");
-
-	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
-
-	if(FAILED(Add_Shaders(eLevel)))
-		return E_FAIL;
-
-
-	m_strLoadingText = TEXT("객체를(을) 로딩 중 입니다.");
-
-	/* For.Prototype_GameObject_Grid */
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Grid"), CGrid);
-
-	///* For.Prototype_GameObject_Camera_Free */
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
-
-	/* For.Prototype_GameObject_Tool_Anim */
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Tool_Anim"), CTool_Anim);
-
-	/* For.Prototype_GameObject_Tool_NonAnim */
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Tool_NonAnim"), CTool_NonAnim);
-
-	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
-	m_isFinished = true;
-	return S_OK;
-}
 
 HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 {
-	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
-
-	/* Prototype_Component_Texture_Terrain */
+	m_strLoadingText = TEXT("Loading Textures..");
 	if (FAILED(Add_Texture(eLevel, "Terrain", "Terrain/Tile0.jpg")))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Ground", "Terrain/groundTile%d.dds", 4)))
@@ -315,8 +307,9 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Portal", "Portal/Portal.dds")))
 		return E_FAIL;
-	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 
+
+	m_strLoadingText = TEXT("Loading NavigationCells..");
 	/* Prototype_Component_VIBuffer_Terrain_SlimeBoss */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_SlimeBoss"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_SlimeBoss.bmp")))))
@@ -338,16 +331,21 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../objects_txt/SlimeBossRoom_Cells.txt")))))
 		return E_FAIL;
 
-	TraverseAnimModels(eLevel, L"../../../model_txt/Anim/");
-	TraverseNonAnimModels(eLevel, L"../../../model_txt/NonAnim/");
 
-	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
+	m_strLoadingText = TEXT("Loading Models..");
+	vector<string> vecAnimModelNames = { "Jack", "PartSlime", "PartSlimeBoss", "Slime", "SlimeBoss" };
+	vector<string> vecNonAnimModelNames = { "Spear", "Rifle", "Scythe", "LevelSlimeBoss",
+		"cemeteryFence1", "cemeteryPillar", "Knife", "NotOpen", "SlimeBossHead", "SlimeDamageZone"};
 
+	if (FAILED(Add_Models(eLevel, vecAnimModelNames, vecNonAnimModelNames)))
+		return E_FAIL;
+
+
+	m_strLoadingText = TEXT("Loading Shaders..");
 	Add_Shaders(eLevel);
 
 
-	m_strLoadingText = TEXT("객체를(을) 로딩 중 입니다.");
-
+	m_strLoadingText = TEXT("Loading GameObjects..");
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SlimeBoss"), CSlimeBoss);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_SlimeBoss_Slime"), CSlimeBoss_Slime);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Knife"), CKnife);
@@ -361,7 +359,8 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SlimeDamageZone"), CSlimeDamageZone);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Terrain_SlimeBossRoom"), CTerrain_SlimeBossRoom);
 
-	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
+
+	m_strLoadingText = TEXT("Loading Complete.");
 
 	m_isFinished = true;
 
@@ -370,30 +369,28 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 
 HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 {
-	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
-	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+	m_strLoadingText = TEXT("Loading Textures..");
 
-	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Jack")))
-		return E_FAIL;
-	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "Spear")))
-		return E_FAIL;
-	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "Rifle")))
-		return E_FAIL;
-	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "Scythe")))
-		return E_FAIL;
-	if (FAILED(Add_Model(eLevel, TYPE_ANIM, "Wizard")))
-		return E_FAIL;
-	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "LevelWizard")))
+
+	m_strLoadingText = TEXT("Loading Models..");
+	vector<string> vecAnimModelNames = 	{ "Jack", "Wizard" };
+	vector<string> vecNonAnimModelNames = { "Spear", "Rifle", "Scythe", "LevelWizard",
+		"Amulet", "Book", "elecArena1", "elecArena2", "elecArena3", "HoleWall", 
+		"TeslaTower", "Tornado", "WizardBrickGround", "WizardTower" };
+
+	if (FAILED(Add_Models(eLevel, vecAnimModelNames, vecNonAnimModelNames)))
 		return E_FAIL;
 
-	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
-
+	m_strLoadingText = TEXT("Loading Shaders..");
 	Add_Shaders(eLevel);
 
-	m_strLoadingText = TEXT("객체를(을) 로딩 중 입니다.");
+
+	m_strLoadingText = TEXT("Loading GameObjects..");
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Wizard"), CWizard);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TongMap_Wizard"), CTongMap_Wizard);
-	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
+
+
+	m_strLoadingText = TEXT("Loading Complete.");
 	m_isFinished = true;
 	return S_OK;
 }
@@ -437,9 +434,26 @@ HRESULT CLoader::Add_Model(LEVEL eLevel, TYPE eModelType, string strModelName)
 	return S_OK;
 }
 
-HRESULT CLoader::Add_Models_GamePlay()
+HRESULT CLoader::Add_Models(LEVEL eLevel, vector<string> _vecAnimModelNames, vector<string> _vecNonAnimModelNames)
 {
-	/* Prototype_Component_Model_Jack */
+	if (_vecAnimModelNames.empty() || _vecNonAnimModelNames.empty())
+		return S_OK;
+
+	for (auto& strAnimModelName : _vecAnimModelNames)
+	{
+		if (FAILED(Add_Model(eLevel, TYPE_ANIM, strAnimModelName))) {
+			MB("Failed to Add : " + strAnimModelName);
+			return E_FAIL;
+		}
+	}
+
+	for (auto& strNonAnimModelName : _vecNonAnimModelNames)
+	{
+		if (FAILED(Add_Model(eLevel, TYPE_NONANIM, strNonAnimModelName))) {
+			MB("Failed to Add : " + strNonAnimModelName);
+			return E_FAIL;
+		}
+	}
 
 	return S_OK;
 }
@@ -583,6 +597,7 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degaree, NewScale, RootIndex
 
 	/* Level_Wizard */
 	m_ModelConfigs.emplace("Wizard", MODEL_CONFIG{ 0.12f, 0.f, 12.f });
+	m_ModelConfigs.emplace("Amulet", MODEL_CONFIG{ 5.2f, 0.f, 5.2f });
 }
 
 void CLoader::TraverseAnimModels(LEVEL eLevel, const wstring& rootFolderPath)

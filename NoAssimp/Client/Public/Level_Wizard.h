@@ -20,7 +20,7 @@ private:
 	HRESULT Ready_Layer_Camera(const wstring& strLayerTag);
 	HRESULT Ready_Layer_BackGround(const wstring& strLayerTag);
 	HRESULT Ready_LandObject();
-	HRESULT Ready_ParsedObjects(const wstring& strLayerTag);
+	HRESULT Ready_ParsedObjects();
 	HRESULT Ready_UI(const wstring& strLayerTag);
 
 private:

@@ -37,14 +37,9 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
 
-	
 	if (FAILED(Ready_LandObject()))
 		return E_FAIL;
-	/*
-	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
-		return E_FAIL;
 
-	*/
 	if (FAILED(m_pGameInstance->Initialize_ImGui(LEVEL_GAMEPLAY, CImGui_Client::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 	
@@ -69,7 +64,7 @@ HRESULT CLevel_GamePlay::Render()
 
 	_int iFps = m_pGameInstance->Get_FPS();
 	wstring wstrFPS = to_wstring(iFps);
-	wstring wstrLevelFPS = wstring(L"Level_GamePlay  FPS: ") + wstrFPS;
+	wstring wstrLevelFPS = wstring(L"LevelGamePlay  FPS: ") + wstrFPS;
 	SetWindowText(g_hWnd, wstrLevelFPS.c_str());
 
 	return S_OK;
@@ -118,22 +113,13 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_LandObject()
 {
-
-	if (FAILED(Ready_ParsedObjects(TEXT("Layer_Monster"))))
-		return E_FAIL;
-
-	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
+	if (FAILED(Ready_ParsedObjects()))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring& strLayerTag)
-{
-	return S_OK;
-}
-
-HRESULT CLevel_GamePlay::Ready_ParsedObjects(const wstring & strLayerTag)
+HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 {
 	wchar_t wcharPrototypeTag[MAX_PATH];
 	wchar_t wcharModelTag[MAX_PATH];
@@ -206,16 +192,11 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects(const wstring & strLayerTag)
 				return E_FAIL;
 		}
 		else {
-			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Monster"), &tempDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Monster"), &tempDesc)))
 				return E_FAIL;
 		}
 	}
 	
-	return S_OK;
-}
-
-HRESULT CLevel_GamePlay::Ready_Layer_Effect(const wstring & strLayerTag)
-{
 	return S_OK;
 }
 

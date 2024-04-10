@@ -59,7 +59,7 @@ HRESULT CLevel_Wizard::Render()
 
 	_int iFps = m_pGameInstance->Get_FPS();
 	wstring wstrFPS = to_wstring(iFps);
-	wstring wstrLevelFPS = wstring(L"Level_GamePlay  FPS: ") + wstrFPS;
+	wstring wstrLevelFPS = wstring(L"LevelWizard  FPS: ") + wstrFPS;
 	SetWindowText(g_hWnd, wstrLevelFPS.c_str());
 
 	return S_OK;
@@ -109,13 +109,13 @@ HRESULT CLevel_Wizard::Ready_Layer_Camera(const wstring& strLayerTag)
 HRESULT CLevel_Wizard::Ready_LandObject()
 {
 
-	if (FAILED(Ready_ParsedObjects(TEXT("Layer_Monster"))))
+	if (FAILED(Ready_ParsedObjects()))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CLevel_Wizard::Ready_ParsedObjects(const wstring& strLayerTag)
+HRESULT CLevel_Wizard::Ready_ParsedObjects()
 {
 	wchar_t wcharPrototypeTag[MAX_PATH];
 	wchar_t wcharModelTag[MAX_PATH];
@@ -150,7 +150,7 @@ HRESULT CLevel_Wizard::Ready_ParsedObjects(const wstring& strLayerTag)
 		}*/
 
 		else {
-			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, strLayerTag, TEXT("Prototype_GameObject_Monster"), &tempDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Monster"), &tempDesc)))
 				return E_FAIL;
 		}
 	}
@@ -193,11 +193,6 @@ HRESULT CLevel_Wizard::Ready_Layer_BackGround(const wstring& strLayerTag)
 	tDesc.iLevel = LEVEL_WIZARD;
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, strLayerTag, TEXT("Prototype_GameObject_Sky"), &tDesc)))
 		return E_FAIL;
-
-	//CTerrain::TERRAIN_DESC terrainDesc{};
-	//terrainDesc.iLevel = LEVEL_WIZARD;
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, strLayerTag, TEXT("Prototype_GameObject_Terrain"), &terrainDesc)))
-	//	return E_FAIL;
 
 	return S_OK;
 }

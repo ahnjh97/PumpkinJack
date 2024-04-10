@@ -84,7 +84,7 @@ void CTongMap_Wizard::SetUp_MeshShaderTypes(_uint iNumMeshes)
 void CTongMap_Wizard::SetUp_MeshShaderPassIndices(_uint iNumMeshes)
 {
 	m_vecMeshShaderPassIndices.resize(iNumMeshes);
-	for (_int i = 0; i < iNumMeshes; i++)
+	for (_uint i = 0; i < iNumMeshes; i++)
 	{
 		string strDiffuseTexName = m_pModelCom->Get_DiffuseTextureName(i);
 		if (strDiffuseTexName == "T_Earth_Mat")

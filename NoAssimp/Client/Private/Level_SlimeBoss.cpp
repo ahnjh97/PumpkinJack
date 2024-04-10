@@ -75,7 +75,7 @@ HRESULT CLevel_SlimeBoss::Render()
 
 	_int iFps = m_pGameInstance->Get_FPS();
 	wstring wstrFPS = to_wstring(iFps);
-	wstring wstrLevelFPS = wstring(L"Level_SlimeBoss  FPS: ") + wstrFPS;
+	wstring wstrLevelFPS = wstring(L"LevelSlimeBoss  FPS: ") + wstrFPS;
 	SetWindowText(g_hWnd, wstrLevelFPS.c_str());
 
 	return S_OK;
