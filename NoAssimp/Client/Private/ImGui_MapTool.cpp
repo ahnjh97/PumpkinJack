@@ -422,18 +422,24 @@ void CImGui_MapTool::OptionChange()
 			continue;
 
 		CGrid* pGrid = dynamic_cast<CGrid*>(grid);
-		if (m_iMode == 0) // SOLID
-		{
-			pGrid->Set_PassIndex(0);
-			pGrid->Set_Hide(false);
-		}
-		else if (m_iMode == 1) // WIREFRAME
-		{
+
+		if (strCurLevel == "Level_Wizard")
 			pGrid->Set_PassIndex(1);
-			pGrid->Set_Hide(false);
+		else
+		{
+			if (m_iMode == 0) // SOLID
+			{
+				pGrid->Set_PassIndex(0);
+				pGrid->Set_Hide(false);
+			}
+			else if (m_iMode == 1) // WIREFRAME
+			{
+				pGrid->Set_PassIndex(1);
+				pGrid->Set_Hide(false);
+			}
+			else if (m_iMode == 2) // CELL
+				pGrid->Set_Hide(true);
 		}
-		else if (m_iMode == 2) // CELL
-			pGrid->Set_Hide(true);
 	}
 }
 
@@ -699,6 +705,7 @@ void CImGui_MapTool::Load_Level()
 	fileStream.close();
 
 	Load_Cells(); 
+	MoveCameraToPlayer();
 }
 
 void CImGui_MapTool::Save_Cells()
@@ -1429,6 +1436,39 @@ void CImGui_MapTool::Remove_RedundantCells()
 	}
 
 	vecCells = vecTempCells;
+}
+
+void CImGui_MapTool::MoveCameraToPlayer()
+{
+	_float4x4 matPlayerWorld{};
+	list<CGameObject*> objList = m_pGameInstance->Get_ObjectList(LEVEL_MAPTOOL, TEXT("Layer_Parse"));
+
+	if (objList.empty())
+		return;
+
+	for (auto& obj : objList) {
+		if (obj == nullptr)
+			continue;
+
+		CModel* pModel = dynamic_cast<CModel*>(obj->Get_Component(TEXT("Com_Model")));
+		if (pModel == nullptr)
+			continue;
+
+		if (pModel->Get_ModelName() == "Jack")	{
+			matPlayerWorld = obj->Get_ParseData().matWorld;
+			break;
+		}
+	}
+	
+	CGameObject* pCamera = m_pGameInstance->Get_GameObject(LEVEL_MAPTOOL, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free"));
+	if (pCamera == nullptr)
+		return;
+
+	CTransform* pCamTransform = dynamic_cast<CTransform*>(pCamera->Get_Component(g_strTransformTag));
+	if (pCamTransform == nullptr)
+		return;
+
+	pCamTransform->Set_Pos(_float4(matPlayerWorld._41, matPlayerWorld._42 + 50, matPlayerWorld._43 - 50, 1));
 }
 
 CImGui_MapTool* CImGui_MapTool::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

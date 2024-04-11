@@ -33,6 +33,9 @@ HRESULT CTongMap_GamePlay::Initialize(void* pArg)
 	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel), GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
 
+	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+	SetUp_MeshShaderPassIndices(iNumMeshes);
+
 	return S_OK;
 }
 
@@ -52,24 +55,33 @@ HRESULT CTongMap_GamePlay::Render()
 		return E_FAIL;
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
-	vector<_uint> vecMeshShaderType = m_pModelCom->Get_MeshShaderType();
+
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
-		SHADER eShader = (SHADER)vecMeshShaderType[i];
-		string g_strTexture = "g_DiffuseTexture";
-		if (eShader == NO_LIGHT)
-			g_strTexture = "g_Texture";
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom[vecMeshShaderType[i]], g_strTexture.c_str(), i, aiTextureType_DIFFUSE)))
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom[m_vecMeshShaderTypes[i]], "g_DiffuseTexture", i, aiTextureType_DIFFUSE)))
 			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom[vecMeshShaderType[i]]->Begin(0)))
+		if (FAILED(m_pShaderCom[m_vecMeshShaderTypes[i]]->Begin(m_vecMeshShaderPassIndices[i])))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
 	}
 
 	return S_OK;
+}
+
+void CTongMap_GamePlay::SetUp_MeshShaderPassIndices(_uint iNumMeshes)
+{
+	m_vecMeshShaderTypes.resize(iNumMeshes);
+	m_vecMeshShaderPassIndices.resize(iNumMeshes);
+
+	for (_uint i = 0; i < iNumMeshes; i++)
+	{
+		string strTexturName = m_pModelCom->Get_DiffuseTextureName(i);
+		if (strTexturName == "pine_Mat")
+			m_vecMeshShaderTypes[i] = NO_LIGHT;
+	}
 }
 
 HRESULT CTongMap_GamePlay::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
@@ -80,10 +92,6 @@ HRESULT CTongMap_GamePlay::Add_Components(LEVEL eLevel, const wstring& _wstrMode
 
 	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel_Lighted");
 	if (FAILED(__super::Add_Component(eLevel, wstrShaderTag, TEXT("Com_Shader_Lighted"), (CComponent**)&m_pShaderCom[LIGHTED])))
-		return E_FAIL;
-
-	wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel_AlphaTex");
-	if (FAILED(__super::Add_Component(eLevel, wstrShaderTag, TEXT("Com_Shader_AlphaTex"), (CComponent**)&m_pShaderCom[ALPHA])))
 		return E_FAIL;
 
 	wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel");
@@ -105,7 +113,7 @@ HRESULT CTongMap_GamePlay::Bind_ShaderResources()
 	if (nullptr == pLightDesc)
 		return E_FAIL;
 
-	for (_int i = 0; i <= ALPHA; i++)
+	for (_int i = 0; i <= LIGHTED; i++)
 	{
 		if (FAILED(m_pShaderCom[i]->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldFloat4x4_Ptr())))
 			return E_FAIL;
@@ -170,8 +178,6 @@ CGameObject* CTongMap_GamePlay::Clone(void* pArg)
 void CTongMap_GamePlay::Free()
 {
 	__super::Free();
-	for (_int i = 0; i < TEX_END; i++)
-		Safe_Release(m_pTextureCom[i]);
 	for (_int j = 0; j < SHADER_END; j++)
 		Safe_Release(m_pShaderCom[j]);
 	Safe_Release(m_pModelCom);

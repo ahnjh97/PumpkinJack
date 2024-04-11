@@ -44,19 +44,17 @@ void CKnife::Tick(_float fTimeDelta)
 	if (m_fAlpha <= 0.01f)
 		Set_Dead();
 
-	m_fTime += fTimeDelta * 1.6f;
-
+	m_fTime += fTimeDelta;
+	m_fAccSpeed += exp(m_fTime * 1.2f) * fTimeDelta;
 	if (m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y >= -3)
-		m_pTransformCom->Fall(m_fTime);
-	else
-	{
-		m_fAlpha -= 0.005f;
+		m_pTransformCom->Fall(m_fAccSpeed);
+	else {
+		m_fAlpha -= exp(m_fTime * 0.12f) * fTimeDelta;
 		return;
 	}
 
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_SLIMEBOSS));
-	if (pPlayer)
-	{
+	if (pPlayer) {
 		CCollider* pPlayerCollider = dynamic_cast<CCollider*>(pPlayer->Get_Component(TEXT("Com_Collider")));
 		if (m_pColliderCom->Intersect(pPlayerCollider))
 		{
@@ -92,7 +90,7 @@ HRESULT CKnife::Render()
 		m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE);
 		
 			/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(0)))
+		if (FAILED(m_pShaderCom->Begin(3)))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -108,7 +106,7 @@ HRESULT CKnife::Render()
 HRESULT CKnife::Add_Components(const wstring& _wstrModelTag)
 {
 	/* For.Com_Shader */
-	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel_Knife");
+	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel");
 	if (FAILED(__super::Add_Component(LEVEL_SLIMEBOSS, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 

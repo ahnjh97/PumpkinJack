@@ -32,10 +32,10 @@ public:
 	_bool Get_Shrinked() {
 		if (abs(m_vOriginalScale.x / m_vScale.x) > 33.f) { return true; }
 	else { return false; }}
-	vector<_uint> Get_MeshShaderType() { return m_vecMeshShaderType; }
 	_float Get_LerpRatio() { return m_fLerpRatio; }
 	string Get_MeshName(_uint iMeshIndex);
 	string Get_DiffuseTextureName(_uint iMeshIndex);
+	_float Get_MeshOffsetX(_uint iMeshIndex);
 
 	void Set_Animation(_uint iAnimIndex, _bool isLoop) {
 		if (m_bIsNonAnimVersion) return;
@@ -102,8 +102,6 @@ private:
 	_bool						m_bIsLerping = { false };
 	vector<KEYFRAME>			m_FinalKeyFrames;
 	_float						m_fLerpTime = { 0.08f };
-
-	vector<_uint>				m_vecMeshShaderType;
 
 
 	// 파일입출력 변수

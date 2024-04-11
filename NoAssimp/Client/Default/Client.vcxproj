@@ -212,7 +212,6 @@
     <ClInclude Include="..\Public\Tool_NonAnim.h" />
     <ClInclude Include="..\Public\Trigger.h" />
     <ClInclude Include="..\Public\UI_Weapon.h" />
-    <ClInclude Include="..\Public\Water.h" />
     <ClInclude Include="..\Public\Weapon.h" />
     <ClInclude Include="..\Public\Wizard.h" />
     <ClInclude Include="Client.h" />
@@ -270,7 +269,6 @@
     <ClCompile Include="..\Private\Tool_NonAnim.cpp" />
     <ClCompile Include="..\Private\Trigger.cpp" />
     <ClCompile Include="..\Private\UI_Weapon.cpp" />
-    <ClCompile Include="..\Private\Water.cpp" />
     <ClCompile Include="..\Private\Weapon.cpp" />
     <ClCompile Include="..\Private\Wizard.cpp" />
     <ClCompile Include="Client.cpp" />
@@ -290,24 +288,13 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel.hlsl" />
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel_Slime.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCube.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel.hlsl" />
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_AlphaTex.hlsl" />
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Knife.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Lighted.hlsl" />
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_ArenaFire.hlsl" />
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_SlimeBossRoom.hlsl" />
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Water.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_LevelSlimeBoss.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl" />
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex_CrowLifeBar.hlsl" />
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex_Inven.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex_LifeBar.hlsl" />
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex_Portal.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

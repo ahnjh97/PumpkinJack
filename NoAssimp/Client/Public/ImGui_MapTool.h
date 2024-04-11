@@ -53,6 +53,9 @@ public:
 	void				Erase_NullPointers();
 	void				Remove_RedundantCells();
 
+	// Camera
+	void				MoveCameraToPlayer();
+
 private:
 	_bool						bCallNewFrame = { false };
 	_bool						bSeeAnim = { false };

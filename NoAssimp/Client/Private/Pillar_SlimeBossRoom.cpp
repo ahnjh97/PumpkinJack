@@ -113,7 +113,7 @@ _bool CPillar_SlimeBossRoom::Check_HeadCol()
 HRESULT CPillar_SlimeBossRoom::Add_Components(const wstring& _wstrModelTag)
 {
 	/* For.Com_Shader */
-	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel_Lighted");
+	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel");
 	if (FAILED(__super::Add_Component(LEVEL_SLIMEBOSS, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 

@@ -50,8 +50,7 @@ HRESULT CLevel_GamePlay::Initialize()
 void CLevel_GamePlay::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
-	if (m_pGameInstance->KeyDown(DIK_RETURN))
-	{
+	if (m_pGameInstance->KeyDown(DIK_RETURN)) {
 		if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_SLIMEBOSS))))
 			return;
 	}
@@ -64,7 +63,7 @@ HRESULT CLevel_GamePlay::Render()
 
 	_int iFps = m_pGameInstance->Get_FPS();
 	wstring wstrFPS = to_wstring(iFps);
-	wstring wstrLevelFPS = wstring(L"LevelGamePlay  FPS: ") + wstrFPS;
+	wstring wstrLevelFPS = wstring(L"Level_GamePlay  FPS: ") + wstrFPS;
 	SetWindowText(g_hWnd, wstrLevelFPS.c_str());
 
 	return S_OK;
@@ -93,7 +92,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 	CCamera_Jack::CAMERA_JACK_DESC		CameraDesc{};
 
 	CameraDesc.fMouseSensor = 0.1f;
-	CameraDesc.fFovy = XMConvertToRadians(70.0f);
+	CameraDesc.fFovy = XMConvertToRadians(50.0f);
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
 	CameraDesc.fFar = 1000.0f;
@@ -102,8 +101,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 	CameraDesc.fSpeedPerSec = 20.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	
-	CameraDesc.fDistance = 40.f;
-	CameraDesc.fHeight = 10.f;
+	CameraDesc.fDistance = 70.f;
+	CameraDesc.fHeight = 20.f;
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Camera_Jack"), &CameraDesc)))
 		return E_FAIL;

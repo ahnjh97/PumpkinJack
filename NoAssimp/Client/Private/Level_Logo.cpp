@@ -29,7 +29,7 @@ void CLevel_Logo::Tick(_float fTimeDelta)
 	if (GetKeyState(VK_RETURN) & 0x8000)
 	{
 		if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_GAMEPLAY))))
-			return ;
+			return;
 	}
 
 	if (GetKeyState('M') & 0x8000)
@@ -44,7 +44,7 @@ HRESULT CLevel_Logo::Render()
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
-	SetWindowText(g_hWnd, TEXT("로고레벨입니다."));
+	SetWindowText(g_hWnd, TEXT("Level_Logo."));
 	
 
 

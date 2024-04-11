@@ -28,6 +28,7 @@ private:
 	void Link_Animation(_float fTimeDelta);
 	void StateToAnimation();
 	void TurnTowards_Player(_float fTimeDelta);
+	void KnifeSpawn();
 	void PillarSpawn();
 	void PortalSpawn();
 	void SlimeSpawn();

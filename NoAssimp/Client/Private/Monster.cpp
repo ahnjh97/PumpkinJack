@@ -76,7 +76,7 @@ HRESULT CMonster::Render()
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
 		/*if (m_pModelCom->Get_ModelType() == TYPE_NONANIM)*/
-			/*if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", i, aiTextureType_DIFFUSE)))
+			/*if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE)))
 				return E_FAIL;*/
 	/*	if (m_pModelCom->Get_ModelType() == TYPE_ANIM)*/
 			if(FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE)))

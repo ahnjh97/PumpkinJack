@@ -430,7 +430,12 @@ _bool CPlayer::Check_TerrainCol()
 	if (m_bInSlimeBossRoom == false)
 	{
 		if (m_pNavigationCom[DEFAULT] == nullptr)
-			return true;
+		{
+			if (vPos.y <= 0.f)
+				return true;
+			else
+				return false;
+		}
 
 		_float fPlaneHeight = m_pNavigationCom[DEFAULT]->Get_PlaneHeight(vPos);
 		if (vPos.y <= fPlaneHeight)
@@ -595,15 +600,16 @@ _bool CPlayer::Check_Kart()
 		_vector vDirectionToWallCenter = vCenterPos - vPlayerPos;
 		vDirectionToWallCenter = ::XMVectorSetY(vDirectionToWallCenter, 0.f);
 		_float fAngle = ::XMVectorGetX(::XMVector3AngleBetweenNormals(::XMVector3Normalize(XMLoadFloat3(&m_vDirection)), ::XMVector3Normalize(vDirectionToWallCenter)));
-		if (fAngle <= XM_PIDIV2 - 0.6f)
-		{
+		if (fAngle <= XM_PIDIV2 - 0.6f)	{
 			CTransform* pKartTransform = dynamic_cast<CTransform*>(pKart->Get_Component(g_strTransformTag));
 			if (pKartTransform == nullptr)
 				return false;
+
 			XMStoreFloat3(&m_vKartLook, pKartTransform->Get_State_Vector(CTransform::STATE_LOOK));
 			_vector vKartPos = pKartTransform->Get_State_Vector(CTransform::STATE_POSITION);
 			_vector vKartLook = pKartTransform->Get_State_Vector(CTransform::STATE_LOOK);
-			XMStoreFloat4(&m_vPushPos, vKartPos - vKartLook * 6.f - ::XMVectorSet(0, 1.15f, 0, 0));
+			_vector vKartRight = pKartTransform->Get_State_Vector(CTransform::STATE_RIGHT);
+			XMStoreFloat4(&m_vPushPos, vKartPos - vKartLook * 6.f - ::XMVectorSet(0, 1.15f, 0, 0) - vKartRight * 0.7f );
 			return true;
 		}
 	}

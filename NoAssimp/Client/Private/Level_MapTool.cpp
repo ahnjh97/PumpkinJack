@@ -66,7 +66,7 @@ HRESULT CLevel_MapTool::Ready_Layer_Camera(const wstring& strLayerTag)
 	CCamera_Free::CAMERA_FREE_DESC		CameraDesc{};
 
 	CameraDesc.fMouseSensor = 0.1f;
-	CameraDesc.fFovy = XMConvertToRadians(70.0f);
+	CameraDesc.fFovy = XMConvertToRadians(45.0f);
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
 	CameraDesc.fFar = 1000.0f;

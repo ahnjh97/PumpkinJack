@@ -50,7 +50,7 @@ private:
 	HRESULT Add_Shaders(LEVEL eLevel);
 	HRESULT Add_Texture(LEVEL eLevel, string strPrototypeName, string strFolderAndFileName, _uint iNumTextures = 1);
 
-	void Insert_ScaleRotationData();
+	void SetUp_ModelScaleRotation();
 
 	void TraverseAnimModels(LEVEL eLevel, const wstring& rootFolderPath);
 	void TraverseNonAnimModels(LEVEL eLevel, const wstring& rootFolderPath);

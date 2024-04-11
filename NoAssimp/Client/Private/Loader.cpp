@@ -26,7 +26,6 @@
 #include "Trigger.h"
 #include "Soldier.h"
 #include "Arrow.h"
-#include "Water.h"
 #include "Kart.h"
 #include "Rail.h"
 
@@ -45,7 +44,6 @@
 
 #include "TongMap_Wizard.h"
 #include "Wizard.h"
-//#include "Effect.h"
 
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -82,7 +80,7 @@ HRESULT CLoader::Initialize(LEVEL eNextLevelID)
 	if (0 == m_hThread)
 		return E_FAIL;
 
-	Insert_ScaleRotationData();
+	SetUp_ModelScaleRotation();
 	return S_OK;
 }
 
@@ -124,17 +122,17 @@ HRESULT CLoader::Start()
 
 HRESULT CLoader::Loading_For_Logo()
 {
-	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+	m_strLoadingText = TEXT("Loading Textures for Level_Logo...");
 	/* For.Prototype_Component_Texture_Logo */
 	if(FAILED(Add_Texture(LEVEL_LOGO, "Logo", "Logo/wallpaper.jpg")))
 		return E_FAIL;
 
 
-	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+	m_strLoadingText = TEXT("Loading Models for Level_Logo...");
 
-	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
+	m_strLoadingText = TEXT("Loading Shaders for Level_Logo...");
 
-	m_strLoadingText = TEXT("객체의 원형를(을) 로딩 중 입니다.");
+	m_strLoadingText = TEXT("Loading GameObject Prototypes for Level_Logo...");
 
 	/* For.Prototype_GameObject_BackGround */
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGround"),
@@ -142,7 +140,7 @@ HRESULT CLoader::Loading_For_Logo()
 		return E_FAIL;
 
 
-	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
+	m_strLoadingText = TEXT("Loading Complete: Level_Logo");
 
 	m_isFinished = true;
 
@@ -213,7 +211,7 @@ HRESULT CLoader::Loading_For_MapTool(LEVEL eLevel)
 
 HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 {
-	m_strLoadingText = TEXT("Loading Textures..");
+	m_strLoadingText = TEXT("Loading Textures for Level_GamePlay...");
 	if (FAILED(Add_Texture(eLevel, "Terrain", "Terrain/Tile0.jpg")))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Ground", "Terrain/groundTile%d.dds", 4)))
@@ -226,7 +224,7 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 		return E_FAIL;
 
 
-	m_strLoadingText = TEXT("Loading NavigationCells..");
+	m_strLoadingText = TEXT("Loading NavigationCells for Level_GamePlay...");
 	/* Prototype_Component_VIBuffer_Terrain_GamePlay */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_GamePlay"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_GamePlay.bmp")))))
@@ -238,7 +236,7 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../objects_txt/Level_GamePlay_Cells.txt")))))
 		return E_FAIL;
 
-	m_strLoadingText = TEXT("Loading Models..");
+	m_strLoadingText = TEXT("Loading Models for Level_GamePlay...");
 	vector<string> vecAnimModelNames = { "Jack", "Ballista", "Dummy", "SkullCrossBow", "Soldier", "Trabuchet" };
 	vector<string> vecNonAnimModelNames = { "Spear", "Rifle", "Scythe", "LevelGamePlay",
 		"ballistaArrow", "ballistaBase", "ballistaRotator", "crateBoxPotion", "fenceStack_SmallCol", "Kart",
@@ -248,11 +246,11 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 		return E_FAIL;
 
 
-	m_strLoadingText = TEXT("Loading Shaders..");
+	m_strLoadingText = TEXT("Loading Shaders for Level_GamePlay...");
 	Add_Shaders(eLevel);
 
 
-	m_strLoadingText = TEXT("Loading GameObjects..");
+	m_strLoadingText = TEXT("Loading GameObject Prototypes for Level_GamePlay...");
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Terrain"), CTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Jack"), CCamera_Jack);
@@ -274,10 +272,9 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Trigger"), CTrigger);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Soldier"), CSoldier);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_SoldierWeapon"), CSoldierWeapon);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Water"), CWater);
 
 
-	m_strLoadingText = TEXT("Loading Complete.");
+	m_strLoadingText = TEXT("Loading Complete: Level_GamePlay");
 
 	m_isFinished = true;
 
@@ -288,7 +285,7 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 
 HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 {
-	m_strLoadingText = TEXT("Loading Textures..");
+	m_strLoadingText = TEXT("Loading Textures for Level_SlimeBoss...");
 	if (FAILED(Add_Texture(eLevel, "Terrain", "Terrain/Tile0.jpg")))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Ground", "Terrain/groundTile%d.dds", 4)))
@@ -309,7 +306,7 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 		return E_FAIL;
 
 
-	m_strLoadingText = TEXT("Loading NavigationCells..");
+	m_strLoadingText = TEXT("Loading NavigationCells for Level_SlimeBoss...");
 	/* Prototype_Component_VIBuffer_Terrain_SlimeBoss */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_SlimeBoss"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_SlimeBoss.bmp")))))
@@ -332,7 +329,7 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 		return E_FAIL;
 
 
-	m_strLoadingText = TEXT("Loading Models..");
+	m_strLoadingText = TEXT("Loading Models for Level_SlimeBoss...");
 	vector<string> vecAnimModelNames = { "Jack", "PartSlime", "PartSlimeBoss", "Slime", "SlimeBoss" };
 	vector<string> vecNonAnimModelNames = { "Spear", "Rifle", "Scythe", "LevelSlimeBoss",
 		"cemeteryFence1", "cemeteryPillar", "Knife", "NotOpen", "SlimeBossHead", "SlimeDamageZone"};
@@ -341,11 +338,11 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 		return E_FAIL;
 
 
-	m_strLoadingText = TEXT("Loading Shaders..");
+	m_strLoadingText = TEXT("Loading Shaders for Level_SlimeBoss...");
 	Add_Shaders(eLevel);
 
 
-	m_strLoadingText = TEXT("Loading GameObjects..");
+	m_strLoadingText = TEXT("Loading GameObject Prototypes for Level_SlimeBoss...");
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SlimeBoss"), CSlimeBoss);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_SlimeBoss_Slime"), CSlimeBoss_Slime);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Knife"), CKnife);
@@ -360,7 +357,7 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Terrain_SlimeBossRoom"), CTerrain_SlimeBossRoom);
 
 
-	m_strLoadingText = TEXT("Loading Complete.");
+	m_strLoadingText = TEXT("Loading Complete: Level_SlimeBoss");
 
 	m_isFinished = true;
 
@@ -369,7 +366,7 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 
 HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 {
-	m_strLoadingText = TEXT("Loading Textures..");
+	m_strLoadingText = TEXT("Loading Textures for Level_Wizard...");
 
 
 	m_strLoadingText = TEXT("Loading Models..");
@@ -381,16 +378,16 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 	if (FAILED(Add_Models(eLevel, vecAnimModelNames, vecNonAnimModelNames)))
 		return E_FAIL;
 
-	m_strLoadingText = TEXT("Loading Shaders..");
+	m_strLoadingText = TEXT("Loading Shaders for Level_Wizard...");
 	Add_Shaders(eLevel);
 
 
-	m_strLoadingText = TEXT("Loading GameObjects..");
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Wizard"), CWizard);
+	m_strLoadingText = TEXT("Loading GameObject Prototypes for Level_Wizard...");
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Wizard"), CWizard);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TongMap_Wizard"), CTongMap_Wizard);
 
 
-	m_strLoadingText = TEXT("Loading Complete.");
+	m_strLoadingText = TEXT("Loading Complete: Level_Wizard");
 	m_isFinished = true;
 	return S_OK;
 }
@@ -480,44 +477,10 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_Lighted.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 		return E_FAIL;
 
-	/* For.Prototype_Component_Shader_VtxModel_AlphaTex */
-	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_AlphaTex"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_AlphaTex.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
-		return E_FAIL;
-
-	if (eLevel == LEVEL_GAMEPLAY) {
-		/* For.Prototype_Component_Shader_VtxModel_Water */
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_Water"),
-			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_Water.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
-			return E_FAIL;
-	}
-
 	if (eLevel == LEVEL_SLIMEBOSS) {
 		/* For.Prototype_Component_Shader_VtxNorTex_LevelSlimeBoss */
 		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxNorTex_LevelSlimeBoss"),
 			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex_LevelSlimeBoss.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
-			return E_FAIL;
-
-		/* For.Prototype_Component_Shader_VtxModel_Knife */
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_Knife"),
-			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_Knife.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
-			return E_FAIL;
-
-		/* For.Prototype_Component_Shader_VtxModel_SlimeBossRoom */
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_SlimeBossRoom"),
-			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_SlimeBossRoom.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
-			return E_FAIL;
-
-		/* For.Prototype_Component_Shader_VtxPosTex_Portal */
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxPosTex_Portal"),
-			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex_Portal.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
-			return E_FAIL;
-	}
-
-	if (LEVEL_WIZARD == eLevel) {
-		/* For.Prototype_Component_Shader_VtxModel_ArenaFire */
-		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_ArenaFire"),
-			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_ArenaFire.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 			return E_FAIL;
 	}
 
@@ -536,7 +499,7 @@ HRESULT CLoader::Add_Texture(LEVEL eLevel, string strPrototypeName, string strFo
 	return S_OK;
 }
 
-void CLoader::Insert_ScaleRotationData() // Scale, Degaree, NewScale, RootIndex
+void CLoader::SetUp_ModelScaleRotation() // Scale, Degaree, NewScale, RootIndex
 {
 	m_ModelConfigs.emplace("Ballista", MODEL_CONFIG{ 0.1f, 180.f, 9.f });
 	m_ModelConfigs.emplace("Bat", MODEL_CONFIG{ 0.005f, 0.f, 0.5f, 4 });
@@ -597,7 +560,16 @@ void CLoader::Insert_ScaleRotationData() // Scale, Degaree, NewScale, RootIndex
 
 	/* Level_Wizard */
 	m_ModelConfigs.emplace("Wizard", MODEL_CONFIG{ 0.12f, 0.f, 12.f });
+	m_ModelConfigs.emplace("LevelWizard", MODEL_CONFIG{ 2.4f, 0.f, 2.4f });
 	m_ModelConfigs.emplace("Amulet", MODEL_CONFIG{ 5.2f, 0.f, 5.2f });
+	m_ModelConfigs.emplace("Book", MODEL_CONFIG{ 4.f, 0.f, 4.f });
+	for (_int i = 1; i < 4; i++)
+		m_ModelConfigs.emplace("elecArena" + to_string(i), MODEL_CONFIG{ 15.f, 0.f, 15.f });
+	m_ModelConfigs.emplace("HoleWall", MODEL_CONFIG{ 12.f, 0.f, 12.f });
+	m_ModelConfigs.emplace("TeslaTower", MODEL_CONFIG{ 20.f, 0.f, 20.f });
+	m_ModelConfigs.emplace("Tornado", MODEL_CONFIG{ 15.f, 0.f, 15.f });
+	m_ModelConfigs.emplace("WizardBrickGround", MODEL_CONFIG{ 12.f, 0.f, 12.f });
+	m_ModelConfigs.emplace("WizardTower", MODEL_CONFIG{ 15.f, 0.f, 15.f });
 }
 
 void CLoader::TraverseAnimModels(LEVEL eLevel, const wstring& rootFolderPath)

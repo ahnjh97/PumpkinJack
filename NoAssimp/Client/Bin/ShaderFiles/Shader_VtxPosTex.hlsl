@@ -4,8 +4,8 @@
 /* 전역변수 : 쉐이더 외부에 있는 데이터를 쉐이더 안으로 받아온다. */
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
-texture2D	g_Texture;
-
+texture2D g_DiffuseTexture;
+float g_fAlpha;
 
 struct VS_IN
 {
@@ -50,14 +50,35 @@ PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-	Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
  
 	return Out;
 }
 
+PS_OUT PS_MAIN_CROWLIFEBAR(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (Out.vColor.a == 0.0f)
+        discard;
+	
+    return Out;
+}
+
+PS_OUT PS_MAIN_INVEN(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+	
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    Out.vColor.a *= saturate(g_fAlpha);
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
-	pass Default
+	pass Default // 0
 	{
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -68,4 +89,40 @@ technique11 DefaultTechnique
 		DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
 		PixelShader = compile ps_5_0 PS_MAIN();
 	}
+
+    pass CrowLifeBar // 1
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_CROWLIFEBAR();
+    }
+
+    pass Inven // 2
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_INVEN();
+    }
+
+    pass Portal // 3
+    {
+        SetRasterizerState(RS_NoCull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_CROWLIFEBAR();
+    }
 }

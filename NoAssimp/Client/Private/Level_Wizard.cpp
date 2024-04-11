@@ -59,7 +59,7 @@ HRESULT CLevel_Wizard::Render()
 
 	_int iFps = m_pGameInstance->Get_FPS();
 	wstring wstrFPS = to_wstring(iFps);
-	wstring wstrLevelFPS = wstring(L"LevelWizard  FPS: ") + wstrFPS;
+	wstring wstrLevelFPS = wstring(L"Level_Wizard  FPS: ") + wstrFPS;
 	SetWindowText(g_hWnd, wstrLevelFPS.c_str());
 
 	return S_OK;
@@ -88,17 +88,17 @@ HRESULT CLevel_Wizard::Ready_Layer_Camera(const wstring& strLayerTag)
 	CCamera_Jack::CAMERA_JACK_DESC		CameraDesc{};
 
 	CameraDesc.fMouseSensor = 0.1f;
-	CameraDesc.fFovy = XMConvertToRadians(70.0f);
+	CameraDesc.fFovy = XMConvertToRadians(50.0f);
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
-	CameraDesc.fFar = 1000.0f;
+	CameraDesc.fFar = 3000.0f;
 	CameraDesc.vEye = _float4(0.f, 10.f, -7.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 	CameraDesc.fSpeedPerSec = 20.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-	CameraDesc.fDistance = 40.f;
-	CameraDesc.fHeight = 10.f;
+	CameraDesc.fDistance = 70.f;
+	CameraDesc.fHeight = 25.f;
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, strLayerTag, TEXT("Prototype_GameObject_Camera_Jack"), &CameraDesc)))
 		return E_FAIL;
@@ -144,11 +144,10 @@ HRESULT CLevel_Wizard::Ready_ParsedObjects()
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_Map"), TEXT("Prototype_GameObject_TongMap_Wizard"), &tempDesc)))
 				return E_FAIL;
 		}
-		/*else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Wizard")) {
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Wizard")) {
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_Wizard"), TEXT("Prototype_GameObject_Wizard"), &tempDesc)))
 				return E_FAIL;
-		}*/
-
+		}
 		else {
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Monster"), &tempDesc)))
 				return E_FAIL;
@@ -181,8 +180,6 @@ HRESULT CLevel_Wizard::Ready_UI(const wstring& strLayerTag)
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, strLayerTag, TEXT("Prototype_GameObject_Indicator"), &tInvenDesc)))
 			return E_FAIL;
 	}
-
-
 
 	return S_OK;
 }

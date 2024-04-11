@@ -74,7 +74,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             {
                 if(*pGameInstance->Get_CurrentLevelID() == LEVEL_MAPTOOL)
                     ShowCursor(TRUE);
-                else if (*pGameInstance->Get_CurrentLevelID() >= LEVEL_GAMEPLAY && *pGameInstance->Get_CurrentLevelID() <= LEVEL_SLIMEBOSS)
+                else if (*pGameInstance->Get_CurrentLevelID() >= LEVEL_GAMEPLAY && *pGameInstance->Get_CurrentLevelID() <= LEVEL_WIZARD)
                 {
                     RECT rect;
                     GetClientRect(msg.hwnd, &rect); // hwnd는 윈도우 핸들입니다.

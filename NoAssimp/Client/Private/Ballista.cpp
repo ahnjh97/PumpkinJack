@@ -55,7 +55,7 @@ void CBallista::Tick(_float fTimeDelta)
 		}		
 	}
 
-	m_pTransformCom->Look_At(XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1.f));
+	m_pTransformCom->Look_At(XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42 + 6.f, m_pPlayerWorldMat->_43, 1.f));
 	m_pTransformCom->Set_Pos(m_vOriginalPos);
 
 	if (BALLISTA_IDLE == m_eState && m_fIdleTime > 6.5f)

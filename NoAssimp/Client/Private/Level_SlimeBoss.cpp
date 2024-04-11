@@ -75,7 +75,7 @@ HRESULT CLevel_SlimeBoss::Render()
 
 	_int iFps = m_pGameInstance->Get_FPS();
 	wstring wstrFPS = to_wstring(iFps);
-	wstring wstrLevelFPS = wstring(L"LevelSlimeBoss  FPS: ") + wstrFPS;
+	wstring wstrLevelFPS = wstring(L"Level_SlimeBoss  FPS: ") + wstrFPS;
 	SetWindowText(g_hWnd, wstrLevelFPS.c_str());
 
 	return S_OK;
@@ -104,7 +104,7 @@ HRESULT CLevel_SlimeBoss::Ready_Layer_Camera(const wstring& strLayerTag)
 	CCamera_Jack::CAMERA_JACK_DESC		CameraDesc{};
 
 	CameraDesc.fMouseSensor = 0.1f;
-	CameraDesc.fFovy = XMConvertToRadians(70.0f);
+	CameraDesc.fFovy = XMConvertToRadians(50.0f);
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
 	CameraDesc.fFar = 1000.0f;
@@ -113,8 +113,8 @@ HRESULT CLevel_SlimeBoss::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fSpeedPerSec = 60.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-	CameraDesc.fDistance = 42.f;
-	CameraDesc.fHeight = 22.f;
+	CameraDesc.fDistance = 72.f;
+	CameraDesc.fHeight = 26.f;
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, strLayerTag, TEXT("Prototype_GameObject_Camera_Jack"), &CameraDesc)))
 		return E_FAIL;

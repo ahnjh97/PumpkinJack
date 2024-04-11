@@ -12,8 +12,8 @@ BEGIN(Client)
 class CTongMap_SlimeBoss final : public CGameObject
 {
 private:
-	enum SHADER { LIGHTED, ALPHA, SLIMEBOSSROOM, NO_LIGHT, SHADER_END };
-	enum TONGMAP_TEX { TEX_ALPHA, TEX_WATER, TEX_CAUSTIC, TEX_END };
+	enum SHADER { LIGHTED, NO_LIGHT, SHADER_END };
+	enum TONGMAP_TEX { TEX_WATER, TEX_CAUSTIC, TEX_END };
 
 private:
 	CTongMap_SlimeBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -28,8 +28,15 @@ public:
 	virtual HRESULT Render() override;
 
 private:
+	void SetUp_MeshShaderPassIndices(_uint iNumMeshes);
+
+private:
 	_float m_fOffset_Y = {};
 
+	vector<_uint> m_vecMeshShaderTypes;
+	vector<_uint> m_vecMeshShaderPassIndices;
+
+private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom[SHADER_END] = {};
 	CTexture* m_pTextureCom[TEX_END] = {};

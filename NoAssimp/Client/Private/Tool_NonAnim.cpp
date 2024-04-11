@@ -57,7 +57,7 @@ HRESULT CTool_NonAnim::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
-		m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", i, aiTextureType_DIFFUSE);
+		m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE);
 
 		/*if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;*/

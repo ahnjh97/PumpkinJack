@@ -29,9 +29,8 @@ private:
 
 	_float m_fTime = {};
 	_float m_fAlpha = { 1.f };
+	_float m_fAccSpeed = {};
 	
-	
-
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };

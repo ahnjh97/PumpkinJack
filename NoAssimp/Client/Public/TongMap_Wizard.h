@@ -12,7 +12,6 @@ BEGIN(Client)
 class CTongMap_Wizard final : public CGameObject
 {
 private:
-	enum SHADER { DEFAULT, ARENA_FIRE, SHADER_END };
 	enum TONGMAP_WIZARD_TEX { TEX_SKY, TEX_FIRE, TEX_END };
 
 private:
@@ -28,18 +27,17 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	void SetUp_MeshShaderTypes(_uint iNumMeshes);
 	void SetUp_MeshShaderPassIndices(_uint iNumMeshes);
 
 private:
 	_float m_fOffset_Y = {};
+	_float m_fAlpha = {0.5f};
 
-	vector<_uint> m_vecMeshShaderTypes;
 	vector<_uint> m_vecMeshShaderPassIndices;
 
 private:
 	CModel* m_pModelCom = { nullptr };
-	CShader* m_pShaderCom[SHADER_END] = {};
+	CShader* m_pShaderCom = { nullptr };
 	CTexture* m_pTextureCom[TEX_END] = {};
 
 private:

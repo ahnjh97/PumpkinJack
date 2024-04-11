@@ -65,13 +65,11 @@ HRESULT CSlimeBoss_Slime::Render()
 	{
 		if(FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE)))
 			return E_FAIL;
-		if (FAILED(m_pTextureCom->Bind_ShaderResources(m_pShaderCom, "g_EmitTexture")))
-			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(0)))
+		if (FAILED(m_pShaderCom->Begin(2))) // Slime
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -101,8 +99,8 @@ HRESULT CSlimeBoss_Slime::Add_Components(LEVEL eLevel, const wstring& _wstrModel
 	if (FAILED(__super::Add_Component(eLevel, wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
-	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxAnimModel_Slime");
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxAnimModel");
+	if (FAILED(__super::Add_Component(eLevel, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	return S_OK;
@@ -133,7 +131,9 @@ HRESULT CSlimeBoss_Slime::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))
 		return E_FAIL;
-	
+	if (FAILED(m_pTextureCom->Bind_ShaderResources(m_pShaderCom, "g_SlimeEmitTexture")))
+		return E_FAIL;
+
 	return S_OK;
 }
 

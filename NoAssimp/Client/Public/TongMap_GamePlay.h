@@ -12,8 +12,7 @@ BEGIN(Client)
 class CTongMap_GamePlay final : public CGameObject
 {
 private:
-	enum SHADER { LIGHTED, ALPHA, NO_LIGHT, SHADER_END };
-	enum TONGMAP_TEX { TEX_ALPHA, TEX_WATER, TEX_CAUSTIC, TEX_END };
+	enum SHADER { LIGHTED, NO_LIGHT, SHADER_END };
 
 private:
 	CTongMap_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -28,11 +27,18 @@ public:
 	virtual HRESULT Render() override;
 
 private:
+	void SetUp_MeshShaderPassIndices(_uint iNumMeshes);
+
+private:
 	_float m_fOffset_Y = {};
 
+	vector<_uint> m_vecMeshShaderTypes;
+	vector<_uint> m_vecMeshShaderPassIndices;
+
+private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom[SHADER_END] = {};
-	CTexture* m_pTextureCom[TEX_END] = {};
+
 
 private:
 	HRESULT Add_Components(LEVEL eLevel, const wstring& _wstrModelTag);

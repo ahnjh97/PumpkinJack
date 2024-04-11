@@ -83,7 +83,7 @@ void CLifeBar::Tick(_float fTimeDelta)
 		return;
 
 	m_fOffset_Y += 0.002f;
-	m_fTime += fTimeDelta * 2.f;
+	m_fTime += fTimeDelta * 3.f;
 	m_fPreHpRatio = m_fHpRatio;
 
 	if (m_fZ == fZ_LifeBarMask)
@@ -110,8 +110,16 @@ HRESULT CLifeBar::Render()
 		return E_FAIL;
 
 	/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-	if (FAILED(m_pShaderCom->Begin(0)))
-		return E_FAIL;
+	if (m_fZ == fZ_LifeBarMask)	{
+		if (FAILED(m_pShaderCom->Begin(0)))
+			return E_FAIL;
+
+	}
+	else if (m_fZ == fZ_CrowLifeBar){
+		if (FAILED(m_pShaderCom->Begin(1)))
+			return E_FAIL;
+	}
+
 
 	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
 		return E_FAIL;
@@ -127,7 +135,7 @@ void CLifeBar::Lerp_Hp(_float fTimeDelta)
 	if (m_fHpDifference >= 1.f)
 		m_fHpDifference = 1.f;
 
-	_float decreaseRate = (1 - cosf(m_fTime * XM_PI)) * m_fHpDifference * 2.f;
+	_float decreaseRate = (1 - cosf(m_fTime * XM_PI)) * m_fHpDifference * 3.f;
 
 	m_fRenderedHpRatio -= decreaseRate * fTimeDelta;
 
@@ -156,7 +164,7 @@ HRESULT CLifeBar::Add_Components()
 			TEXT("Com_Texture_Diffuse"), (CComponent**)&m_pTextureCom[TYPE_DIFFUSE])))
 			return E_FAIL;
 		/* For.Com_Shader */
-		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex_CrowLifeBar"),
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
 			TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 			return E_FAIL;
 	}

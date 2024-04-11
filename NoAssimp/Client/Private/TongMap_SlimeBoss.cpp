@@ -33,6 +33,9 @@ HRESULT CTongMap_SlimeBoss::Initialize(void* pArg)
 	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel), GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
 
+	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+	SetUp_MeshShaderPassIndices(iNumMeshes);
+
 	return S_OK;
 }
 
@@ -52,24 +55,45 @@ HRESULT CTongMap_SlimeBoss::Render()
 		return E_FAIL;
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
-	vector<_uint> vecMeshShaderType = m_pModelCom->Get_MeshShaderType();
+
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
-		SHADER eShader = (SHADER)vecMeshShaderType[i];
-		string g_strTexture = "g_DiffuseTexture";
-		if (eShader == SLIMEBOSSROOM || eShader == NO_LIGHT)
-			g_strTexture = "g_Texture";
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom[vecMeshShaderType[i]], g_strTexture.c_str(), i, aiTextureType_DIFFUSE)))
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom[m_vecMeshShaderTypes[i]], "g_DiffuseTexture", i, aiTextureType_DIFFUSE)))
 			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom[vecMeshShaderType[i]]->Begin(0)))
+		if (FAILED(m_pShaderCom[m_vecMeshShaderTypes[i]]->Begin(m_vecMeshShaderPassIndices[i])))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
 	}
 
 	return S_OK;
+}
+
+void CTongMap_SlimeBoss::SetUp_MeshShaderPassIndices(_uint iNumMeshes)
+{
+	m_vecMeshShaderTypes.resize(iNumMeshes);
+	m_vecMeshShaderPassIndices.resize(iNumMeshes);
+	vector<_uint> vecSlimeBossRoom;
+
+	for (_uint i = 0; i < iNumMeshes; i++)
+	{
+		string strTextureName = m_pModelCom->Get_DiffuseTextureName(i);
+		if (strTextureName == "pine_Mat")
+			m_vecMeshShaderTypes[i] = NO_LIGHT;
+		else if (strTextureName == "slimeBossTex2_Mat")
+			vecSlimeBossRoom.push_back(i);
+	}
+
+	for (auto& SBR : vecSlimeBossRoom)
+		m_vecMeshShaderTypes[SBR] = NO_LIGHT;
+
+	// 크기가 더 작은메쉬를 이펙트용으로 할당
+	if (m_pModelCom->Get_MeshOffsetX(vecSlimeBossRoom.front()) < m_pModelCom->Get_MeshOffsetX(vecSlimeBossRoom.back()))
+		m_vecMeshShaderPassIndices[vecSlimeBossRoom.front()] = 2; // SLIMEBOSSROOM
+	else
+		m_vecMeshShaderPassIndices[vecSlimeBossRoom.back()] = 2; // SLIMEBOSSROOM
 }
 
 HRESULT CTongMap_SlimeBoss::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
@@ -82,21 +106,9 @@ HRESULT CTongMap_SlimeBoss::Add_Components(LEVEL eLevel, const wstring& _wstrMod
 	if (FAILED(__super::Add_Component(eLevel, wstrShaderTag, TEXT("Com_Shader_Lighted"), (CComponent**)&m_pShaderCom[LIGHTED])))
 		return E_FAIL;
 
-	wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel_AlphaTex");
-	if (FAILED(__super::Add_Component(eLevel, wstrShaderTag, TEXT("Com_Shader_AlphaTex"), (CComponent**)&m_pShaderCom[ALPHA])))
-		return E_FAIL;
-
-	wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel_SlimeBossRoom");
-	if (FAILED(__super::Add_Component(eLevel, wstrShaderTag, TEXT("Com_Shader_SlimeBossRoom"), (CComponent**)&m_pShaderCom[SLIMEBOSSROOM])))
-		return E_FAIL;
-
 	wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel");
 	if (FAILED(__super::Add_Component(eLevel, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom[NO_LIGHT])))
 		return E_FAIL;
-
-	/*if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_pineTreeAlpha_Tex"),
-		TEXT("Com_Texture_Alpha"), (CComponent**)&m_pTextureCom[TEX_ALPHA])))
-		return E_FAIL;*/
 
 	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_Water"),
 		TEXT("Com_Texture_Water"), (CComponent**)&m_pTextureCom[TEX_WATER])))
@@ -121,7 +133,7 @@ HRESULT CTongMap_SlimeBoss::Bind_ShaderResources()
 	if (nullptr == pLightDesc)
 		return E_FAIL;
 
-	for (_int i = 0; i <= ALPHA; i++)
+	for (_int i = 0; i <= LIGHTED; i++)
 	{
 		if (FAILED(m_pShaderCom[i]->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldFloat4x4_Ptr())))
 			return E_FAIL;
@@ -141,7 +153,7 @@ HRESULT CTongMap_SlimeBoss::Bind_ShaderResources()
 			return E_FAIL;
 	}
 
-	for (_int i = SLIMEBOSSROOM; i < SHADER_END; i++)
+	for (_int i = NO_LIGHT; i < SHADER_END; i++)
 	{
 		if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom[i], "g_WorldMatrix")))
 			return E_FAIL;
@@ -151,13 +163,13 @@ HRESULT CTongMap_SlimeBoss::Bind_ShaderResources()
 			return E_FAIL;
 	}
 
-	if (FAILED(m_pTextureCom[TEX_WATER]->Bind_ShaderResource(m_pShaderCom[SLIMEBOSSROOM], "g_WaterTexture", 0)))
+	if (FAILED(m_pTextureCom[TEX_WATER]->Bind_ShaderResource(m_pShaderCom[NO_LIGHT], "g_WaterTexture", 0)))
 		return E_FAIL;
 
-	if (FAILED(m_pTextureCom[TEX_CAUSTIC]->Bind_ShaderResource(m_pShaderCom[SLIMEBOSSROOM], "g_CausticTexture", 0)))
+	if (FAILED(m_pTextureCom[TEX_CAUSTIC]->Bind_ShaderResource(m_pShaderCom[NO_LIGHT], "g_CausticTexture", 0)))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom[SLIMEBOSSROOM]->Bind_RawValue("g_fOffset_Y", &m_fOffset_Y, sizeof(_float))))
+	if (FAILED(m_pShaderCom[NO_LIGHT]->Bind_RawValue("g_fOffset_Y", &m_fOffset_Y, sizeof(_float))))
 		return E_FAIL;
 	return S_OK;
 }

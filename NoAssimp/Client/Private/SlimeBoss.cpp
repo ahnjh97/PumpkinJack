@@ -152,6 +152,7 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 	{
 		if (m_pModelCom->isFinished())
 		{
+			KnifeSpawn();
 			SlimeSpawn();
 			PillarSpawn();
 			PortalSpawn();
@@ -193,8 +194,7 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 				m_bPortalSpawn = true;
 			}
 
-			if (m_pModelCom->isFinished() && m_ePreState != SLIMEBOSS_HIT)
-			{
+			if (m_pModelCom->isFinished() && m_ePreState != SLIMEBOSS_HIT) {
 				++m_iCurPattern;
 				if (m_iCurPattern >= m_vecSlimeBossPattern.size())
 					m_iCurPattern = 0;
@@ -212,23 +212,11 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 		}
 		else if (m_eState == SLIMEBOSS_LIGHTNING)
 		{
-			XMStoreFloat4(&m_vLightningPos, XMVectorSet(m_pPlayerWorldMatrix->_41, m_pPlayerWorldMatrix->_42, m_pPlayerWorldMatrix->_43, 1));
-
 			_float fPlayRatio = m_pModelCom->Get_AnimPlayRatio();
 			if (m_iLightningCount == m_pModelCom->Get_AnimPlayCount(SLIMEBOSS_LIGHTNING) && fPlayRatio > 0.6f)
-			{
-				CGameObject::GAMEOBJECT_DESC tDesc{};
-				tDesc.matWorld._41 = m_vLightningPos.x;
-				tDesc.matWorld._42 = 85.f;
-				tDesc.matWorld._43 = m_vLightningPos.z;
-				tDesc.iLevel = LEVEL_SLIMEBOSS;
-				tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Knife");
-				m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_Knife"), TEXT("Prototype_GameObject_Knife"), &tDesc);
-				m_iLightningCount++;
-			}
+				KnifeSpawn();
 
-			if (m_bSlimeSpawn == false)
-			{
+			if (m_bSlimeSpawn == false)	{
 				SlimeSpawn();
 				m_bSlimeSpawn = true;
 			}
@@ -263,6 +251,20 @@ void CSlimeBoss::TurnTowards_Player(_float fTimeDelta)
 	m_pTransformCom->Look_At_ForLandObject(vPlayerPos);
 	if (m_eState == SLIMEBOSS_DEATH)
 		m_bTurnToPlayer = true;
+}
+
+void CSlimeBoss::KnifeSpawn()
+{
+	XMStoreFloat4(&m_vLightningPos, XMVectorSet(m_pPlayerWorldMatrix->_41, m_pPlayerWorldMatrix->_42, m_pPlayerWorldMatrix->_43, 1));
+
+	CGameObject::GAMEOBJECT_DESC tDesc{};
+	tDesc.matWorld._41 = m_vLightningPos.x;
+	tDesc.matWorld._42 = 85.f;
+	tDesc.matWorld._43 = m_vLightningPos.z;
+	tDesc.iLevel = LEVEL_SLIMEBOSS;
+	tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Knife");
+	m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_Knife"), TEXT("Prototype_GameObject_Knife"), &tDesc);
+	m_iLightningCount++;
 }
 
 void CSlimeBoss::PillarSpawn()

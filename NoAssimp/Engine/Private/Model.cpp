@@ -30,7 +30,6 @@ CModel::CModel(const CModel& rhs)
 	, m_strModelName { rhs.m_strModelName }
 	, m_AnimIndex{ rhs.m_AnimIndex }
 	, m_vOriginalScale{ rhs.m_vOriginalScale }
-	, m_vecMeshShaderType{ rhs.m_vecMeshShaderType }
 {
 	for (auto& pPrototypeAnimation : rhs.m_Animations)
 		m_Animations.push_back(pPrototypeAnimation->Clone());
@@ -78,6 +77,14 @@ string CModel::Get_DiffuseTextureName(_uint iMeshIndex)
 	_uint iMaterialIdx = m_Meshes[iMeshIndex]->Get_MaterialIndex();
 	string strTextureName = m_Materials[iMaterialIdx].MaterialTextures[1]->Get_TextureName(); // DIFFUSE
 	return strTextureName;
+}
+
+_float CModel::Get_MeshOffsetX(_uint iMeshIndex)
+{
+	if (m_Meshes.empty())
+		return _float();
+
+	return m_Meshes[iMeshIndex]->Get_OffsetX();
 }
 
 void CModel::Save_FinalKeyFrames()
@@ -392,46 +399,6 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 			m_Materials.push_back(MeshMaterial);
 		else // 벡터 안에있는 배열의 원소 수정
 			m_Materials[iTemp].MaterialTextures[jTemp] = MeshMaterial.MaterialTextures[jTemp];
-	}
-
-	if (m_strModelName == "LevelGamePlay")	{
-		m_vecMeshShaderType.resize(m_Meshes.size());
-		for (_int i = 0; i < m_Meshes.size(); i++)
-		{
-			_uint iMaterialIdx = m_Meshes[i]->Get_MaterialIndex();
-			string strTextureName = m_Materials[iMaterialIdx].MaterialTextures[1]->Get_TextureName(); // DIFFUSE
-			if (strTextureName == "pine_Mat")
-				m_vecMeshShaderType[i] = 1;  // ALPHA
-		}
-	}
-
-	else if (m_strModelName == "LevelSlimeBoss")
-	{
-		vector<_uint> vecSlimeBossRoom;
-
-		m_vecMeshShaderType.resize(m_Meshes.size());
-		for (_int i = 0; i< m_Meshes.size(); i++)
-		{
-			_uint iMaterialIdx = m_Meshes[i]->Get_MaterialIndex();
-			string strTextureName = m_Materials[iMaterialIdx].MaterialTextures[1]->Get_TextureName(); // DIFFUSE
-			if (strTextureName == "pine_Mat")
-				m_vecMeshShaderType[i] = 1;  // ALPHA
-			else if (strTextureName == "slimeBossTex2_Mat")
-				vecSlimeBossRoom.push_back(i);
-			
-		}
-
-		// 크기가 더 작은메쉬를 이펙트용으로 할당
-		if (m_Meshes[vecSlimeBossRoom.front()]->Get_OffSetX() < m_Meshes[vecSlimeBossRoom.back()]->Get_OffSetX())
-		{
-			m_vecMeshShaderType[vecSlimeBossRoom.front()] = 2; // SLIMEBOSSROOM
-			m_vecMeshShaderType[vecSlimeBossRoom.back()] = 3; // NO_LIGHT
-		}
-		else
-		{
-			m_vecMeshShaderType[vecSlimeBossRoom.back()] = 2; // SLIMEBOSSROOM
-			m_vecMeshShaderType[vecSlimeBossRoom.front()] = 3; // NO_LIGHT
-		}
 	}
 
 	return S_OK;

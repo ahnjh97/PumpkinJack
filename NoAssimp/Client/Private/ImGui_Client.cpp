@@ -11,6 +11,7 @@ CImGui_Client::CImGui_Client(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 HRESULT CImGui_Client::Initialize()
 {
 	__super::Initialize(g_hWnd);
+	m_pCurLevelIndex = m_pGameInstance->Get_CurrentLevelID();
 	return S_OK;
 }
 
@@ -21,7 +22,7 @@ void CImGui_Client::Tick(_float fTimeDelta)
 {
 	Settings(fTimeDelta);
 	OnKeyInput();
-	if (true == Is_IMGUI_Switch && m_pPlayer)
+	if (true == Is_IMGUI_Switch && m_pPlayer && *m_pCurLevelIndex != LEVEL_LOADING)
 	{
 		ImGui::Begin("Jack");
 
@@ -138,12 +139,12 @@ void CImGui_Client::ConvertToString()
 void CImGui_Client::Release_Player()
 {
 	Safe_Release(m_pPlayer);
-	m_pPlayer = nullptr;
 }
 
 void CImGui_Client::Replace_Player(CGameObject* pPlayer)
 {
 	m_pPlayer = dynamic_cast<CPlayer*>(pPlayer);
+	Safe_AddRef(m_pPlayer);
 }
 
 CImGui_Client* CImGui_Client::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -18,7 +18,7 @@ public:
 	_uint Get_MaterialIndex() const { return m_iMaterialIndex; }
 	streampos Get_IncreasedFilePtPos() { return m_filePointerPos; }
 	string Get_MeshName() { return string(m_szName); }
-	_float Get_OffSetX() { if (m_OffsetMatrices.empty()) { return 0; }
+	_float Get_OffsetX() { if (m_OffsetMatrices.empty()) { return 0; }
 		else { return m_OffsetMatrices.front()._41; } }
 
 public:

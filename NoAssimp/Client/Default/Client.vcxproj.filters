@@ -13,15 +13,6 @@
     <Filter Include="98.Default">
       <UniqueIdentifier>{00a0e8fc-8926-4877-aa3c-b6cc3ff3f072}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\Loading">
-      <UniqueIdentifier>{783aa7d0-e4a9-47f3-b857-f5b824dad2b8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Logo">
-      <UniqueIdentifier>{7fa67ac9-2f2d-435f-bf35-849f5cbedd3c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\GamePlay">
-      <UniqueIdentifier>{8b1d5579-1fb9-493c-96b9-62d618153e5d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects">
       <UniqueIdentifier>{c4cae272-dd94-43ce-85e6-ecc0b24de4d0}</UniqueIdentifier>
     </Filter>
@@ -43,12 +34,6 @@
     <Filter Include="_MyImGui">
       <UniqueIdentifier>{9c1d6565-90e9-4f70-b4b3-975ecb0b33ce}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\MapTool">
-      <UniqueIdentifier>{32c2c183-be08-4bf2-b552-63cb8a4031b0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\_Loader">
-      <UniqueIdentifier>{17ab5a45-d880-40f6-b518-e747936c79d3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Terrain\Grid">
       <UniqueIdentifier>{0841abf2-9ab3-4a8c-964a-fe3f09299bfe}</UniqueIdentifier>
     </Filter>
@@ -57,9 +42,6 @@
     </Filter>
     <Filter Include="02.GameObjects\Player">
       <UniqueIdentifier>{f536d6a1-b841-49e8-9585-b965b6f55737}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\SlimeBoss">
-      <UniqueIdentifier>{94e6e0d5-20a5-469f-9fc1-b657d034cb3a}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\UI">
       <UniqueIdentifier>{a3660a24-62fb-47bf-91ab-fe5bb344bfa2}</UniqueIdentifier>
@@ -82,11 +64,41 @@
     <Filter Include="02.GameObjects\Terrain\Terrain_SlimeBossRoom">
       <UniqueIdentifier>{9ce42e70-5595-4d2b-8ac0-bde47ff87a0b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Player\Part_Body">
+      <UniqueIdentifier>{48b8254c-1435-4716-b1d6-f21b638a2498}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Player\Part_Weapon">
+      <UniqueIdentifier>{4569359c-bf45-4398-b9d7-4dd78585945f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\01. Loading">
+      <UniqueIdentifier>{783aa7d0-e4a9-47f3-b857-f5b824dad2b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\02. Logo">
+      <UniqueIdentifier>{7fa67ac9-2f2d-435f-bf35-849f5cbedd3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\03. MapTool">
+      <UniqueIdentifier>{32c2c183-be08-4bf2-b552-63cb8a4031b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\05. SlimeBoss">
+      <UniqueIdentifier>{94e6e0d5-20a5-469f-9fc1-b657d034cb3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\06. Wizard">
+      <UniqueIdentifier>{8e8e492d-8b96-44f8-87db-3cdcc41bc460}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\04. GamePlay">
+      <UniqueIdentifier>{8b1d5579-1fb9-493c-96b9-62d618153e5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\00. Loader">
+      <UniqueIdentifier>{17ab5a45-d880-40f6-b518-e747936c79d3}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObjects\Level_GamePlay">
       <UniqueIdentifier>{4e0719bc-e992-4be5-9a06-2d416c049cb2}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Level_GamePlay\Soldier">
       <UniqueIdentifier>{b43b9c15-5169-45c0-9fed-3a7fb94555a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay\Soldier\Part_Weapon">
+      <UniqueIdentifier>{c502e2f4-093f-44e0-b27f-52fa65850827}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Level_GamePlay\CrateBox">
       <UniqueIdentifier>{52cc2442-0c78-4514-a237-df5d1e5c7c5a}</UniqueIdentifier>
@@ -97,11 +109,20 @@
     <Filter Include="02.GameObjects\Level_GamePlay\Trigger">
       <UniqueIdentifier>{f9354dee-2d61-4df4-9a68-b8eecde6a044}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Level_GamePlay\Water">
-      <UniqueIdentifier>{c2c02c03-d225-4337-88cb-bc090bde9cbc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Level_GamePlay\Kart">
       <UniqueIdentifier>{7d1ee032-fc9f-4574-8621-cb8cf4bdbc72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay\Ballista">
+      <UniqueIdentifier>{b6020dd5-18c0-4a4b-889f-b0b7bd041d49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay\Arrow">
+      <UniqueIdentifier>{f828f593-9917-48d7-b5a0-ab822a9dca31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay\BallistaRotator">
+      <UniqueIdentifier>{9bf095a1-35d9-4e12-acbf-0c14b26f6173}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay\SkullCrossBow">
+      <UniqueIdentifier>{28bce0e1-5d2e-48e7-88e2-342597485dc3}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Level_SlimeBoss">
       <UniqueIdentifier>{4aa7cc76-a207-452b-b071-fee6bb68994c}</UniqueIdentifier>
@@ -130,20 +151,8 @@
     <Filter Include="02.GameObjects\Level_SlimeBoss\SlimeBoss">
       <UniqueIdentifier>{e3011246-c527-479d-8d79-e5c3892ab976}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Level_GamePlay\Ballista">
-      <UniqueIdentifier>{b6020dd5-18c0-4a4b-889f-b0b7bd041d49}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Level_GamePlay\Arrow">
-      <UniqueIdentifier>{f828f593-9917-48d7-b5a0-ab822a9dca31}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Level_GamePlay\BallistaRotator">
-      <UniqueIdentifier>{9bf095a1-35d9-4e12-acbf-0c14b26f6173}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Level_GamePlay\SkullCrossBow">
-      <UniqueIdentifier>{28bce0e1-5d2e-48e7-88e2-342597485dc3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Wizard">
-      <UniqueIdentifier>{8e8e492d-8b96-44f8-87db-3cdcc41bc460}</UniqueIdentifier>
+    <Filter Include="02.GameObjects\Level_SlimeBoss\SlimeBoss\Part_SlimeBoss">
+      <UniqueIdentifier>{4bd183c5-abbb-4768-8e59-0bce6d955da6}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Level_Wizard">
       <UniqueIdentifier>{bfd47f8a-60d3-4cd6-a9a5-77f4fe5a323f}</UniqueIdentifier>
@@ -151,17 +160,8 @@
     <Filter Include="02.GameObjects\Level_Wizard\Wizard">
       <UniqueIdentifier>{439d7498-aa80-4c8e-8c29-c2a57d9653a9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Level_GamePlay\Soldier\Part_Weapon">
-      <UniqueIdentifier>{c502e2f4-093f-44e0-b27f-52fa65850827}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Player\Part_Body">
-      <UniqueIdentifier>{48b8254c-1435-4716-b1d6-f21b638a2498}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Player\Part_Weapon">
-      <UniqueIdentifier>{4569359c-bf45-4398-b9d7-4dd78585945f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Level_SlimeBoss\SlimeBoss\Part_SlimeBoss">
-      <UniqueIdentifier>{4bd183c5-abbb-4768-8e59-0bce6d955da6}</UniqueIdentifier>
+    <Filter Include="01.Levels\07. Death">
+      <UniqueIdentifier>{8c918047-5318-4084-b2ad-ad27b4e69a01}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -181,16 +181,16 @@
       <Filter>00.MainApp</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_GamePlay.h">
-      <Filter>01.Levels\GamePlay</Filter>
+      <Filter>01.Levels\04. GamePlay</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Loading.h">
-      <Filter>01.Levels\Loading</Filter>
+      <Filter>01.Levels\01. Loading</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Logo.h">
-      <Filter>01.Levels\Logo</Filter>
+      <Filter>01.Levels\02. Logo</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Loader.h">
-      <Filter>01.Levels\_Loader</Filter>
+      <Filter>01.Levels\00. Loader</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BackGround.h">
       <Filter>02.GameObjects\BackGround</Filter>
@@ -211,7 +211,7 @@
       <Filter>_MyImGui</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_MapTool.h">
-      <Filter>01.Levels\MapTool</Filter>
+      <Filter>01.Levels\03. MapTool</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Grid.h">
       <Filter>02.GameObjects\Terrain\Grid</Filter>
@@ -241,7 +241,7 @@
       <Filter>02.GameObjects\UI\LifeBar</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_SlimeBoss.h">
-      <Filter>01.Levels\SlimeBoss</Filter>
+      <Filter>01.Levels\05. SlimeBoss</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Slime.h">
       <Filter>02.GameObjects\Level_SlimeBoss\Slime</Filter>
@@ -312,9 +312,6 @@
     <ClInclude Include="..\Public\Terrain_SlimeBossRoom.h">
       <Filter>02.GameObjects\Terrain\Terrain_SlimeBossRoom</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Water.h">
-      <Filter>02.GameObjects\Level_GamePlay\Water</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\SlimeBoss.h">
       <Filter>02.GameObjects\Level_SlimeBoss\SlimeBoss</Filter>
     </ClInclude>
@@ -331,7 +328,7 @@
       <Filter>02.GameObjects\Level_Wizard</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Wizard.h">
-      <Filter>01.Levels\Wizard</Filter>
+      <Filter>01.Levels\06. Wizard</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SoldierWeapon.h">
       <Filter>02.GameObjects\Level_GamePlay\Soldier\Part_Weapon</Filter>
@@ -348,16 +345,16 @@
       <Filter>00.MainApp</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_GamePlay.cpp">
-      <Filter>01.Levels\GamePlay</Filter>
+      <Filter>01.Levels\04. GamePlay</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Loading.cpp">
-      <Filter>01.Levels\Loading</Filter>
+      <Filter>01.Levels\01. Loading</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Logo.cpp">
-      <Filter>01.Levels\Logo</Filter>
+      <Filter>01.Levels\02. Logo</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Loader.cpp">
-      <Filter>01.Levels\_Loader</Filter>
+      <Filter>01.Levels\00. Loader</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BackGround.cpp">
       <Filter>02.GameObjects\BackGround</Filter>
@@ -375,7 +372,7 @@
       <Filter>_MyImGui</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_MapTool.cpp">
-      <Filter>01.Levels\MapTool</Filter>
+      <Filter>01.Levels\03. MapTool</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Grid.cpp">
       <Filter>02.GameObjects\Terrain\Grid</Filter>
@@ -405,7 +402,7 @@
       <Filter>02.GameObjects\UI\LifeBar</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_SlimeBoss.cpp">
-      <Filter>01.Levels\SlimeBoss</Filter>
+      <Filter>01.Levels\05. SlimeBoss</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Slime.cpp">
       <Filter>02.GameObjects\Level_SlimeBoss\Slime</Filter>
@@ -476,9 +473,6 @@
     <ClCompile Include="..\Private\Terrain_SlimeBossRoom.cpp">
       <Filter>02.GameObjects\Terrain\Terrain_SlimeBossRoom</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Water.cpp">
-      <Filter>02.GameObjects\Level_GamePlay\Water</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\SlimeBoss.cpp">
       <Filter>02.GameObjects\Level_SlimeBoss\SlimeBoss</Filter>
     </ClCompile>
@@ -495,7 +489,7 @@
       <Filter>02.GameObjects\Level_Wizard</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Wizard.cpp">
-      <Filter>01.Levels\Wizard</Filter>
+      <Filter>01.Levels\06. Wizard</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SoldierWeapon.cpp">
       <Filter>02.GameObjects\Level_GamePlay\Soldier\Part_Weapon</Filter>
@@ -527,43 +521,16 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex_CrowLifeBar.hlsl">
-      <Filter>97.ShaderFiles</Filter>
-    </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex_LifeBar.hlsl">
-      <Filter>97.ShaderFiles</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel_Slime.hlsl">
-      <Filter>97.ShaderFiles</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Knife.hlsl">
-      <Filter>97.ShaderFiles</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_AlphaTex.hlsl">
-      <Filter>97.ShaderFiles</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_SlimeBossRoom.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Lighted.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex_Inven.hlsl">
-      <Filter>97.ShaderFiles</Filter>
-    </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCube.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex_Portal.hlsl">
-      <Filter>97.ShaderFiles</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Water.hlsl">
-      <Filter>97.ShaderFiles</Filter>
-    </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_LevelSlimeBoss.hlsl">
-      <Filter>97.ShaderFiles</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_ArenaFire.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>
