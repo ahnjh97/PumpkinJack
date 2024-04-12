@@ -1,7 +1,7 @@
-- ArenaFire PixelShader
-- 
-
-- Level_Wizard
+- Lightning
+- Tornado
+- Wizard HpLoss
+- Ground Change
 
 - Hit Effect
 - Arrow Effect
