@@ -195,6 +195,7 @@
     <ClInclude Include="..\Public\Rail.h" />
     <ClInclude Include="..\Public\SkullCrossBow.h" />
     <ClInclude Include="..\Public\Sky.h" />
+    <ClInclude Include="..\Public\SkySphere.h" />
     <ClInclude Include="..\Public\Slime.h" />
     <ClInclude Include="..\Public\SlimeBoss.h" />
     <ClInclude Include="..\Public\SlimeBossHead.h" />
@@ -252,6 +253,7 @@
     <ClCompile Include="..\Private\Rail.cpp" />
     <ClCompile Include="..\Private\SkullCrossBow.cpp" />
     <ClCompile Include="..\Private\Sky.cpp" />
+    <ClCompile Include="..\Private\SkySphere.cpp" />
     <ClCompile Include="..\Private\Slime.cpp" />
     <ClCompile Include="..\Private\SlimeBoss.cpp" />
     <ClCompile Include="..\Private\SlimeBossHead.cpp" />

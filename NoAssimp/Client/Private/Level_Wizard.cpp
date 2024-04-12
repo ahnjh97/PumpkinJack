@@ -34,7 +34,7 @@ HRESULT CLevel_Wizard::Initialize()
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
+	if (FAILED(Ready_Layer_BackGround()))
 		return E_FAIL;
 
 
@@ -43,7 +43,7 @@ HRESULT CLevel_Wizard::Initialize()
 
 	m_InputFile.close();
 
-	m_pGameInstance->UnHide_ImGui(m_pGameInstance->Get_Player(LEVEL_WIZARD));
+	m_pGameInstance->UnHide_ImGui();
 	return S_OK;
 }
 
@@ -97,8 +97,8 @@ HRESULT CLevel_Wizard::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fSpeedPerSec = 20.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-	CameraDesc.fDistance = 70.f;
-	CameraDesc.fHeight = 25.f;
+	CameraDesc.fDistance = 75.f;
+	CameraDesc.fHeight = 30.f;
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, strLayerTag, TEXT("Prototype_GameObject_Camera_Jack"), &CameraDesc)))
 		return E_FAIL;
@@ -184,11 +184,11 @@ HRESULT CLevel_Wizard::Ready_UI(const wstring& strLayerTag)
 	return S_OK;
 }
 
-HRESULT CLevel_Wizard::Ready_Layer_BackGround(const wstring& strLayerTag)
+HRESULT CLevel_Wizard::Ready_Layer_BackGround()
 {
 	CGameObject::GAMEOBJECT_DESC tDesc{};
 	tDesc.iLevel = LEVEL_WIZARD;
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, strLayerTag, TEXT("Prototype_GameObject_Sky"), &tDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_SkySphere"), TEXT("Prototype_GameObject_SkySphere"), &tDesc)))
 		return E_FAIL;
 
 	return S_OK;

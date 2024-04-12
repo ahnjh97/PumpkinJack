@@ -43,6 +43,7 @@
 #include "Slime.h"
 
 #include "TongMap_Wizard.h"
+#include "SkySphere.h"
 #include "Wizard.h"
 
 
@@ -367,12 +368,13 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 {
 	m_strLoadingText = TEXT("Loading Textures for Level_Wizard...");
-
+	if (FAILED(Add_Texture(eLevel, "VoronoiNoise", "CommonTextures/voronoiNoise.dds")))
+		return E_FAIL;
 
 	m_strLoadingText = TEXT("Loading Models..");
 	vector<string> vecAnimModelNames = 	{ "Jack", "Wizard" };
 	vector<string> vecNonAnimModelNames = { "Spear", "Rifle", "Scythe", "LevelWizard",
-		"Amulet", "Book", "elecArena1", "elecArena2", "elecArena3", "HoleWall", 
+		"Amulet", "Book", "elecArena1", "elecArena2", "elecArena3", "HoleWall", "SkySphere",
 		"TeslaTower", "Tornado", "WizardBrickGround", "WizardTower" };
 
 	if (FAILED(Add_Models(eLevel, vecAnimModelNames, vecNonAnimModelNames)))
@@ -385,6 +387,7 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 	m_strLoadingText = TEXT("Loading GameObject Prototypes for Level_Wizard...");
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Wizard"), CWizard);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TongMap_Wizard"), CTongMap_Wizard);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SkySphere"), CSkySphere);
 
 
 	m_strLoadingText = TEXT("Loading Complete: Level_Wizard");
@@ -559,17 +562,18 @@ void CLoader::SetUp_ModelScaleRotation() // Scale, Degaree, NewScale, RootIndex
 	m_ModelConfigs.emplace("cemeteryFence1", MODEL_CONFIG{ 4.3f, 0.f, 4.3f });
 
 	/* Level_Wizard */
-	m_ModelConfigs.emplace("Wizard", MODEL_CONFIG{ 0.12f, 0.f, 12.f });
+	m_ModelConfigs.emplace("Wizard", MODEL_CONFIG{ 0.12f, 180.f, 12.f });
 	m_ModelConfigs.emplace("LevelWizard", MODEL_CONFIG{ 2.4f, 0.f, 2.4f });
 	m_ModelConfigs.emplace("Amulet", MODEL_CONFIG{ 5.2f, 0.f, 5.2f });
 	m_ModelConfigs.emplace("Book", MODEL_CONFIG{ 4.f, 0.f, 4.f });
 	for (_int i = 1; i < 4; i++)
-		m_ModelConfigs.emplace("elecArena" + to_string(i), MODEL_CONFIG{ 15.f, 0.f, 15.f });
+		m_ModelConfigs.emplace("elecArena" + to_string(i), MODEL_CONFIG{ 14.f, 0.f, 14.f });
 	m_ModelConfigs.emplace("HoleWall", MODEL_CONFIG{ 12.f, 0.f, 12.f });
 	m_ModelConfigs.emplace("TeslaTower", MODEL_CONFIG{ 20.f, 0.f, 20.f });
 	m_ModelConfigs.emplace("Tornado", MODEL_CONFIG{ 15.f, 0.f, 15.f });
 	m_ModelConfigs.emplace("WizardBrickGround", MODEL_CONFIG{ 12.f, 0.f, 12.f });
 	m_ModelConfigs.emplace("WizardTower", MODEL_CONFIG{ 15.f, 0.f, 15.f });
+	m_ModelConfigs.emplace("SkySphere", MODEL_CONFIG{ 0.2f, 0.f, 0.2f });
 }
 
 void CLoader::TraverseAnimModels(LEVEL eLevel, const wstring& rootFolderPath)

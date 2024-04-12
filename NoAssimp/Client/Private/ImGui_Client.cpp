@@ -2,6 +2,7 @@
 #include "GameInstance.h"
 #include "ImGui_Client.h"
 #include "Body.h"
+#include "Wizard.h"
 
 CImGui_Client::CImGui_Client(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMyImGui{ pDevice, pContext }
@@ -30,6 +31,12 @@ void CImGui_Client::Tick(_float fTimeDelta)
 
 		ImGui::End();
 	}
+
+	if (true == Is_IMGUI_Switch && m_pPlayer && *m_pCurLevelIndex == LEVEL_WIZARD) {
+		ImGui::Begin("Wizard");
+		WizardDebug();
+		ImGui::End();
+	}
 }
 
 HRESULT CImGui_Client::Render()
@@ -53,8 +60,7 @@ void CImGui_Client::Settings(_float fTimeDelta)
 	else
 		IsMouseTrigger = true;
 
-	if (m_pPlayer == nullptr)
-	{
+	if (m_pPlayer == nullptr) {
 		if (*m_pGameInstance->Get_CurrentLevelID() < LEVEL_GAMEPLAY || *m_pGameInstance->Get_CurrentLevelID() > LEVEL_WIZARD)
 			return;
 
@@ -136,9 +142,45 @@ void CImGui_Client::ConvertToString()
 		ImGui::Text(strCellIndexSBR.c_str());
 }
 
+void CImGui_Client::WizardDebug()
+{
+	CWizard* pWizard = dynamic_cast<CWizard*>(m_pGameInstance->Get_GameObject(LEVEL_WIZARD, TEXT("Layer_Wizard"), TEXT("Prototype_GameObject_Wizard")));
+	if (nullptr == pWizard)
+		return;
+
+	Safe_AddRef(pWizard);
+	INFO_WIZARD tWizardInfo = pWizard->Get_WizardInfo();
+	string strState = "State: " + m_vecWizardState[tWizardInfo.eState];
+	string strCurAnim = "CurAnim: " + tWizardInfo.strCurAnim;
+	string strWizardPhase = "Phase: " + to_string(tWizardInfo.iWizardPhase);
+	string strAttackCount = "AttackCount: " + to_string(tWizardInfo.iAttackCount);
+	string strAttackFinishCount = "AttackFinishCount: " + to_string(tWizardInfo.iAttackFinishCount);
+	string strSpellIndex = "Spell: ";
+	if (tWizardInfo.eSpell == 0)
+		strSpellIndex += "LIGHTNING";
+	else if(tWizardInfo.eSpell == 1)
+		strSpellIndex += "TORNADO";
+	else if(tWizardInfo.eSpell == 2)
+		strSpellIndex += "HOLEWALL)";
+	else if (tWizardInfo.eSpell == 3)
+		strSpellIndex += "SPELL_END";
+	string strIdleTime = "IdleTime: " + to_string(tWizardInfo.fIdleTime).erase(to_string(tWizardInfo.fIdleTime).size() - 4);
+
+	ImGui::Text(strState.c_str());
+	ImGui::Text(strCurAnim.c_str());
+	ImGui::Text(strWizardPhase.c_str());
+	ImGui::Text(strAttackCount.c_str());
+	ImGui::Text(strAttackFinishCount.c_str());
+	ImGui::Text(strSpellIndex.c_str());
+	ImGui::Text(strIdleTime.c_str());
+	Safe_Release(pWizard);
+}
+
 void CImGui_Client::Release_Player()
 {
-	Safe_Release(m_pPlayer);
+	if(m_pPlayer)
+		Safe_Release(m_pPlayer);
+	m_pPlayer = nullptr;
 }
 
 void CImGui_Client::Replace_Player(CGameObject* pPlayer)
@@ -163,6 +205,4 @@ CImGui_Client* CImGui_Client::Create(ID3D11Device* pDevice, ID3D11DeviceContext*
 void CImGui_Client::Free()
 {
 	__super::Free();
-
-	Safe_Release(m_pPlayer);
 }

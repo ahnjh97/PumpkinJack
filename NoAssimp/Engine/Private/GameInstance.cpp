@@ -485,12 +485,12 @@ void CGameInstance::Hide_ImGui()
 	m_pImGui_Manager->Hide_ImGui();
 }
 
-void CGameInstance::UnHide_ImGui(CGameObject* pPlayer)
+void CGameInstance::UnHide_ImGui()
 {
 	if (nullptr == m_pImGui_Manager)
 		return;
 
-	m_pImGui_Manager->UnHide_ImGui(pPlayer);
+	m_pImGui_Manager->UnHide_ImGui();
 }
 
 const LIGHT_DESC* CGameInstance::Get_LightDesc(_uint iIndex)

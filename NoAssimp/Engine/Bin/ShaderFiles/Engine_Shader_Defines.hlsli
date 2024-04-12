@@ -64,7 +64,6 @@ BlendState BS_Default
 BlendState BS_AlphaBlend
 {
 	BlendEnable[0] = true;
-	BlendEnable[0] = true;
 
 	SrcBlend = src_alpha;
 	DestBlend = inv_src_alpha;

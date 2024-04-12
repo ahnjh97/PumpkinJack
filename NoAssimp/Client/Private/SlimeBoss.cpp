@@ -82,18 +82,16 @@ void CSlimeBoss::Tick(_float fTimeDelta)
 
 	for (auto& Pair : m_Parts)
 		Pair.second->Tick(fTimeDelta);
-	if (m_pModelCom->Get_Shrinked())
-	{
+
+	if (m_pModelCom->Get_Shrinked()) {
 		DeathEffect();
 		Set_Dead();
 	}
-
 }
 
 void CSlimeBoss::Late_Tick(_float fTimeDelta)
 {
-	if (m_pPlayer != nullptr)
-	{
+	if (m_pPlayer != nullptr) {
 		if (m_pPlayer->Get_InSlimeBossRoom())
 			return;
 	}

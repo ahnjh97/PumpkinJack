@@ -41,7 +41,7 @@ HRESULT CTongMap_Wizard::Initialize(void* pArg)
 
 void CTongMap_Wizard::Tick(_float fTimeDelta)
 {
-	m_fOffset_Y += 0.003f;
+	m_fOffset_Y += 0.004f;
 }
 
 void CTongMap_Wizard::Late_Tick(_float fTimeDelta)
@@ -94,6 +94,10 @@ HRESULT CTongMap_Wizard::Add_Components(LEVEL eLevel, const wstring& _wstrModelT
 	if (FAILED(__super::Add_Component(eLevel, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
+	wstring wstrTextureTag = TEXT("Prototype_Component_Texture_VoronoiNoise");
+	if (FAILED(__super::Add_Component(eLevel, wstrTextureTag, TEXT("Com_Texture_Noise"), (CComponent**)&m_pTextureCom[TEX_NOISE])))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -112,7 +116,8 @@ HRESULT CTongMap_Wizard::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(m_fAlpha))))
 		return E_FAIL;
-
+	if (FAILED(m_pTextureCom[TEX_NOISE]->Bind_ShaderResource(m_pShaderCom, "g_NoiseTexture")))
+		return E_FAIL;
 	return S_OK;
 }
 

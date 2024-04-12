@@ -17,6 +17,7 @@ public:
 	void				Settings(_float fTimeDelta);
 	void				OnKeyInput();
 	void				ConvertToString();
+	void				WizardDebug();
 	void				Release_Player() override;
 	void				Replace_Player(CGameObject* pPlayer) override;
 
@@ -28,6 +29,7 @@ private:
 	vector<string>		m_vecWeaponName = { "Spear", "Rifle", "Scythe", "WPN_END" };
 	_uint*				m_pCurLevelIndex = { nullptr };
 
+	vector<string>		m_vecWizardState = { "WIZARD_ATTACK", "WIZARD_CHARGE", "WIZARD_AIR_IDLE", "WIZARD_DIE", "WIZARD_DIE2", "WIZARD_HIT", "WIZARD_IDLE", "WIZARD_WEAK", "WIZARD_END" };
 public:
 	static CImGui_Client*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual void			Free();

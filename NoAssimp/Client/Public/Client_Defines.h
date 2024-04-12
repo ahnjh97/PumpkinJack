@@ -15,6 +15,8 @@ namespace Client
     enum WEAPON { WPN_SPEAR, WPN_RIFLE, WPN_SCYTHE, WPN_END };
 	enum BALLISTA { BALLISTA_IDLE, BALLISTA_SHOOT, BALLISTA_END };
 	enum SOLDIER { SOLDIER_SPAWN, SOLDIER_IDLE, SOLDIER_RUN, SOLDIER_ATTACK, SOLDIER_SPIN, SOLDIER_HIT, SOLDIER_DEATH, SOLDIER_END };
+	enum WIZARD { WIZARD_ATTACK, WIZARD_CHARGE, WIZARD_AIR_IDLE, WIZARD_DIE, WIZARD_DIE2, WIZARD_HIT, WIZARD_IDLE, WIZARD_WEAK, WIZARD_END };
+	enum SPELL { SPELL_LIGHTNING, SPELL_TORNADO, SPELL_HOLEWALL, SPELL_END };
 
 	const unsigned int	g_iWinSizeX = 1280;
 	const unsigned int	g_iWinSizeY = 720;
@@ -35,6 +37,17 @@ namespace Client
 
 		_float3	vDirection = {};
     }INFO;
+
+	typedef struct
+	{
+		WIZARD eState;
+		string strCurAnim;
+		_int iWizardPhase;
+		_int iAttackCount;
+		_int iAttackFinishCount;
+		SPELL eSpell;
+		_float fIdleTime;
+	}INFO_WIZARD;
 }
 
 

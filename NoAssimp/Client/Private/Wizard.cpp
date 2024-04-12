@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Wizard.h"
+#include "Player.h"
 
 CWizard::CWizard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -10,6 +11,12 @@ CWizard::CWizard(const CWizard& rhs)
 	: CGameObject{ rhs }
 {
 
+}
+
+INFO_WIZARD CWizard::Get_WizardInfo()
+{
+	INFO_WIZARD tInfo = { m_eState, m_pModelCom->Get_AnimationName(), m_iWizardPhase, m_iAttackCount, m_iAttackFinishCount, m_eSpell, m_fIdleTime };
+	return tInfo;
 }
 
 HRESULT CWizard::Initialize_Prototype()
@@ -33,12 +40,26 @@ HRESULT CWizard::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pModelCom->Set_Animation(0, true);
+	m_pModelCom->Set_LerpTime(0.1f);
+	SetUp_WizardAnimSpeed();
+	m_iHp = 300;
 
 	return S_OK;
 }
 
 void CWizard::Tick(_float fTimeDelta)
 {
+	Get_PlayerPtr();
+	if (WIZARD_DIE == m_eState && m_pModelCom->isFinished())
+		Set_Dead();		
+
+	Check_WizardHp();
+
+	TurnTowards_Player(fTimeDelta);
+	Link_State(fTimeDelta);
+	StateToAnimation();
+
+	m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
 }
 
 void CWizard::Late_Tick(_float fTimeDelta)
@@ -72,6 +93,146 @@ HRESULT CWizard::Render()
 	return S_OK;
 }
 
+void CWizard::Get_PlayerPtr()
+{
+	if (m_pPlayer == nullptr)	{
+		m_pPlayer = m_pGameInstance->Get_Player(LEVEL_WIZARD);
+		if (m_pPlayer != nullptr)
+		{
+			Safe_AddRef(m_pPlayer);
+			CTransform* pPlayerTransform = dynamic_cast<CTransform*>(m_pPlayer->Get_Component(g_strTransformTag));
+			m_pPlayerWorldMatrix = pPlayerTransform->Get_WorldFloat4x4_Ptr();
+		}
+	}
+}
+
+void CWizard::Check_WizardHp()
+{
+	if (m_iHp <= 0) {
+		m_eState = WIZARD_DIE;
+		return;
+	}
+
+	if (WIZARD_HIT == m_eState || WIZARD_IDLE == m_eState) {
+		if ((m_iHp > 100 && m_iHp <= 200 && m_iWizardPhase == 0) || (m_iHp > 0 && m_iHp <= 100 && m_iWizardPhase == 1)) {
+			m_eState = WIZARD_AIR_IDLE;
+			m_iWizardPhase++;
+			m_bTowerSpawn = false;
+		}
+	}
+}
+
+void CWizard::Link_State(_float fTimeDelta)
+{
+	if (SPELL_LIGHTNING == m_eSpell){
+		_int iAnimPlayCount = m_pModelCom->Get_AnimPlayCount(WIZARD_ATTACK);
+		if (iAnimPlayCount == m_iAttackCount) {
+			m_eState = WIZARD_ATTACK;
+			m_iAttackCount++;
+			m_iAttackFinishCount++;
+			Lightning();
+		}
+
+	}
+
+	if (SPELL_TORNADO == m_eSpell || SPELL_HOLEWALL == m_eSpell) {
+		if (WIZARD_AIR_IDLE == m_eState) {
+			m_fIdleTime += fTimeDelta;
+			if (m_fIdleTime >= 0.8f) {
+				m_eState = WIZARD_ATTACK;
+				m_iAttackCount++;
+				m_fIdleTime = 0.f;
+			}
+		}
+	}
+
+	if (WIZARD_ATTACK == m_eState) {
+		if (m_iAttackCount > m_iAttackFinishCount) {
+			switch (m_eSpell)
+			{
+			case SPELL_TORNADO:
+				Tornado();
+				break;
+			case SPELL_HOLEWALL:
+				HoleWall();
+				break;
+			}
+		}
+
+		if (m_pModelCom->isFinished()) {
+			m_eState = WIZARD_AIR_IDLE;
+			m_iAttackFinishCount++;
+			m_fIdleTime = 0.f;
+		}
+	}
+
+	if (SPELL_END != m_eSpell) {
+		if (m_iAttackFinishCount >= m_vecSpellThresholds[m_eSpell]) {
+			m_eSpell = (SPELL)((_int)m_eSpell + 1);
+			m_iAttackCount = 0;
+			m_iAttackFinishCount = 0;
+			m_pModelCom->Reset_AnimPlayCount(WIZARD_ATTACK);
+			m_pModelCom->Reset_Animation(string("Air_Attack"));
+			m_eState = WIZARD_AIR_IDLE;
+
+			if (m_eSpell == SPELL_END)
+				m_eState = WIZARD_CHARGE;
+		}
+	}
+
+	if (WIZARD_CHARGE == m_eState) {
+		if (!m_bTowerSpawn)	{
+			Tower();
+			m_bTowerSpawn = true;
+		}
+	}
+
+	m_ePreState = m_eState;
+}
+
+void CWizard::StateToAnimation()
+{
+	_bool bLoop = true;
+	_uint iIndex = m_eState;
+	if (m_eState == WIZARD_ATTACK || m_eState == WIZARD_DIE || m_eState == WIZARD_DIE2 || m_eState == WIZARD_HIT)
+		bLoop = false;
+
+	if (SPELL_LIGHTNING == m_eSpell && WIZARD_ATTACK == m_eState) // Lightning
+		bLoop = true;
+	m_pModelCom->Change_Animation_ByIndex(iIndex, bLoop);
+	// 0.Air_Attack  1.Air_Charge  2.Air_Idle  3.Die  4.Die2  5.Hit  6.Idle  7.Weak
+}
+
+void CWizard::TurnTowards_Player(_float fTimeDelta)
+{
+	if (WIZARD_DIE == m_eState)
+		return;
+
+	_vector vPlayerPos = XMVectorSet(m_pPlayerWorldMatrix->_41, m_pPlayerWorldMatrix->_42, m_pPlayerWorldMatrix->_43, 1);
+	m_pTransformCom->Look_At_ForLandObject(vPlayerPos);
+}
+
+void CWizard::Lightning()
+{
+	
+}
+
+void CWizard::FireBall()
+{
+}
+
+void CWizard::Tornado()
+{
+}
+
+void CWizard::HoleWall()
+{
+}
+
+void CWizard::Tower()
+{
+}
+
 HRESULT CWizard::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 {
 	/* For.Com_Model */
@@ -79,10 +240,19 @@ HRESULT CWizard::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 	if (FAILED(__super::Add_Component(eLevel, wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
+	/* For.Com_Shader */
 	wstring wstrShaderTag  = TEXT("Prototype_Component_Shader_VtxAnimModel");
 	if (FAILED(__super::Add_Component(eLevel, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
+	/* For.Com_Collider */
+	CBounding_Sphere::BOUNDING_SPHERE_DESC		ColliderDesc{};
+	ColliderDesc.vCenter = _float3(0.f, 0, 0.f);
+	ColliderDesc.fRadius = 15.f;
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
+		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom, &ColliderDesc)))
+		return E_FAIL;
+	
 	return S_OK;
 }
 
@@ -114,6 +284,12 @@ HRESULT CWizard::Bind_ShaderResources()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CWizard::SetUp_WizardAnimSpeed()
+{
+	m_pModelCom->Set_AnimSpeed(WIZARD_ATTACK, 1.7f);
+	m_pModelCom->Set_AnimSpeed(WIZARD_AIR_IDLE, 1.3f);
 }
 
 CWizard* CWizard::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -148,7 +324,9 @@ CGameObject* CWizard::Clone(void* pArg)
 void CWizard::Free()
 {
 	__super::Free();
-
+	
+	Safe_Release(m_pPlayer);
+	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
 }

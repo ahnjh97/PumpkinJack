@@ -71,12 +71,10 @@ void CImGui_Manager::Hide_ImGui()
 	}
 }
 
-void CImGui_Manager::UnHide_ImGui(CGameObject* pPlayer)
+void CImGui_Manager::UnHide_ImGui()
 {
-	if (m_pImGui != nullptr)	{
-		m_pImGui->Replace_Player(pPlayer);
+	if (m_pImGui != nullptr)	
 		m_pImGui->Set_Hide(false);
-	}
 }
 
 CImGui_Manager* CImGui_Manager::Create(CMyImGui* pImGui)

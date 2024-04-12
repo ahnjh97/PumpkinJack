@@ -163,6 +163,9 @@
     <Filter Include="01.Levels\07. Death">
       <UniqueIdentifier>{8c918047-5318-4084-b2ad-ad27b4e69a01}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Level_Wizard\SkySphere">
+      <UniqueIdentifier>{230f3645-3d22-4323-9504-343d01476852}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -333,6 +336,9 @@
     <ClInclude Include="..\Public\SoldierWeapon.h">
       <Filter>02.GameObjects\Level_GamePlay\Soldier\Part_Weapon</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SkySphere.h">
+      <Filter>02.GameObjects\Level_Wizard\SkySphere</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -493,6 +499,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\SoldierWeapon.cpp">
       <Filter>02.GameObjects\Level_GamePlay\Soldier\Part_Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SkySphere.cpp">
+      <Filter>02.GameObjects\Level_Wizard\SkySphere</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

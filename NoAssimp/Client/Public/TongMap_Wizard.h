@@ -12,7 +12,7 @@ BEGIN(Client)
 class CTongMap_Wizard final : public CGameObject
 {
 private:
-	enum TONGMAP_WIZARD_TEX { TEX_SKY, TEX_FIRE, TEX_END };
+	enum TONGMAP_WIZARD_TEX { TEX_NOISE, TEX_END };
 
 private:
 	CTongMap_Wizard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

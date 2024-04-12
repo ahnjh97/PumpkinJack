@@ -4,7 +4,7 @@
 /* 전역변수 : 쉐이더 외부에 있는 데이터를 쉐이더 안으로 받아온다. */
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
-texture2D g_DiffuseTexture, g_WaterTexture, g_CausticTexture;
+texture2D g_DiffuseTexture, g_WaterTexture, g_CausticTexture, g_NoiseTexture;
 float g_fOffset_Y;
 float g_fAlpha;
 
@@ -96,17 +96,17 @@ PS_OUT PS_MAIN_ARENAFIRE(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     In.vTexcoord.y += g_fOffset_Y;
-    
-    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord * 7.f);
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord * 6.f);
+    vector vNoiseColor = g_NoiseTexture.Sample(LinearSampler, In.vTexcoord * 4.f);
     if (0.3f >= Out.vColor.a)
         discard;
-    
-    float3 darkOrange = float3(0.6, 0.3, 0.1); // 어두운 주황색
-    float3 redPurple = float3(0.7, 0.2, 0.5); // 붉은 자주색
-    float3 color = lerp(darkOrange, redPurple, Out.vColor.r);
+    //Out.vColor.xyz += vNoiseColor.xyz;
+    //Out.vColor.a *= vNoiseColor.r ;
+    float3 darkOrange = float3(0.6, 0.2, 0.2); 
+    float3 redPurple = float3(0.9, 0.4, 0.3); 
+    float3 color = lerp(darkOrange, redPurple, Out.vColor.xyz);
     Out.vColor.xyz = color;
-    Out.vColor.a = 0.3f;
-    
+    Out.vColor.a = lerp(Out.vColor.a * 0.5f, 0, vNoiseColor.r);
     return Out;
 }
 
@@ -170,5 +170,17 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_ARENAFIRE();
+    }
+
+    pass SkySphere // 5
+    {
+        SetRasterizerState(RS_Sky);
+        SetDepthStencilState(DSS_Sky, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN();
     }
 }

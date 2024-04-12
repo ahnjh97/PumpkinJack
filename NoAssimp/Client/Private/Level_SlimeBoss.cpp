@@ -39,7 +39,7 @@ HRESULT CLevel_SlimeBoss::Initialize()
 
 	m_InputFile.close();
 
-	m_pGameInstance->UnHide_ImGui(m_pGameInstance->Get_Player(LEVEL_SLIMEBOSS));
+	m_pGameInstance->UnHide_ImGui();
 	return S_OK;
 }
 

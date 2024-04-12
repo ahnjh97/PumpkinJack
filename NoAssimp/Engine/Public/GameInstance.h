@@ -80,7 +80,7 @@ public: /* For.ImGui_Manager */
 	_bool IsPicking();
 	HRESULT	Release_ImGui();
 	void Hide_ImGui();
-	void UnHide_ImGui(CGameObject* pPlayer);
+	void UnHide_ImGui();
 
 public: /* For.Light_Manager */
 	const LIGHT_DESC* Get_LightDesc(_uint iIndex);

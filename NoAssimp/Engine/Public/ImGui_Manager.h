@@ -19,7 +19,7 @@ public:
 	HRESULT					Render();
 	HRESULT					Release_ImGui();
 	void					Hide_ImGui();
-	void					UnHide_ImGui(class CGameObject* pPlayer);
+	void					UnHide_ImGui();
 
 public:
 	static CImGui_Manager* Create(class CMyImGui* pImGui);
