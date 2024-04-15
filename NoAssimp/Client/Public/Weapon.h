@@ -45,6 +45,10 @@ private:
 	void Check_SlimeCol();
 	void Check_SlimeBossRoomPillarCol();
 	void Check_SoldierCol();
+	void Check_WizardCol();
+	void Check_TeslaTowerCol();
+
+	void Check_Collision(CGameObject* pEnemy);
 
 private:
 	_bool m_bCorrectWeapon = { false };

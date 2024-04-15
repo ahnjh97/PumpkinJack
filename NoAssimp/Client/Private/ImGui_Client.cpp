@@ -161,10 +161,13 @@ void CImGui_Client::WizardDebug()
 	else if(tWizardInfo.eSpell == 1)
 		strSpellIndex += "TORNADO";
 	else if(tWizardInfo.eSpell == 2)
-		strSpellIndex += "HOLEWALL)";
+		strSpellIndex += "HOLEWALL";
 	else if (tWizardInfo.eSpell == 3)
 		strSpellIndex += "SPELL_END";
+	string strTime = "Time: " + to_string(tWizardInfo.fTime).erase(to_string(tWizardInfo.fTime).size() - 4);
 	string strIdleTime = "IdleTime: " + to_string(tWizardInfo.fIdleTime).erase(to_string(tWizardInfo.fIdleTime).size() - 4);
+	string strWaitTime = "WaitTime: " + to_string(tWizardInfo.fWaitTime).erase(to_string(tWizardInfo.fWaitTime).size() - 4);
+	string strChargeTime = "ChargeTime: " + to_string(tWizardInfo.fChargeTime).erase(to_string(tWizardInfo.fChargeTime).size() - 4);
 
 	ImGui::Text(strState.c_str());
 	ImGui::Text(strCurAnim.c_str());
@@ -172,7 +175,11 @@ void CImGui_Client::WizardDebug()
 	ImGui::Text(strAttackCount.c_str());
 	ImGui::Text(strAttackFinishCount.c_str());
 	ImGui::Text(strSpellIndex.c_str());
+	ImGui::Text(strTime.c_str());
 	ImGui::Text(strIdleTime.c_str());
+	ImGui::Text(strWaitTime.c_str());
+	ImGui::Text(strChargeTime.c_str());
+
 	Safe_Release(pWizard);
 }
 

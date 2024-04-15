@@ -166,6 +166,18 @@
     <Filter Include="02.GameObjects\Level_Wizard\SkySphere">
       <UniqueIdentifier>{230f3645-3d22-4323-9504-343d01476852}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Level_Wizard\Tornado">
+      <UniqueIdentifier>{aef3c116-317b-477d-b522-562b19eefa9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_Wizard\WizardTower">
+      <UniqueIdentifier>{1a474925-d05f-4574-8c75-5ef1cc8c83f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_Wizard\HoleWall">
+      <UniqueIdentifier>{4d46156f-928b-402d-91d4-72b3fb6dae86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_Wizard\TeslaTower">
+      <UniqueIdentifier>{0add6b66-1759-45e9-8075-25dd66fb9f90}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -339,6 +351,18 @@
     <ClInclude Include="..\Public\SkySphere.h">
       <Filter>02.GameObjects\Level_Wizard\SkySphere</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Tornado.h">
+      <Filter>02.GameObjects\Level_Wizard\Tornado</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HoleWall.h">
+      <Filter>02.GameObjects\Level_Wizard\HoleWall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TeslaTower.h">
+      <Filter>02.GameObjects\Level_Wizard\TeslaTower</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\WizardTower.h">
+      <Filter>02.GameObjects\Level_Wizard\WizardTower</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -502,6 +526,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\SkySphere.cpp">
       <Filter>02.GameObjects\Level_Wizard\SkySphere</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Tornado.cpp">
+      <Filter>02.GameObjects\Level_Wizard\Tornado</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HoleWall.cpp">
+      <Filter>02.GameObjects\Level_Wizard\HoleWall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TeslaTower.cpp">
+      <Filter>02.GameObjects\Level_Wizard\TeslaTower</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\WizardTower.cpp">
+      <Filter>02.GameObjects\Level_Wizard\WizardTower</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,6 @@
 #pragma once
 #include "Bounding.h"
+#include "Bone.h"
 
 BEGIN(Engine)
 

@@ -46,7 +46,10 @@ namespace Client
 		_int iAttackCount;
 		_int iAttackFinishCount;
 		SPELL eSpell;
+		_float fTime;
 		_float fIdleTime;
+		_float fWaitTime;
+		_float fChargeTime;
 	}INFO_WIZARD;
 }
 

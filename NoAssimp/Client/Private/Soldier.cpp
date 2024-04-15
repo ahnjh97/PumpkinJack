@@ -63,10 +63,8 @@ void CSoldier::Tick(_float fTimeDelta)
 	LinkState();
 	StateToAnimation();
 
-	if (m_eState == SOLDIER_IDLE || m_eState == SOLDIER_RUN || m_eState == SOLDIER_SPAWN || m_eState == SOLDIER_SPIN)
-	{
-		if (true == m_pModelCom->Get_IsLerping())
-		{
+	if (m_eState == SOLDIER_IDLE || m_eState == SOLDIER_RUN || m_eState == SOLDIER_SPAWN || m_eState == SOLDIER_SPIN)	{
+		if (true == m_pModelCom->Get_IsLerping())		{
 			_float4 vRightFloat{}, vLookFloat{};
 			m_pTransformCom->Get_Look_LandObject(XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1), vRightFloat, vLookFloat);
 
@@ -78,10 +76,8 @@ void CSoldier::Tick(_float fTimeDelta)
 			if (abs(fAngle) >= XMConvertToRadians(2.f))
 				m_pTransformCom->Turn(::XMVectorSet(0, 1, 0, 0), fTimeDelta * fAngle * 5.f);
 		}
-		else
-		{
-			if (m_eState == SOLDIER_SPIN)
-			{
+		else {
+			if (m_eState == SOLDIER_SPIN) {
 				_float fPlayRatio = m_pModelCom->Get_AnimPlayRatio();
 				if (fPlayRatio >= 0.4f && fPlayRatio <= 0.7f)
 					m_pTransformCom->Look_At_ForLandObject(XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1));
@@ -89,8 +85,12 @@ void CSoldier::Tick(_float fTimeDelta)
 			else
 				m_pTransformCom->Look_At_ForLandObject(XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1));
 		}
-			
 	}
+	else if (SOLDIER_HIT == m_eState) {
+		if(m_pModelCom->Get_AnimPlayRatio() < 0.15f)
+			m_pTransformCom->Look_At_ForLandObject(XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1));
+	}
+
 
 
 	if (m_eState == SOLDIER_RUN)
@@ -172,6 +172,7 @@ void CSoldier::Get_PlayerWorldMatPtr()
 	if (nullptr == pPlayerTransform)
 		return;
 	m_pPlayerWorldMat = pPlayerTransform->Get_WorldFloat4x4_Ptr();
+	Safe_AddRef(m_pPlayer);
 }
 
 void CSoldier::LinkState()

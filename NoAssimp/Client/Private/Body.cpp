@@ -170,7 +170,7 @@ void CBody::Initialize_AnimSpeed()
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_Roll"), 1.8f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Rifle_Roll"), 3.2f);
 	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Scythe_Roll"), 2.2f);
-	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Roll"), 3.8f);
+	m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Roll"), 3.45f);
 	
 	for(int i = 1; i< 4; i++)
 		m_pModelCom->Set_AnimSpeed(m_pModelCom->Get_AnimIndex("Spear_Atk" + to_string(i)), 2.2f);

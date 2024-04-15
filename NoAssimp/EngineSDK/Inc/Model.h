@@ -72,6 +72,7 @@ public:
 	void Change_Animation_ByIndex(_uint iAnimIndex, _bool isLoop, _bool bLerp = true);
 	void Play_FinalFrame(string& strAnimName);
 	void Reset_Animation(string& strAnimName);
+	void Reset_Animation(_uint iAnimIndex);
 
 private:
 	TYPE						m_eModelType = { TYPE_END };

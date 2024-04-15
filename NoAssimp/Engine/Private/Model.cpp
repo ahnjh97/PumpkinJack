@@ -263,17 +263,19 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 			m_bIsLerping = false;		
 	}
 
-	//// 진짜 Root의 변환행렬
-	//_matrix HipLocalTransform = XMLoadFloat4x4(m_Bones[m_tConfig.iRealRoot]->Get_TransformationMatrix());
-	//_vector scale, rotation, translation;
-	//XMMatrixDecompose(&scale, &rotation, &translation, HipLocalTransform);
-	//XMStoreFloat3(&m_vRootTranslation, translation);
+#pragma region 진짜 Root의 변환행렬
+	_matrix HipLocalTransform = XMLoadFloat4x4(m_Bones[m_tConfig.iRealRoot]->Get_TransformationMatrix());
+	_vector scale, rotation, translation;
+	XMMatrixDecompose(&scale, &rotation, &translation, HipLocalTransform);
+	XMStoreFloat3(&m_vRootTranslation, translation);
+#pragma endregion
 
-	////무기 장착을 위한 이동값 저장
+#pragma region 무기 장착을 위한 이동값 저장
 	//_matrix matLocalTransform_forHand = XMLoadFloat4x4(m_Bones[0]->Get_TransformationMatrix());
 	//_vector scale_forHand, rotation_forHand, translation_forHand;
 	//XMMatrixDecompose(&scale_forHand, &rotation_forHand, &translation_forHand, matLocalTransform_forHand);
 	//XMStoreFloat3(&m_vHandTranslation, translation_forHand);
+#pragma endregion
 
 	// 0번 노드의 변환행렬 
 	_matrix RootLocalTransform = XMLoadFloat4x4(m_Bones[0]->Get_TransformationMatrix());
@@ -352,6 +354,12 @@ void CModel::Reset_Animation(string& strAnimName)
 
 	m_Animations[iter->second]->Reset(m_Bones);
 	m_Animations[iter->second]->Set_IsFinished(false);
+}
+
+void CModel::Reset_Animation(_uint iAnimIndex)
+{
+	m_Animations[iAnimIndex]->Reset(m_Bones);
+	m_Animations[iAnimIndex]->Set_IsFinished(false);
 }
 
 HRESULT CModel::Ready_Meshes()

@@ -97,7 +97,7 @@ HRESULT CLevel_Wizard::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fSpeedPerSec = 20.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-	CameraDesc.fDistance = 75.f;
+	CameraDesc.fDistance = 82.f;
 	CameraDesc.fHeight = 30.f;
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, strLayerTag, TEXT("Prototype_GameObject_Camera_Jack"), &CameraDesc)))
@@ -146,6 +146,10 @@ HRESULT CLevel_Wizard::Ready_ParsedObjects()
 		}
 		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Wizard")) {
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_Wizard"), TEXT("Prototype_GameObject_Wizard"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_WizardTower")) {
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_WizardTower"), TEXT("Prototype_GameObject_WizardTower"), &tempDesc)))
 				return E_FAIL;
 		}
 		else {

@@ -66,7 +66,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 	if (pArg)
 		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
 
-	GameObjectDesc.fSpeedPerSec = 43.f;
+	GameObjectDesc.fSpeedPerSec = 45.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
@@ -279,7 +279,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 	}
 
 	if(m_eState == ROLL)
-		m_pTransformCom->Move(fTimeDelta * 1.5f, ::XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
+		m_pTransformCom->Move(fTimeDelta * 1.45f, ::XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
 
 	if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) || (m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80)
 		|| (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80) || (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80))
@@ -704,9 +704,9 @@ void CPlayer::TargetNearestEnemy()
 	m_pNearestEnemyCollider = nullptr;
 	m_fEnemyDistance = 50.f;
 	
-	if (LEVEL_GAMEPLAY == *m_pCurLevel)	{
+	if (LEVEL_GAMEPLAY == *m_pCurLevel)	
 		Check_EnemyDistance(LEVEL_GAMEPLAY, TEXT("Layer_Soldier"), CCollider::TYPE_OBB);
-	}
+	
 	else if (LEVEL_SLIMEBOSS == *m_pCurLevel) {
 		if (!m_bInSlimeBossRoom)
 			Check_EnemyDistance(LEVEL_SLIMEBOSS, TEXT("Layer_Slime"), CCollider::TYPE_SPHERE);
@@ -714,6 +714,8 @@ void CPlayer::TargetNearestEnemy()
 			Check_EnemyDistance(LEVEL_SLIMEBOSS, TEXT("Layer_Pillar2"), CCollider::TYPE_OBB);
 	}
 	else if(LEVEL_WIZARD == *m_pCurLevel) { 
+		Check_EnemyDistance(LEVEL_WIZARD, TEXT("Layer_Wizard"), CCollider::TYPE_SPHERE);
+		Check_EnemyDistance(LEVEL_WIZARD, TEXT("Layer_TeslaTower"), CCollider::TYPE_SPHERE);
 	}
 
 	if (nullptr == m_pNearestEnemyCollider)

@@ -38,7 +38,7 @@ HRESULT CBallista::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pModelCom->Set_Animation(0, true); // 999: 랜덤 애니메이션
-	m_pModelCom->Set_AnimSpeed(0, 0.7f);
+	m_pModelCom->Set_AnimSpeed(0, 0.6f);
 
 	return S_OK;
 }

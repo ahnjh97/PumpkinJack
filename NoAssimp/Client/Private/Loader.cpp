@@ -43,9 +43,12 @@
 #include "Slime.h"
 
 #include "TongMap_Wizard.h"
+#include "WizardTower.h"
+#include "TeslaTower.h"
 #include "SkySphere.h"
+#include "HoleWall.h"
+#include "Tornado.h"
 #include "Wizard.h"
-
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -388,7 +391,10 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Wizard"), CWizard);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TongMap_Wizard"), CTongMap_Wizard);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SkySphere"), CSkySphere);
-
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Tornado"), CTornado);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HoleWall"), CHoleWall);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("WizardTower"), CWizardTower);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TeslaTower"), CTeslaTower);
 
 	m_strLoadingText = TEXT("Loading Complete: Level_Wizard");
 	m_isFinished = true;
@@ -570,7 +576,7 @@ void CLoader::SetUp_ModelScaleRotation() // Scale, Degaree, NewScale, RootIndex
 		m_ModelConfigs.emplace("elecArena" + to_string(i), MODEL_CONFIG{ 14.f, 0.f, 14.f });
 	m_ModelConfigs.emplace("HoleWall", MODEL_CONFIG{ 12.f, 0.f, 12.f });
 	m_ModelConfigs.emplace("TeslaTower", MODEL_CONFIG{ 20.f, 0.f, 20.f });
-	m_ModelConfigs.emplace("Tornado", MODEL_CONFIG{ 15.f, 0.f, 15.f });
+	//m_ModelConfigs.emplace("Tornado", MODEL_CONFIG{ 15.f, 0.f, 15.f });
 	m_ModelConfigs.emplace("WizardBrickGround", MODEL_CONFIG{ 12.f, 0.f, 12.f });
 	m_ModelConfigs.emplace("WizardTower", MODEL_CONFIG{ 15.f, 0.f, 15.f });
 	m_ModelConfigs.emplace("SkySphere", MODEL_CONFIG{ 0.2f, 0.f, 0.2f });
@@ -707,7 +713,6 @@ CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, L
 
 	return pInstance;
 }
-
 
 void CLoader::Free()
 {

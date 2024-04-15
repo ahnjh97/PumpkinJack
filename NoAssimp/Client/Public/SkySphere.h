@@ -4,7 +4,6 @@
 
 BEGIN(Engine)
 class CModel;
-class CTexture;
 class CShader;
 END
 

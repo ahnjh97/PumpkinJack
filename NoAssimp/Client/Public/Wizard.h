@@ -28,18 +28,24 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-
 	void Get_PlayerPtr();
 	void Check_WizardHp();
 	void Link_State(_float fTimeDelta);
 	void StateToAnimation();
-	void TurnTowards_Player(_float fTimeDelta);
+	void TurnTowards_Player();
 
+	void Summon_LevitationTornado();
+
+	void Cast_Spell();
 	void Lightning();
 	void FireBall();
 	void Tornado();
 	void HoleWall();
-	void Tower();
+	void TeslaTower();
+
+	_bool AllTowersDestroyed();
+
+	_matrix AttachColliderToBone();
 
 private:
 	WIZARD m_eState = { WIZARD_AIR_IDLE };
@@ -48,15 +54,21 @@ private:
 
 	_bool m_bTowerSpawn = { false };
 	_bool m_bAllTowersDead = { false };
+	_bool m_bChangePhase = { false };
+	_bool m_bCastSpell = { true };
+	_bool m_bWait = { false };
+	_bool m_bSummonLevitationTornado = { false };
 
 	_int m_iWizardPhase = {};
 	_int m_iAttackCount = {};
 	_int m_iAttackFinishCount = { };
-
+	_int m_iPreHp = {};
 
 	_float m_fAlpha = { 1.f };
+	_float m_fTime = {};
 	_float m_fIdleTime = {};
 	_float m_fChargeTime = {};
+	_float m_fWaitTime = {};
 
 	vector <_int> m_vecSpellThresholds = { 8, 4, 4 };
 	vector<_float> m_vecIdleDurations = { 1.f, 1.2f, 1.4f, 1.6f, 1.8f, 2.f };

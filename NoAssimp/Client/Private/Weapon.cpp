@@ -76,6 +76,8 @@ void CWeapon::Tick(_float fTimeDelta)
 		Check_SlimeCol();
 		Check_SlimeBossRoomPillarCol();
 		Check_SoldierCol();
+		Check_WizardCol();
+		Check_TeslaTowerCol();
 	}
 }
 
@@ -141,7 +143,7 @@ HRESULT CWeapon::Render()
 				m_pColliderCom[i]->Render();
 		}
 	}
-#endif // _DEBUG
+#endif 
 
 	return S_OK;
 }
@@ -170,20 +172,7 @@ void CWeapon::Check_SlimeCol()
 		return;
 
 	for (auto& slime : slimeList)
-	{
-		if (slime == nullptr)
-			continue;
-
-		CCollider* pSlimeCollider = dynamic_cast<CCollider*>(slime->Get_Component(TEXT("Com_Collider")));
-		if (pSlimeCollider == nullptr)
-			continue;
-
-		if (m_pColliderCom[0]->Check_AlreadyCollided(pSlimeCollider) || m_pColliderCom[1]->Check_AlreadyCollided(pSlimeCollider))
-			continue;
-
-		if (m_pColliderCom[0]->Intersect(pSlimeCollider) || m_pColliderCom[1]->Intersect(pSlimeCollider))
-			slime->Deduct_HP(*m_pDamage);
-	}
+		Check_Collision(slime);
 }
 
 void CWeapon::Check_SlimeBossRoomPillarCol()
@@ -196,20 +185,7 @@ void CWeapon::Check_SlimeBossRoomPillarCol()
 		return;
 
 	for (auto& SBR_Pillar : SBR_PillarList)
-	{
-		if (SBR_Pillar == nullptr)
-			continue;
-
-		CCollider* pSBR_Pillar_Collider = dynamic_cast<CCollider*>(SBR_Pillar->Get_Component(TEXT("Com_Collider")));
-		if (pSBR_Pillar_Collider == nullptr)
-			continue;
-
-		if (m_pColliderCom[0]->Check_AlreadyCollided(pSBR_Pillar_Collider) || m_pColliderCom[1]->Check_AlreadyCollided(pSBR_Pillar_Collider))
-			continue;
-
-		if (m_pColliderCom[0]->Intersect(pSBR_Pillar_Collider) || m_pColliderCom[1]->Intersect(pSBR_Pillar_Collider))
-			SBR_Pillar->Deduct_HP(*m_pDamage);
-	}
+		Check_Collision(SBR_Pillar);
 }
 
 void CWeapon::Check_SoldierCol()
@@ -222,21 +198,47 @@ void CWeapon::Check_SoldierCol()
 		return;
 
 	for (auto& soldier : soldierList)
-	{
-		if (soldier == nullptr)
-			continue;
-
-		CCollider* pSoliderCollider = dynamic_cast<CCollider*>(soldier->Get_Component(TEXT("Com_Collider")));
-		if (pSoliderCollider == nullptr)
-			continue;
-
-		if (m_pColliderCom[0]->Check_AlreadyCollided(pSoliderCollider) || m_pColliderCom[1]->Check_AlreadyCollided(pSoliderCollider))
-			continue;
-
-		if (m_pColliderCom[0]->Intersect(pSoliderCollider) || m_pColliderCom[1]->Intersect(pSoliderCollider))
-			soldier->Deduct_HP(*m_pDamage);
-	}
+		Check_Collision(soldier);
 }
+
+void CWeapon::Check_WizardCol()
+{
+	if (*m_pCurLevel != LEVEL_WIZARD)
+		return;
+
+	CGameObject* pWizard = m_pGameInstance->Get_GameObject(LEVEL_WIZARD, TEXT("Layer_Wizard"), TEXT("Prototype_GameObject_Wizard"));
+	Check_Collision(pWizard);
+}
+
+void CWeapon::Check_TeslaTowerCol()
+{
+	if (*m_pCurLevel != LEVEL_WIZARD)
+		return;
+
+	list<CGameObject*> teslaTowerList = m_pGameInstance->Get_ObjectList(LEVEL_WIZARD, TEXT("Layer_TeslaTower"));
+	if (teslaTowerList.empty())
+		return;
+
+	for (auto& teslaTower : teslaTowerList)
+		Check_Collision(teslaTower);
+}
+
+void CWeapon::Check_Collision(CGameObject* pEnemy)
+{
+	if (nullptr == pEnemy)
+		return;
+
+	CCollider* pEnemyCollider = dynamic_cast<CCollider*>(pEnemy->Get_Component(TEXT("Com_Collider")));
+	if (nullptr == pEnemyCollider)
+		return;
+
+	if (m_pColliderCom[0]->Check_AlreadyCollided(pEnemyCollider) || m_pColliderCom[1]->Check_AlreadyCollided(pEnemyCollider))
+		return;
+
+	if (m_pColliderCom[0]->Intersect(pEnemyCollider) || m_pColliderCom[1]->Intersect(pEnemyCollider))
+		pEnemy->Deduct_HP(*m_pDamage);
+}
+
 
 HRESULT CWeapon::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 {

@@ -1,6 +1,5 @@
-- Lightning
-- Tornado
-- Wizard HpLoss
+- TeslaTower
+- WizardFall
 - Ground Change
 
 - Hit Effect

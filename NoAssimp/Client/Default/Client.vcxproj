@@ -172,6 +172,7 @@
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\CrateBox.h" />
     <ClInclude Include="..\Public\Grid.h" />
+    <ClInclude Include="..\Public\HoleWall.h" />
     <ClInclude Include="..\Public\ImGui_Client.h" />
     <ClInclude Include="..\Public\ImGui_MapTool.h" />
     <ClInclude Include="..\Public\Indicator.h" />
@@ -206,15 +207,18 @@
     <ClInclude Include="..\Public\SoldierWeapon.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\Terrain_SlimeBossRoom.h" />
+    <ClInclude Include="..\Public\TeslaTower.h" />
     <ClInclude Include="..\Public\TongMap_GamePlay.h" />
     <ClInclude Include="..\Public\TongMap_SlimeBoss.h" />
     <ClInclude Include="..\Public\TongMap_Wizard.h" />
     <ClInclude Include="..\Public\Tool_Anim.h" />
     <ClInclude Include="..\Public\Tool_NonAnim.h" />
+    <ClInclude Include="..\Public\Tornado.h" />
     <ClInclude Include="..\Public\Trigger.h" />
     <ClInclude Include="..\Public\UI_Weapon.h" />
     <ClInclude Include="..\Public\Weapon.h" />
     <ClInclude Include="..\Public\Wizard.h" />
+    <ClInclude Include="..\Public\WizardTower.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -230,6 +234,7 @@
     <ClCompile Include="..\Private\Camera_Jack.cpp" />
     <ClCompile Include="..\Private\CrateBox.cpp" />
     <ClCompile Include="..\Private\Grid.cpp" />
+    <ClCompile Include="..\Private\HoleWall.cpp" />
     <ClCompile Include="..\Private\ImGui_Client.cpp" />
     <ClCompile Include="..\Private\ImGui_MapTool.cpp" />
     <ClCompile Include="..\Private\Indicator.cpp" />
@@ -264,15 +269,18 @@
     <ClCompile Include="..\Private\SoldierWeapon.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\Terrain_SlimeBossRoom.cpp" />
+    <ClCompile Include="..\Private\TeslaTower.cpp" />
     <ClCompile Include="..\Private\TongMap_GamePlay.cpp" />
     <ClCompile Include="..\Private\TongMap_SlimeBoss.cpp" />
     <ClCompile Include="..\Private\TongMap_Wizard.cpp" />
     <ClCompile Include="..\Private\Tool_Anim.cpp" />
     <ClCompile Include="..\Private\Tool_NonAnim.cpp" />
+    <ClCompile Include="..\Private\Tornado.cpp" />
     <ClCompile Include="..\Private\Trigger.cpp" />
     <ClCompile Include="..\Private\UI_Weapon.cpp" />
     <ClCompile Include="..\Private\Weapon.cpp" />
     <ClCompile Include="..\Private\Wizard.cpp" />
+    <ClCompile Include="..\Private\WizardTower.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

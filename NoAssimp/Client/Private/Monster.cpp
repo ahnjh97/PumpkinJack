@@ -143,6 +143,7 @@ HRESULT CMonster::Bind_ShaderResources()
 }
 
 CMonster * CMonster::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+
 {
 	CMonster*		pInstance = new CMonster(pDevice, pContext);
 
