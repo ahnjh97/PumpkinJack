@@ -171,6 +171,7 @@ HRESULT CTongMap_SlimeBoss::Bind_ShaderResources()
 
 	if (FAILED(m_pShaderCom[NO_LIGHT]->Bind_RawValue("g_fOffset_Y", &m_fOffset_Y, sizeof(_float))))
 		return E_FAIL;
+
 	return S_OK;
 }
 

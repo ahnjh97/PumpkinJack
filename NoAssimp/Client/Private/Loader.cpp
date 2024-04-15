@@ -21,6 +21,7 @@
 #include "BallistaRotator.h"
 #include "SkullCrossBow.h"
 #include "SoldierWeapon.h"
+#include "CollisionCube.h"
 #include "Ballista.h"
 #include "CrateBox.h"
 #include "Trigger.h"
@@ -45,6 +46,7 @@
 #include "TongMap_Wizard.h"
 #include "WizardTower.h"
 #include "TeslaTower.h"
+#include "ElecArena.h"
 #include "SkySphere.h"
 #include "HoleWall.h"
 #include "Tornado.h"
@@ -243,8 +245,8 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	m_strLoadingText = TEXT("Loading Models for Level_GamePlay...");
 	vector<string> vecAnimModelNames = { "Jack", "Ballista", "Dummy", "SkullCrossBow", "Soldier", "Trabuchet" };
 	vector<string> vecNonAnimModelNames = { "Spear", "Rifle", "Scythe", "LevelGamePlay",
-		"ballistaArrow", "ballistaBase", "ballistaRotator", "crateBoxPotion", "fenceStack_SmallCol", "Kart",
-		"MinePlatform", "Rail", "RailLeft60", "RailLeft90", "RailRight60", "RailRight90" };
+		"ballistaArrow", "ballistaBase", "ballistaRotator", "crateBoxPotion", "fenceStack_SmallCol", "Cube",
+		"Kart", "MinePlatform", "Rail", "RailLeft60", "RailLeft90", "RailRight60", "RailRight90" };
 
 	if (FAILED(Add_Models(eLevel, vecAnimModelNames, vecNonAnimModelNames)))
 		return E_FAIL;
@@ -276,7 +278,7 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Trigger"), CTrigger);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Soldier"), CSoldier);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_SoldierWeapon"), CSoldierWeapon);
-
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CollisionCube"), CCollisionCube);
 
 	m_strLoadingText = TEXT("Loading Complete: Level_GamePlay");
 
@@ -284,8 +286,6 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 
 	return S_OK;
 }
-
-
 
 HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 {
@@ -395,6 +395,7 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HoleWall"), CHoleWall);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("WizardTower"), CWizardTower);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TeslaTower"), CTeslaTower);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ElecArena"), CElecArena);
 
 	m_strLoadingText = TEXT("Loading Complete: Level_Wizard");
 	m_isFinished = true;

@@ -50,6 +50,7 @@ namespace Client
 		_float fIdleTime;
 		_float fWaitTime;
 		_float fChargeTime;
+		_float fPhaseChangeTime;
 	}INFO_WIZARD;
 }
 

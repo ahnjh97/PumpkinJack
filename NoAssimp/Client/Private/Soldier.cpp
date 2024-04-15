@@ -40,7 +40,7 @@ HRESULT CSoldier::Initialize(void* pArg)
 		Soldier_AnimSpeed();
 
 	m_pModelCom->Set_Animation(10, false); // SPAWN
-	m_iPreHp = m_iHp = 40;
+	m_iPreHp = m_iHp = 70;
 	m_pNavigationCom->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 	return S_OK;
 }
@@ -90,8 +90,6 @@ void CSoldier::Tick(_float fTimeDelta)
 		if(m_pModelCom->Get_AnimPlayRatio() < 0.15f)
 			m_pTransformCom->Look_At_ForLandObject(XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1));
 	}
-
-
 
 	if (m_eState == SOLDIER_RUN)
 		m_pTransformCom->Move(fTimeDelta * 2.8f, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), m_pNavigationCom);

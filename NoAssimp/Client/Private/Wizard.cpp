@@ -2,6 +2,7 @@
 #include "Wizard.h"
 #include "Player.h"
 #include "Bone.h"
+#include "ElecArena.h"
 
 CWizard::CWizard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -17,7 +18,7 @@ CWizard::CWizard(const CWizard& rhs)
 INFO_WIZARD CWizard::Get_WizardInfo()
 {
 	INFO_WIZARD tInfo = { m_eState, m_pModelCom->Get_AnimationName(), m_iWizardPhase, m_iAttackCount, m_iAttackFinishCount, 
-		m_eSpell, m_fTime, m_fIdleTime, m_fWaitTime, m_fChargeTime};
+		m_eSpell, m_fTime, m_fIdleTime, m_fWaitTime, m_fChargeTime, m_fPhaseChangeTime};
 
 	return tInfo;
 }
@@ -57,6 +58,7 @@ HRESULT CWizard::Initialize(void* pArg)
 void CWizard::Tick(_float fTimeDelta)
 {
 	m_fTime += fTimeDelta;
+	m_fPhaseChangeTime += fTimeDelta;
 	Get_PlayerPtr();
 	if (WIZARD_DIE == m_eState && m_pModelCom->isFinished())
 		Set_Dead();		
@@ -94,7 +96,7 @@ HRESULT CWizard::Render()
 			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(1))) // NoCull
+		if (FAILED(m_pShaderCom->Begin(3))) // Wizard
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -137,8 +139,9 @@ void CWizard::Check_WizardHp()
 			if (!m_bSummonLevitationTornado) {
 				Summon_LevitationTornado();
 				m_bSummonLevitationTornado = true;
+				m_fPhaseChangeTime = 0.f;
+				m_bDestroyElecArena = true;
 			}
-				
 		}
 	}
 }
@@ -166,6 +169,14 @@ void CWizard::Link_State(_float fTimeDelta)
 		if (m_pTransformCom->Get_Pos_Float4().y < 60.f)
 			m_pTransformCom->Fall(-fTimeDelta * 5.f);
 		else {
+			if (m_fPhaseChangeTime < 5.f) {
+				if (m_bDestroyElecArena) {
+					DestroyElecArena();
+					m_bDestroyElecArena = false;
+				}
+				return;
+			}
+
 			if (m_bChangePhase) {
 				m_bChangePhase = false;
 				m_eSpell = SPELL_LIGHTNING;
@@ -248,19 +259,22 @@ void CWizard::Link_State(_float fTimeDelta)
 			m_bTowerSpawn = true;
 		}
 
-		if (m_fChargeTime > 22.f) {
+		if (m_fChargeTime > 25.f) {
 			m_eSpell = SPELL_LIGHTNING;
 			m_iAttackCount = 0;
 			m_iAttackFinishCount = 0;
 			m_pModelCom->Reset_AnimPlayCount(WIZARD_ATTACK);
 			m_eState = WIZARD_ATTACK;
 			m_fChargeTime = 0.f;
+			m_bTowerSpawn = false;
+			DestroyTeslaTowers();
 		}
 		else if(true == AllTowersDestroyed()){
 			m_eState = WIZARD_IDLE;
 			m_fChargeTime = 0.f;
 			CGameObject* pTornado = m_pGameInstance->Get_GameObject(LEVEL_WIZARD, TEXT("Layer_Tornado"), TEXT("Prototype_GameObject_Tornado"));
-			pTornado->Set_Dead();
+			if(pTornado != nullptr)
+				pTornado->Set_Dead();
 		}
 	}
 
@@ -371,7 +385,6 @@ void CWizard::HoleWall()
 
 	GAMEOBJECT_DESC tDesc{};
 	tDesc.iLevel = LEVEL_WIZARD;
-	//tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
 	XMStoreFloat4x4(&tDesc.matWorld, matNew);
 
 	m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_HoleWall"), TEXT("Prototype_GameObject_HoleWall"), &tDesc);
@@ -389,13 +402,49 @@ void CWizard::TeslaTower()
 	tDesc.iLevel = LEVEL_WIZARD;
 
 	for (_int i = 0; i < 3; i++) {
-		_float fAngle = XMConvertToRadians(i * 120.f);
+		_float fAngle = XMConvertToRadians(i * 120.f + 60.f);
 
 		tDesc.matWorld._41 = vPos.x + XMVectorGetX(vLook * cos(fAngle) + vRight * sin(fAngle)) *fRadius;
 		tDesc.matWorld._42 = -30;
 		tDesc.matWorld._43 = vPos.z + XMVectorGetZ(vLook * cos(fAngle) + vRight * sin(fAngle)) * fRadius;;
 
 		m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_TeslaTower"), TEXT("Prototype_GameObject_TeslaTower"), &tDesc);
+	}
+}
+
+void CWizard::DestroyTeslaTowers()
+{
+	list<CGameObject*> teslaTowerList = m_pGameInstance->Get_ObjectList(LEVEL_WIZARD, TEXT("Layer_TeslaTower"));
+
+	if (teslaTowerList.empty())
+		return;
+
+	for (auto& teslaTower : teslaTowerList) {
+		if (nullptr == teslaTower)
+			continue;
+
+		teslaTower->Set_Dead();
+	}
+}
+
+void CWizard::DestroyElecArena()
+{
+	if (3 <= m_iWizardPhase)
+		return;
+
+	list<CGameObject*> elecArenaList = m_pGameInstance->Get_ObjectList(LEVEL_WIZARD, TEXT("Layer_ElecArena"));
+
+	if (elecArenaList.empty())
+		return;
+
+	for (auto& elecArena : elecArenaList) {
+		if (nullptr == elecArena)
+			continue;
+
+		if (elecArena->Get_ParseData().wstrModelTag == TEXT("Prototype_Component_Model_elecArena") + to_wstring(m_iWizardPhase)) {
+			CElecArena* pElecArena = dynamic_cast<CElecArena*>(elecArena);
+			pElecArena->Set_Whiten();
+		}	 
 	}
 }
 
@@ -406,8 +455,10 @@ _bool CWizard::AllTowersDestroyed()
 		return false;
 
 	for (auto& teslaTower : teslaTowerList) {
-		if(teslaTower != nullptr)
-			return false;
+		if (teslaTower != nullptr) {
+			if(false == teslaTower->Get_Dead())
+				return false;
+		}
 	}
 
 	return true;
@@ -459,21 +510,6 @@ HRESULT CWizard::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
-		return E_FAIL;
-
-	const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-	if (nullptr == pLightDesc)
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))
 		return E_FAIL;
 
 	return S_OK;

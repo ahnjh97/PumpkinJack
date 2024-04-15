@@ -190,6 +190,10 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Water"), TEXT("Prototype_GameObject_Water"), &tempDesc)))
 				return E_FAIL;
 		}
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_Cube")) {
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_CollisionCube"), TEXT("Prototype_GameObject_CollisionCube"), &tempDesc)))
+				return E_FAIL;
+		}
 		else {
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Monster"), &tempDesc)))
 				return E_FAIL;

@@ -39,13 +39,15 @@ HRESULT CTeslaTower::Initialize(void* pArg)
 
 void CTeslaTower::Tick(_float fTimeDelta)
 {
-	if (m_iHp <= 0)
+	if (m_iHp <= 0) {
 		Set_Dead();
-
+		return;
+	}
+		
 	if (m_pTransformCom->Get_Pos_Float4().y < 0)
 		m_pTransformCom->Fall(-fTimeDelta * 2.5f);
 
-	if (m_pColliderCom)
+	if (m_pColliderCom != nullptr)
 		m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
 }
 
@@ -94,8 +96,8 @@ HRESULT CTeslaTower::Add_Components(LEVEL eLevel)
 
 	/* For.Com_Collider */
 	CBounding_Sphere::BOUNDING_SPHERE_DESC		ColliderDesc{};
-	ColliderDesc.vCenter = _float3(0.f, 3.f, 0.f);
-	ColliderDesc.fRadius = 7.f;
+	ColliderDesc.vCenter = _float3(0.f, 5.f, 0.f);
+	ColliderDesc.fRadius = 8.f;
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom, &ColliderDesc)))
 		return E_FAIL;

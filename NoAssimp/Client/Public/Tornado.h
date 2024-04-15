@@ -51,7 +51,7 @@ private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };
-	CCollider* m_pColliderCom[2] = {nullptr};
+	CCollider* m_pColliderCom = {nullptr};
 	CGameObject* m_pPlayer = { nullptr };
 	const _float4x4* m_pPlayerWorldMatrix = {nullptr};
 

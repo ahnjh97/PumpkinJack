@@ -90,8 +90,7 @@ void CTornado::Tick(_float fTimeDelta)
 
 	Check_PlayerCol();
 
-	for (_int i = 0; i < 2; i++) 
-		m_pColliderCom[i]->Tick(m_pTransformCom->Get_WorldMatrix());
+	m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
 }
 
 void CTornado::Late_Tick(_float fTimeDelta)
@@ -119,10 +118,8 @@ HRESULT CTornado::Render()
 	}
 
 #ifdef _DEBUG
-	for (_int i = 0; i < 2; i++) {
-		if (m_pColliderCom[i] != nullptr)
-			m_pColliderCom[i]->Render();
-	}
+	if (m_pColliderCom != nullptr)
+		m_pColliderCom->Render();
 #endif
 
 	return S_OK;
@@ -146,9 +143,13 @@ void CTornado::Check_PlayerCol()
 		return;
 
 	CCollider* pPlayerCollider = dynamic_cast<CCollider*>(m_pPlayer->Get_Component(TEXT("Com_Collider")));
-	if (m_pColliderCom[0]->Intersect(pPlayerCollider) || m_pColliderCom[1]->Intersect(pPlayerCollider)) {
+	if (m_pColliderCom->Intersect(pPlayerCollider)) {
 		if (m_fDamageTime >= 1.f) {
-			m_pPlayer->Deduct_HP(20);
+			if(m_bMove)
+				m_pPlayer->Deduct_HP(20);
+			else
+				m_pPlayer->Deduct_HP(10);
+
 			m_fDamageTime = 0.f;
 		}
 	}
@@ -160,7 +161,7 @@ void CTornado::Check_TornadoCol(_float fTimeDelta)
 	if (tornadoList.empty())
 		return;
 
-	_float3 vSrcPosFloat = m_pColliderCom[0]->Get_Center(CCollider::TYPE_SPHERE);
+	_float3 vSrcPosFloat = m_pColliderCom->Get_Center(CCollider::TYPE_SPHERE);
 	_vector vSrsPos = XMLoadFloat3(&vSrcPosFloat);
 
 	for (auto& tornado : tornadoList)
@@ -172,7 +173,7 @@ void CTornado::Check_TornadoCol(_float fTimeDelta)
 		if (nullptr == pTornadoCollider)
 			continue;
 
-		if (m_pColliderCom[0]->Intersect(pTornadoCollider))
+		if (m_pColliderCom->Intersect(pTornadoCollider))
 		{
 			_float3 vDstPosFloat = pTornadoCollider->Get_Center(CCollider::TYPE_SPHERE);
 			_vector vDstPos = XMLoadFloat3(&vDstPosFloat);
@@ -212,7 +213,7 @@ void CTornado::Check_HoleWallCol()
 		if (nullptr == pHoleWallCollider)
 			continue;
 
-		if (m_pColliderCom[0]->Intersect(pHoleWallCollider))
+		if (m_pColliderCom->Intersect(pHoleWallCollider))
 			m_bHoleWallCol = true;
 	}
 }
@@ -238,13 +239,9 @@ HRESULT CTornado::Add_Components(LEVEL eLevel)
 	ColliderDesc.vCenter = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.fRadius = 1.1f;
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
-		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom[0], &ColliderDesc)))
+		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom, &ColliderDesc)))
 		return E_FAIL;
 
-	ColliderDesc.vCenter = _float3(0.f, 2.6f, 0.f);
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
-		TEXT("Com_Collider_Sub"), (CComponent**)&m_pColliderCom[1], &ColliderDesc)))
-		return E_FAIL;
 	return S_OK;
 }
 
@@ -297,8 +294,7 @@ void CTornado::Free()
 	__super::Free();
 
 	Safe_Release(m_pPlayer);
-	for(_int i = 0; i<2; i++)
-		Safe_Release(m_pColliderCom[i]);
+	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);

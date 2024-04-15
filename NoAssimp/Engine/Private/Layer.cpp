@@ -48,7 +48,7 @@ void CLayer::Tick(_float fTimeDelta)
 				return;
 			}
 				
-			pGameObject->Tick(fTimeDelta);
+ 			pGameObject->Tick(fTimeDelta);
 		}
 	}
 }

@@ -39,30 +39,34 @@ HRESULT CArrow::Initialize(void* pArg)
 
 void CArrow::Tick(_float fTimeDelta)
 {
-	if (m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y <= -15.f)
+	if (m_fAlpha <= 0.01f || m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y <= -15.f)
 		Set_Dead();
-
-	m_pTransformCom->Go_Straight(fTimeDelta * 16.f);
 
 	m_fTime += fTimeDelta;
 
-	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_GAMEPLAY));
-	if (pPlayer) 
-	{
-		CCollider* pPlayerCollider = dynamic_cast<CCollider*>(pPlayer->Get_Component(TEXT("Com_Collider")));
-		if (!m_pColliderCom->Check_AlreadyCollided(pPlayerCollider)) 
-		{
-			if (m_pColliderCom->Intersect(pPlayerCollider))
-				pPlayer->Deduct_HP(15);
-		}
-	}
+	if (m_fCollisionTime < 0.01f)
+		m_pTransformCom->Go_Straight(fTimeDelta * 16.f);
+	else
+		m_fAlpha -= exp(m_fTime * 0.12f) * fTimeDelta;
+	
+	if (m_bObstacleCol)
+		m_fCollisionTime += fTimeDelta;
+
+	if (false == m_bObstacleCol)
+		Check_CollisionCubeCol();
+
+	if(false == m_bObstacleCol)
+		Check_PlayerCol();
 
 	m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
 }
 
 void CArrow::Late_Tick(_float fTimeDelta)
 {
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	if(m_fAlpha == 1.f)
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	else
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
 }
 
 HRESULT CArrow::Render()
@@ -77,7 +81,7 @@ HRESULT CArrow::Render()
 		m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE);
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(0)))
+		if (FAILED(m_pShaderCom->Begin(3))) // Knife
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -90,10 +94,41 @@ HRESULT CArrow::Render()
 	return S_OK;
 }
 
+void CArrow::Check_CollisionCubeCol()
+{
+	list<CGameObject*> collisionCubeList = m_pGameInstance->Get_ObjectList(LEVEL_GAMEPLAY, TEXT("Layer_CollisionCube"));
+	if (collisionCubeList.empty())
+		return;
+
+	for (auto& collisionCube : collisionCubeList) {
+		if (nullptr == collisionCube)
+			continue;
+
+		CCollider* pCollider = dynamic_cast<CCollider*>(collisionCube->Get_Component(TEXT("Com_Collider")));
+		if (nullptr == pCollider)
+			continue;
+
+		if (m_pColliderCom->Intersect(pCollider))
+			m_bObstacleCol = true;
+	}
+}
+
+void CArrow::Check_PlayerCol()
+{
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_GAMEPLAY));
+	if (pPlayer) {
+		CCollider* pPlayerCollider = dynamic_cast<CCollider*>(pPlayer->Get_Component(TEXT("Com_Collider")));
+		if (!m_pColliderCom->Check_AlreadyCollided(pPlayerCollider)) {
+			if (m_pColliderCom->Intersect(pPlayerCollider))
+				pPlayer->Deduct_HP(15);
+		}
+	}
+}
+
 HRESULT CArrow::Add_Components(const wstring& _wstrModelTag)
 {
 	/* For.Com_Shader */
-	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel_Lighted");
+	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel");
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
@@ -124,21 +159,7 @@ HRESULT CArrow::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
-
-	const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-	if (nullptr == pLightDesc)
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(m_fAlpha))))
 		return E_FAIL;
 
 	return S_OK;

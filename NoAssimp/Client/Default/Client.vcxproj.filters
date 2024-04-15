@@ -178,6 +178,12 @@
     <Filter Include="02.GameObjects\Level_Wizard\TeslaTower">
       <UniqueIdentifier>{0add6b66-1759-45e9-8075-25dd66fb9f90}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay\CollisionCube">
+      <UniqueIdentifier>{7726441b-9b0a-49d8-8b6c-b781f9798ec1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_Wizard\ElecArena">
+      <UniqueIdentifier>{1f3afa3d-7311-4a05-aa96-fdac79db49fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -363,6 +369,12 @@
     <ClInclude Include="..\Public\WizardTower.h">
       <Filter>02.GameObjects\Level_Wizard\WizardTower</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\CollisionCube.h">
+      <Filter>02.GameObjects\Level_GamePlay\CollisionCube</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ElecArena.h">
+      <Filter>02.GameObjects\Level_Wizard\ElecArena</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -538,6 +550,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\WizardTower.cpp">
       <Filter>02.GameObjects\Level_Wizard\WizardTower</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CollisionCube.cpp">
+      <Filter>02.GameObjects\Level_GamePlay\CollisionCube</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ElecArena.cpp">
+      <Filter>02.GameObjects\Level_Wizard\ElecArena</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

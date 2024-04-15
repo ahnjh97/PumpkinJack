@@ -156,18 +156,19 @@ void CImGui_Client::WizardDebug()
 	string strAttackCount = "AttackCount: " + to_string(tWizardInfo.iAttackCount);
 	string strAttackFinishCount = "AttackFinishCount: " + to_string(tWizardInfo.iAttackFinishCount);
 	string strSpellIndex = "Spell: ";
-	if (tWizardInfo.eSpell == 0)
-		strSpellIndex += "LIGHTNING";
-	else if(tWizardInfo.eSpell == 1)
-		strSpellIndex += "TORNADO";
-	else if(tWizardInfo.eSpell == 2)
-		strSpellIndex += "HOLEWALL";
-	else if (tWizardInfo.eSpell == 3)
+	if (tWizardInfo.eSpell == SPELL_LIGHTNING)
+		strSpellIndex += "SPELL_LIGHTNING";
+	else if(tWizardInfo.eSpell == SPELL_TORNADO)
+		strSpellIndex += "SPELL_TORNADO";
+	else if(tWizardInfo.eSpell == SPELL_HOLEWALL)
+		strSpellIndex += "SPELL_HOLEWALL";
+	else if (tWizardInfo.eSpell == SPELL_END)
 		strSpellIndex += "SPELL_END";
 	string strTime = "Time: " + to_string(tWizardInfo.fTime).erase(to_string(tWizardInfo.fTime).size() - 4);
 	string strIdleTime = "IdleTime: " + to_string(tWizardInfo.fIdleTime).erase(to_string(tWizardInfo.fIdleTime).size() - 4);
 	string strWaitTime = "WaitTime: " + to_string(tWizardInfo.fWaitTime).erase(to_string(tWizardInfo.fWaitTime).size() - 4);
 	string strChargeTime = "ChargeTime: " + to_string(tWizardInfo.fChargeTime).erase(to_string(tWizardInfo.fChargeTime).size() - 4);
+	string strPhaseChangeTime = "PhaseChangeTime: " + to_string(tWizardInfo.fPhaseChangeTime).erase(to_string(tWizardInfo.fPhaseChangeTime).size() - 4);
 
 	ImGui::Text(strState.c_str());
 	ImGui::Text(strCurAnim.c_str());
@@ -179,6 +180,7 @@ void CImGui_Client::WizardDebug()
 	ImGui::Text(strIdleTime.c_str());
 	ImGui::Text(strWaitTime.c_str());
 	ImGui::Text(strChargeTime.c_str());
+	ImGui::Text(strPhaseChangeTime.c_str());
 
 	Safe_Release(pWizard);
 }

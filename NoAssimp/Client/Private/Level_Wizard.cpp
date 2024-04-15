@@ -152,6 +152,14 @@ HRESULT CLevel_Wizard::Ready_ParsedObjects()
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_WizardTower"), TEXT("Prototype_GameObject_WizardTower"), &tempDesc)))
 				return E_FAIL;
 		}
+		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_elecArena1")) {
+			for (_int i = 1; i < 4; i++) {
+				tempDesc.wstrModelTag = TEXT("Prototype_Component_Model_elecArena") + to_wstring(i);
+				tempDesc.matWorld._42 += (1.f) * (i - 1);
+				if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_ElecArena"), TEXT("Prototype_GameObject_ElecArena"), &tempDesc)))
+					return E_FAIL;
+			}
+		}
 		else {
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Monster"), &tempDesc)))
 				return E_FAIL;

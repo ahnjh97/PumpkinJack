@@ -745,6 +745,9 @@ void CPlayer::Check_EnemyDistance(LEVEL eLevel, const wstring& wstrLayerTag, CCo
 		if (nullptr == enemy)
 			continue;
 
+		if (true == enemy->Get_Dead())
+			continue;
+
 		CCollider* pEnemyCollider = dynamic_cast<CCollider*>(enemy->Get_Component(wstrColliderTag));
 		if (nullptr == pEnemyCollider)
 			continue;

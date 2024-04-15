@@ -42,6 +42,8 @@ private:
 	void Tornado();
 	void HoleWall();
 	void TeslaTower();
+	void DestroyTeslaTowers();
+	void DestroyElecArena();
 
 	_bool AllTowersDestroyed();
 
@@ -58,6 +60,7 @@ private:
 	_bool m_bCastSpell = { true };
 	_bool m_bWait = { false };
 	_bool m_bSummonLevitationTornado = { false };
+	_bool m_bDestroyElecArena = { false };
 
 	_int m_iWizardPhase = {};
 	_int m_iAttackCount = {};
@@ -69,6 +72,7 @@ private:
 	_float m_fIdleTime = {};
 	_float m_fChargeTime = {};
 	_float m_fWaitTime = {};
+	_float m_fPhaseChangeTime = { 100 };
 
 	vector <_int> m_vecSpellThresholds = { 8, 4, 4 };
 	vector<_float> m_vecIdleDurations = { 1.f, 1.2f, 1.4f, 1.6f, 1.8f, 2.f };

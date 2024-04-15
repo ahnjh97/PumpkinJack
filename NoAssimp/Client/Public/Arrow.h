@@ -24,8 +24,15 @@ public:
 	virtual HRESULT Render() override;
 
 private:
+	void Check_CollisionCubeCol();
+	void Check_PlayerCol();
+	
+private:
+	_bool m_bObstacleCol = { false };
 
 	_float m_fTime = {};
+	_float m_fCollisionTime = {};
+	_float m_fAlpha = { 1.f };
 
 private:
 	CModel* m_pModelCom = { nullptr };
