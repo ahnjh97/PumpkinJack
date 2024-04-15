@@ -1,6 +1,7 @@
 - TeslaTower
 - WizardFall
 - Ground Change
+- Spell Effects
 
 - Hit Effect
 - Arrow Effect
