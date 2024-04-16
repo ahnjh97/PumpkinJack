@@ -167,6 +167,7 @@
     <ClInclude Include="..\Public\Ballista.h" />
     <ClInclude Include="..\Public\BallistaRotator.h" />
     <ClInclude Include="..\Public\Body.h" />
+    <ClInclude Include="..\Public\Book.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
     <ClInclude Include="..\Public\Camera_Jack.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
@@ -222,7 +223,6 @@
     <ClInclude Include="..\Public\Weapon.h" />
     <ClInclude Include="..\Public\Wizard.h" />
     <ClInclude Include="..\Public\WizardTower.h" />
-    <ClInclude Include="Book.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -234,6 +234,7 @@
     <ClCompile Include="..\Private\Ballista.cpp" />
     <ClCompile Include="..\Private\BallistaRotator.cpp" />
     <ClCompile Include="..\Private\Body.cpp" />
+    <ClCompile Include="..\Private\Book.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Camera_Jack.cpp" />
     <ClCompile Include="..\Private\CollisionCube.cpp" />
@@ -288,7 +289,6 @@
     <ClCompile Include="..\Private\Weapon.cpp" />
     <ClCompile Include="..\Private\Wizard.cpp" />
     <ClCompile Include="..\Private\WizardTower.cpp" />
-    <ClCompile Include="Book.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -307,6 +307,7 @@
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCube.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Mesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Point.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Lighted.hlsl" />

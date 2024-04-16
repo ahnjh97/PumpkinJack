@@ -20,7 +20,7 @@ HRESULT CVIBuffer_Instance_Mesh::Initialize_Prototype(ifstream& fileStream, cons
 	m_InputFile.read(reinterpret_cast<char*>(&m_szName), sizeof(m_szName));
 	m_InputFile.read(reinterpret_cast<char*>(&m_iMaterialIndex), sizeof(m_iMaterialIndex));
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumVertices), sizeof(m_iNumVertices));
-	m_InputFile.read(reinterpret_cast<char*>(&m_iFaces), sizeof(m_iFaces));
+ 	m_InputFile.read(reinterpret_cast<char*>(&m_iFaces), sizeof(m_iFaces));
 
 	if (FAILED(__super::Initialize_Prototype(InstanceDesc)))
 		return E_FAIL;
@@ -35,7 +35,7 @@ HRESULT CVIBuffer_Instance_Mesh::Initialize_Prototype(ifstream& fileStream, cons
 	m_iIndexStride = sizeof(_uint);
 	m_iNumVertexBuffers = 2;
 	m_eIndexFormat = DXGI_FORMAT_R32_UINT;
-	m_ePrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_POINTLIST;
+	m_ePrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
 #pragma region VERTEX_BUFFER
 	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
@@ -80,18 +80,28 @@ HRESULT CVIBuffer_Instance_Mesh::Initialize_Prototype(ifstream& fileStream, cons
 	m_BufferDesc.MiscFlags = 0;
 	m_BufferDesc.StructureByteStride = 0;
 
+	_uint* pOriginalIndices = new _uint[m_iIndexCountPerInstance];
+	ZeroMemory(pOriginalIndices, sizeof(_uint) * m_iIndexCountPerInstance);
+
+	for (size_t i = 0; i < m_iIndexCountPerInstance; i++)
+		m_InputFile.read(reinterpret_cast<char*>(&pOriginalIndices[i]), sizeof(_uint));
+
+
 	_uint* pIndices = new _uint[m_iNumIndices];
 	ZeroMemory(pIndices, sizeof(_uint) * m_iNumIndices);
 
-	for (size_t i = 0; i < m_iNumIndices; i++)
-		m_InputFile.read(reinterpret_cast<char*>(&pIndices[i]), sizeof(_uint));
-
+	for (size_t j = 0; j < m_iNumInstance; j++) {
+		for (size_t k = 0; k < m_iIndexCountPerInstance; k++)
+ 			pIndices[k + j * m_iIndexCountPerInstance] = pOriginalIndices[k];
+	}
+		
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);
 	m_InitialData.pSysMem = pIndices;
 
 	if (FAILED(__super::Create_Buffer(&m_pIB)))
 		return E_FAIL;
 
+	Safe_Delete_Array(pOriginalIndices);
 	Safe_Delete_Array(pIndices);
 
 #pragma endregion
@@ -127,9 +137,10 @@ HRESULT CVIBuffer_Instance_Mesh::Initialize_Prototype(ifstream& fileStream, cons
 
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
-		XMStoreFloat4(&m_pInstanceVertices[i].vRight, XMVectorSet(1.f, 0.f, 0.f, 0.f) * ScaleX(m_RandomNumber));
-		XMStoreFloat4(&m_pInstanceVertices[i].vUp, XMVectorSet(0.f, 1.f, 0.f, 0.f) * ScaleY(m_RandomNumber));
-		XMStoreFloat4(&m_pInstanceVertices[i].vLook, XMVectorSet(0.f, 0.f, 1.f, 0.f) * ScaleZ(m_RandomNumber));
+		_float fScale = ScaleX(m_RandomNumber);
+		XMStoreFloat4(&m_pInstanceVertices[i].vRight, XMVectorSet(1.f, 0.f, 0.f, 0.f) * fScale);
+		XMStoreFloat4(&m_pInstanceVertices[i].vUp, XMVectorSet(0.f, 1.f, 0.f, 0.f) * fScale);
+		XMStoreFloat4(&m_pInstanceVertices[i].vLook, XMVectorSet(0.f, 0.f, 1.f, 0.f) * fScale);
 		m_pInstanceVertices[i].vPosition = Compute_RandPosition();
 
 		m_pInstanceVertices[i].isLived = true;
@@ -184,16 +195,7 @@ CVIBuffer_Instance_Mesh* CVIBuffer_Instance_Mesh::Create(ID3D11Device* pDevice, 
 
 CComponent* CVIBuffer_Instance_Mesh::Clone(void* pArg)
 {
-	CComponent* pInstance = new CVIBuffer_Instance_Mesh(*this);
-
-	if (FAILED(pInstance->Initialize(pArg)))
-	{
-		MSG_BOX(TEXT("Failed To Created : CVIBuffer_Instance_Mesh"));
-
-		Safe_Release(pInstance);
-	}
-
-	return pInstance;
+	return nullptr;
 }
 
 void CVIBuffer_Instance_Mesh::Free()

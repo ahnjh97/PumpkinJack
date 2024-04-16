@@ -22,6 +22,9 @@ HRESULT CLevel_EffectTool::Initialize()
 	if (FAILED(Ready_Layer_Grid(TEXT("Layer_Grid"))))
 		return E_FAIL;
 
+	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -35,7 +38,10 @@ HRESULT CLevel_EffectTool::Render()
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
-	SetWindowText(g_hWnd, TEXT("Level_EffectTool"));
+	_int iFps = m_pGameInstance->Get_FPS();
+	wstring wstrFPS = to_wstring(iFps);
+	wstring wstrLevelFPS = wstring(L"Level_EffectTool  FPS: ") + wstrFPS;
+	SetWindowText(g_hWnd, wstrLevelFPS.c_str());
 
 	return S_OK;
 }
@@ -69,7 +75,7 @@ HRESULT CLevel_EffectTool::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fFar = 1000.0f;
 	CameraDesc.vEye = _float4(0.f, 10.f, -7.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
-	CameraDesc.fSpeedPerSec = 100.f;
+	CameraDesc.fSpeedPerSec = 10.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
@@ -89,8 +95,16 @@ HRESULT CLevel_EffectTool::Ready_Layer_Grid(const wstring& strLayerTag)
 	return S_OK;
 }
 
-HRESULT CLevel_EffectTool::Ready_Layer_Object(const wstring& strLayerTag)
+HRESULT CLevel_EffectTool::Ready_Layer_Effect(const wstring& strLayerTag)
 {
+	CGameObject::GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = LEVEL_EFFECTTOOL;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Book"), &tDesc)))
+		return S_OK;
+
+	tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Book");
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Monster"), &tDesc)))
+		return S_OK;
 	return S_OK;
 }
 

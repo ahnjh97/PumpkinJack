@@ -51,6 +51,7 @@
 #include "HoleWall.h"
 #include "Tornado.h"
 #include "Wizard.h"
+#include "Book.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
@@ -433,6 +434,8 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "TopBottomFade", "Effects/topBottomFadeTex.dds")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Book", "CommonTextures/books.dds")))
+		return E_FAIL;
 
 	m_strLoadingText = TEXT("Loading Component Prototypes for Level_EffectTool...");
 	/* Prototype_Component_VIBuffer_Terrain */
@@ -440,15 +443,25 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 100, 100))))
 		return E_FAIL;
 
-	/* Prototype_Component_VIBuffer_Instance_Model */
+	m_strLoadingText = TEXT("Loading Models for Level_EffectTool...");
+	/*if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "Tornado")))
+		return E_FAIL;*/
+	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "Book")))
+		return E_FAIL;
+
+	m_strLoadingText = TEXT("Loading Shaders for Level_EffectTool...");
+	if (FAILED(Add_Shaders(eLevel)))
+		return E_FAIL;
+
+	/* Prototype_Component_VIBuffer_Instance_Mesh */
 	CVIBuffer_Instance::INSTANCE_DESC		InstanceDesc{};
 
 	InstanceDesc.vPivot = _float3(0.f, -5.f, 0.f);
 	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
-	InstanceDesc.vRange = _float3(1.f, 1.f, 1.f);
+	InstanceDesc.vRange = _float3(200.f, 3.f, 200.f);
 	InstanceDesc.vMinScale = _float3(0.2f, 0.2f, 0.2f);
-	InstanceDesc.vMaxScale = _float3(0.4f, 0.4f, 0.4f);
-	InstanceDesc.iNumInstance = 400;
+	InstanceDesc.vMaxScale = _float3(2.f, 2.f, 2.f);
+	InstanceDesc.iNumInstance = 10000;
 	InstanceDesc.vLifeTime = _float2(2.f, 10.0f);
 	InstanceDesc.isLoop = true;
 	InstanceDesc.vSpeed = _float2(2.f, 15.f);
@@ -456,22 +469,12 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 		CInstance_Model::Create(m_pDevice, m_pContext, "Book", InstanceDesc))))
 		return E_FAIL;
 
-
-	m_strLoadingText = TEXT("Loading Models for Level_EffectTool...");
-	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "Tornado")))
-		return E_FAIL;
-
-
-	m_strLoadingText = TEXT("Loading Shaders for Level_EffectTool...");
-	if (FAILED(Add_Shaders(eLevel)))
-		return E_FAIL;
-
-
 	m_strLoadingText = TEXT("Loading GameObject Prototypes for Level_EffectTool...");
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Terrain"), CTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Tornado"), CTornado);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
-
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Book"), CBook);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Monster"), CMonster);
 
 	m_strLoadingText = TEXT("Loading Complete: Level_EffectTool");
 	m_isFinished = true;
@@ -556,6 +559,16 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 	/* For.Prototype_Component_Shader_VtxModel_Lighted */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_Lighted"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_Lighted.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_Shader_VtxInstance_Point */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxInstance_Point"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_Point.hlsl"), VTXINSTANCE_POINT::Elements, VTXINSTANCE_POINT::iNumElements))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_Shader_VtxInstance_Mesh */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxInstance_Mesh"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_Mesh.hlsl"), VTXINSTANCE_MESH::Elements, VTXINSTANCE_MESH::iNumElements))))
 		return E_FAIL;
 
 	if (eLevel == LEVEL_SLIMEBOSS) {

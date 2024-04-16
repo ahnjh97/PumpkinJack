@@ -29,7 +29,7 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 
 private:
-	HRESULT Add_Components();
+	HRESULT Add_Components(LEVEL eLevel);
 	HRESULT Bind_ShaderResources();
 
 public:

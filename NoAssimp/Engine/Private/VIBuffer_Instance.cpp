@@ -35,7 +35,6 @@ HRESULT CVIBuffer_Instance::Initialize_Prototype(const CVIBuffer_Instance::INSTA
 
 HRESULT CVIBuffer_Instance::Initialize(void* pArg)
 {
-
 	if (FAILED(m_pDevice->CreateBuffer(&m_InstanceBufferDesc, &m_InstanceSubResourceData, &m_pVBInstance)))
 		return E_FAIL;
 
@@ -146,13 +145,10 @@ void CVIBuffer_Instance::Free()
 {
 	__super::Free();
 
-
 	if (false == m_isCloned)
-	{
 		Safe_Delete_Array(m_pSpeeds);
-	}
 
 	Safe_Delete_Array(m_pLifeTimes);
-
+	Safe_Delete_Array(m_pInstanceVertices);
 	Safe_Release(m_pVBInstance);
 }

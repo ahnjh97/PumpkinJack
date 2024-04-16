@@ -29,7 +29,7 @@ HRESULT CBook::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components()))
+	if (FAILED(Add_Components((LEVEL)GameObjectDesc.iLevel)))
 		return E_FAIL;
 
 	return S_OK;
@@ -37,6 +37,7 @@ HRESULT CBook::Initialize(void* pArg)
 
 void CBook::Tick(_float fTimeDelta)
 {
+	//m_pInstanceModelCom->Spread(fTimeDelta);
 }
 
 void CBook::Late_Tick(_float fTimeDelta)
@@ -66,15 +67,15 @@ HRESULT CBook::Render()
 	return S_OK;
 }
 
-HRESULT CBook::Add_Components()
+HRESULT CBook::Add_Components(LEVEL eLevel)
 {
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(LEVEL_WIZARD, TEXT("Prototype_Component_Shader_VtxInstance_Model"),
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Shader_VtxInstance_Mesh"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	/* For.Com_VIBuffer */
-	if (FAILED(__super::Add_Component(LEVEL_WIZARD, TEXT("Prototype_Component_Instance_Model"),
+	/* For.Com_Instance_Model */
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Instance_Model"),
 		TEXT("Com_Instance_Model"), (CComponent**)&m_pInstanceModelCom)))
 		return E_FAIL;
 

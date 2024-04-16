@@ -18,6 +18,7 @@ CInstance_Model::CInstance_Model(const CInstance_Model& rhs)
 {
 	for (auto& pInstanceMesh : m_vecInstanceMeshes)
 		Safe_AddRef(pInstanceMesh);
+
 	for (auto& material : m_vecMaterials) {
 		for (size_t i = 0; i < AI_TEXTURE_TYPE_MAX; i++)
 			Safe_AddRef(material.MaterialTextures[i]);
@@ -39,6 +40,8 @@ HRESULT CInstance_Model::Initialize_Prototype(const string& strModelName, const 
 
 	if (FAILED(Ready_Materials(strModelName.c_str())))
 		return E_FAIL;
+
+	m_InputFile.close();
 
 	return S_OK;
 }
@@ -83,6 +86,8 @@ HRESULT CInstance_Model::Ready_InstanceMeshes(const CVIBuffer_Instance::INSTANCE
 		if (nullptr == pInstanceMesh)
 			return E_FAIL;
 
+		pInstanceMesh->Initialize(nullptr);
+
 		m_vecInstanceMeshes.push_back(pInstanceMesh);
 	}
 	return S_OK;
@@ -110,7 +115,7 @@ HRESULT CInstance_Model::Ready_Materials(const _char* pModelFilePath)
 		if (nullptr == MeshMaterial.MaterialTextures[jTemp])
 			return E_FAIL;
 
-		if (m_vecMaterials.size() <= iTemp) // 새로운 배열 삽입
+ 		if (m_vecMaterials.size() <= iTemp) // 새로운 배열 삽입
 			m_vecMaterials.push_back(MeshMaterial);
 		else // 벡터 안에있는 배열의 원소 수정
 			m_vecMaterials[iTemp].MaterialTextures[jTemp] = MeshMaterial.MaterialTextures[jTemp];
@@ -143,10 +148,9 @@ void CInstance_Model::Free()
 {
 	__super::Free();
 
-	for (auto& Material : m_vecMaterials)
-	{
+	for (auto& material : m_vecMaterials) {
 		for (size_t i = 0; i < AI_TEXTURE_TYPE_MAX; i++)
-			Safe_Release(Material.MaterialTextures[i]);
+			Safe_Release(material.MaterialTextures[i]);
 	}
 	m_vecMaterials.clear();
 

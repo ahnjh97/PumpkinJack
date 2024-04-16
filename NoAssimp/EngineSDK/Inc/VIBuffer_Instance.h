@@ -38,11 +38,11 @@ public:
 
 
 protected:
-	ID3D11Buffer* m_pVBInstance = { nullptr };
+	ID3D11Buffer*			m_pVBInstance = { nullptr };
 	_uint					m_iInstanceStride = { 0 };
 	_uint					m_iNumInstance = { 0 };
 	_uint					m_iIndexCountPerInstance = { 0 };
-	VTXMATRIX* m_pInstanceVertices = { nullptr };
+	VTXMATRIX*				m_pInstanceVertices = { nullptr };
 	INSTANCE_DESC			m_InstanceDesc{};
 
 protected:

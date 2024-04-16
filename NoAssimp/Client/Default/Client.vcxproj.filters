@@ -384,7 +384,7 @@
     <ClInclude Include="..\Public\Level_EffectTool.h">
       <Filter>01.Levels\08. Effect</Filter>
     </ClInclude>
-    <ClInclude Include="Book.h">
+    <ClInclude Include="..\Public\Book.h">
       <Filter>02.GameObjects\Level_Wizard\Book</Filter>
     </ClInclude>
   </ItemGroup>
@@ -572,7 +572,7 @@
     <ClCompile Include="..\Private\Level_EffectTool.cpp">
       <Filter>01.Levels\08. Effect</Filter>
     </ClCompile>
-    <ClCompile Include="Book.cpp">
+    <ClCompile Include="..\Private\Book.cpp">
       <Filter>02.GameObjects\Level_Wizard\Book</Filter>
     </ClCompile>
   </ItemGroup>
@@ -615,6 +615,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Point.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Mesh.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>
