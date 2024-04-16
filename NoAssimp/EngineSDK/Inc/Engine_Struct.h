@@ -125,6 +125,22 @@ namespace Engine
 			_uint _iRealRoot = { 4 }) : fScale(_fScale), fDegree(_fDegree), fNewScale(_fNewScale), iRealRoot(_iRealRoot) {}
 	};
 
+	typedef struct ENGINE_DLL
+	{
+		XMFLOAT4		vRight;
+		XMFLOAT4		vUp;
+		XMFLOAT4		vLook;
+		XMFLOAT4		vPosition;
+		bool			isLived;
+
+	}VTXMATRIX;
+
+	typedef struct ENGINE_DLL
+	{
+		static const unsigned int	iNumElements = { 6 };
+		static const D3D11_INPUT_ELEMENT_DESC	Elements[6];
+	}VTXINSTANCE_POINT;
+
 	// MODEL_NONANIM.mNumMeshes 만큼 반복: MESH_NONANIM. { mName, mMaterialIndex, mNumVertices,	mNumFaces } -> VTXMESH * mNumVertices -> _uint * m_iNumIndices
 	// MODEL_NONANIM.mNumMaterials * 20번 만큼 반복: _tchar szPerfectPath[MAX_PATH]
 	// NoAssimp Client에서는 CMesh에 Get_MeshInfo함수 만들어서 mNumVertices, mNumFaces를 가져와서 파일읽기 시작위치 지정해줄것

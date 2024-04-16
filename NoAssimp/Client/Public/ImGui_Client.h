@@ -1,7 +1,6 @@
 #pragma once
 #include "Client_Defines.h"
 #include "MyImGui.h"
-#include "Player.h"
 
 BEGIN(Client)
 class CImGui_Client : public CMyImGui
@@ -18,12 +17,9 @@ public:
 	void				OnKeyInput();
 	void				ConvertToString();
 	void				WizardDebug();
-	void				Release_Player() override;
-	void				Replace_Player(CGameObject* pPlayer) override;
 
 private:
 	_bool				bCallNewFrame = { false };
-	CPlayer*			m_pPlayer = { nullptr };
 	vector<string>		m_vecState = { "IDLE", "RUN", "JUMP", "ROLL", "ATTACK1", "ATTACK2", "ATTACK3", "AIR_ATTACK","AIR_ATTACK_END", "ROLL_ATTACK", "HIGHFALL", "PUSHING", "STATE_END" };
 	vector<string>		m_vecWeapon = { "WPN_SPEAR", "WPN_RIFLE", "WPN_SCYTHE", "WPN_END" };
 	vector<string>		m_vecWeaponName = { "Spear", "Rifle", "Scythe", "WPN_END" };

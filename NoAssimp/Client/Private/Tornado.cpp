@@ -52,7 +52,7 @@ void CTornado::Tick(_float fTimeDelta)
 	m_fTime += fTimeDelta;
 	m_fDamageTime += fTimeDelta;
 	m_fTornadoSize += exp(m_fTime) * fTimeDelta;
-	m_pTransformCom->Turn(XMVectorSet(0, 1, 0, 0), fTimeDelta * 2.f * m_iTurnDir);
+	m_pTransformCom->Turn(XMVectorSet(0, 1, 0, 0), fTimeDelta * 7.f * m_iTurnDir);
 
 	if (m_bMove) {
 		if (m_fHoleWallColTime > 3.f) {
@@ -117,7 +117,7 @@ HRESULT CTornado::Render()
 			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(0))) // Default
+		if (FAILED(m_pShaderCom->Begin(7))) // Default
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -240,6 +240,14 @@ HRESULT CTornado::Add_Components(LEVEL eLevel)
 	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel");
 	if (FAILED(__super::Add_Component(eLevel, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
+	/* For.Com_Texture_TigerStripe */
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_TigerStripes"), 
+		TEXT("Com_Texture_TigerStripe"), (CComponent**) & m_pTextureCom[TEX_TIGERSTRIPE])))
+		return E_FAIL;
+	/* For.Com_Texture_TopBottomFade */
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_TopBottomFade"),
+		TEXT("Com_Texture_TopBottomFade"), (CComponent**)&m_pTextureCom[TEX_TOPBOTTOMFADE])))
+		return E_FAIL;
 	/* For.Com_Collider */
 	CBounding_Sphere::BOUNDING_SPHERE_DESC		ColliderDesc{};
 	ColliderDesc.vCenter = _float3(0.f, 0.f, 0.f);
@@ -261,6 +269,10 @@ HRESULT CTornado::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
+	if (FAILED(m_pTextureCom[TEX_TIGERSTRIPE]->Bind_ShaderResource(m_pShaderCom, "g_TigerStripes")))
+		return E_FAIL;
+	if (FAILED(m_pTextureCom[TEX_TOPBOTTOMFADE]->Bind_ShaderResource(m_pShaderCom, "g_TopBottomFadeTex")))
 		return E_FAIL;
 
 	return S_OK;
@@ -301,7 +313,8 @@ void CTornado::Free()
 
 	Safe_Release(m_pPlayer);
 	Safe_Release(m_pColliderCom);
-	Safe_Release(m_pTextureCom);
+	for(_int i = 0; i < TEX_END; i++)
+		Safe_Release(m_pTextureCom[i]);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 }

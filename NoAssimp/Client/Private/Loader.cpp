@@ -116,6 +116,9 @@ HRESULT CLoader::Start()
 	case LEVEL_DEATH:
 		hr = Loading_For_Death(LEVEL_DEATH);
 		break;
+	case LEVEL_EFFECTTOOL:
+		hr = Loading_For_EffectTool(LEVEL_EFFECTTOOL);
+		break;
 	}
 
 	if (FAILED(hr))
@@ -253,7 +256,8 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 
 
 	m_strLoadingText = TEXT("Loading Shaders for Level_GamePlay...");
-	Add_Shaders(eLevel);
+	if (FAILED(Add_Shaders(eLevel)))
+		return E_FAIL;
 
 
 	m_strLoadingText = TEXT("Loading GameObject Prototypes for Level_GamePlay...");
@@ -343,7 +347,8 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 
 
 	m_strLoadingText = TEXT("Loading Shaders for Level_SlimeBoss...");
-	Add_Shaders(eLevel);
+	if (FAILED(Add_Shaders(eLevel)))
+		return E_FAIL;
 
 
 	m_strLoadingText = TEXT("Loading GameObject Prototypes for Level_SlimeBoss...");
@@ -373,8 +378,12 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 	m_strLoadingText = TEXT("Loading Textures for Level_Wizard...");
 	if (FAILED(Add_Texture(eLevel, "VoronoiNoise", "CommonTextures/voronoiNoise.dds")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "TigerStripes", "Effects/tigerStripes.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "TopBottomFade", "Effects/topBottomFadeTex.dds")))
+		return E_FAIL;
 
-	m_strLoadingText = TEXT("Loading Models..");
+	m_strLoadingText = TEXT("Loading Models for Level_Wizard...");
 	vector<string> vecAnimModelNames = 	{ "Jack", "Wizard" };
 	vector<string> vecNonAnimModelNames = { "Spear", "Rifle", "Scythe", "LevelWizard",
 		"Amulet", "Book", "elecArena1", "elecArena2", "elecArena3", "HoleWall", "SkySphere",
@@ -384,7 +393,8 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("Loading Shaders for Level_Wizard...");
-	Add_Shaders(eLevel);
+	if (FAILED(Add_Shaders(eLevel)))
+		return E_FAIL;
 
 
 	m_strLoadingText = TEXT("Loading GameObject Prototypes for Level_Wizard...");
@@ -404,6 +414,67 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 
 HRESULT CLoader::Loading_For_Death(LEVEL eLevel)
 {
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
+{
+	m_strLoadingText = TEXT("Loading Textures for Level_EffectTool...");
+	if (FAILED(Add_Texture(eLevel, "Ground", "Terrain/groundTile%d.dds", 4)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Mask", "Terrain/WaterMask.bmp")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Water", "Terrain/Water.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "VoronoiNoise", "CommonTextures/voronoiNoise.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "TigerStripes", "Effects/tigerStripes.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "TopBottomFade", "Effects/topBottomFadeTex.dds")))
+		return E_FAIL;
+
+	m_strLoadingText = TEXT("Loading Component Prototypes for Level_EffectTool...");
+	/* Prototype_Component_VIBuffer_Terrain */
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain"),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 100, 100))))
+		return E_FAIL;
+
+	/* Prototype_Component_VIBuffer_Instance_Model */
+	CVIBuffer_Instance::INSTANCE_DESC		InstanceDesc{};
+
+	InstanceDesc.vPivot = _float3(0.f, -5.f, 0.f);
+	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	InstanceDesc.vRange = _float3(1.f, 1.f, 1.f);
+	InstanceDesc.vMinScale = _float3(0.2f, 0.2f, 0.2f);
+	InstanceDesc.vMaxScale = _float3(0.4f, 0.4f, 0.4f);
+	InstanceDesc.iNumInstance = 400;
+	InstanceDesc.vLifeTime = _float2(2.f, 10.0f);
+	InstanceDesc.isLoop = true;
+	InstanceDesc.vSpeed = _float2(2.f, 15.f);
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_EFFECTTOOL, TEXT("Prototype_Component_Instance_Model"),
+		CInstance_Model::Create(m_pDevice, m_pContext, "Book", InstanceDesc))))
+		return E_FAIL;
+
+
+	m_strLoadingText = TEXT("Loading Models for Level_EffectTool...");
+	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "Tornado")))
+		return E_FAIL;
+
+
+	m_strLoadingText = TEXT("Loading Shaders for Level_EffectTool...");
+	if (FAILED(Add_Shaders(eLevel)))
+		return E_FAIL;
+
+
+	m_strLoadingText = TEXT("Loading GameObject Prototypes for Level_EffectTool...");
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Terrain"), CTerrain);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Tornado"), CTornado);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
+
+
+	m_strLoadingText = TEXT("Loading Complete: Level_EffectTool");
+	m_isFinished = true;
 	return S_OK;
 }
 

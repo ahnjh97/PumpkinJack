@@ -33,6 +33,7 @@ HRESULT CHoleWall::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pPlayer = m_pGameInstance->Get_Player(LEVEL_WIZARD);
+	Safe_AddRef(m_pPlayer);
 	m_fFallSpeed = m_pGameInstance->RandomNumber(5, 15) * 0.1f;
 
 	return S_OK;
@@ -40,7 +41,7 @@ HRESULT CHoleWall::Initialize(void* pArg)
 
 void CHoleWall::Tick(_float fTimeDelta)
 {
-	if (m_fTime > 25.f)
+	if (m_fTime > 9.f)
 		Set_Dead();
 
 	m_fTime += fTimeDelta;

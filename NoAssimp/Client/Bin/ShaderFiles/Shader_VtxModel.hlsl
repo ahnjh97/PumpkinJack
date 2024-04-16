@@ -5,6 +5,7 @@
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 texture2D g_DiffuseTexture, g_WaterTexture, g_CausticTexture, g_NoiseTexture;
+texture2D g_TigerStripes, g_TopBottomFadeTex;
 float g_fOffset_Y;
 float g_fAlpha;
 float g_fColorOffset;
@@ -124,6 +125,21 @@ PS_OUT PS_MAIN_ELEC_ARENA(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_MAIN_TORNADO(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    vector vTigerStripes = g_TigerStripes.Sample(LinearSampler, In.vTexcoord );
+    vector vTopBottomFade = g_TopBottomFadeTex.Sample(LinearSampler, In.vTexcoord);
+  
+    //Out.vColor = vDiffuse;
+    float4 finalColor = lerp(vTigerStripes, vDiffuse, vDiffuse.g);
+    Out.vColor = finalColor;
+    Out.vColor.a = vTopBottomFade.r /** (1 - vTigerStripes.r) */* finalColor.g;
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
 	pass Default // 0
@@ -190,7 +206,7 @@ technique11 DefaultTechnique
     {
         SetRasterizerState(RS_Sky);
         SetDepthStencilState(DSS_Sky, 0);
-        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
@@ -202,11 +218,23 @@ technique11 DefaultTechnique
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_ELEC_ARENA();
+    }
+
+    pass Tornado // 7
+    {
+        SetRasterizerState(RS_NoCull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_TORNADO();
     }
 }

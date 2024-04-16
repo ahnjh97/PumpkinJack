@@ -26,15 +26,18 @@ void CLevel_Logo::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	if (GetKeyState(VK_RETURN) & 0x8000)
-	{
+	if (GetKeyState(VK_RETURN) & 0x8000) {
 		if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_GAMEPLAY))))
 			return;
 	}
 
-	if (GetKeyState('M') & 0x8000)
-	{
+	if (GetKeyState('M') & 0x8000) {
 		if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_MAPTOOL))))
+			return;
+	}
+
+	if (GetKeyState('E') & 0x8000) {
+		if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_EFFECTTOOL))))
 			return;
 	}
 }

@@ -36,6 +36,8 @@ namespace Engine
 #define aiTextureType_DIFFUSE 1
 #define Level_MapTool 3
 
+#include <random>
+
 using namespace DirectX;
 
 #include <unordered_set>

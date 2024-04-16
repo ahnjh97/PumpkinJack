@@ -184,6 +184,12 @@
     <Filter Include="02.GameObjects\Level_Wizard\ElecArena">
       <UniqueIdentifier>{1f3afa3d-7311-4a05-aa96-fdac79db49fa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Levels\08. Effect">
+      <UniqueIdentifier>{6b947265-a777-45cf-9a0f-bf77d7cf9029}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_Wizard\Book">
+      <UniqueIdentifier>{47961f50-2687-49d8-91ef-52782fcf9ada}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -375,6 +381,12 @@
     <ClInclude Include="..\Public\ElecArena.h">
       <Filter>02.GameObjects\Level_Wizard\ElecArena</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Level_EffectTool.h">
+      <Filter>01.Levels\08. Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Book.h">
+      <Filter>02.GameObjects\Level_Wizard\Book</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -557,6 +569,12 @@
     <ClCompile Include="..\Private\ElecArena.cpp">
       <Filter>02.GameObjects\Level_Wizard\ElecArena</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Level_EffectTool.cpp">
+      <Filter>01.Levels\08. Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="Book.cpp">
+      <Filter>02.GameObjects\Level_Wizard\Book</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -594,6 +612,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_LevelSlimeBoss.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Point.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

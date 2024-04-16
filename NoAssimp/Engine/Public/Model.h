@@ -53,8 +53,7 @@ public:
 	void Set_LerpTime(_float fLerpTime) { m_fLerpTime = fLerpTime; }
 	void Shrink();
 
-public: // 바운딩박스
-	_bool Check_BoundingBox(const class CTransform* pTransform) const;
+public: 
 	_float4 Check_Meshes(const class CTransform* pTransform) const;
 
 public:
@@ -114,6 +113,7 @@ private:
 	
 	_bool						m_bIsNonAnimVersion = { false };
 	_bool						m_bHide = { false };
+
 private:
 	HRESULT Ready_Meshes();
 	HRESULT Ready_Materials(const _char* pModelFilePath);

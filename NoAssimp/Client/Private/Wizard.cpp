@@ -403,13 +403,18 @@ void CWizard::TeslaTower()
 
 	GAMEOBJECT_DESC tDesc{};
 	tDesc.iLevel = LEVEL_WIZARD;
+	tDesc.matWorld._42 = -30;
 
 	for (_int i = 0; i < 3; i++) {
-		_float fAngle = XMConvertToRadians(i * 120.f + 60.f);
-
-		tDesc.matWorld._41 = vPos.x + XMVectorGetX(vLook * cos(fAngle) + vRight * sin(fAngle)) *fRadius;
-		tDesc.matWorld._42 = -30;
-		tDesc.matWorld._43 = vPos.z + XMVectorGetZ(vLook * cos(fAngle) + vRight * sin(fAngle)) * fRadius;;
+		if (m_iWizardPhase == 0) {
+			_float fAngle = XMConvertToRadians(i * 120.f + 60.f);
+			tDesc.matWorld._41 = vPos.x + XMVectorGetX(vLook * cos(fAngle) + vRight * sin(fAngle)) * fRadius;
+			tDesc.matWorld._43 = vPos.z + XMVectorGetZ(vLook * cos(fAngle) + vRight * sin(fAngle)) * fRadius;
+		}
+		else {
+			tDesc.matWorld._41 = m_vTeslaTowerPos[i + (m_iWizardPhase - 1) * 3].x;
+			tDesc.matWorld._43 = m_vTeslaTowerPos[i + (m_iWizardPhase - 1) * 3].z;
+		}
 
 		m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_TeslaTower"), TEXT("Prototype_GameObject_TeslaTower"), &tDesc);
 	}
@@ -536,7 +541,6 @@ CWizard* CWizard::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	}
 
 	return pInstance;
-
 }
 
 CGameObject* CWizard::Clone(void* pArg)

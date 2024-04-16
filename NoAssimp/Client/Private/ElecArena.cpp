@@ -99,7 +99,6 @@ HRESULT CElecArena::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldFloat4x4_Ptr())))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
@@ -113,7 +112,6 @@ HRESULT CElecArena::Bind_ShaderResources()
 }
 
 CElecArena* CElecArena::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-
 {
 	CElecArena* pInstance = new CElecArena(pDevice, pContext);
 
@@ -125,7 +123,6 @@ CElecArena* CElecArena::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 	}
 
 	return pInstance;
-
 }
 
 CGameObject* CElecArena::Clone(void* pArg)

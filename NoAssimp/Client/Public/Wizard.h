@@ -74,6 +74,9 @@ private:
 	_float m_fWaitTime = {};
 	_float m_fPhaseChangeTime = { 100 };
 
+	_float3 m_vTeslaTowerPos[6] = { _float3(483, 0, 483), _float3(695, 0, 535), _float3(515, 0, 695), 
+		_float3(440, 0, 573), _float3(640, 0, 455), _float3(666, 0, 673) };
+
 	vector <_int> m_vecSpellThresholds = { 6, 4, 4 };
 	vector<_float> m_vecIdleDurations = { 1.f, 1.2f, 1.4f, 1.6f, 1.8f, 2.f };
 

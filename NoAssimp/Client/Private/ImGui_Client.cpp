@@ -3,6 +3,7 @@
 #include "ImGui_Client.h"
 #include "Body.h"
 #include "Wizard.h"
+#include "Player.h"
 
 CImGui_Client::CImGui_Client(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMyImGui{ pDevice, pContext }
@@ -23,16 +24,16 @@ void CImGui_Client::Tick(_float fTimeDelta)
 {
 	Settings(fTimeDelta);
 	OnKeyInput();
-	if (true == Is_IMGUI_Switch && m_pPlayer && *m_pCurLevelIndex != LEVEL_LOADING)
+	if (true == Is_IMGUI_Switch 
+		&& *m_pGameInstance->Get_CurrentLevelID() >= LEVEL_GAMEPLAY 
+		&& *m_pGameInstance->Get_CurrentLevelID() <= LEVEL_WIZARD)
 	{
 		ImGui::Begin("Jack");
-
 		ConvertToString();
-
 		ImGui::End();
 	}
 
-	if (true == Is_IMGUI_Switch && m_pPlayer && *m_pCurLevelIndex == LEVEL_WIZARD) {
+	if (true == Is_IMGUI_Switch && *m_pCurLevelIndex == LEVEL_WIZARD) {
 		ImGui::Begin("Wizard");
 		WizardDebug();
 		ImGui::End();
@@ -59,15 +60,6 @@ void CImGui_Client::Settings(_float fTimeDelta)
 		IsMouseTrigger = false;
 	else
 		IsMouseTrigger = true;
-
-	if (m_pPlayer == nullptr) {
-		if (*m_pGameInstance->Get_CurrentLevelID() < LEVEL_GAMEPLAY || *m_pGameInstance->Get_CurrentLevelID() > LEVEL_WIZARD)
-			return;
-
-		m_pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), TEXT("Prototype_GameObject_Player")));
-		if(m_pPlayer != nullptr)
-			Safe_AddRef(m_pPlayer);
-	}
 }
 
 void CImGui_Client::OnKeyInput()
@@ -84,46 +76,51 @@ void CImGui_Client::OnKeyInput()
 
 void CImGui_Client::ConvertToString()
 {
-	CTransform* pPlayerTransform = dynamic_cast<CTransform*>(m_pPlayer->Get_Component(g_strTransformTag));
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(*m_pCurLevelIndex));
+	if (nullptr == pPlayer)
+		return;
+
+	Safe_AddRef(pPlayer);
+	CTransform* pPlayerTransform = dynamic_cast<CTransform*>(pPlayer->Get_Component(g_strTransformTag));
 	_float4 vPlayerPos = pPlayerTransform->Get_State_Float4(CTransform::STATE_POSITION);
 	string strPlayerPos = "PlayerPos : " + to_string(vPlayerPos.x).erase(to_string(vPlayerPos.x).size() - 4) + ", "
 		+ to_string(vPlayerPos.y).erase(to_string(vPlayerPos.y).size() - 4) + ", " + to_string(vPlayerPos.z).erase(to_string(vPlayerPos.z).size() - 4);
 	_float4 vCamPos = m_pGameInstance->Get_CamPosition_Float4();
 	string strCamPos = "CamPos : " + to_string(vCamPos.x).erase(to_string(vCamPos.x).size() - 4) + ", "
 		+ to_string(vCamPos.y).erase(to_string(vCamPos.y).size() - 4) + ", " + to_string(vCamPos.z).erase(to_string(vCamPos.z).size() - 4);
-	_float3 vDir = m_pPlayer->Get_TargetDir();
+	_float3 vDir = pPlayer->Get_TargetDir();
 	string strDir = "Direction : " + to_string(vDir.x).erase(to_string(vDir.x).size() - 4) + ", "
 		+ to_string(vDir.y).erase(to_string(vDir.y).size() - 4) + ", " + to_string(vDir.z).erase(to_string(vDir.z).size() - 4);
-	CBody* pBody = dynamic_cast<CBody*>((m_pPlayer->Get_Part(TEXT("Part_Body"))));
+	CBody* pBody = dynamic_cast<CBody*>((pPlayer->Get_Part(TEXT("Part_Body"))));
 	CModel* pPlayerModel = dynamic_cast<CModel*>(pBody->Get_Component(TEXT("Com_Model")));
 	string strAnimName = "Anim : "  + pPlayerModel->Get_AnimationName();
-	STATE eState = m_pPlayer->Get_State();
+	STATE eState = pPlayer->Get_State();
 	string strState = "State : " + m_vecState[eState];
-	WEAPON eWeapon = m_pPlayer->Get_Weapon();
+	WEAPON eWeapon = pPlayer->Get_Weapon();
 	string strWeapon = "Weapon : " + m_vecWeapon[eWeapon];
-	_uint iLastAttack = m_pPlayer->Get_Attack();
+	_uint iLastAttack = pPlayer->Get_Attack();
 	string strAttack = "Attack : Attack" + to_string(iLastAttack);
-	_bool bGroundCol = m_pPlayer->Get_GroundCol();
+	_bool bGroundCol = pPlayer->Get_GroundCol();
 	string strGroundCol = "GroundCol : ";
 	if (bGroundCol)
 		strGroundCol += "TRUE";
 	else
 		strGroundCol += "FALSE";
-	_bool bIsJumping = m_pPlayer->Get_IsJumping();
+	_bool bIsJumping = pPlayer->Get_IsJumping();
 	string strIsJumping = "IsJumping : ";
 	if (bIsJumping)
 		strIsJumping += "TRUE";
 	else
 		strIsJumping += "FALSE";
-	_float4 vWeaponPos = m_pPlayer->Get_WeaponPos(eWeapon);
+	_float4 vWeaponPos = pPlayer->Get_WeaponPos(eWeapon);
 	string strWeaponPos = "WeaponPos : " + to_string(vWeaponPos.x).erase(to_string(vWeaponPos.x).size() - 4) + ", "
 		+ to_string(vWeaponPos.y).erase(to_string(vWeaponPos.y).size() - 4) + ", " + to_string(vWeaponPos.z).erase(to_string(vWeaponPos.z).size() - 4);
 
-	CNavigation* pPlayerNavigation = dynamic_cast<CNavigation*>(m_pPlayer->Get_Component(TEXT("Com_Navigation")));
+	CNavigation* pPlayerNavigation = dynamic_cast<CNavigation*>(pPlayer->Get_Component(TEXT("Com_Navigation")));
 	string strCellIndex;
 	if(pPlayerNavigation != nullptr)
 		strCellIndex = "CurrentCell : " + to_string(pPlayerNavigation->Get_CurrentIndex());
-	CNavigation* pPlayerNavigationSBR = dynamic_cast<CNavigation*>(m_pPlayer->Get_Component(TEXT("Com_Navigation_SlimeBossRoom")));
+	CNavigation* pPlayerNavigationSBR = dynamic_cast<CNavigation*>(pPlayer->Get_Component(TEXT("Com_Navigation_SlimeBossRoom")));
 	string strCellIndexSBR;
 	if(pPlayerNavigationSBR != nullptr)
 		strCellIndexSBR = "CurrentCell_SBR : " + to_string(pPlayerNavigationSBR->Get_CurrentIndex());
@@ -140,6 +137,8 @@ void CImGui_Client::ConvertToString()
 	ImGui::Text(strCellIndex.c_str());
 	if (pPlayerNavigationSBR != nullptr)
 		ImGui::Text(strCellIndexSBR.c_str());
+
+	Safe_Release(pPlayer); 
 }
 
 void CImGui_Client::WizardDebug()
@@ -186,19 +185,6 @@ void CImGui_Client::WizardDebug()
 	ImGui::Text(strPhaseChangeTime.c_str());
 
 	Safe_Release(pWizard);
-}
-
-void CImGui_Client::Release_Player()
-{
-	if(m_pPlayer)
-		Safe_Release(m_pPlayer);
-	m_pPlayer = nullptr;
-}
-
-void CImGui_Client::Replace_Player(CGameObject* pPlayer)
-{
-	m_pPlayer = dynamic_cast<CPlayer*>(pPlayer);
-	Safe_AddRef(m_pPlayer);
 }
 
 CImGui_Client* CImGui_Client::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

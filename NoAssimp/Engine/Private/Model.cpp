@@ -4,7 +4,6 @@
 
 #include "Shader.h"
 #include "Texture.h"
-#include <fstream>
 #include "GameInstance.h"
 #include <locale>
 #include <codecvt>
@@ -40,8 +39,7 @@ CModel::CModel(const CModel& rhs)
 	for (auto& pMesh : m_Meshes)
 		Safe_AddRef(pMesh);
 
-	for (auto& Material : m_Materials)
-	{
+	for (auto& Material : m_Materials) {
 		for (size_t i = 0; i < AI_TEXTURE_TYPE_MAX; i++)
 			Safe_AddRef(Material.MaterialTextures[i]);
 	}
@@ -113,17 +111,6 @@ void CModel::Shrink()
 	m_vScale.x *= 0.97f;
 	m_vScale.y *= 0.97f;
 	m_vScale.z *= 0.97f;
-}
-
-_bool CModel::Check_BoundingBox(const CTransform* pTransform) const
-{
-	//_float3 vRayDir{}, vRayPos{};
-	//_float fDis;
-	//m_pGameInstance->Transform_PickingToLocalSpace(pTransform, &vRayDir, &vRayPos);
-	//_vector vecRayDir = ::XMVector3Normalize(::XMLoadFloat3(&vRayDir));
-	//_vector vecRayPos = ::XMLoadFloat3(&vRayPos);
-	//return m_BoundingBox.Intersects(vecRayPos, vecRayDir, fDis);
-	return false;
 }
 
 _float4 CModel::Check_Meshes(const CTransform* pTransform) const
@@ -375,8 +362,6 @@ HRESULT CModel::Ready_Meshes()
 		m_Meshes.push_back(pMesh);
 		m_filePointerPos = pMesh->Get_IncreasedFilePtPos(); // 파일포인터 위치 갱신
 	}
-
-
 
 	return S_OK;
 }

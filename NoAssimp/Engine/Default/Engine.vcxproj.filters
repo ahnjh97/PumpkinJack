@@ -145,6 +145,18 @@
     <Filter Include="01. Utility\02. Components\Navigation\Cell">
       <UniqueIdentifier>{4c42ea44-8d73-4fcb-944c-a2d3d4f74942}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\02. Components\VIBuffer\Instance">
+      <UniqueIdentifier>{319d4dc0-e120-4a8d-9eba-8a7d9af59544}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\02. Components\VIBuffer\Instance\Point">
+      <UniqueIdentifier>{d273a7e1-d7dc-4e6a-849f-186beb2a00f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\02. Components\VIBuffer\Instance\Mesh">
+      <UniqueIdentifier>{4e02c3e0-ece3-4508-9774-d50b5c7e68b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\02. Components\Instance_Model">
+      <UniqueIdentifier>{b6e73773-8d72-46a0-852d-a9615c0c4099}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -203,9 +215,6 @@
     </ClCompile>
     <ClCompile Include="..\private\Texture.cpp">
       <Filter>01. Utility\02. Components\Texture</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Transform.cpp">
-      <Filter>01. Utility\02. Components\Transform</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\VIBuffer_Terrain.cpp">
       <Filter>01. Utility\02. Components\VIBuffer\Terrain</Filter>
@@ -302,6 +311,21 @@
     </ClCompile>
     <ClCompile Include="..\Private\Cell.cpp">
       <Filter>01. Utility\02. Components\Navigation\Cell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Transform.cpp">
+      <Filter>01. Utility\02. Components\Transform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Instance.cpp">
+      <Filter>01. Utility\02. Components\VIBuffer\Instance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Instance_Point.cpp">
+      <Filter>01. Utility\02. Components\VIBuffer\Instance\Point</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Instance_Mesh.cpp">
+      <Filter>01. Utility\02. Components\VIBuffer\Instance\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Instance_Model.cpp">
+      <Filter>01. Utility\02. Components\Instance_Model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -475,6 +499,18 @@
     </ClInclude>
     <ClInclude Include="..\Public\Cell.h">
       <Filter>01. Utility\02. Components\Navigation\Cell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Instance.h">
+      <Filter>01. Utility\02. Components\VIBuffer\Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Instance_Point.h">
+      <Filter>01. Utility\02. Components\VIBuffer\Instance\Point</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Instance_Mesh.h">
+      <Filter>01. Utility\02. Components\VIBuffer\Instance\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Instance_Model.h">
+      <Filter>01. Utility\02. Components\Instance_Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,10 +1,10 @@
 #include "stdafx.h"
+#include "Level_Loading.h"
 #include "Level_Wizard.h"
 #include "ImGui_Client.h"
 #include "Camera_Jack.h"
-#include "Level_Loading.h"
-#include "Inven.h"
 #include "Terrain.h"
+#include "Inven.h"
 
 CLevel_Wizard::CLevel_Wizard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }

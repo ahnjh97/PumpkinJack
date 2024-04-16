@@ -2,6 +2,7 @@
 #include "Level_SlimeBoss.h"
 #include "Level_Loading.h"
 #include "ImGui_Client.h"
+#include "Camera_Jack.h"
 #include "Terrain.h"
 #include "Inven.h"
 

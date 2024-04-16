@@ -12,6 +12,7 @@ BEGIN(Client)
 
 class CTornado final : public CGameObject
 {
+	enum TORNADO_TEX { TEX_TIGERSTRIPE, TEX_TOPBOTTOMFADE, TEX_END };
 private:
 	CTornado(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CTornado(const CTornado& rhs);
@@ -50,7 +51,7 @@ private:
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
-	CTexture* m_pTextureCom = { nullptr };
+	CTexture* m_pTextureCom[TEX_END] = {};
 	CCollider* m_pColliderCom = {nullptr};
 	CGameObject* m_pPlayer = { nullptr };
 	const _float4x4* m_pPlayerWorldMatrix = {nullptr};

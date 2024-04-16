@@ -27,7 +27,7 @@ HRESULT CTerrain::Initialize(void * pArg)
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	m_iGridIndex = GameObjectDesc.iGridIndex;
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
-		return E_FAIL;
+		return E_FAIL; 
 
 	if (FAILED(Add_Components((LEVEL)GameObjectDesc.iLevel)))
 		return E_FAIL;	
@@ -129,10 +129,12 @@ HRESULT CTerrain::Add_Components(LEVEL eLevel)
 	if (FAILED(__super::Add_Component(eLevel, wstrVIBufferTerrain, TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
 
-	/* For.Com_Navigation */
-	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Navigation" + to_wstring(eLevel)),
-		TEXT("Com_Navigation"), (CComponent**)&m_pNavigationCom)))
-		return E_FAIL;
+	if (eLevel == LEVEL_GAMEPLAY || eLevel == LEVEL_SLIMEBOSS) {
+		/* For.Com_Navigation */
+		if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Navigation" + to_wstring(eLevel)),
+			TEXT("Com_Navigation"), (CComponent**)&m_pNavigationCom)))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }
