@@ -75,6 +75,9 @@ void CInven::Tick(_float fTimeDelta)
 	if (m_pPlayer == nullptr)
 		return;
 
+	if (true == m_pPlayer->Get_Dead())
+		return;
+
 	_vector vUp = m_pTransformCom->Get_State_Vector(CTransform::STATE_UP);
 	_float fDegree = XMConvertToDegrees(XMVectorGetY(XMVector3AngleBetweenVectors(vUp, m_vInvenUp[m_pPlayer->Get_Weapon()])));
 	if (fDegree > 4.f)

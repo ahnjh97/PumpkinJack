@@ -53,6 +53,9 @@ void CTeslaTower::Tick(_float fTimeDelta)
 
 void CTeslaTower::Late_Tick(_float fTimeDelta)
 {
+	if (m_bDead)
+		return;
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
@@ -76,7 +79,7 @@ HRESULT CTeslaTower::Render()
 	}
 
 #ifdef _DEBUG
-	if (m_pColliderCom)
+	if (m_pColliderCom != nullptr)
 		m_pColliderCom->Render();
 #endif // _DEBUG
 

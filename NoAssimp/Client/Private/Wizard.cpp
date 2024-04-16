@@ -60,8 +60,10 @@ void CWizard::Tick(_float fTimeDelta)
 	m_fTime += fTimeDelta;
 	m_fPhaseChangeTime += fTimeDelta;
 	Get_PlayerPtr();
-	if (WIZARD_DIE == m_eState && m_pModelCom->isFinished())
-		Set_Dead();		
+	if (WIZARD_DIE == m_eState && m_pModelCom->isFinished()) {
+		Set_Dead();
+		return;
+	}				
 
 	Check_WizardHp();
 
@@ -70,7 +72,8 @@ void CWizard::Tick(_float fTimeDelta)
 	StateToAnimation();
 
 	_matrix matBoneWorld = AttachColliderToBone();
-	m_pColliderCom->Tick(matBoneWorld);
+	if(m_pColliderCom != nullptr)
+		m_pColliderCom->Tick(matBoneWorld);
 }
 
 void CWizard::Late_Tick(_float fTimeDelta)
@@ -169,7 +172,7 @@ void CWizard::Link_State(_float fTimeDelta)
 		if (m_pTransformCom->Get_Pos_Float4().y < 60.f)
 			m_pTransformCom->Fall(-fTimeDelta * 5.f);
 		else {
-			if (m_fPhaseChangeTime < 5.f) {
+			if (m_fPhaseChangeTime < 8.f) {
 				if (m_bDestroyElecArena) {
 					DestroyElecArena();
 					m_bDestroyElecArena = false;
@@ -251,7 +254,7 @@ void CWizard::Link_State(_float fTimeDelta)
 		}
 	}
 
-	if (WIZARD_CHARGE == m_eState && m_fWaitTime >= 3.f) {
+	if (WIZARD_CHARGE == m_eState && m_fWaitTime >= 6.f) {
 		m_fChargeTime += fTimeDelta;
 
 		if (!m_bTowerSpawn)	{

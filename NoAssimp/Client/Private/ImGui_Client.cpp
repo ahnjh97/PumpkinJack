@@ -148,6 +148,9 @@ void CImGui_Client::WizardDebug()
 	if (nullptr == pWizard)
 		return;
 
+	if (true == pWizard->Get_Dead())
+		return;
+
 	Safe_AddRef(pWizard);
 	INFO_WIZARD tWizardInfo = pWizard->Get_WizardInfo();
 	string strState = "State: " + m_vecWizardState[tWizardInfo.eState];

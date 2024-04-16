@@ -45,6 +45,9 @@ HRESULT CTornado::Initialize(void* pArg)
 
 void CTornado::Tick(_float fTimeDelta)
 {
+	if (m_bDead == true)
+		return;
+
 	Get_PlayerPtr();
 	m_fTime += fTimeDelta;
 	m_fDamageTime += fTimeDelta;
@@ -52,6 +55,11 @@ void CTornado::Tick(_float fTimeDelta)
 	m_pTransformCom->Turn(XMVectorSet(0, 1, 0, 0), fTimeDelta * 2.f * m_iTurnDir);
 
 	if (m_bMove) {
+		if (m_fHoleWallColTime > 3.f) {
+			Set_Dead();
+			return;
+		}
+			
 		_float3 vScale = m_pTransformCom->Get_Scaled();
 		if (vScale.x < 15.f)
 			EnlargeTornado(fTimeDelta);
@@ -68,9 +76,6 @@ void CTornado::Tick(_float fTimeDelta)
 			m_fHoleWallColTime += fTimeDelta;
 		else
 			Check_HoleWallCol();
-
-		if (m_fHoleWallColTime > 3.f)
-			Set_Dead();
 
 		if (false == m_bFall)
 			Check_Fall();
@@ -90,7 +95,8 @@ void CTornado::Tick(_float fTimeDelta)
 
 	Check_PlayerCol();
 
-	m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
+	if(m_pColliderCom != nullptr)
+		m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
 }
 
 void CTornado::Late_Tick(_float fTimeDelta)
@@ -195,7 +201,7 @@ void CTornado::MoveTowardsPlayer(_float fTimeDelta)
 {
 	_float4 vRight{}, vLook;
 	m_pTransformCom->Get_Look_LandObject(XMVectorSet(m_pPlayerWorldMatrix->_41, m_pPlayerWorldMatrix->_42, m_pPlayerWorldMatrix->_43, 1), vRight, vLook);
-	m_pTransformCom->Move(fTimeDelta * 3.f, XMLoadFloat4(&vLook));
+	m_pTransformCom->Move(fTimeDelta * 2.8f, XMLoadFloat4(&vLook));
 }
 
 void CTornado::Check_HoleWallCol()
