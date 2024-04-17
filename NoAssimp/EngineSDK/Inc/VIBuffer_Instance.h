@@ -55,8 +55,6 @@ protected:
 	_float2* m_pLifeTimes = { nullptr };
 	_float* m_pSpeeds = { nullptr };
 
-
-
 public:
 	virtual CComponent* Clone(void* pArg) = 0;
 	virtual void Free() override;

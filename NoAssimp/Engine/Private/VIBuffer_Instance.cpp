@@ -35,7 +35,7 @@ HRESULT CVIBuffer_Instance::Initialize_Prototype(const CVIBuffer_Instance::INSTA
 
 HRESULT CVIBuffer_Instance::Initialize(void* pArg)
 {
-	if (FAILED(m_pDevice->CreateBuffer(&m_InstanceBufferDesc, &m_InstanceSubResourceData, &m_pVBInstance)))
+ 	if (FAILED(m_pDevice->CreateBuffer(&m_InstanceBufferDesc, &m_InstanceSubResourceData, &m_pVBInstance)))
 		return E_FAIL;
 
 	return S_OK;

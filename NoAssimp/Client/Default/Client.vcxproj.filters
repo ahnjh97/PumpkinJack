@@ -569,11 +569,11 @@
     <ClCompile Include="..\Private\ElecArena.cpp">
       <Filter>02.GameObjects\Level_Wizard\ElecArena</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Level_EffectTool.cpp">
-      <Filter>01.Levels\08. Effect</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Book.cpp">
       <Filter>02.GameObjects\Level_Wizard\Book</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_EffectTool.cpp">
+      <Filter>01.Levels\08. Effect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

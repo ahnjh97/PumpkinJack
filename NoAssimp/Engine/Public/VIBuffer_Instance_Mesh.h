@@ -20,11 +20,15 @@ public:
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual _float4 Compute_RandPosition() override;
 
+public:
+	void TurnAndSpread(_float fTimeDelta, _float fRotationSpeed);
+
 private:
 	_char		m_szName[MAX_PATH] = { "" };
 	_uint		m_iMaterialIndex = { 0 };
 	ifstream&	m_InputFile;
 	_uint		m_iFaces = { };
+	_float3*	m_pRotationAxes = { nullptr };
 
 public:
 	static CVIBuffer_Instance_Mesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ifstream& fileStream, const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc);

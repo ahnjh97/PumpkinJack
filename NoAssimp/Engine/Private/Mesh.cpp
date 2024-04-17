@@ -13,7 +13,7 @@ CMesh::CMesh(const CMesh& rhs)
 {
 }
 
-HRESULT CMesh::Initialize_Prototype(TYPE eModelType, string strDirectory, streampos filePtPos, const vector<CBone*>& Bones, _fmatrix TransformMatrix)
+HRESULT CMesh::Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones, _fmatrix TransformMatrix)
 {
 	m_strDirectory = strDirectory;
 	if (!m_InputFile.is_open())
@@ -245,11 +245,11 @@ HRESULT CMesh::Ready_Vertices_For_AnimModel(const vector<CBone*>& Bones)
 	return S_OK;
 }
 
-CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, string strDirectory, ifstream& fileStream, streampos filePtPos, const vector<CBone*>& Bones, _fmatrix TransformMatrix)
+CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, string strDirectory, ifstream& fileStream, const vector<CBone*>& Bones, _fmatrix TransformMatrix)
 {
 	CMesh* pInstance = new CMesh(pDevice, pContext, fileStream);
 
-	if (FAILED(pInstance->Initialize_Prototype(eModelType, strDirectory, filePtPos, Bones, TransformMatrix)))
+	if (FAILED(pInstance->Initialize_Prototype(eModelType, strDirectory, Bones, TransformMatrix)))
 	{
 		MSG_BOX(TEXT("Failed To Create : CMesh"));
 

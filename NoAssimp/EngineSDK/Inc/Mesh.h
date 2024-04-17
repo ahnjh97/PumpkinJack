@@ -22,7 +22,7 @@ public:
 		else { return m_OffsetMatrices.front()._41; } }
 
 public:
-	virtual HRESULT Initialize_Prototype(TYPE eModelType, string strDirectory, streampos filePtPos, const vector<CBone*>& Bones, _fmatrix TransformMatrix);
+	virtual HRESULT Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones, _fmatrix TransformMatrix);
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
@@ -54,7 +54,7 @@ private:
 	HRESULT Ready_Vertices_For_AnimModel(const vector<CBone*>& Bones);
 
 public:
-	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, string strDirectory, ifstream& fileStream, streampos filePtPos, const vector<class CBone*>& Bones, _fmatrix TransformMatrix);
+	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, string strDirectory, ifstream& fileStream, const vector<class CBone*>& Bones, _fmatrix TransformMatrix);
 	virtual CMesh* Clone(void* pArg);
 	virtual void Free() override;
 };

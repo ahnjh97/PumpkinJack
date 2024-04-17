@@ -106,7 +106,6 @@ private:
 
 	// 파일입출력 변수
 	string						m_strDirectory;
-	streampos					m_filePointerPos;
 	ifstream					m_InputFile;
 
 	string						m_strModelName;

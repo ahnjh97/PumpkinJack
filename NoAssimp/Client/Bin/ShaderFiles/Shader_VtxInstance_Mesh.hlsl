@@ -64,10 +64,11 @@ PS_OUT PS_MAIN(PS_IN In)
     PS_OUT Out = (PS_OUT) 0;
 
     Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+   
+   // Out.vColor.xyz = float3(In.vTexcoord.y, In.vTexcoord.y, In.vTexcoord.y);
 
-    if (Out.vColor.a <= 0.3f ||
-		false == In.isLived)
-        discard;
+    if (Out.vColor.a <= 0.3f || false == In.isLived)
+            discard;
 	
     return Out;
 }

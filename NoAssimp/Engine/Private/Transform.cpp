@@ -251,14 +251,8 @@ void CTransform::Turn(_fvector vAxis, _float fTimeDelta)
 {
 	_matrix			RotationMatrix  = XMMatrixRotationAxis(vAxis, m_fRotationPerSec * fTimeDelta);
 
-	for (size_t i = 0; i < STATE_POSITION; i++)
-	{
-		Set_State(STATE(i), 
-			XMVector4Transform(Get_State_Vector((STATE)i), RotationMatrix));
-		/*Set_State(STATE(i),
-			XMVector3TransformNormal(Get_State_Vector((STATE)i), RotationMatrix));*/
-	}
-
+	for (size_t i = 0; i < STATE_POSITION; i++) 
+		Set_State(STATE(i), XMVector4Transform(Get_State_Vector((STATE)i), RotationMatrix));
 }
 
 void CTransform::Rotation(_fvector vAxis, _float fRadian)

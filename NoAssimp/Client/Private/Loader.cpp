@@ -384,6 +384,25 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 	if (FAILED(Add_Texture(eLevel, "TopBottomFade", "Effects/topBottomFadeTex.dds")))
 		return E_FAIL;
 
+
+	m_strLoadingText = TEXT("Loading VIBuffers for Level_Wizard...");
+	/* Prototype_Component_VIBuffer_Instance_Mesh */
+	CVIBuffer_Instance::INSTANCE_DESC		InstanceDesc{};
+	InstanceDesc.vPivot = _float3(580.f, -550.f, 580.f);
+	InstanceDesc.vCenter = _float3(580.f, -450.f, 580.f);
+	InstanceDesc.vRange = _float3(1000.f, 800.f, 1000.f);
+	InstanceDesc.vMinScale = _float3(6.f, 4.f, 6.f);
+	InstanceDesc.vMaxScale = _float3(9.f, 6.f, 9.f);
+	InstanceDesc.iNumInstance = 2000;
+	InstanceDesc.vLifeTime = _float2(8.f, 12.f);
+	InstanceDesc.isLoop = true;
+	InstanceDesc.vSpeed = _float2(40.f, 70.f);
+	
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_WIZARD, TEXT("Prototype_Component_Instance_Model"),
+		CInstance_Model::Create(m_pDevice, m_pContext, "Book", InstanceDesc))))
+		return E_FAIL;
+
+
 	m_strLoadingText = TEXT("Loading Models for Level_Wizard...");
 	vector<string> vecAnimModelNames = 	{ "Jack", "Wizard" };
 	vector<string> vecNonAnimModelNames = { "Spear", "Rifle", "Scythe", "LevelWizard",
@@ -407,6 +426,7 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("WizardTower"), CWizardTower);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TeslaTower"), CTeslaTower);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ElecArena"), CElecArena);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Book"), CBook);
 
 	m_strLoadingText = TEXT("Loading Complete: Level_Wizard");
 	m_isFinished = true;
@@ -437,11 +457,29 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 	if (FAILED(Add_Texture(eLevel, "Book", "CommonTextures/books.dds")))
 		return E_FAIL;
 
-	m_strLoadingText = TEXT("Loading Component Prototypes for Level_EffectTool...");
+	m_strLoadingText = TEXT("Loading VIBuffers for Level_EffectTool...");
 	/* Prototype_Component_VIBuffer_Terrain */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain"),
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 100, 100))))
 		return E_FAIL;
+
+	/* Prototype_Component_VIBuffer_Instance_Mesh */
+	CVIBuffer_Instance::INSTANCE_DESC		InstanceDesc{};
+
+	InstanceDesc.vPivot = _float3(0.f, -5.f, 0.f);
+	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	InstanceDesc.vRange = _float3(50.f, 3.f, 50.f);
+	InstanceDesc.vMinScale = _float3(0.3f, 0.1f, 0.3f);
+	InstanceDesc.vMaxScale = _float3(0.8f, 0.5f, 0.8f);
+	InstanceDesc.iNumInstance = 250;
+	InstanceDesc.vLifeTime = _float2(3.f, 6.0f);
+	InstanceDesc.isLoop = true;
+	InstanceDesc.vSpeed = _float2(2.f, 15.f);
+
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_EFFECTTOOL, TEXT("Prototype_Component_Instance_Model"),
+		CInstance_Model::Create(m_pDevice, m_pContext, "Book", InstanceDesc))))
+		return E_FAIL;
+
 
 	m_strLoadingText = TEXT("Loading Models for Level_EffectTool...");
 	/*if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "Tornado")))
@@ -453,21 +491,7 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 	if (FAILED(Add_Shaders(eLevel)))
 		return E_FAIL;
 
-	/* Prototype_Component_VIBuffer_Instance_Mesh */
-	CVIBuffer_Instance::INSTANCE_DESC		InstanceDesc{};
 
-	InstanceDesc.vPivot = _float3(0.f, -5.f, 0.f);
-	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
-	InstanceDesc.vRange = _float3(200.f, 3.f, 200.f);
-	InstanceDesc.vMinScale = _float3(0.2f, 0.2f, 0.2f);
-	InstanceDesc.vMaxScale = _float3(2.f, 2.f, 2.f);
-	InstanceDesc.iNumInstance = 10000;
-	InstanceDesc.vLifeTime = _float2(2.f, 10.0f);
-	InstanceDesc.isLoop = true;
-	InstanceDesc.vSpeed = _float2(2.f, 15.f);
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_EFFECTTOOL, TEXT("Prototype_Component_Instance_Model"),
-		CInstance_Model::Create(m_pDevice, m_pContext, "Book", InstanceDesc))))
-		return E_FAIL;
 
 	m_strLoadingText = TEXT("Loading GameObject Prototypes for Level_EffectTool...");
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Terrain"), CTerrain);

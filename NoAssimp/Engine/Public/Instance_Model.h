@@ -14,6 +14,7 @@ private:
 
 public:
 	_uint Get_NumInstanceMeshes() { return m_iNumInstanceMeshes; }
+	void TurnAndSpread(_float fTimeDelta, _float fRotationSpeed);
 
 public:
 	virtual HRESULT Initialize_Prototype(const string& strModelName, const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc);
@@ -25,7 +26,7 @@ public:
 
 private:
 	HRESULT Ready_InstanceMeshes(const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc);
-	HRESULT Ready_Materials(const _char* pModelFilePath);
+	HRESULT Ready_Materials();
 	
 private:
 	vector<class CVIBuffer_Instance_Mesh*>		m_vecInstanceMeshes;

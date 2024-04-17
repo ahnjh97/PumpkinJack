@@ -102,9 +102,6 @@ HRESULT CLevel_EffectTool::Ready_Layer_Effect(const wstring& strLayerTag)
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Book"), &tDesc)))
 		return S_OK;
 
-	tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Book");
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Monster"), &tDesc)))
-		return S_OK;
 	return S_OK;
 }
 

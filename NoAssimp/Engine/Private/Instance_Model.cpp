@@ -25,6 +25,15 @@ CInstance_Model::CInstance_Model(const CInstance_Model& rhs)
 	}
 }
 
+void CInstance_Model::TurnAndSpread(_float fTimeDelta, _float fRotationSpeed)
+{
+	if (m_vecInstanceMeshes.empty())
+		return;
+
+	for (auto& instanceMesh : m_vecInstanceMeshes)
+		instanceMesh->TurnAndSpread(fTimeDelta, fRotationSpeed);
+}
+
 HRESULT CInstance_Model::Initialize_Prototype(const string& strModelName, const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc)
 {
 	m_strDirectory = "../../../model_txt/NonAnim/" + strModelName + ".txt";
@@ -38,7 +47,7 @@ HRESULT CInstance_Model::Initialize_Prototype(const string& strModelName, const 
 	if (FAILED(Ready_InstanceMeshes(InstanceDesc)))
 		return E_FAIL;
 
-	if (FAILED(Ready_Materials(strModelName.c_str())))
+	if (FAILED(Ready_Materials()))
 		return E_FAIL;
 
 	m_InputFile.close();
@@ -71,8 +80,11 @@ HRESULT CInstance_Model::Bind_ShaderResource(CShader* pShader, const _char* pCon
 
 HRESULT CInstance_Model::Render(_uint iMeshIndex)
 {
-	m_vecInstanceMeshes[iMeshIndex]->Bind_Buffers();
-	m_vecInstanceMeshes[iMeshIndex]->Render();
+	if (FAILED(m_vecInstanceMeshes[iMeshIndex]->Bind_Buffers()))
+		return E_FAIL;
+	
+	if (FAILED(m_vecInstanceMeshes[iMeshIndex]->Render()))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -93,7 +105,7 @@ HRESULT CInstance_Model::Ready_InstanceMeshes(const CVIBuffer_Instance::INSTANCE
 	return S_OK;
 }
 
-HRESULT CInstance_Model::Ready_Materials(const _char* pModelFilePath)
+HRESULT CInstance_Model::Ready_Materials()
 {
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumMaterials), sizeof(m_iNumMaterials));
 

@@ -37,7 +37,7 @@ HRESULT CBook::Initialize(void* pArg)
 
 void CBook::Tick(_float fTimeDelta)
 {
-	//m_pInstanceModelCom->Spread(fTimeDelta);
+	m_pInstanceModelCom->TurnAndSpread(fTimeDelta, 0.05f);
 }
 
 void CBook::Late_Tick(_float fTimeDelta)
@@ -61,7 +61,8 @@ HRESULT CBook::Render()
 		if (FAILED(m_pShaderCom->Begin(0))) 
 			return E_FAIL;
 
-		m_pInstanceModelCom->Render(i);
+		if(FAILED(m_pInstanceModelCom->Render(i)))
+			return E_FAIL;
 	}
 
 	return S_OK;

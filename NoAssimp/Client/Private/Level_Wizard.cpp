@@ -50,6 +50,20 @@ HRESULT CLevel_Wizard::Initialize()
 void CLevel_Wizard::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
+
+	//m_fTime += fTimeDelta;
+
+	//if (m_bBooks && ((m_fTime >= 1.f && m_fTime < 1.5f) || (m_fTime >= 3.f && m_fTime < 3.5f)
+	//	|| (m_fTime >= 5.f && m_fTime < 5.5f) || (m_fTime >= 7.f && m_fTime < 7.5f))) {
+	//	Add_Books();
+	//	m_bBooks = false;
+	//}
+
+	//if (!m_bBooks && ((m_fTime >= 2.f && m_fTime < 2.5f) || (m_fTime >= 4.f && m_fTime < 4.5f)
+	//	|| (m_fTime >= 6.f && m_fTime < 6.5f) || (m_fTime >= 8.f && m_fTime < 8.5f))) {
+	//	Add_Books();
+	//	m_bBooks = true;
+	//}
 }
 
 HRESULT CLevel_Wizard::Render()
@@ -196,11 +210,21 @@ HRESULT CLevel_Wizard::Ready_UI(const wstring& strLayerTag)
 	return S_OK;
 }
 
+void CLevel_Wizard::Add_Books()
+{
+	CGameObject::GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = LEVEL_WIZARD;
+	m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_Book"), TEXT("Prototype_GameObject_Book"), &tDesc);
+}
+
 HRESULT CLevel_Wizard::Ready_Layer_BackGround()
 {
 	CGameObject::GAMEOBJECT_DESC tDesc{};
 	tDesc.iLevel = LEVEL_WIZARD;
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_SkySphere"), TEXT("Prototype_GameObject_SkySphere"), &tDesc)))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_Book"), TEXT("Prototype_GameObject_Book"), &tDesc)))
 		return E_FAIL;
 
 	return S_OK;

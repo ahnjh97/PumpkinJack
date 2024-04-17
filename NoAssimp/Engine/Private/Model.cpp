@@ -355,12 +355,11 @@ HRESULT CModel::Ready_Meshes()
 
 	for (size_t i = 0; i < m_iNumMeshes; i++)
 	{
-		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_eModelType, m_strDirectory, m_InputFile, m_filePointerPos, m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
+		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_eModelType, m_strDirectory, m_InputFile, m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
 		if (nullptr == pMesh)
 			return E_FAIL;
 
 		m_Meshes.push_back(pMesh);
-		m_filePointerPos = pMesh->Get_IncreasedFilePtPos(); // 파일포인터 위치 갱신
 	}
 
 	return S_OK;
@@ -435,8 +434,7 @@ HRESULT CModel::Ready_Animations()
 			{
 				Safe_Release(pAnimation);
 				continue;
-			}
-				
+			}		
 		}
 
 		m_Animations.push_back(pAnimation);

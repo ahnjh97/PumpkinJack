@@ -1,4 +1,5 @@
 #include "VIBuffer_Instance_Mesh.h"
+#include "Transform.h"
 
 CVIBuffer_Instance_Mesh::CVIBuffer_Instance_Mesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ifstream& fileStream)
 	: CVIBuffer_Instance{ pDevice, pContext }, m_InputFile(fileStream)
@@ -51,17 +52,13 @@ HRESULT CVIBuffer_Instance_Mesh::Initialize_Prototype(ifstream& fileStream, cons
 	VTXMESH* pVertices = new VTXMESH[m_iNumVertices];
 	ZeroMemory(pVertices, sizeof(VTXMESH) * m_iNumVertices);
 
-	for (size_t i = 0; i < m_iNumVertices; i++)
-	{
+	for (size_t i = 0; i < m_iNumVertices; i++)	
 		m_InputFile.read(reinterpret_cast<char*>(&pVertices[i]), sizeof(VTXMESH));
-		XMStoreFloat3(&pVertices[i].vPosition, XMLoadFloat3(&pVertices[i].vPosition));
-		XMStoreFloat3(&pVertices[i].vNormal, XMLoadFloat3(&pVertices[i].vNormal));
-	}
 
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);
 	m_InitialData.pSysMem = pVertices;
 
-	if (FAILED(__super::Create_Buffer(&m_pVB)))
+ 	if (FAILED(__super::Create_Buffer(&m_pVB)))
 		return E_FAIL;
 
 	Safe_Delete_Array(pVertices);
@@ -116,7 +113,7 @@ HRESULT CVIBuffer_Instance_Mesh::Initialize_Prototype(ifstream& fileStream, cons
 
 	uniform_real_distribution<float>	LifeTime(InstanceDesc.vLifeTime.x, InstanceDesc.vLifeTime.y);
 	uniform_real_distribution<float>	Speed(InstanceDesc.vSpeed.x, InstanceDesc.vSpeed.y);
-
+	uniform_real_distribution<float>	RotationAxis(-1, 1);
 
 	/* 인덱스 버퍼의 byte크기 */
 	m_InstanceBufferDesc.ByteWidth = m_iInstanceStride * m_iNumInstance;
@@ -135,6 +132,9 @@ HRESULT CVIBuffer_Instance_Mesh::Initialize_Prototype(ifstream& fileStream, cons
 	m_pSpeeds = new _float[m_iNumInstance];
 	ZeroMemory(m_pSpeeds, sizeof(_float) * m_iNumInstance);
 
+	m_pRotationAxes = new _float3[m_iNumInstance];
+	ZeroMemory(m_pRotationAxes, sizeof(_float3) * m_iNumInstance);
+
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
 		_float fScale = ScaleX(m_RandomNumber);
@@ -150,6 +150,7 @@ HRESULT CVIBuffer_Instance_Mesh::Initialize_Prototype(ifstream& fileStream, cons
 		/* LifeTime(m_RandomNumber) 인스턴스마다 랜덤하게 설정된 각각의 라이프타임디다. */
 		m_pLifeTimes[i] = _float2(0.f, LifeTime(m_RandomNumber));
 		m_pSpeeds[i] = Speed(m_RandomNumber);
+		m_pRotationAxes[i] = _float3(RotationAxis(m_RandomNumber), RotationAxis(m_RandomNumber), RotationAxis(m_RandomNumber));
 	}
 
 	ZeroMemory(&m_InstanceSubResourceData, sizeof m_InstanceSubResourceData);
@@ -178,6 +179,50 @@ _float4 CVIBuffer_Instance_Mesh::Compute_RandPosition()
 	return _float4(RangePosX(m_RandomNumber), RangePosY(m_RandomNumber), RangePosZ(m_RandomNumber), 1.f);
 }
 
+void CVIBuffer_Instance_Mesh::TurnAndSpread(_float fTimeDelta, _float fRotationSpeed)
+{
+	D3D11_MAPPED_SUBRESOURCE		SubResource{};
+	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+	VTXMATRIX* pVertices = ((VTXMATRIX*)SubResource.pData);
+
+	/*_float fIncreaseRate = 1.002f;
+	_float fDecreaseRate = 0.9975f;*/
+
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		//// 크기변화
+		//if (m_pLifeTimes[i].x < m_pLifeTimes[i].y * 0.5f) { // 증가
+		//	XMStoreFloat4(&pVertices[i].vRight, XMLoadFloat4(&pVertices[i].vRight) * fIncreaseRate);
+		//	XMStoreFloat4(&pVertices[i].vUp, XMLoadFloat4(&pVertices[i].vUp) * fIncreaseRate);
+		//	XMStoreFloat4(&pVertices[i].vLook, XMLoadFloat4(&pVertices[i].vLook) * fIncreaseRate);
+		//}
+		//	
+		//else {// 감소
+		//	XMStoreFloat4(&pVertices[i].vRight, XMLoadFloat4(&pVertices[i].vRight) * fDecreaseRate);
+		//	XMStoreFloat4(&pVertices[i].vUp, XMLoadFloat4(&pVertices[i].vUp) * fDecreaseRate);
+		//	XMStoreFloat4(&pVertices[i].vLook, XMLoadFloat4(&pVertices[i].vLook) * fDecreaseRate);
+		//}
+		
+		// 자전
+		_vector vRotationAxis = XMVector3Normalize(XMLoadFloat3(&m_pRotationAxes[i]));
+		_matrix	RotationMatrix = XMMatrixRotationAxis(vRotationAxis, m_pSpeeds[i] * fTimeDelta * fRotationSpeed);
+
+		XMStoreFloat4(&pVertices[i].vRight, XMVector4Transform(XMLoadFloat4(&pVertices[i].vRight), RotationMatrix));
+		XMStoreFloat4(&pVertices[i].vUp, XMVector4Transform(XMLoadFloat4(&pVertices[i].vUp), RotationMatrix));
+		XMStoreFloat4(&pVertices[i].vLook, XMVector4Transform(XMLoadFloat4(&pVertices[i].vLook), RotationMatrix));
+			
+		// 이동
+		_vector		vDir = XMVectorSetW(XMLoadFloat4(&pVertices[i].vPosition) - XMLoadFloat3(&m_InstanceDesc.vPivot), 0.f);
+
+		XMStoreFloat4(&pVertices[i].vPosition,
+			XMLoadFloat4(&pVertices[i].vPosition) + XMVector3Normalize(vDir) * m_pSpeeds[i] * fTimeDelta);
+
+		Compute_LifeTime(pVertices, i, fTimeDelta);
+	}
+
+	m_pContext->Unmap(m_pVBInstance, 0);
+}
+
 CVIBuffer_Instance_Mesh* CVIBuffer_Instance_Mesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ifstream& fileStream, const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc)
 {
 	CVIBuffer_Instance_Mesh* pInstance = new CVIBuffer_Instance_Mesh(pDevice, pContext, fileStream);
@@ -202,4 +247,5 @@ void CVIBuffer_Instance_Mesh::Free()
 {
 	__super::Free();
 
+	Safe_Delete_Array(m_pRotationAxes);
 }
