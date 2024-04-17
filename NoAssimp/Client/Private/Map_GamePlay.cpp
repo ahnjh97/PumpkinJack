@@ -1,23 +1,23 @@
 #include "stdafx.h"
-#include "TongMap_SlimeBoss.h"
+#include "Map_GamePlay.h"
 
-CTongMap_SlimeBoss::CTongMap_SlimeBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CMap_GamePlay::CMap_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
 {
 }
 
-CTongMap_SlimeBoss::CTongMap_SlimeBoss(const CTongMap_SlimeBoss& rhs)
+CMap_GamePlay::CMap_GamePlay(const CMap_GamePlay& rhs)
 	: CGameObject{ rhs }
 {
 
 }
 
-HRESULT CTongMap_SlimeBoss::Initialize_Prototype()
+HRESULT CMap_GamePlay::Initialize_Prototype()
 {
 	return S_OK;
 }
 
-HRESULT CTongMap_SlimeBoss::Initialize(void* pArg)
+HRESULT CMap_GamePlay::Initialize(void* pArg)
 {
 	GAMEOBJECT_DESC GameObjectDesc = {}; // = (GAMEOBJECT_DESC*)pArg;
 	if (pArg)
@@ -39,17 +39,17 @@ HRESULT CTongMap_SlimeBoss::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CTongMap_SlimeBoss::Tick(_float fTimeDelta)
+void CMap_GamePlay::Tick(_float fTimeDelta)
 {
-	m_fOffset_Y -= 0.0015f;
+	//m_fOffset_Y -= 0.0015f;
 }
 
-void CTongMap_SlimeBoss::Late_Tick(_float fTimeDelta)
+void CMap_GamePlay::Late_Tick(_float fTimeDelta)
 {
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this); // 알파값 있는 애들때문에 객체 분리해야될거같음
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this); // 알파값 있는 애들때문에 객체 분리해야될거같음
 }
 
-HRESULT CTongMap_SlimeBoss::Render()
+HRESULT CMap_GamePlay::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -71,32 +71,20 @@ HRESULT CTongMap_SlimeBoss::Render()
 	return S_OK;
 }
 
-void CTongMap_SlimeBoss::SetUp_MeshShaderPassIndices(_uint iNumMeshes)
+void CMap_GamePlay::SetUp_MeshShaderPassIndices(_uint iNumMeshes)
 {
 	m_vecMeshShaderTypes.resize(iNumMeshes);
 	m_vecMeshShaderPassIndices.resize(iNumMeshes);
-	vector<_uint> vecSlimeBossRoom;
 
 	for (_uint i = 0; i < iNumMeshes; i++)
 	{
-		string strTextureName = m_pModelCom->Get_DiffuseTextureName(i);
-		if (strTextureName == "pine_Mat")
+		string strTexturName = m_pModelCom->Get_DiffuseTextureName(i);
+		if (strTexturName == "pine_Mat")
 			m_vecMeshShaderTypes[i] = NO_LIGHT;
-		else if (strTextureName == "slimeBossTex2_Mat")
-			vecSlimeBossRoom.push_back(i);
 	}
-
-	for (auto& SBR : vecSlimeBossRoom)
-		m_vecMeshShaderTypes[SBR] = NO_LIGHT;
-
-	// 크기가 더 작은메쉬를 이펙트용으로 할당
-	if (m_pModelCom->Get_MeshOffsetX(vecSlimeBossRoom.front()) < m_pModelCom->Get_MeshOffsetX(vecSlimeBossRoom.back()))
-		m_vecMeshShaderPassIndices[vecSlimeBossRoom.front()] = 2; // SLIMEBOSSROOM
-	else
-		m_vecMeshShaderPassIndices[vecSlimeBossRoom.back()] = 2; // SLIMEBOSSROOM
 }
 
-HRESULT CTongMap_SlimeBoss::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
+HRESULT CMap_GamePlay::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 {
 	wstring wstrModelTag = _wstrModelTag;
 	if (FAILED(__super::Add_Component(eLevel, wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
@@ -110,18 +98,10 @@ HRESULT CTongMap_SlimeBoss::Add_Components(LEVEL eLevel, const wstring& _wstrMod
 	if (FAILED(__super::Add_Component(eLevel, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom[NO_LIGHT])))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_Water"),
-		TEXT("Com_Texture_Water"), (CComponent**)&m_pTextureCom[TEX_WATER])))
-		return E_FAIL;
-
-	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_waterCausticText"),
-		TEXT("Com_Texture_Caustic"), (CComponent**)&m_pTextureCom[TEX_CAUSTIC])))
-		return E_FAIL;
-
 	return S_OK;
 }
 
-HRESULT CTongMap_SlimeBoss::Bind_ShaderResources()
+HRESULT CMap_GamePlay::Bind_ShaderResources()
 {
 	for (_int i = 0; i < SHADER_END; i++)
 	{
@@ -163,25 +143,16 @@ HRESULT CTongMap_SlimeBoss::Bind_ShaderResources()
 			return E_FAIL;
 	}
 
-	if (FAILED(m_pTextureCom[TEX_WATER]->Bind_ShaderResource(m_pShaderCom[NO_LIGHT], "g_WaterTexture", 0)))
-		return E_FAIL;
-
-	if (FAILED(m_pTextureCom[TEX_CAUSTIC]->Bind_ShaderResource(m_pShaderCom[NO_LIGHT], "g_CausticTexture", 0)))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom[NO_LIGHT]->Bind_RawValue("g_fOffset_Y", &m_fOffset_Y, sizeof(_float))))
-		return E_FAIL;
-
 	return S_OK;
 }
 
-CTongMap_SlimeBoss* CTongMap_SlimeBoss::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CMap_GamePlay* CMap_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CTongMap_SlimeBoss* pInstance = new CTongMap_SlimeBoss(pDevice, pContext);
+	CMap_GamePlay* pInstance = new CMap_GamePlay(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Create : CTongMap_SlimeBoss"));
+		MSG_BOX(TEXT("Failed To Create : CMap_GamePlay"));
 
 		Safe_Release(pInstance);
 	}
@@ -190,13 +161,13 @@ CTongMap_SlimeBoss* CTongMap_SlimeBoss::Create(ID3D11Device* pDevice, ID3D11Devi
 
 }
 
-CGameObject* CTongMap_SlimeBoss::Clone(void* pArg)
+CGameObject* CMap_GamePlay::Clone(void* pArg)
 {
-	CTongMap_SlimeBoss* pInstance = new CTongMap_SlimeBoss(*this);
+	CMap_GamePlay* pInstance = new CMap_GamePlay(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Create : CTongMap_SlimeBoss"));
+		MSG_BOX(TEXT("Failed To Create : CMap_GamePlay"));
 
 		Safe_Release(pInstance);
 	}
@@ -204,12 +175,10 @@ CGameObject* CTongMap_SlimeBoss::Clone(void* pArg)
 	return pInstance;
 }
 
-void CTongMap_SlimeBoss::Free()
+void CMap_GamePlay::Free()
 {
 	__super::Free();
-	for (_int i = 0; i < TEX_END; i++)
-		Safe_Release(m_pTextureCom[i]);
-	for(_int j = 0; j< SHADER_END; j++)
+	for (_int j = 0; j < SHADER_END; j++)
 		Safe_Release(m_pShaderCom[j]);
 	Safe_Release(m_pModelCom);
 }

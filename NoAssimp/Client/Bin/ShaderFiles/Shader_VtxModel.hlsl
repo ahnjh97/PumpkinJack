@@ -129,7 +129,7 @@ PS_OUT PS_MAIN_TORNADO(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
-    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord); // CloudTex
     vector vTigerStripes = g_TigerStripes.Sample(LinearSampler, In.vTexcoord );
     vector vTopBottomFade = g_TopBottomFadeTex.Sample(LinearSampler, In.vTexcoord);
   
@@ -137,6 +137,8 @@ PS_OUT PS_MAIN_TORNADO(PS_IN In)
     float4 finalColor = lerp(vTigerStripes, vDiffuse, vDiffuse.g);
     Out.vColor = finalColor;
     Out.vColor.a = vTopBottomFade.r /** (1 - vTigerStripes.r) */* finalColor.g;
+    if (Out.vColor.a <= 0.15f)
+        discard;
     return Out;
 }
 

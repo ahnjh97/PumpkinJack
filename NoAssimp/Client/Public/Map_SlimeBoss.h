@@ -9,15 +9,16 @@ END
 
 BEGIN(Client)
 
-class CTongMap_Wizard final : public CGameObject
+class CMap_SlimeBoss final : public CGameObject
 {
 private:
-	enum TONGMAP_WIZARD_TEX { TEX_NOISE, TEX_END };
+	enum SHADER { LIGHTED, NO_LIGHT, SHADER_END };
+	enum TONGMAP_TEX { TEX_WATER, TEX_CAUSTIC, TEX_END };
 
 private:
-	CTongMap_Wizard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CTongMap_Wizard(const CTongMap_Wizard& rhs);
-	virtual ~CTongMap_Wizard() = default;
+	CMap_SlimeBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CMap_SlimeBoss(const CMap_SlimeBoss& rhs);
+	virtual ~CMap_SlimeBoss() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -31,13 +32,13 @@ private:
 
 private:
 	_float m_fOffset_Y = {};
-	_float m_fAlpha = {0.5f};
 
+	vector<_uint> m_vecMeshShaderTypes;
 	vector<_uint> m_vecMeshShaderPassIndices;
 
 private:
 	CModel* m_pModelCom = { nullptr };
-	CShader* m_pShaderCom = { nullptr };
+	CShader* m_pShaderCom[SHADER_END] = {};
 	CTexture* m_pTextureCom[TEX_END] = {};
 
 private:
@@ -45,10 +46,9 @@ private:
 	HRESULT Bind_ShaderResources();
 
 public:
-	static CTongMap_Wizard* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CMap_SlimeBoss* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };
 
 END
-

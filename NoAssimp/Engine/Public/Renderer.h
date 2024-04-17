@@ -10,7 +10,7 @@ BEGIN(Engine)
 class CRenderer final : public CBase
 {
 public:
-	enum RENDERGROUP { RENDER_PRIORITY, RENDER_NONBLEND, RENDER_BLEND, RENDER_UI, RENDER_END };
+	enum RENDERGROUP { RENDER_PRIORITY, RENDER_NONBLEND, RENDER_NONLIGHT, RENDER_BLEND, RENDER_UI, RENDER_END };
 private:
 	CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CRenderer() = default;
@@ -20,13 +20,14 @@ public:
 	HRESULT Render();
 	
 private:
-	ID3D11Device*						m_pDevice = { nullptr };
-	ID3D11DeviceContext*				m_pContext = { nullptr };
+	ID3D11Device*				m_pDevice = { nullptr };
+	ID3D11DeviceContext*		m_pContext = { nullptr };
 	list<class CGameObject*>	m_RenderObjects[RENDER_END];
 
 private:
 	HRESULT Render_Priority();
 	HRESULT Render_NonBlend();
+	HRESULT Render_NonLight();
 	HRESULT Render_Blend();
 	HRESULT Render_UI();
 

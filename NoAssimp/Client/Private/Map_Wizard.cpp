@@ -1,23 +1,23 @@
 #include "stdafx.h"
-#include "TongMap_Wizard.h"
+#include "Map_Wizard.h"
 
-CTongMap_Wizard::CTongMap_Wizard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CMap_Wizard::CMap_Wizard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
 {
 }
 
-CTongMap_Wizard::CTongMap_Wizard(const CTongMap_Wizard& rhs)
+CMap_Wizard::CMap_Wizard(const CMap_Wizard& rhs)
 	: CGameObject{ rhs }
 {
 
 }
 
-HRESULT CTongMap_Wizard::Initialize_Prototype()
+HRESULT CMap_Wizard::Initialize_Prototype()
 {
 	return S_OK;
 }
 
-HRESULT CTongMap_Wizard::Initialize(void* pArg)
+HRESULT CMap_Wizard::Initialize(void* pArg)
 {
 	GAMEOBJECT_DESC GameObjectDesc = {}; // = (GAMEOBJECT_DESC*)pArg;
 	if (pArg)
@@ -39,17 +39,17 @@ HRESULT CTongMap_Wizard::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CTongMap_Wizard::Tick(_float fTimeDelta)
+void CMap_Wizard::Tick(_float fTimeDelta)
 {
 	m_fOffset_Y += 0.004f;
 }
 
-void CTongMap_Wizard::Late_Tick(_float fTimeDelta)
+void CMap_Wizard::Late_Tick(_float fTimeDelta)
 {
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this); // 알파값 있는 애들때문에 객체 분리해야될거같음
 }
 
-HRESULT CTongMap_Wizard::Render()
+HRESULT CMap_Wizard::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -71,7 +71,7 @@ HRESULT CTongMap_Wizard::Render()
 	return S_OK;
 }
 
-void CTongMap_Wizard::SetUp_MeshShaderPassIndices(_uint iNumMeshes)
+void CMap_Wizard::SetUp_MeshShaderPassIndices(_uint iNumMeshes)
 {
 	m_vecMeshShaderPassIndices.resize(iNumMeshes);
 	for (_uint i = 0; i < iNumMeshes; i++)
@@ -84,7 +84,7 @@ void CTongMap_Wizard::SetUp_MeshShaderPassIndices(_uint iNumMeshes)
 	}
 }
 
-HRESULT CTongMap_Wizard::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
+HRESULT CMap_Wizard::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 {
 	wstring wstrModelTag = _wstrModelTag;
 	if (FAILED(__super::Add_Component(eLevel, wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
@@ -101,7 +101,7 @@ HRESULT CTongMap_Wizard::Add_Components(LEVEL eLevel, const wstring& _wstrModelT
 	return S_OK;
 }
 
-HRESULT CTongMap_Wizard::Bind_ShaderResources()
+HRESULT CMap_Wizard::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -121,13 +121,13 @@ HRESULT CTongMap_Wizard::Bind_ShaderResources()
 	return S_OK;
 }
 
-CTongMap_Wizard* CTongMap_Wizard::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CMap_Wizard* CMap_Wizard::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CTongMap_Wizard* pInstance = new CTongMap_Wizard(pDevice, pContext);
+	CMap_Wizard* pInstance = new CMap_Wizard(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Create : CTongMap_Wizard"));
+		MSG_BOX(TEXT("Failed To Create : CMap_Wizard"));
 
 		Safe_Release(pInstance);
 	}
@@ -136,13 +136,13 @@ CTongMap_Wizard* CTongMap_Wizard::Create(ID3D11Device* pDevice, ID3D11DeviceCont
 
 }
 
-CGameObject* CTongMap_Wizard::Clone(void* pArg)
+CGameObject* CMap_Wizard::Clone(void* pArg)
 {
-	CTongMap_Wizard* pInstance = new CTongMap_Wizard(*this);
+	CMap_Wizard* pInstance = new CMap_Wizard(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Create : CTongMap_Wizard"));
+		MSG_BOX(TEXT("Failed To Create : CMap_Wizard"));
 
 		Safe_Release(pInstance);
 	}
@@ -150,7 +150,7 @@ CGameObject* CTongMap_Wizard::Clone(void* pArg)
 	return pInstance;
 }
 
-void CTongMap_Wizard::Free()
+void CMap_Wizard::Free()
 {
 	__super::Free();
 	for (_int i = 0; i < TEX_END; i++)

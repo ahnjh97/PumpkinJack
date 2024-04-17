@@ -190,6 +190,21 @@
     <Filter Include="02.GameObjects\Level_Wizard\Book">
       <UniqueIdentifier>{47961f50-2687-49d8-91ef-52782fcf9ada}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effects">
+      <UniqueIdentifier>{92d4c771-4bac-4012-8a47-70a642d63142}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_Wizard\ElecParts">
+      <UniqueIdentifier>{f1f70f3d-6432-4f97-90a0-5f15d15dc129}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_Wizard\_Map">
+      <UniqueIdentifier>{1b5db11d-a798-42ba-bc55-382cd45776cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_SlimeBoss\_Map">
+      <UniqueIdentifier>{bfa1bf44-5b76-4711-a351-2556251c5606}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay\_Map">
+      <UniqueIdentifier>{4773ce19-f8ca-4a12-bb3a-16b1e688ae24}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -342,17 +357,8 @@
     <ClInclude Include="..\Public\SlimeBoss.h">
       <Filter>02.GameObjects\Level_SlimeBoss\SlimeBoss</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\TongMap_GamePlay.h">
-      <Filter>02.GameObjects\Level_GamePlay</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\TongMap_SlimeBoss.h">
-      <Filter>02.GameObjects\Level_SlimeBoss</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Wizard.h">
       <Filter>02.GameObjects\Level_Wizard\Wizard</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\TongMap_Wizard.h">
-      <Filter>02.GameObjects\Level_Wizard</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Wizard.h">
       <Filter>01.Levels\06. Wizard</Filter>
@@ -386,6 +392,18 @@
     </ClInclude>
     <ClInclude Include="..\Public\Book.h">
       <Filter>02.GameObjects\Level_Wizard\Book</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Map_Wizard.h">
+      <Filter>02.GameObjects\Level_Wizard\_Map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Map_SlimeBoss.h">
+      <Filter>02.GameObjects\Level_SlimeBoss\_Map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Map_GamePlay.h">
+      <Filter>02.GameObjects\Level_GamePlay\_Map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ElecParts.h">
+      <Filter>02.GameObjects\Level_Wizard\ElecParts</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -530,17 +548,8 @@
     <ClCompile Include="..\Private\SlimeBoss.cpp">
       <Filter>02.GameObjects\Level_SlimeBoss\SlimeBoss</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\TongMap_GamePlay.cpp">
-      <Filter>02.GameObjects\Level_GamePlay</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\TongMap_SlimeBoss.cpp">
-      <Filter>02.GameObjects\Level_SlimeBoss</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Wizard.cpp">
       <Filter>02.GameObjects\Level_Wizard\Wizard</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\TongMap_Wizard.cpp">
-      <Filter>02.GameObjects\Level_Wizard</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Wizard.cpp">
       <Filter>01.Levels\06. Wizard</Filter>
@@ -574,6 +583,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_EffectTool.cpp">
       <Filter>01.Levels\08. Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Map_Wizard.cpp">
+      <Filter>02.GameObjects\Level_Wizard\_Map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Map_SlimeBoss.cpp">
+      <Filter>02.GameObjects\Level_SlimeBoss\_Map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Map_GamePlay.cpp">
+      <Filter>02.GameObjects\Level_GamePlay\_Map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ElecParts.cpp">
+      <Filter>02.GameObjects\Level_Wizard\ElecParts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

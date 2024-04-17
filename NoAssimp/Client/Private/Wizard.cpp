@@ -47,7 +47,7 @@ HRESULT CWizard::Initialize(void* pArg)
 	m_pModelCom->Set_LerpTime(0.1f);
 	SetUp_WizardAnimSpeed();
 
-	m_iPreHp = m_iHp = 300;
+	m_iPreHp = m_iHp = 200;
 	m_pTransformCom->Set_Height(60);
 
 	Summon_LevitationTornado();
@@ -133,7 +133,7 @@ void CWizard::Check_WizardHp()
 	}
 
 	if (WIZARD_HIT == m_eState || WIZARD_IDLE == m_eState) {
-		if ((m_iHp > 100 && m_iHp <= 200 && m_iWizardPhase == 0) || (m_iHp > 0 && m_iHp <= 100 && m_iWizardPhase == 1)) {
+		if ((m_iHp > 70 && m_iHp <= 140 && m_iWizardPhase == 0) || (m_iHp > 0 && m_iHp <= 70 && m_iWizardPhase == 1)) {
 			m_eState = WIZARD_AIR_IDLE;
 			m_iWizardPhase++;
 			m_bChangePhase = true;
@@ -262,7 +262,7 @@ void CWizard::Link_State(_float fTimeDelta)
 			m_bTowerSpawn = true;
 		}
 
-		if (m_fChargeTime > 25.f) {
+		if (m_fChargeTime > 35.f) {
 			m_eSpell = SPELL_LIGHTNING;
 			m_iAttackCount = 0;
 			m_iAttackFinishCount = 0;

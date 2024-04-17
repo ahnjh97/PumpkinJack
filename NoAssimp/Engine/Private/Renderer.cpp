@@ -34,6 +34,8 @@ HRESULT CRenderer::Render()
 		return E_FAIL;
 	if (FAILED(Render_NonBlend()))
 		return E_FAIL;
+	if (FAILED(Render_NonLight()))
+		return E_FAIL;
 	if (FAILED(Render_Blend()))
 		return E_FAIL;
 	if (FAILED(Render_UI()))
@@ -64,6 +66,20 @@ HRESULT CRenderer::Render_NonBlend()
 		Safe_Release(pRenderObject);
 	}
 	m_RenderObjects[RENDER_NONBLEND].clear();
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_NonLight()
+{
+	for (auto& pRenderObject : m_RenderObjects[RENDER_NONLIGHT])
+	{
+		if (nullptr != pRenderObject)
+			pRenderObject->Render();
+		Safe_Release(pRenderObject);
+	}
+
+	m_RenderObjects[RENDER_NONLIGHT].clear();
 
 	return S_OK;
 }

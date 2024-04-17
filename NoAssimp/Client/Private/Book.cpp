@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Instance_Model.h"
+//#include "Instance_Model.h"
 #include "Book.h"
 
 CBook::CBook(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

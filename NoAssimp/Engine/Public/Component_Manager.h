@@ -12,6 +12,7 @@
 #include "VIBuffer_Cell.h"
 #include "VIBuffer_Terrain.h"
 #include "VIBuffer_Instance_Mesh.h"
+#include "VIBuffer_Instance_Point.h"
 #include "Bounding_AABB.h"
 #include "Bounding_OBB.h"
 #include "Bounding_SPHERE.h"

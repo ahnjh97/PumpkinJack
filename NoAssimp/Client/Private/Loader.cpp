@@ -17,7 +17,7 @@
 #include "Weapon.h"
 #include "Sky.h"
 
-#include "TongMap_GamePlay.h"
+#include "Map_GamePlay.h"
 #include "BallistaRotator.h"
 #include "SkullCrossBow.h"
 #include "SoldierWeapon.h"
@@ -32,7 +32,7 @@
 
 #include "Terrain_SlimeBossRoom.h"
 #include "Pillar_SlimeBossRoom.h"
-#include "TongMap_SlimeBoss.h"
+#include "Map_SlimeBoss.h"
 #include "SlimeBoss_Slime.h"
 #include "SlimeDamageZone.h"
 #include "SlimeBossHead.h"
@@ -43,11 +43,12 @@
 #include "Knife.h"
 #include "Slime.h"
 
-#include "TongMap_Wizard.h"
+#include "Map_Wizard.h"
 #include "WizardTower.h"
 #include "TeslaTower.h"
 #include "ElecArena.h"
 #include "SkySphere.h"
+#include "ElecParts.h"
 #include "HoleWall.h"
 #include "Tornado.h"
 #include "Wizard.h"
@@ -272,7 +273,7 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Rifle"), CWeapon);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Scythe"), CWeapon);
 
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TongMap_GamePlay"), CTongMap_GamePlay);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TongMap_GamePlay"), CMap_GamePlay);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Ballista"), CBallista);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Arrow"), CArrow);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BallistaRotator"), CBallistaRotator);
@@ -356,7 +357,7 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SlimeBoss"), CSlimeBoss);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_SlimeBoss_Slime"), CSlimeBoss_Slime);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Knife"), CKnife);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TongMap_SlimeBoss"), CTongMap_SlimeBoss);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TongMap_SlimeBoss"), CMap_SlimeBoss);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("cemeteryPillar"), CPillar);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Portal"), CPortal);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Pillar_SlimeBossRoom"), CPillar_SlimeBossRoom);
@@ -382,6 +383,8 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 	if (FAILED(Add_Texture(eLevel, "TigerStripes", "Effects/tigerStripes.dds")))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "TopBottomFade", "Effects/topBottomFadeTex.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "ElecParts", "Effects/elecParts.dds")))
 		return E_FAIL;
 
 
@@ -419,7 +422,7 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 
 	m_strLoadingText = TEXT("Loading GameObject Prototypes for Level_Wizard...");
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Wizard"), CWizard);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TongMap_Wizard"), CTongMap_Wizard);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TongMap_Wizard"), CMap_Wizard);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SkySphere"), CSkySphere);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Tornado"), CTornado);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HoleWall"), CHoleWall);
@@ -427,6 +430,7 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TeslaTower"), CTeslaTower);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ElecArena"), CElecArena);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Book"), CBook);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ElecParts"), CElecParts);
 
 	m_strLoadingText = TEXT("Loading Complete: Level_Wizard");
 	m_isFinished = true;
@@ -454,7 +458,7 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "TopBottomFade", "Effects/topBottomFadeTex.dds")))
 		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Book", "CommonTextures/books.dds")))
+	if (FAILED(Add_Texture(eLevel, "ElecParts", "Effects/elecParts.dds")))
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("Loading VIBuffers for Level_EffectTool...");
