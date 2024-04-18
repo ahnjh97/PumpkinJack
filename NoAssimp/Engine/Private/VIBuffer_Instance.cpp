@@ -107,8 +107,6 @@ void CVIBuffer_Instance::Spread(_float fTimeDelta)
 
 	VTXMATRIX* pVertices = ((VTXMATRIX*)SubResource.pData);
 
-
-
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
 		_vector		vDir = XMVectorSetW(XMLoadFloat4(&pVertices[i].vPosition) - XMLoadFloat3(&m_InstanceDesc.vPivot), 0.f);
@@ -139,16 +137,15 @@ void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceI
 	}
 }
 
-
-
 void CVIBuffer_Instance::Free()
 {
 	__super::Free();
 
-	if (false == m_isCloned)
+	if (false == m_isCloned) {
 		Safe_Delete_Array(m_pSpeeds);
+		Safe_Delete_Array(m_pInstanceVertices);
+	}
 
 	Safe_Delete_Array(m_pLifeTimes);
-	Safe_Delete_Array(m_pInstanceVertices);
 	Safe_Release(m_pVBInstance);
 }

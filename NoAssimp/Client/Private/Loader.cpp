@@ -17,11 +17,11 @@
 #include "Weapon.h"
 #include "Sky.h"
 
-#include "Map_GamePlay.h"
 #include "BallistaRotator.h"
 #include "SkullCrossBow.h"
 #include "SoldierWeapon.h"
 #include "CollisionCube.h"
+#include "Map_GamePlay.h"
 #include "Ballista.h"
 #include "CrateBox.h"
 #include "Trigger.h"
@@ -32,10 +32,10 @@
 
 #include "Terrain_SlimeBossRoom.h"
 #include "Pillar_SlimeBossRoom.h"
-#include "Map_SlimeBoss.h"
 #include "SlimeBoss_Slime.h"
 #include "SlimeDamageZone.h"
 #include "SlimeBossHead.h"
+#include "Map_SlimeBoss.h"
 #include "Slime_Slime.h"
 #include "SlimeBoss.h"
 #include "Pillar.h"
@@ -43,8 +43,8 @@
 #include "Knife.h"
 #include "Slime.h"
 
-#include "Map_Wizard.h"
 #include "WizardTower.h"
+#include "Map_Wizard.h"
 #include "TeslaTower.h"
 #include "ElecArena.h"
 #include "SkySphere.h"
@@ -389,20 +389,11 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 
 
 	m_strLoadingText = TEXT("Loading VIBuffers for Level_Wizard...");
-	/* Prototype_Component_VIBuffer_Instance_Mesh */
-	CVIBuffer_Instance::INSTANCE_DESC		InstanceDesc{};
-	InstanceDesc.vPivot = _float3(580.f, -550.f, 580.f);
-	InstanceDesc.vCenter = _float3(580.f, -450.f, 580.f);
-	InstanceDesc.vRange = _float3(1000.f, 800.f, 1000.f);
-	InstanceDesc.vMinScale = _float3(6.f, 4.f, 6.f);
-	InstanceDesc.vMaxScale = _float3(9.f, 6.f, 9.f);
-	InstanceDesc.iNumInstance = 2000;
-	InstanceDesc.vLifeTime = _float2(8.f, 12.f);
-	InstanceDesc.isLoop = true;
-	InstanceDesc.vSpeed = _float2(40.f, 70.f);
-	
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_WIZARD, TEXT("Prototype_Component_Instance_Model"),
-		CInstance_Model::Create(m_pDevice, m_pContext, "Book", InstanceDesc))))
+
+	if (FAILED(Add_Instance_Models(eLevel)))
+		return E_FAIL;
+
+	if (FAILED(Add_VIBuffer_Instance_Points(eLevel)))
 		return E_FAIL;
 
 
@@ -467,21 +458,10 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, 100, 100))))
 		return E_FAIL;
 
-	/* Prototype_Component_VIBuffer_Instance_Mesh */
-	CVIBuffer_Instance::INSTANCE_DESC		InstanceDesc{};
+	if(FAILED(Add_Instance_Models(eLevel)))
+		return E_FAIL;
 
-	InstanceDesc.vPivot = _float3(0.f, -5.f, 0.f);
-	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
-	InstanceDesc.vRange = _float3(50.f, 3.f, 50.f);
-	InstanceDesc.vMinScale = _float3(0.3f, 0.1f, 0.3f);
-	InstanceDesc.vMaxScale = _float3(0.8f, 0.5f, 0.8f);
-	InstanceDesc.iNumInstance = 250;
-	InstanceDesc.vLifeTime = _float2(3.f, 6.0f);
-	InstanceDesc.isLoop = true;
-	InstanceDesc.vSpeed = _float2(2.f, 15.f);
-
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_EFFECTTOOL, TEXT("Prototype_Component_Instance_Model"),
-		CInstance_Model::Create(m_pDevice, m_pContext, "Book", InstanceDesc))))
+	if (FAILED(Add_VIBuffer_Instance_Points(eLevel)))
 		return E_FAIL;
 
 
@@ -496,13 +476,14 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 		return E_FAIL;
 
 
-
 	m_strLoadingText = TEXT("Loading GameObject Prototypes for Level_EffectTool...");
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Terrain"), CTerrain);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Tornado"), CTornado);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Book"), CBook);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Monster"), CMonster);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ElecParts"), CElecParts);
+
 
 	m_strLoadingText = TEXT("Loading Complete: Level_EffectTool");
 	m_isFinished = true;
@@ -589,11 +570,6 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_Lighted.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 		return E_FAIL;
 
-	/* For.Prototype_Component_Shader_VtxInstance_Point */
-	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxInstance_Point"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_Point.hlsl"), VTXINSTANCE_POINT::Elements, VTXINSTANCE_POINT::iNumElements))))
-		return E_FAIL;
-
 	/* For.Prototype_Component_Shader_VtxInstance_Mesh */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxInstance_Mesh"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_Mesh.hlsl"), VTXINSTANCE_MESH::Elements, VTXINSTANCE_MESH::iNumElements))))
@@ -617,6 +593,76 @@ HRESULT CLoader::Add_Texture(LEVEL eLevel, string strPrototypeName, string strFo
 
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag,	CTexture::Create(m_pDevice, m_pContext, wstrFullPath, iNumTextures))))
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLoader::Add_Instance_Models(LEVEL eLevel)
+{
+	CVIBuffer_Instance::INSTANCE_DESC		InstanceDesc{};
+	if (eLevel == LEVEL_WIZARD) {
+		InstanceDesc.vPivot = _float3(580.f, -550.f, 580.f);
+		InstanceDesc.vCenter = _float3(580.f, -450.f, 580.f);
+		InstanceDesc.vRange = _float3(1000.f, 800.f, 1000.f);
+		InstanceDesc.vMinScale = _float3(6.f, 4.f, 6.f);
+		InstanceDesc.vMaxScale = _float3(9.f, 6.f, 9.f);
+		InstanceDesc.iNumInstance = 2000;
+		InstanceDesc.vLifeTime = _float2(8.f, 12.f);
+		InstanceDesc.isLoop = true;
+		InstanceDesc.vSpeed = _float2(40.f, 70.f);
+	}
+	else if (eLevel == LEVEL_EFFECTTOOL) {
+		InstanceDesc.vPivot = _float3(0.f, -5.f, 0.f);
+		InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+		InstanceDesc.vRange = _float3(4.f, 3.f, 3.f);
+		InstanceDesc.vMinScale = _float3(2.f, 2.f, 2.f);
+		InstanceDesc.vMaxScale = _float3(3, 3, 3);
+		InstanceDesc.iNumInstance = 20;
+		InstanceDesc.vLifeTime = _float2(3.f, 6.0f);
+		InstanceDesc.isLoop = true;
+		InstanceDesc.vSpeed = _float2(2.f, 15.f);
+	}
+
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Instance_Model"),
+		CInstance_Model::Create(m_pDevice, m_pContext, "Book", InstanceDesc))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLoader::Add_VIBuffer_Instance_Points(LEVEL eLevel)
+{
+	vector<CVIBuffer_Instance::INSTANCE_DESC> vecInstanceDesc;
+	vecInstanceDesc.resize(CElecParts::ELEC_END);
+	// ELEC_TORNADO
+	CVIBuffer_Instance::INSTANCE_DESC		InstanceDesc{};
+	InstanceDesc.vPivot = _float3(0.f, -5.f, 0.f);
+	InstanceDesc.vCenter = _float3(0.f, 18.f, 0.f);
+	InstanceDesc.vRange = _float3(25.f, 36.f, 25.f);
+	InstanceDesc.vMinScale = _float3(16.f, 16.f, 16.f);
+	InstanceDesc.vMaxScale = _float3(18, 18, 18);
+	InstanceDesc.iNumInstance = 20;
+	InstanceDesc.vLifeTime = _float2(3.f, 5.f);
+	InstanceDesc.isLoop = true;
+	InstanceDesc.vSpeed = _float2(2.f, 15.f);
+	InstanceDesc.iSpriteIndexOffset = 8;
+	vecInstanceDesc[CElecParts::ELEC_TORNADO] = InstanceDesc;
+
+	//
+	//wstring wstrPrototypeTag = TEXT("Prototype_Component_VIBuffer_Instance_Point") + to_wstring(CElecParts::ELEC_TORNADO);
+	//if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag,	CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext, InstanceDesc))))
+	//	return E_FAIL;
+
+	if (vecInstanceDesc.empty())
+		return S_OK;
+
+	for (_int i = 0; i < CElecParts::ELEC_END; i++) {
+		if (vecInstanceDesc[i].iSpriteIndexOffset != 0) {
+			wstring wstrPrototypeTag = TEXT("Prototype_Component_VIBuffer_Instance_Point") + to_wstring(i);
+			if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext, vecInstanceDesc[i]))))
+				return E_FAIL;
+		}
+	}
 
 	return S_OK;
 }

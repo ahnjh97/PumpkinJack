@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Level_EffectTool.h"
 #include "Camera_Free.h"
+#include "ElecParts.h"
 #include "Terrain.h"
 
 CLevel_EffectTool::CLevel_EffectTool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -73,9 +74,9 @@ HRESULT CLevel_EffectTool::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	CameraDesc.fNear = 0.1f;
 	CameraDesc.fFar = 1000.0f;
-	CameraDesc.vEye = _float4(0.f, 10.f, -7.f, 1.f);
+	CameraDesc.vEye = _float4(0.f, 50.f, -100.f, 1.f);
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
-	CameraDesc.fSpeedPerSec = 10.f;
+	CameraDesc.fSpeedPerSec = 50.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
@@ -90,17 +91,22 @@ HRESULT CLevel_EffectTool::Ready_Layer_Grid(const wstring& strLayerTag)
 	terrainDesc.iLevel = LEVEL_EFFECTTOOL;
 	terrainDesc.iGridIndex = 0;
 	if(FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Terrain"), &terrainDesc)))
-		return S_OK;
+		return E_FAIL;
 
 	return S_OK;
 }
 
 HRESULT CLevel_EffectTool::Ready_Layer_Effect(const wstring& strLayerTag)
 {
-	CGameObject::GAMEOBJECT_DESC tDesc{};
-	tDesc.iLevel = LEVEL_EFFECTTOOL;
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Book"), &tDesc)))
-		return S_OK;
+	/*if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Book"), &tDesc)))
+		return E_FAIL;*/
+
+	CElecParts::ELECPARTS_DESC tElecPartsDesc{};
+	tElecPartsDesc.iLevel = LEVEL_EFFECTTOOL;
+	tElecPartsDesc.eElecEffect = CElecParts::ELEC_TORNADO;
+	
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
+		return E_FAIL;
 
 	return S_OK;
 }

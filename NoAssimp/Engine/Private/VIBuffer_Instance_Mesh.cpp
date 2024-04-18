@@ -185,24 +185,8 @@ void CVIBuffer_Instance_Mesh::TurnAndSpread(_float fTimeDelta, _float fRotationS
 	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
 	VTXMATRIX* pVertices = ((VTXMATRIX*)SubResource.pData);
 
-	/*_float fIncreaseRate = 1.002f;
-	_float fDecreaseRate = 0.9975f;*/
-
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
-		//// 크기변화
-		//if (m_pLifeTimes[i].x < m_pLifeTimes[i].y * 0.5f) { // 증가
-		//	XMStoreFloat4(&pVertices[i].vRight, XMLoadFloat4(&pVertices[i].vRight) * fIncreaseRate);
-		//	XMStoreFloat4(&pVertices[i].vUp, XMLoadFloat4(&pVertices[i].vUp) * fIncreaseRate);
-		//	XMStoreFloat4(&pVertices[i].vLook, XMLoadFloat4(&pVertices[i].vLook) * fIncreaseRate);
-		//}
-		//	
-		//else {// 감소
-		//	XMStoreFloat4(&pVertices[i].vRight, XMLoadFloat4(&pVertices[i].vRight) * fDecreaseRate);
-		//	XMStoreFloat4(&pVertices[i].vUp, XMLoadFloat4(&pVertices[i].vUp) * fDecreaseRate);
-		//	XMStoreFloat4(&pVertices[i].vLook, XMLoadFloat4(&pVertices[i].vLook) * fDecreaseRate);
-		//}
-		
 		// 자전
 		_vector vRotationAxis = XMVector3Normalize(XMLoadFloat3(&m_pRotationAxes[i]));
 		_matrix	RotationMatrix = XMMatrixRotationAxis(vRotationAxis, m_pSpeeds[i] * fTimeDelta * fRotationSpeed);

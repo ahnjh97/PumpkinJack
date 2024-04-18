@@ -1,8 +1,9 @@
 #include "stdafx.h"
+#include "ElecArena.h"
+#include "ElecParts.h"
 #include "Wizard.h"
 #include "Player.h"
 #include "Bone.h"
-#include "ElecArena.h"
 
 CWizard::CWizard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }

@@ -158,7 +158,7 @@ CShader* CShader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, c
 {
 	CShader* pInstance = new CShader(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(strShaderFilePath, pElements, iNumElements)))
+ 	if (FAILED(pInstance->Initialize_Prototype(strShaderFilePath, pElements, iNumElements)))
 	{
 		MSG_BOX(TEXT("Failed To Create : CShader"));
 

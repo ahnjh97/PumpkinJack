@@ -184,9 +184,6 @@
     <Filter Include="02.GameObjects\Level_Wizard\ElecArena">
       <UniqueIdentifier>{1f3afa3d-7311-4a05-aa96-fdac79db49fa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\08. Effect">
-      <UniqueIdentifier>{6b947265-a777-45cf-9a0f-bf77d7cf9029}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Level_Wizard\Book">
       <UniqueIdentifier>{47961f50-2687-49d8-91ef-52782fcf9ada}</UniqueIdentifier>
     </Filter>
@@ -204,6 +201,9 @@
     </Filter>
     <Filter Include="02.GameObjects\Level_GamePlay\_Map">
       <UniqueIdentifier>{4773ce19-f8ca-4a12-bb3a-16b1e688ae24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\08. EffectTool">
+      <UniqueIdentifier>{6b947265-a777-45cf-9a0f-bf77d7cf9029}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -388,7 +388,7 @@
       <Filter>02.GameObjects\Level_Wizard\ElecArena</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_EffectTool.h">
-      <Filter>01.Levels\08. Effect</Filter>
+      <Filter>01.Levels\08. EffectTool</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Book.h">
       <Filter>02.GameObjects\Level_Wizard\Book</Filter>
@@ -582,7 +582,7 @@
       <Filter>02.GameObjects\Level_Wizard\Book</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_EffectTool.cpp">
-      <Filter>01.Levels\08. Effect</Filter>
+      <Filter>01.Levels\08. EffectTool</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Map_Wizard.cpp">
       <Filter>02.GameObjects\Level_Wizard\_Map</Filter>

@@ -1,4 +1,3 @@
-
 #include "VIBuffer_Instance_Point.h"
 
 CVIBuffer_Instance_Point::CVIBuffer_Instance_Point(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -86,12 +85,13 @@ HRESULT CVIBuffer_Instance_Point::Initialize_Prototype(const CVIBuffer_Instance:
 
 	ZeroMemory(&m_InstanceBufferDesc, sizeof m_InstanceBufferDesc);
 
-	uniform_real_distribution<float>	ScaleX(InstanceDesc.vMinScale.x, InstanceDesc.vMaxScale.x);
-	uniform_real_distribution<float>	ScaleY(InstanceDesc.vMinScale.y, InstanceDesc.vMaxScale.y);
-	uniform_real_distribution<float>	ScaleZ(InstanceDesc.vMinScale.z, InstanceDesc.vMaxScale.z);
+	uniform_real_distribution<_float>	ScaleX(InstanceDesc.vMinScale.x, InstanceDesc.vMaxScale.x);
+	uniform_real_distribution<_float>	ScaleY(InstanceDesc.vMinScale.y, InstanceDesc.vMaxScale.y);
+	uniform_real_distribution<_float>	ScaleZ(InstanceDesc.vMinScale.z, InstanceDesc.vMaxScale.z);
 
-	uniform_real_distribution<float>	LifeTime(InstanceDesc.vLifeTime.x, InstanceDesc.vLifeTime.y);
-	uniform_real_distribution<float>	Speed(InstanceDesc.vSpeed.x, InstanceDesc.vSpeed.y);
+	uniform_real_distribution<_float>	LifeTime(InstanceDesc.vLifeTime.x, InstanceDesc.vLifeTime.y);
+	uniform_real_distribution<_float>	Speed(InstanceDesc.vSpeed.x, InstanceDesc.vSpeed.y);
+	uniform_int_distribution<_uint>		SpriteIndexOffset(0, InstanceDesc.iSpriteIndexOffset);
 
 
 	/* 인덱스 버퍼의 byte크기 */
@@ -111,6 +111,7 @@ HRESULT CVIBuffer_Instance_Point::Initialize_Prototype(const CVIBuffer_Instance:
 	m_pSpeeds = new _float[m_iNumInstance];
 	ZeroMemory(m_pSpeeds, sizeof(_float) * m_iNumInstance);
 
+
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
 		XMStoreFloat4(&m_pInstanceVertices[i].vRight, XMVectorSet(1.f, 0.f, 0.f, 0.f) * ScaleX(m_RandomNumber));
@@ -125,6 +126,12 @@ HRESULT CVIBuffer_Instance_Point::Initialize_Prototype(const CVIBuffer_Instance:
 		/* LifeTime(m_RandomNumber) 인스턴스마다 랜덤하게 설정된 각각의 라이프타임디다. */
 		m_pLifeTimes[i] = _float2(0.f, LifeTime(m_RandomNumber));
 		m_pSpeeds[i] = Speed(m_RandomNumber);
+	}
+
+
+	if (InstanceDesc.iSpriteIndexOffset != 0) {
+		for (size_t j = 0; j < m_iNumInstance; j++)
+			m_pInstanceVertices[j].iSpriteOffset = SpriteIndexOffset(m_RandomNumber);
 	}
 
 	ZeroMemory(&m_InstanceSubResourceData, sizeof m_InstanceSubResourceData);
@@ -152,7 +159,6 @@ _float4 CVIBuffer_Instance_Point::Compute_RandPosition()
 
 	return _float4(RangePosX(m_RandomNumber), RangePosY(m_RandomNumber), RangePosZ(m_RandomNumber), 1.f);
 }
-
 
 CVIBuffer_Instance_Point* CVIBuffer_Instance_Point::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc)
 {
@@ -187,4 +193,5 @@ void CVIBuffer_Instance_Point::Free()
 {
 	__super::Free();
 
+	Safe_Delete_Array(m_pSpriteIndexOffsets);
 }

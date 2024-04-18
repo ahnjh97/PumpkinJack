@@ -132,7 +132,7 @@ namespace Engine
 		XMFLOAT4		vLook;
 		XMFLOAT4		vPosition;
 		bool			isLived;
-
+		_uint			iSpriteOffset;
 	}VTXMATRIX;
 
 	typedef struct ENGINE_DLL
@@ -143,8 +143,8 @@ namespace Engine
 
 	typedef struct ENGINE_DLL
 	{
-		static const unsigned int	iNumElements = { 6 };
-		static const D3D11_INPUT_ELEMENT_DESC	Elements[6];
+		static const unsigned int	iNumElements = { 7 };
+		static const D3D11_INPUT_ELEMENT_DESC	Elements[7];
 	}VTXINSTANCE_POINT;
 
 	// MODEL_NONANIM.mNumMeshes 만큼 반복: MESH_NONANIM. { mName, mMaterialIndex, mNumVertices,	mNumFaces } -> VTXMESH * mNumVertices -> _uint * m_iNumIndices

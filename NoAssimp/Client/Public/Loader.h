@@ -51,6 +51,9 @@ private:
 	HRESULT Add_Shaders(LEVEL eLevel);
 	HRESULT Add_Texture(LEVEL eLevel, string strPrototypeName, string strFolderAndFileName, _uint iNumTextures = 1);
 
+	HRESULT Add_Instance_Models(LEVEL eLevel);
+	HRESULT Add_VIBuffer_Instance_Points(LEVEL eLevel);
+
 	void SetUp_ModelScaleRotation();
 
 	void TraverseAnimModels(LEVEL eLevel, const wstring& rootFolderPath);

@@ -1,5 +1,5 @@
-- Electricity Particles
-- Electricity Ray
+- Tornado PartObject :  ElecParts
+- func Lightning : ElecParts, ElecRay
 - 
 
 - Spell Effects

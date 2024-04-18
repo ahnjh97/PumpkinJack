@@ -16,6 +16,7 @@ public:
 		_bool		isLoop;
 		_float2		vSpeed;
 		_uint		iNumInstance;
+		_uint		iSpriteIndexOffset = {};
 	}INSTANCE_DESC;
 
 protected:

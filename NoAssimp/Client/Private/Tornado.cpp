@@ -1,6 +1,8 @@
 #include "stdafx.h"
+#include "ElecParts.h"
 #include "Tornado.h"
 #include "Wizard.h"
+
 
 CTornado::CTornado(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -39,6 +41,14 @@ HRESULT CTornado::Initialize(void* pArg)
 	_int iRandNum = m_pGameInstance->RandomNumber(0, 1);
 	if (iRandNum == 0)
 		m_iTurnDir = -1;
+
+	CElecParts::ELECPARTS_DESC tElecPartsDesc{};
+	tElecPartsDesc.iLevel = LEVEL_WIZARD;
+	tElecPartsDesc.eElecEffect = CElecParts::ELEC_TORNADO;
+	tElecPartsDesc.pTargetWorldMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_ElecParts"), TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
+		return E_FAIL;
 
 	return S_OK;
 }

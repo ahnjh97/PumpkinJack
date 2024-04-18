@@ -18,37 +18,51 @@ HRESULT CElecParts::Initialize_Prototype()
 
 HRESULT CElecParts::Initialize(void* pArg)
 {
-	GAMEOBJECT_DESC GameObjectDesc = {}; // = (GAMEOBJECT_DESC*)pArg;
+	ELECPARTS_DESC tElecPartsDesc = {}; // = (GAMEOBJECT_DESC*)pArg;
 	if (pArg)
-		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
+		tElecPartsDesc = *(ELECPARTS_DESC*)pArg;
+
+	m_pTargetWorldMat = tElecPartsDesc.pTargetWorldMat;
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components((LEVEL)GameObjectDesc.iLevel)))
+	if (FAILED(Add_Components((LEVEL)tElecPartsDesc.iLevel, tElecPartsDesc.eElecEffect)))
 		return E_FAIL;
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(rand() % 20, 3.0f, rand() % 20, 1.f));
+	if (m_pTargetWorldMat != nullptr)
+		m_pTransformCom->Set_Pos(XMVectorSet(m_pTargetWorldMat->_41, m_pTargetWorldMat->_42, m_pTargetWorldMat->_43, 1));
 
 	return S_OK;
 }
 
 void CElecParts::Tick(_float fTimeDelta)
 {
-	m_pVIBufferCom->Spread(fTimeDelta);
+	m_fTime += fTimeDelta;
+
+	if (m_fTime > 0.055f) {
+		m_iSpriteIndex++;
+		m_fTime = 0;
+	}
+	
+	if (m_iSpriteIndex == 9) 
+		m_iSpriteIndex = 0;
+
+	if (m_pTargetWorldMat != nullptr) 
+		m_pTransformCom->Set_Pos(XMVectorSet(m_pTargetWorldMat->_41, m_pTargetWorldMat->_42, m_pTargetWorldMat->_43, 1));
+	
 }
 
 void CElecParts::Late_Tick(_float fTimeDelta)
 {
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
 }
-
 HRESULT CElecParts::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Begin(0)))
+	if (FAILED(m_pShaderCom->Begin(1))) // ElecParts
 		return E_FAIL;
 
 	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
@@ -60,21 +74,21 @@ HRESULT CElecParts::Render()
 	return S_OK;
 }
 
-HRESULT CElecParts::Add_Components(LEVEL eLevel)
+HRESULT CElecParts::Add_Components(LEVEL eLevel, ELEC_EFFECT eElecEffect)
 {
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Shader_VtxInstance_Point"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxInstance_Point"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	/* For.Com_Texture */
-	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_Snow"),
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_ElecParts"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
 	/* For.Com_VIBuffer */
-	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_VIBuffer_Instance_Point"),
-		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
+	wstring wstrPrototypeTag = TEXT("Prototype_Component_VIBuffer_Instance_Point") + to_wstring(eElecEffect);
+	if (FAILED(__super::Add_Component(eLevel, wstrPrototypeTag,	TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
 
 	return S_OK;
@@ -97,6 +111,9 @@ HRESULT CElecParts::Bind_ShaderResources()
 		return E_FAIL;
 
 	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_iSpriteIndex", &m_iSpriteIndex, sizeof(m_iSpriteIndex))))
 		return E_FAIL;
 
 	return S_OK;
@@ -130,7 +147,6 @@ CGameObject* CElecParts::Clone(void* pArg)
 
 	return pInstance;
 }
-
 
 void CElecParts::Free()
 {

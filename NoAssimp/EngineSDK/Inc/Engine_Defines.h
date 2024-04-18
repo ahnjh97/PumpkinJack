@@ -1,9 +1,9 @@
 #pragma once
-
 #pragma warning (disable : 4251)
 #pragma warning(disable : 5208)
 #pragma warning(disable : 4244)
 #pragma warning(disable : 4267)
+
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <d3dcompiler.h>
@@ -18,8 +18,6 @@ namespace Engine
 	enum MOUSEMOVESTATE { DIMMS_X, DIMMS_Y, DIMMS_WHEEL, DIMMS_END };
 	enum TYPE { TYPE_NONANIM, TYPE_ANIM, TYPE_END };
 }
-
-
 
 #include "Effects11/d3dx11effect.h"
 #include "DirectXTK/DDSTextureLoader.h"
