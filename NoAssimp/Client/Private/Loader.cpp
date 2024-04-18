@@ -638,7 +638,7 @@ HRESULT CLoader::Add_VIBuffer_Instance_Points(LEVEL eLevel)
 	CVIBuffer_Instance::INSTANCE_DESC		InstanceDesc{};
 	InstanceDesc.vPivot = _float3(0.f, -5.f, 0.f);
 	InstanceDesc.vCenter = _float3(0.f, 18.f, 0.f);
-	InstanceDesc.vRange = _float3(25.f, 36.f, 25.f);
+	InstanceDesc.vRange = _float3(22.f, 36.f, 22.f);
 	InstanceDesc.vMinScale = _float3(16.f, 16.f, 16.f);
 	InstanceDesc.vMaxScale = _float3(18, 18, 18);
 	InstanceDesc.iNumInstance = 20;
@@ -646,12 +646,8 @@ HRESULT CLoader::Add_VIBuffer_Instance_Points(LEVEL eLevel)
 	InstanceDesc.isLoop = true;
 	InstanceDesc.vSpeed = _float2(2.f, 15.f);
 	InstanceDesc.iSpriteIndexOffset = 8;
-	vecInstanceDesc[CElecParts::ELEC_TORNADO] = InstanceDesc;
 
-	//
-	//wstring wstrPrototypeTag = TEXT("Prototype_Component_VIBuffer_Instance_Point") + to_wstring(CElecParts::ELEC_TORNADO);
-	//if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag,	CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext, InstanceDesc))))
-	//	return E_FAIL;
+	vecInstanceDesc[CElecParts::ELEC_TORNADO] = InstanceDesc;
 
 	if (vecInstanceDesc.empty())
 		return S_OK;
