@@ -18,7 +18,6 @@ public:
 public:
 	virtual HRESULT Initialize_Prototype(ifstream& fileStream, const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc);
 	virtual HRESULT Initialize(void* pArg) override;
-	virtual _float4 Compute_RandPosition() override;
 
 public:
 	void TurnAndSpread(_float fTimeDelta, _float fRotationSpeed);

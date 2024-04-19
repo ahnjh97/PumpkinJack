@@ -81,6 +81,49 @@ HRESULT CVIBuffer_Instance::Render()
 	return S_OK;
 }
 
+_float4 CVIBuffer_Instance::Compute_RandPosition(INSTANCE_SHAPE eShape)
+{
+	if (eShape == SHAPE_DEFAULT) {
+		uniform_real_distribution<float>	RangePosX(m_InstanceDesc.vCenter.x - m_InstanceDesc.vRange.x * 0.5f, m_InstanceDesc.vCenter.x + m_InstanceDesc.vRange.x * 0.5f);
+		uniform_real_distribution<float>	RangePosY(m_InstanceDesc.vCenter.y - m_InstanceDesc.vRange.y * 0.5f, m_InstanceDesc.vCenter.y + m_InstanceDesc.vRange.y * 0.5f);
+		uniform_real_distribution<float>	RangePosZ(m_InstanceDesc.vCenter.z - m_InstanceDesc.vRange.z * 0.5f, m_InstanceDesc.vCenter.z + m_InstanceDesc.vRange.z * 0.5f);
+
+		return _float4(RangePosX(m_RandomNumber), RangePosY(m_RandomNumber), RangePosZ(m_RandomNumber), 1.f);
+	}
+	else if (eShape == SHAPE_SPHERE) {
+		uniform_real_distribution<_float> Angle(0, XM_2PI);
+		uniform_real_distribution<_float> Radius(0, m_InstanceDesc.vRange.x);
+		uniform_real_distribution<_float> RangePosZ(m_InstanceDesc.vCenter.z - m_InstanceDesc.vRange.z * 0.5f, m_InstanceDesc.vCenter.z + m_InstanceDesc.vRange.z * 0.5f);
+
+		_float fRadius = Radius(m_RandomNumber);
+		_float fAngle = Angle(m_RandomNumber);
+
+		_float fX = fRadius * cos(fAngle);
+		_float fY = fRadius * sin(fAngle);
+
+		_float4 vPos{};
+		do
+		{
+			vPos = _float4(fX, fY, RangePosZ(m_RandomNumber), 1);
+		} while (XMVector4Length(XMLoadFloat4(&vPos)).m128_f32[0] > m_InstanceDesc.vRange.x);
+
+		return vPos;
+	}
+	else if (eShape == SHAPE_RING) {
+		_float fOuterRadius = m_InstanceDesc.vRange.x;
+		_float fInnerRadius = fOuterRadius * 0.8f;
+		uniform_real_distribution<_float> Angle(0, XM_2PI);
+		uniform_real_distribution<_float> Radius(fInnerRadius, fOuterRadius);
+		uniform_real_distribution<_float> RangePosZ(m_InstanceDesc.vCenter.z - m_InstanceDesc.vRange.z * 0.5f, m_InstanceDesc.vCenter.z + m_InstanceDesc.vRange.z * 0.5f);
+
+		_float fRadius = Radius(m_RandomNumber);
+		_float fAngle = Angle(m_RandomNumber);
+
+		return _float4(fRadius * cos(fAngle), fRadius * sin(fAngle), RangePosZ(m_RandomNumber), 1.f);
+	}
+	return _float4();
+}
+
 void CVIBuffer_Instance::Drop(_float fTimeDelta)
 {
 	D3D11_MAPPED_SUBRESOURCE		SubResource{};
@@ -120,21 +163,31 @@ void CVIBuffer_Instance::Spread(_float fTimeDelta)
 	m_pContext->Unmap(m_pVBInstance, 0);
 }
 
+void CVIBuffer_Instance::Check_LifeTimes(_float fTimeDelta)
+{
+	D3D11_MAPPED_SUBRESOURCE		SubResource{};
+	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+	VTXMATRIX* pVertices = ((VTXMATRIX*)SubResource.pData);
+
+	for (size_t i = 0; i < m_iNumInstance; i++)
+		Compute_LifeTime(pVertices, i, fTimeDelta);
+
+	m_pContext->Unmap(m_pVBInstance, 0);
+}
+
 void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceIndex, _float fTimeDelta)
 {
 	m_pLifeTimes[iInstanceIndex].x += fTimeDelta;
 
 	if (m_pLifeTimes[iInstanceIndex].x > m_pLifeTimes[iInstanceIndex].y)
 	{
-		if (false == m_InstanceDesc.isLoop)
-			pVertices[iInstanceIndex].isLived = false;
-
-		else
-		{
+		if (true == m_InstanceDesc.isLoop){
 			m_pLifeTimes[iInstanceIndex].x = 0.f;
-			pVertices[iInstanceIndex].vPosition = Compute_RandPosition();
+			pVertices[iInstanceIndex].vPosition = Compute_RandPosition(m_InstanceDesc.eShape);
 		}
 	}
+
+	pVertices[iInstanceIndex].fLifeRatio = m_pLifeTimes[iInstanceIndex].x / m_pLifeTimes[iInstanceIndex].y;
 }
 
 void CVIBuffer_Instance::Free()

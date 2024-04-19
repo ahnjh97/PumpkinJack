@@ -5,7 +5,7 @@ matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 texture2D	g_DiffuseTexture[2];
 texture2D	g_MaskTexture;
-float		g_fOffset_Y;
+float		g_fTime;
 float       g_fHpRatio;
 
 struct VS_IN
@@ -56,8 +56,8 @@ PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 	vector vMask = g_MaskTexture.Sample(PointSampler, In.vTexcoord2);
-    In.vTexcoord.y += g_fOffset_Y * 3.f;
-    In.vTexcoord3.y += g_fOffset_Y * 1.6f;
+    In.vTexcoord.y += g_fTime * 0.4f;
+    In.vTexcoord3.y += g_fTime * 0.21f;
     In.vTexcoord.y = fmod(In.vTexcoord.y / 3.f, 1.0);
     In.vTexcoord3.y = fmod(In.vTexcoord3.y / 3.f, 1.f);
     vector vDstDiffuse = g_DiffuseTexture[0].Sample(LinearSampler, In.vTexcoord);

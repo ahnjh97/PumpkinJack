@@ -283,7 +283,7 @@ void CWizard::Link_State(_float fTimeDelta)
 	}
 
 	if (WIZARD_IDLE == m_eState) {
-		if (m_pTransformCom->Get_Pos_Float4().y > 5.f)
+		if (m_pTransformCom->Get_Pos_Float4().y > 12.5f)
 			m_pTransformCom->Fall(fTimeDelta * 6.5f);
 	}
 
@@ -501,7 +501,7 @@ HRESULT CWizard::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 	/* For.Com_Collider */
 	CBounding_Sphere::BOUNDING_SPHERE_DESC		ColliderDesc{};
 	ColliderDesc.vCenter = _float3(0.f, 0.f, 0.f);
-	ColliderDesc.fRadius = 8.5f;
+	ColliderDesc.fRadius = 8.8f;
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom, &ColliderDesc)))
 		return E_FAIL;

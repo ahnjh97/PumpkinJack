@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "ElecParts.h"
 #include "HoleWall.h"
 
 CHoleWall::CHoleWall(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -36,6 +37,15 @@ HRESULT CHoleWall::Initialize(void* pArg)
 	Safe_AddRef(m_pPlayer);
 	m_fFallSpeed = m_pGameInstance->RandomNumber(5, 15) * 0.1f;
 
+	CElecParts::ELECPARTS_DESC tElecPartsDesc{};
+	tElecPartsDesc.iLevel = LEVEL_WIZARD;
+	tElecPartsDesc.eElecEffect = CElecParts::ELEC_HOLE;
+	tElecPartsDesc.pTargetWorldMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+	m_pElecParts = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc);
+	if (m_pElecParts == nullptr)
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -51,12 +61,16 @@ void CHoleWall::Tick(_float fTimeDelta)
 
 	Check_PlayerCol();
 
+	m_pElecParts->Tick(fTimeDelta);
+
 	for (_int i = 0; i < 2; i++)
 		m_pColliderCom[i]->Tick(m_pTransformCom->Get_WorldMatrix());
 }
 
 void CHoleWall::Late_Tick(_float fTimeDelta)
 {
+	m_pElecParts->Late_Tick(fTimeDelta);
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
@@ -188,4 +202,6 @@ void CHoleWall::Free()
 	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
+
+	Safe_Release(m_pElecParts);
 }

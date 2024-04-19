@@ -311,7 +311,7 @@ CGameObject* CObject_Manager::Get_LastGameObject(_uint iLevelIndex, const wstrin
 		if (mapIter.second == nullptr)
 			continue;
 
-		size_t found = mapIter.first.find(TEXT("Layer_Parse")); // 일단 임시로 Layer_Parse
+		size_t found = mapIter.first.find(wstrLayerTag); // 일단 임시로 Layer_Parse
 		if (found == wstring::npos) // 찾지못한경우
 			continue;
 

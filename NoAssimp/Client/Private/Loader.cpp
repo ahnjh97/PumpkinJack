@@ -386,6 +386,8 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "ElecParts", "Effects/elecParts.dds")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Noise", "Effects/reaperSolid.dds")))
+		return E_FAIL;
 
 
 	m_strLoadingText = TEXT("Loading VIBuffers for Level_Wizard...");
@@ -451,6 +453,9 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "ElecParts", "Effects/elecParts.dds")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Noise", "Effects/reaperSolid.dds")))
+		return E_FAIL;
+
 
 	m_strLoadingText = TEXT("Loading VIBuffers for Level_EffectTool...");
 	/* Prototype_Component_VIBuffer_Terrain */
@@ -634,20 +639,30 @@ HRESULT CLoader::Add_VIBuffer_Instance_Points(LEVEL eLevel)
 {
 	vector<CVIBuffer_Instance::INSTANCE_DESC> vecInstanceDesc;
 	vecInstanceDesc.resize(CElecParts::ELEC_END);
+
 	// ELEC_TORNADO
 	CVIBuffer_Instance::INSTANCE_DESC		InstanceDesc{};
-	InstanceDesc.vPivot = _float3(0.f, -5.f, 0.f);
 	InstanceDesc.vCenter = _float3(0.f, 18.f, 0.f);
-	InstanceDesc.vRange = _float3(22.f, 36.f, 22.f);
+	InstanceDesc.vRange = _float3(20.f, 36.f, 20.f);
 	InstanceDesc.vMinScale = _float3(16.f, 16.f, 16.f);
 	InstanceDesc.vMaxScale = _float3(18, 18, 18);
-	InstanceDesc.iNumInstance = 20;
-	InstanceDesc.vLifeTime = _float2(3.f, 5.f);
+	InstanceDesc.iNumInstance = 30;
+	InstanceDesc.vLifeTime = _float2(0.5f, 0.8f);
 	InstanceDesc.isLoop = true;
-	InstanceDesc.vSpeed = _float2(2.f, 15.f);
 	InstanceDesc.iSpriteIndexOffset = 8;
-
+	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_DEFAULT;
 	vecInstanceDesc[CElecParts::ELEC_TORNADO] = InstanceDesc;
+
+	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	InstanceDesc.vRange = _float3(12.f, 12.f, 12.f);
+	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_SPHERE;
+	vecInstanceDesc[CElecParts::ELEC_LIGHTNING1] = InstanceDesc;
+
+	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	InstanceDesc.vRange = _float3(30.f, 30.f, 20.f);
+	InstanceDesc.iNumInstance = 70;
+	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_RING;
+	vecInstanceDesc[CElecParts::ELEC_HOLE] = InstanceDesc;
 
 	if (vecInstanceDesc.empty())
 		return S_OK;

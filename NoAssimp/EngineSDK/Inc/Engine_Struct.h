@@ -131,8 +131,8 @@ namespace Engine
 		XMFLOAT4		vUp;
 		XMFLOAT4		vLook;
 		XMFLOAT4		vPosition;
-		bool			isLived;
-		_uint			iSpriteOffset;
+		float			fLifeRatio;
+		unsigned int	iSpriteOffset;
 	}VTXMATRIX;
 
 	typedef struct ENGINE_DLL

@@ -3,26 +3,23 @@
 /* 전역변수 : 쉐이더 외부에 있는 데이터를 쉐이더 안으로 받아온다. */
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D	g_Texture;
-texture2D	g_MaskTexture;
+texture2D	g_NoiseTexture, g_NoiseMaskTexture;
 
 vector	g_vCamPosition;
-
-uint g_iSpriteIndex;
 
 struct VS_IN
 {
 	float3				vPosition : POSITION;
 	row_major float4x4	TransformMatrix : WORLD;
-	bool				isLived : COLOR0;
+	float				fLifeRatio : COLOR0;
     uint				iSpriteIndexOffset : COLOR1;
 };
-
 
 struct VS_OUT
 {
 	float4		vPosition : POSITION;
 	float2		vPSize : PSIZE;
-	bool		isLived : COLOR0;
+    float		fLifeRatio : COLOR0;
     uint		iSpriteIndexOffset : COLOR1;
 };
 
@@ -35,7 +32,7 @@ VS_OUT VS_MAIN(VS_IN In)
 
 	Out.vPosition = mul(vPosition, g_WorldMatrix);
 	Out.vPSize = float2(In.TransformMatrix._11, In.TransformMatrix._22);
-	Out.isLived = In.isLived;
+    Out.fLifeRatio = In.fLifeRatio;
     Out.iSpriteIndexOffset = In.iSpriteIndexOffset;
 	
 	return Out;
@@ -45,7 +42,7 @@ struct GS_IN
 {
 	float4		vPosition : POSITION;
 	float2		vPSize : PSIZE;
-	bool		isLived : COLOR0;
+    float		fLifeRatio : COLOR0;
     uint		iSpriteIndexOffset : COLOR1;
 };
 
@@ -53,7 +50,7 @@ struct GS_OUT
 {
 	float4		vPosition : SV_POSITION;
 	float2		vTexcoord : TEXCOORD0;
-	bool		isLived : COLOR0;
+    float		fLifeRatio : COLOR0;
     uint		iSpriteIndexOffset : COLOR1;
 };
 
@@ -72,27 +69,27 @@ void GS_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
 	Out[0].vPosition = vector(In[0].vPosition.xyz + vRight + vUp, 1.f);
 	Out[0].vTexcoord = float2(0.0f, 0.0f);
 	Out[0].vPosition = mul(Out[0].vPosition, matVP);
-	Out[0].isLived = In[0].isLived;
+    Out[0].fLifeRatio = In[0].fLifeRatio;
     Out[0].iSpriteIndexOffset = In[0].iSpriteIndexOffset;
 
 	Out[1].vPosition = vector(In[0].vPosition.xyz - vRight + vUp, 1.f);
 	Out[1].vTexcoord = float2(1.0f, 0.0f);
 	Out[1].vPosition = mul(Out[1].vPosition, matVP);
-	Out[1].isLived = In[0].isLived;
+    Out[1].fLifeRatio = In[0].fLifeRatio;
     Out[1].iSpriteIndexOffset = In[0].iSpriteIndexOffset;
 
 
 	Out[2].vPosition = vector(In[0].vPosition.xyz - vRight - vUp, 1.f);
 	Out[2].vTexcoord = float2(1.0f, 1.0f);
 	Out[2].vPosition = mul(Out[2].vPosition, matVP);
-	Out[2].isLived = In[0].isLived;
+    Out[2].fLifeRatio = In[0].fLifeRatio;
     Out[2].iSpriteIndexOffset = In[0].iSpriteIndexOffset;
 
 
 	Out[3].vPosition = vector(In[0].vPosition.xyz + vRight - vUp, 1.f);
 	Out[3].vTexcoord = float2(0.0f, 1.0f);
 	Out[3].vPosition = mul(Out[3].vPosition, matVP);
-	Out[3].isLived = In[0].isLived;
+    Out[3].fLifeRatio = In[0].fLifeRatio;
     Out[3].iSpriteIndexOffset = In[0].iSpriteIndexOffset;
 
 
@@ -110,7 +107,7 @@ struct PS_IN
 {
 	float4		vPosition : SV_POSITION;
 	float2		vTexcoord : TEXCOORD0;
-	bool		isLived : COLOR0;
+    float		fLifeRatio : COLOR0;
     uint		iSpriteIndexOffset : COLOR1;
 };
 
@@ -125,7 +122,7 @@ PS_OUT PS_MAIN(PS_IN In)
 	
     Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
 
-	if (Out.vColor.a <= 0.0f || false == In.isLived)
+    if (Out.vColor.a <= 0.0f || 1.f <= In.fLifeRatio)
 		discard;
 
     Out.vColor.rgb = float3(1.f, 1.f, 1.f);
@@ -136,17 +133,22 @@ PS_OUT PS_MAIN(PS_IN In)
 PS_OUT PS_MAIN_ELECPARTS(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
-    uint iSpriteIndex = (g_iSpriteIndex + In.iSpriteIndexOffset) % 9;
    
-    uint iX = iSpriteIndex % 3;
-    uint iY = iSpriteIndex / 3;
+    uint iX = In.iSpriteIndexOffset % 3;
+    uint iY = In.iSpriteIndexOffset / 3;
     float2 vNewTexcoord = In.vTexcoord * 0.33f + float2(iX / 3.f, iY / 3.f);
     Out.vColor = g_Texture.Sample(LinearSampler, vNewTexcoord);
-
-    if (Out.vColor.a <= 0.33f || false == In.isLived)
+    float fNoise = g_NoiseMaskTexture.Sample(LinearSampler, In.vTexcoord).r;
+	 
+    if (Out.vColor.a <= 0.33f || 1.f <= In.fLifeRatio)
         discard;
 
     Out.vColor.rgb = float3(1.f, 1.f, 1.f);
+	
+    if (In.fLifeRatio < 0.5)  // 투명에서 불투명으로 (noiseValue가 더 크면 알파값 증가)
+        Out.vColor.a = smoothstep(0.0, In.fLifeRatio * 2.0, fNoise);
+    else // 불투명에서 투명으로 (noiseValue가 더 작으면 알파값 감소)
+        Out.vColor.a = 1.0 - smoothstep(0.5, 1.0, (In.fLifeRatio - 0.5) * 2.0) * (1.0 - fNoise);
 	
     return Out;
 }

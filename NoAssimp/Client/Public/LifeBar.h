@@ -32,7 +32,7 @@ private:
 	_float4x4				m_WorldMatrix, m_ViewMatrix, m_ProjMatrix;
 	_uint					m_iTextureIndex = {};
 	_float					m_fTime = {};
-	_float					m_fOffset_Y = {};
+	_float					m_fOffsetTime = {};
 	_float					m_fHpRatio = { 1 };
 	_float					m_fPreHpRatio = { 1 };
 	_float					m_fRenderedHpRatio = { 1 };

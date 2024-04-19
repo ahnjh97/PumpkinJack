@@ -221,7 +221,6 @@ CBallista* CBallista::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 	}
 
 	return pInstance;
-
 }
 
 CGameObject* CBallista::Clone(void* pArg)

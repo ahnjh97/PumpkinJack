@@ -6,6 +6,7 @@ BEGIN(Engine)
 class ENGINE_DLL CVIBuffer_Instance abstract : public CVIBuffer
 {
 public:
+	enum INSTANCE_SHAPE { SHAPE_DEFAULT, SHAPE_SPHERE, SHAPE_RING, SHAPE_END };
 	typedef struct
 	{
 		_float3		vPivot;
@@ -17,6 +18,7 @@ public:
 		_float2		vSpeed;
 		_uint		iNumInstance;
 		_uint		iSpriteIndexOffset = {};
+		INSTANCE_SHAPE	eShape = { };
 	}INSTANCE_DESC;
 
 protected:
@@ -31,9 +33,10 @@ public:
 	virtual HRESULT Render();
 
 public:
-	virtual _float4 Compute_RandPosition() = 0;
+	virtual _float4 Compute_RandPosition(INSTANCE_SHAPE eShape);
 	virtual void Drop(_float fTimeDelta);
 	virtual void Spread(_float fTimeDelta);
+	virtual void Check_LifeTimes(_float fTimeDelta);
 
 	void Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceIndex, _float fTimeDelta);
 
@@ -51,10 +54,10 @@ protected:
 	D3D11_SUBRESOURCE_DATA	m_InstanceSubResourceData{};
 
 protected:
-	random_device				m_RandomDevice;
-	mt19937_64					m_RandomNumber;
-	_float2* m_pLifeTimes = { nullptr };
-	_float* m_pSpeeds = { nullptr };
+	random_device	m_RandomDevice;
+	mt19937_64		m_RandomNumber;
+	_float2*		m_pLifeTimes = { nullptr };
+	_float*			m_pSpeeds = { nullptr };
 
 public:
 	virtual CComponent* Clone(void* pArg) = 0;

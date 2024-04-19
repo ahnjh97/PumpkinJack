@@ -48,7 +48,7 @@ public: /* For.Object_Manager */
 	_bool Binarize_Objects(_uint iLevel, string strLevel);
 	CGameObject* Select_ModelByPicking(_uint iLevelIndex, const wstring& wstrLayerTag); // MapTool에서의 모델선택
 	CGameObject* Get_GameObject(_uint iLevelIndex, const wstring& wstrLayerTag, const wstring& wstrPrototypeTag);
-	CGameObject* Get_LastGameObject(_uint iLevelIndex, const wstring& wstrLayerTag); // MapTool용
+	CGameObject* Get_LastGameObject(_uint iLevelIndex, const wstring& wstrLayerTag);
 	list<CGameObject*>& Get_ObjectList(_uint iLevelIndex, const wstring& wstrLayerTag);
 	void Clear_Layer(_uint iLevelIndex, const wstring& wstrLayerTag);
 	CGameObject* Get_Player(_uint iLevelIndex);

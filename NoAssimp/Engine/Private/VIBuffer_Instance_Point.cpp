@@ -117,17 +117,14 @@ HRESULT CVIBuffer_Instance_Point::Initialize_Prototype(const CVIBuffer_Instance:
 		XMStoreFloat4(&m_pInstanceVertices[i].vRight, XMVectorSet(1.f, 0.f, 0.f, 0.f) * ScaleX(m_RandomNumber));
 		XMStoreFloat4(&m_pInstanceVertices[i].vUp, XMVectorSet(0.f, 1.f, 0.f, 0.f) * ScaleY(m_RandomNumber));
 		XMStoreFloat4(&m_pInstanceVertices[i].vLook, XMVectorSet(0.f, 0.f, 1.f, 0.f) * ScaleZ(m_RandomNumber));
-		m_pInstanceVertices[i].vPosition = Compute_RandPosition();
-
-		m_pInstanceVertices[i].isLived = true;
-
+		m_pInstanceVertices[i].vPosition = Compute_RandPosition(InstanceDesc.eShape);
+		m_pInstanceVertices[i].fLifeRatio = 0;
 
 		/* 0.f 현재 라이프타임 */
 		/* LifeTime(m_RandomNumber) 인스턴스마다 랜덤하게 설정된 각각의 라이프타임디다. */
 		m_pLifeTimes[i] = _float2(0.f, LifeTime(m_RandomNumber));
 		m_pSpeeds[i] = Speed(m_RandomNumber);
 	}
-
 
 	if (InstanceDesc.iSpriteIndexOffset != 0) {
 		for (size_t j = 0; j < m_iNumInstance; j++)
@@ -148,16 +145,6 @@ HRESULT CVIBuffer_Instance_Point::Initialize(void* pArg)
 		return E_FAIL;
 
 	return S_OK;
-}
-
-_float4 CVIBuffer_Instance_Point::Compute_RandPosition()
-{
-	uniform_real_distribution<float>	RangePosX(m_InstanceDesc.vCenter.x - m_InstanceDesc.vRange.x * 0.5f, m_InstanceDesc.vCenter.x + m_InstanceDesc.vRange.x * 0.5f);
-	uniform_real_distribution<float>	RangePosY(m_InstanceDesc.vCenter.y - m_InstanceDesc.vRange.y * 0.5f, m_InstanceDesc.vCenter.y + m_InstanceDesc.vRange.y * 0.5f);
-	uniform_real_distribution<float>	RangePosZ(m_InstanceDesc.vCenter.z - m_InstanceDesc.vRange.z * 0.5f, m_InstanceDesc.vCenter.z + m_InstanceDesc.vRange.z * 0.5f);
-
-
-	return _float4(RangePosX(m_RandomNumber), RangePosY(m_RandomNumber), RangePosZ(m_RandomNumber), 1.f);
 }
 
 CVIBuffer_Instance_Point* CVIBuffer_Instance_Point::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc)

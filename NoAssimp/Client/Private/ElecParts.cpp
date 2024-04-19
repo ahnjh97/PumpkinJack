@@ -30,6 +30,17 @@ HRESULT CElecParts::Initialize(void* pArg)
 	if (FAILED(Add_Components((LEVEL)tElecPartsDesc.iLevel, tElecPartsDesc.eElecEffect)))
 		return E_FAIL;
 
+
+	if (tElecPartsDesc.eElecEffect == ELEC_HOLE) {
+		_vector scale, rotation, translation;
+		XMMatrixDecompose(&scale, &rotation, &translation, XMLoadFloat4x4(m_pTargetWorldMat));
+		_matrix matRotation= XMMatrixRotationQuaternion(rotation);
+
+		_float4x4 matWorld = {};
+		::XMStoreFloat4x4(&matWorld, matRotation);
+		m_pTransformCom->Set_WorldMatrix(matWorld);
+	}
+
 	if (m_pTargetWorldMat != nullptr)
 		m_pTransformCom->Set_Pos(XMVectorSet(m_pTargetWorldMat->_41, m_pTargetWorldMat->_42, m_pTargetWorldMat->_43, 1));
 
@@ -38,19 +49,10 @@ HRESULT CElecParts::Initialize(void* pArg)
 
 void CElecParts::Tick(_float fTimeDelta)
 {
-	m_fTime += fTimeDelta;
-
-	if (m_fTime > 0.055f) {
-		m_iSpriteIndex++;
-		m_fTime = 0;
-	}
-	
-	if (m_iSpriteIndex == 9) 
-		m_iSpriteIndex = 0;
-
 	if (m_pTargetWorldMat != nullptr) 
 		m_pTransformCom->Set_Pos(XMVectorSet(m_pTargetWorldMat->_41, m_pTargetWorldMat->_42, m_pTargetWorldMat->_43, 1));
-	
+
+	m_pVIBufferCom->Check_LifeTimes(fTimeDelta);
 }
 
 void CElecParts::Late_Tick(_float fTimeDelta)
@@ -83,7 +85,12 @@ HRESULT CElecParts::Add_Components(LEVEL eLevel, ELEC_EFFECT eElecEffect)
 
 	/* For.Com_Texture */
 	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_ElecParts"),
-		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
+		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom[TEX_ELECPARTS])))
+		return E_FAIL;
+
+	/* For.Com_Texture_Noise */
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_Noise"),
+		TEXT("Com_Texture_Noise"), (CComponent**)&m_pTextureCom[TEX_NOISE])))
 		return E_FAIL;
 
 	/* For.Com_VIBuffer */
@@ -110,12 +117,10 @@ HRESULT CElecParts::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))
 		return E_FAIL;
 
-	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
+	if (FAILED(m_pTextureCom[TEX_ELECPARTS]->Bind_ShaderResource(m_pShaderCom, "g_Texture")))
 		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_iSpriteIndex", &m_iSpriteIndex, sizeof(m_iSpriteIndex))))
+	if (FAILED(m_pTextureCom[TEX_NOISE]->Bind_ShaderResource(m_pShaderCom, "g_NoiseTexture")))
 		return E_FAIL;
-
 	return S_OK;
 }
 
@@ -131,7 +136,6 @@ CElecParts* CElecParts::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 	}
 
 	return pInstance;
-
 }
 
 CGameObject* CElecParts::Clone(void* pArg)
@@ -153,6 +157,7 @@ void CElecParts::Free()
 	__super::Free();
 
 	Safe_Release(m_pVIBufferCom);
-	Safe_Release(m_pTextureCom);
+	for(_int i = 0; i< TEX_END; i++)
+		Safe_Release(m_pTextureCom[i]);
 	Safe_Release(m_pShaderCom);
 }

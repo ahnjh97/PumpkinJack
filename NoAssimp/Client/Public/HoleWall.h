@@ -38,6 +38,7 @@ private:
 	CTexture* m_pTextureCom = { nullptr };
 	CCollider* m_pColliderCom[2] = { nullptr };
 	CGameObject* m_pPlayer = { nullptr };
+	CGameObject* m_pElecParts = { nullptr };
 
 private:
 	HRESULT Add_Components(LEVEL eLevel);

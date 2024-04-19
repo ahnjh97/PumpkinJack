@@ -141,9 +141,9 @@ HRESULT CVIBuffer_Instance_Mesh::Initialize_Prototype(ifstream& fileStream, cons
 		XMStoreFloat4(&m_pInstanceVertices[i].vRight, XMVectorSet(1.f, 0.f, 0.f, 0.f) * fScale);
 		XMStoreFloat4(&m_pInstanceVertices[i].vUp, XMVectorSet(0.f, 1.f, 0.f, 0.f) * fScale);
 		XMStoreFloat4(&m_pInstanceVertices[i].vLook, XMVectorSet(0.f, 0.f, 1.f, 0.f) * fScale);
-		m_pInstanceVertices[i].vPosition = Compute_RandPosition();
+		m_pInstanceVertices[i].vPosition = Compute_RandPosition(InstanceDesc.eShape);
 
-		m_pInstanceVertices[i].isLived = true;
+		m_pInstanceVertices[i].fLifeRatio = 0;
 
 
 		/* 0.f 현재 라이프타임 */
@@ -167,16 +167,6 @@ HRESULT CVIBuffer_Instance_Mesh::Initialize(void* pArg)
 		return E_FAIL;
 
 	return S_OK;
-}
-
-_float4 CVIBuffer_Instance_Mesh::Compute_RandPosition()
-{
-	uniform_real_distribution<float>	RangePosX(m_InstanceDesc.vCenter.x - m_InstanceDesc.vRange.x * 0.5f, m_InstanceDesc.vCenter.x + m_InstanceDesc.vRange.x * 0.5f);
-	uniform_real_distribution<float>	RangePosY(m_InstanceDesc.vCenter.y - m_InstanceDesc.vRange.y * 0.5f, m_InstanceDesc.vCenter.y + m_InstanceDesc.vRange.y * 0.5f);
-	uniform_real_distribution<float>	RangePosZ(m_InstanceDesc.vCenter.z - m_InstanceDesc.vRange.z * 0.5f, m_InstanceDesc.vCenter.z + m_InstanceDesc.vRange.z * 0.5f);
-
-
-	return _float4(RangePosX(m_RandomNumber), RangePosY(m_RandomNumber), RangePosZ(m_RandomNumber), 1.f);
 }
 
 void CVIBuffer_Instance_Mesh::TurnAndSpread(_float fTimeDelta, _float fRotationSpeed)

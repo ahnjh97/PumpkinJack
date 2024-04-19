@@ -1,6 +1,9 @@
 - Tornado PartObject :  ElecParts
 - func Lightning : ElecParts, ElecRay
-- 
+
+
+- ElecParts Dissolving
+- ElecArena Dissolving
 
 - Spell Effects
 

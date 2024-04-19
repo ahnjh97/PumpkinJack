@@ -12,10 +12,12 @@ BEGIN(Client)
 
 class CElecParts final : public CGameObject
 {
+	enum TEX_ELEC { TEX_ELECPARTS, TEX_NOISE, TEX_END };
+
 public:
-	enum ELEC_EFFECT { ELEC_TORNADO, ELEC_LIGHTNING, ELEC_HOLE, ELEC_WALL, ELEC_CHARGE, 
+	enum ELEC_EFFECT { ELEC_TORNADO, ELEC_LIGHTNING1, ELEC_LIGHTNING2, ELEC_HOLE, ELEC_WALL, ELEC_CHARGE,
 		ELEC_TESLATOWER, ELEC_DESTROY, ELEC_SCATTER, ELEC_EARTHQUAKE, ELEC_END };
-public:
+
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{
 		ELEC_EFFECT eElecEffect;
@@ -41,7 +43,7 @@ private:
 
 private:
 	CVIBuffer_Instance_Point* m_pVIBufferCom = { nullptr };
-	CTexture* m_pTextureCom = { nullptr };
+	CTexture* m_pTextureCom[TEX_END] = {};
 	CShader* m_pShaderCom = { nullptr };
 
 	const _float4x4* m_pTargetWorldMat = { nullptr };

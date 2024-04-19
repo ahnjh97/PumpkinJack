@@ -13,7 +13,7 @@ struct VS_IN
     float4 vUp : TEXCOORD2;
     float4 vLook : TEXCOORD3;
     float4 vTranslation : TEXCOORD4;
-    bool isLived : COLOR0;
+    float fLifeRatio : COLOR0;
 };
 
 
@@ -21,7 +21,7 @@ struct VS_OUT
 {
     float4 vPosition : SV_POSITION;
     float2 vTexcoord : TEXCOORD0;
-    bool isLived : COLOR0;
+    float fLifeRatio : COLOR0;
 };
 
 /* ¡§¡° Ω¶¿Ã¥ı */
@@ -42,7 +42,7 @@ VS_OUT VS_MAIN(VS_IN In)
 
     Out.vPosition = mul(vPosition, matWVP);
     Out.vTexcoord = In.vTexcoord;
-    Out.isLived = In.isLived;
+    Out.fLifeRatio = In.fLifeRatio;
 
     return Out;
 }
@@ -51,7 +51,7 @@ struct PS_IN
 {
     float4 vPosition : SV_POSITION;
     float2 vTexcoord : TEXCOORD0;
-    bool isLived : COLOR0;
+    float fLifeRatio : COLOR0;
 };
 
 struct PS_OUT
@@ -67,7 +67,7 @@ PS_OUT PS_MAIN(PS_IN In)
    
    // Out.vColor.xyz = float3(In.vTexcoord.y, In.vTexcoord.y, In.vTexcoord.y);
 
-    if (Out.vColor.a <= 0.3f || false == In.isLived)
+    if (Out.vColor.a <= 0.3f || 1.f <= In.fLifeRatio)
             discard;
 	
     return Out;

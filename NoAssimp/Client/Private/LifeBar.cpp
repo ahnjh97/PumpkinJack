@@ -82,7 +82,7 @@ void CLifeBar::Tick(_float fTimeDelta)
 	if (nullptr == m_pPlayer)
 		return;
 
-	m_fOffset_Y += 0.002f;
+	m_fOffsetTime += fTimeDelta;
 	m_fTime += fTimeDelta * 3.f;
 	m_fPreHpRatio = m_fHpRatio;
 
@@ -195,7 +195,7 @@ HRESULT CLifeBar::Bind_ShaderResources()
 	{
 		if (FAILED(m_pTextureCom[TYPE_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0)))
 			return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_fOffset_Y", &m_fOffset_Y, sizeof(_float))))
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fOffsetTime, sizeof(m_fOffsetTime))))
 			return E_FAIL;
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_fHpRatio", &m_fRenderedHpRatio, sizeof(_float))))
 			return E_FAIL;

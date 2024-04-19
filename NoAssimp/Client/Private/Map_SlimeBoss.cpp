@@ -41,7 +41,7 @@ HRESULT CMap_SlimeBoss::Initialize(void* pArg)
 
 void CMap_SlimeBoss::Tick(_float fTimeDelta)
 {
-	m_fOffset_Y -= 0.0015f;
+	m_fTime += fTimeDelta;
 }
 
 void CMap_SlimeBoss::Late_Tick(_float fTimeDelta)
@@ -169,7 +169,7 @@ HRESULT CMap_SlimeBoss::Bind_ShaderResources()
 	if (FAILED(m_pTextureCom[TEX_CAUSTIC]->Bind_ShaderResource(m_pShaderCom[NO_LIGHT], "g_CausticTexture", 0)))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom[NO_LIGHT]->Bind_RawValue("g_fOffset_Y", &m_fOffset_Y, sizeof(_float))))
+	if (FAILED(m_pShaderCom[NO_LIGHT]->Bind_RawValue("g_fTime", &m_fTime, sizeof(m_fTime))))
 		return E_FAIL;
 
 	return S_OK;

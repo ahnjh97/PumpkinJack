@@ -31,7 +31,6 @@ private:
 	void Check_TornadoCol(_float fTimeDelta);
 	void EnlargeTornado(_float fTimeDelta);
 	void MoveTowardsPlayer(_float fTimeDelta);
-	void Check_HoleWallCol();
 	void Check_Fall();
 
 private:
@@ -44,7 +43,6 @@ private:
 	_float m_fTime = {};
 	_float m_fTornadoSize = {};
 	_float m_fDamageTime = {};
-	_float m_fHoleWallColTime = {};
 
 	_vector m_vMoveDir = {};
 
@@ -55,6 +53,7 @@ private:
 	CCollider* m_pColliderCom = {nullptr};
 	CGameObject* m_pPlayer = { nullptr };
 	const _float4x4* m_pPlayerWorldMatrix = {nullptr};
+	CGameObject* m_pElecParts = { nullptr };
 
 private:
 	HRESULT Add_Components(LEVEL eLevel);

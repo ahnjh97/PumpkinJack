@@ -517,16 +517,15 @@ wstring CGameInstance::StrToWstr(const string& str)
 
 void CGameInstance::CalculateFPS(_float fTimeDelta)
 {
-	iFrameCount++;
-	fElapsedTime += fTimeDelta;
-
 	if (fElapsedTime >= 1.0)  // fps
 	{
-		iFps = iFrameCount / fElapsedTime;
-
 		iFrameCount = 0;
 		fElapsedTime = 0.f;
 	}
+
+	iFrameCount++;
+	fElapsedTime += fTimeDelta;
+	iFps = iFrameCount / fElapsedTime;
 }
 
 _int CGameInstance::RandomNumber(_int iMin, _int iMax)

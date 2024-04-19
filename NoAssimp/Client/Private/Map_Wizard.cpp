@@ -41,7 +41,7 @@ HRESULT CMap_Wizard::Initialize(void* pArg)
 
 void CMap_Wizard::Tick(_float fTimeDelta)
 {
-	m_fOffset_Y += 0.004f;
+	m_fTime += fTimeDelta;
 }
 
 void CMap_Wizard::Late_Tick(_float fTimeDelta)
@@ -112,7 +112,7 @@ HRESULT CMap_Wizard::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fOffset_Y", &m_fOffset_Y, sizeof(_float))))
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(m_fTime))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(m_fAlpha))))
 		return E_FAIL;

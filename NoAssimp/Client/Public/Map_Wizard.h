@@ -30,7 +30,7 @@ private:
 	void SetUp_MeshShaderPassIndices(_uint iNumMeshes);
 
 private:
-	_float m_fOffset_Y = {};
+	_float m_fTime = {};
 	_float m_fAlpha = {0.5f};
 
 	vector<_uint> m_vecMeshShaderPassIndices;

@@ -1,12 +1,12 @@
 #include "Engine_Shader_Defines.hlsli"
 
-
 /* 전역변수 : 쉐이더 외부에 있는 데이터를 쉐이더 안으로 받아온다. */
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 texture2D g_DiffuseTexture, g_WaterTexture, g_CausticTexture, g_NoiseTexture;
 texture2D g_TigerStripes, g_TopBottomFadeTex;
 float g_fOffset_Y;
+float g_fTime;
 float g_fAlpha;
 float g_fColorOffset;
 
@@ -65,7 +65,7 @@ PS_OUT PS_MAIN(PS_IN In)
 PS_OUT PS_MAIN_SLIMEBOSSROOM(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
-    In.vTexcoord.y += g_fOffset_Y;
+    In.vTexcoord.y += g_fTime * 0.2f;
     In.vTexcoord.y = fmod(In.vTexcoord.y, 1.0);
     
     //float3 darkGreen = float3(0.0, 0.5, 0.0); // 어두운 누리끼리한 초록색
@@ -97,7 +97,7 @@ PS_OUT PS_MAIN_KNIFE(PS_IN In)
 PS_OUT PS_MAIN_ARENAFIRE(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
-    In.vTexcoord.y += g_fOffset_Y;
+    In.vTexcoord.y += g_fTime * 0.1f;
     Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord * 6.f);
     vector vNoiseColor = g_NoiseTexture.Sample(LinearSampler, In.vTexcoord * 4.f);
     if (0.3f >= Out.vColor.a)
@@ -129,16 +129,17 @@ PS_OUT PS_MAIN_TORNADO(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
-    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord); // CloudTex
-    vector vTigerStripes = g_TigerStripes.Sample(LinearSampler, In.vTexcoord );
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, (In.vTexcoord.x, In.vTexcoord.y - g_fTime * 0.6f) * 1.5f); // CloudTex
+    vector vTigerStripes = g_TigerStripes.Sample(LinearSampler, In.vTexcoord - g_fTime * 0.6f);
     vector vTopBottomFade = g_TopBottomFadeTex.Sample(LinearSampler, In.vTexcoord);
   
     //Out.vColor = vDiffuse;
-    float4 finalColor = lerp(vTigerStripes, vDiffuse, vDiffuse.g);
+    float4 finalColor = lerp(vTigerStripes, vDiffuse, vDiffuse.r);
     Out.vColor = finalColor;
     Out.vColor.a = vTopBottomFade.r /** (1 - vTigerStripes.r) */* finalColor.g;
     if (Out.vColor.a <= 0.15f)
         discard;
+    
     return Out;
 }
 

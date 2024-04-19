@@ -103,7 +103,7 @@ HRESULT CLevel_EffectTool::Ready_Layer_Effect(const wstring& strLayerTag)
 
 	CElecParts::ELECPARTS_DESC tElecPartsDesc{};
 	tElecPartsDesc.iLevel = LEVEL_EFFECTTOOL;
-	tElecPartsDesc.eElecEffect = CElecParts::ELEC_TORNADO;
+	tElecPartsDesc.eElecEffect = CElecParts::ELEC_LIGHTNING1;
 	
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
 		return E_FAIL;

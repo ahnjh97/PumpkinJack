@@ -910,7 +910,7 @@ void CPlayer::SpearRollAttackDash(_float fTimeDelta)
 
 	if (fAnimPlayRatio > 0.2f && fAnimPlayRatio < 0.4f) {
 		m_fDashTime += fTimeDelta;
-		m_pTransformCom->Move(cosf(m_fDashTime) * 0.075f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);		
+		m_pTransformCom->Move(cosf(m_fDashTime) * 0.079f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);		
 	}
 		
 	if (pBodyModel->isFinished())
@@ -1095,5 +1095,6 @@ void CPlayer::Free()
 
 	for (auto& Pair : m_Parts)
 		Safe_Release(Pair.second);
+
 	m_Parts.clear();
 }

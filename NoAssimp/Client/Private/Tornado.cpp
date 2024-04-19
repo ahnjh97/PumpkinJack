@@ -3,7 +3,6 @@
 #include "Tornado.h"
 #include "Wizard.h"
 
-
 CTornado::CTornado(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
 {
@@ -47,7 +46,8 @@ HRESULT CTornado::Initialize(void* pArg)
 	tElecPartsDesc.eElecEffect = CElecParts::ELEC_TORNADO;
 	tElecPartsDesc.pTargetWorldMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_ElecParts"), TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
+	m_pElecParts = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc);
+	if (m_pElecParts == nullptr)
 		return E_FAIL;
 
 	return S_OK;
@@ -62,14 +62,9 @@ void CTornado::Tick(_float fTimeDelta)
 	m_fTime += fTimeDelta;
 	m_fDamageTime += fTimeDelta;
 	m_fTornadoSize += exp(m_fTime) * fTimeDelta;
-	m_pTransformCom->Turn(XMVectorSet(0, 1, 0, 0), fTimeDelta * 7.f * m_iTurnDir);
+	m_pTransformCom->Turn(XMVectorSet(0, 1, 0, 0), fTimeDelta * 4.f * m_iTurnDir);
 
-	if (m_bMove) {
-		if (m_fHoleWallColTime > 3.f) {
-			Set_Dead();
-			return;
-		}
-			
+	if (m_bMove) {			
 		_float3 vScale = m_pTransformCom->Get_Scaled();
 		if (vScale.x < 15.f)
 			EnlargeTornado(fTimeDelta);
@@ -82,17 +77,16 @@ void CTornado::Tick(_float fTimeDelta)
 
 		Check_TornadoCol(fTimeDelta);
 
-		if (m_bHoleWallCol)
-			m_fHoleWallColTime += fTimeDelta;
-		else
-			Check_HoleWallCol();
-
 		if (false == m_bFall)
 			Check_Fall();
 
 		if (m_bFall) {
-			if (m_pTransformCom->Get_Pos_Float4().y < -50.f)
+			if (m_pTransformCom->Get_Pos_Float4().y < -50.f) {
 				Set_Dead();
+				if (m_pElecParts != nullptr)
+					m_pElecParts->Set_Dead();
+			}
+				
 			else
 				m_pTransformCom->Fall(fTimeDelta * 3.f);
 		}
@@ -105,12 +99,16 @@ void CTornado::Tick(_float fTimeDelta)
 
 	Check_PlayerCol();
 
+	m_pElecParts->Tick(fTimeDelta);
+
 	if(m_pColliderCom != nullptr)
 		m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
 }
 
 void CTornado::Late_Tick(_float fTimeDelta)
 {
+	m_pElecParts->Late_Tick(fTimeDelta);
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
@@ -214,26 +212,6 @@ void CTornado::MoveTowardsPlayer(_float fTimeDelta)
 	m_pTransformCom->Move(fTimeDelta * 2.8f, XMLoadFloat4(&vLook));
 }
 
-void CTornado::Check_HoleWallCol()
-{
-	list<CGameObject*> holeWallList = m_pGameInstance->Get_ObjectList(LEVEL_WIZARD, TEXT("Layer_HoleWall"));
-	if (holeWallList.empty())
-		return;
-
-	for (auto& holeWall : holeWallList)
-	{
-		if (nullptr == holeWall)
-			continue;
-
-		CCollider* pHoleWallCollider = dynamic_cast<CCollider*>(holeWall->Get_Component(TEXT("Com_Collider")));
-		if (nullptr == pHoleWallCollider)
-			continue;
-
-		if (m_pColliderCom->Intersect(pHoleWallCollider))
-			m_bHoleWallCol = true;
-	}
-}
-
 void CTornado::Check_Fall()
 {
 	if(m_fTime > 11.f)
@@ -284,7 +262,8 @@ HRESULT CTornado::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pTextureCom[TEX_TOPBOTTOMFADE]->Bind_ShaderResource(m_pShaderCom, "g_TopBottomFadeTex")))
 		return E_FAIL;
-
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(m_fTime))))
+		return E_FAIL;
 	return S_OK;
 }
 
@@ -300,7 +279,6 @@ CTornado* CTornado::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	}
 
 	return pInstance;
-
 }
 
 CGameObject* CTornado::Clone(void* pArg)
@@ -327,4 +305,6 @@ void CTornado::Free()
 		Safe_Release(m_pTextureCom[i]);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
+
+	Safe_Release(m_pElecParts);
 }
