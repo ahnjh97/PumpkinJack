@@ -1,9 +1,11 @@
 #include "stdafx.h"
+#include "ElecArena.h"
+#include "Collider.h"
 #include "Player.h"
 #include "Weapon.h"
 #include "Body.h"
-#include "Collider.h"
 #include "Kart.h"
+#include "Cell.h"
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -188,9 +190,11 @@ void CPlayer::Tick(_float fTimeDelta)
 		m_fDashTime = 0.f;
 	}
 
-
 	for (auto& Pair : m_Parts)
 		Pair.second->Tick(fTimeDelta);
+
+	if (*m_pCurLevel == LEVEL_WIZARD && m_pGameInstance->KeyDown(DIK_1))
+		m_pTransformCom->Set_Pos(XMVectorSet(580, 10, 555, 1));
 
 	m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
 }
@@ -221,7 +225,8 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 HRESULT CPlayer::Render()
 {
 #ifdef _DEBUG
-	m_pColliderCom->Render();
+	if (m_pColliderCom != nullptr)
+		m_pGameInstance->Add_DebugComponents(m_pColliderCom);
 
 	if (m_pNavigationCom[m_eNavigation] != nullptr && m_pGameInstance->Get_NavigationMode() == true)
 		m_pNavigationCom[m_eNavigation]->Render();
@@ -431,10 +436,15 @@ _bool CPlayer::Check_TerrainCol()
 	{
 		if (m_pNavigationCom[DEFAULT] == nullptr)
 		{
-			if (vPos.y <= 0.f)
-				return true;
-			else
-				return false;
+			_float fY{};
+			if (true == Check_GroundCells(fY)) {
+				if (vPos.y <= fY) {
+					m_fPlaneHeight = fY;
+					return true;
+				}
+			}
+				
+			return false;
 		}
 
 		_float fPlaneHeight = m_pNavigationCom[DEFAULT]->Get_PlaneHeight(vPos);
@@ -615,6 +625,65 @@ _bool CPlayer::Check_Kart()
 	}
 
 	return _bool();
+}
+
+_bool CPlayer::Check_GroundCells(_Out_ _float& _fHeight)
+{
+	if (*m_pCurLevel != LEVEL_WIZARD)
+		return false;
+
+	list<CGameObject*> elecArenaList = m_pGameInstance->Get_ObjectList(LEVEL_WIZARD, TEXT("Layer_ElecArena"));
+
+	if (elecArenaList.empty())
+		return false;
+
+	_vector vPos = m_pTransformCom->Get_Pos_Vector();
+	vector<CCell*> vecEncasingCells;
+	vector<_matrix> vecElecArenaWorldMatrices;
+
+	for (auto& elecArena : elecArenaList) {
+		if (nullptr == elecArena)
+			continue;
+
+		CElecArena* pElecArena = dynamic_cast<CElecArena*>(elecArena);
+		CTransform* pElecArenaTransform = dynamic_cast<CTransform*>(pElecArena->Get_Component(g_strTransformTag));
+
+		if (nullptr == pElecArenaTransform)
+			continue;
+
+		_matrix matElecArena = pElecArenaTransform->Get_WorldMatrix();
+
+		vector<CCell*> vecGroundCells = pElecArena->Get_GroundCells();
+
+		if (vecGroundCells.empty())
+			continue;
+
+		for (auto& groundCell : vecGroundCells) {
+			if (true == groundCell->IsIn(vPos, matElecArena)) {
+				vecEncasingCells.emplace_back(groundCell);
+				vecElecArenaWorldMatrices.emplace_back(matElecArena);
+				break;
+			}
+		}
+	}
+
+	if (vecEncasingCells.empty())
+		return false;
+
+	_float fHeight = -9999;
+	_int iHighestCellIndex{};
+
+	for (_int i = 0; i < vecEncasingCells.size(); i++) {
+		_float fCellHeight = XMVectorGetY(XMVector3TransformCoord(vecEncasingCells[i]->Get_Point(CCell::POINT_A), vecElecArenaWorldMatrices[i]));
+		if (fCellHeight > fHeight) {
+			fHeight = fCellHeight;
+			iHighestCellIndex = i;
+		}
+	}
+
+	_fHeight = fHeight;
+	
+	return true;
 }
 
 void CPlayer::Check_GoToSlimeBossRoom()
@@ -1050,6 +1119,7 @@ HRESULT CPlayer::Add_PartObjects(LEVEL eLevel)
 	if (nullptr == pScythe)
 		return E_FAIL;
 	m_Parts.emplace(TEXT("Part_Scythe"), pScythe);
+
 	return S_OK;
 }
 
@@ -1065,7 +1135,6 @@ CPlayer* CPlayer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	}
 
 	return pInstance;
-
 }
 
 CGameObject* CPlayer::Clone(void* pArg)

@@ -78,11 +78,13 @@ HRESULT CGameObject::Initialize(void* pArg)
 	Safe_AddRef(m_pTransformCom);	
 	
 	m_iLevel = GameObjectDesc.iLevel;
+
 	return S_OK;
 }
 
 void CGameObject::Tick(_float fTimeDelta)
 {
+
 }
 
 void CGameObject::Late_Tick(_float fTimeDelta)

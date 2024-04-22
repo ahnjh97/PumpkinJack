@@ -5,10 +5,12 @@ matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 texture2D g_DiffuseTexture, g_WaterTexture, g_CausticTexture, g_NoiseTexture;
 texture2D g_TigerStripes, g_TopBottomFadeTex;
+texture2D g_FireNoise, g_VoronoiBlur;
 float g_fOffset_Y;
 float g_fTime;
 float g_fAlpha;
 float g_fColorOffset;
+float g_fCamFar;
 
 struct VS_IN
 {
@@ -21,7 +23,10 @@ struct VS_IN
 struct VS_OUT
 {
 	float4		vPosition : SV_POSITION;
+    float3      vNormal : NORMAL;
 	float2		vTexcoord : TEXCOORD0;
+    float4      vWorldPos : TEXCOORD1;
+    float4      vProjPos : TEXCOORD2;
 };
 
 /* 정점 쉐이더 */
@@ -35,7 +40,10 @@ VS_OUT VS_MAIN(VS_IN In)
 	matWVP = mul(matWV, g_ProjMatrix);
 
 	Out.vPosition = mul(vector(In.vPosition, 1.f), matWVP);
+    Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix)).xyz;
 	Out.vTexcoord = In.vTexcoord;
+    Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
+    Out.vProjPos = Out.vPosition;
 
 	return Out;
 }
@@ -43,12 +51,18 @@ VS_OUT VS_MAIN(VS_IN In)
 struct PS_IN
 {
 	float4		vPosition : SV_POSITION;
+    float3      vNormal : NORMAL;
 	float2		vTexcoord : TEXCOORD0;
+    float4      vWorldPos : TEXCOORD1;
+    float4      vProjPos : TEXCOORD2;
 };
 
 struct PS_OUT
 {
 	float4		vColor : SV_TARGET0;
+    float4      vNormal : SV_TARGET1;
+    float4      vDepth : SV_TARGET2;
+    float4      vFieldDepth : SV_TARGET3;
 };
 
 PS_OUT PS_MAIN(PS_IN In)
@@ -62,7 +76,7 @@ PS_OUT PS_MAIN(PS_IN In)
 	return Out;
 }
 
-PS_OUT PS_MAIN_SLIMEBOSSROOM(PS_IN In)
+PS_OUT PS_SLIMEBOSSROOM(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     In.vTexcoord.y += g_fTime * 0.2f;
@@ -81,7 +95,7 @@ PS_OUT PS_MAIN_SLIMEBOSSROOM(PS_IN In)
     return Out;
 }
 
-PS_OUT PS_MAIN_KNIFE(PS_IN In)
+PS_OUT PS_KNIFE(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
@@ -94,38 +108,46 @@ PS_OUT PS_MAIN_KNIFE(PS_IN In)
     return Out;
 }
 
-PS_OUT PS_MAIN_ARENAFIRE(PS_IN In)
+PS_OUT PS_ARENAFIRE(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     In.vTexcoord.y += g_fTime * 0.1f;
     Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord * 6.f);
     vector vNoiseColor = g_NoiseTexture.Sample(LinearSampler, In.vTexcoord * 4.f);
-    if (0.3f >= Out.vColor.a)
-        discard;
-    //Out.vColor.xyz += vNoiseColor.xyz;
-    //Out.vColor.a *= vNoiseColor.r ;
+  
     float3 darkOrange = float3(0.6, 0.2, 0.2); 
     float3 redPurple = float3(0.9, 0.4, 0.3); 
     float3 color = lerp(darkOrange, redPurple, Out.vColor.xyz);
     Out.vColor.xyz = color;
-    Out.vColor.a = lerp(Out.vColor.a * 0.5f, 0, vNoiseColor.r);
+    Out.vColor.a = lerp(Out.vColor.a * 0.5f, 0.01, vNoiseColor.r);
+
     return Out;
 }
 
-PS_OUT PS_MAIN_ELEC_ARENA(PS_IN In)
+PS_OUT PS_ELEC_ARENA(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
-
+    
+    float3 upDirection = float3(0, 1, 0);
+    float dotProduct = dot(normalize(In.vNormal), upDirection);
+    
     Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     if (0.3f >= Out.vColor.a)
         discard;
     
-    Out.vColor.rgb += g_fColorOffset;
+    //if (In.vWorldPos.y > 0.8f && dotProduct > 0.2f)
+    //    Out.vColor = float4(1, 1, 1, 1);
     
+     Out.vColor.rgb += g_fColorOffset;
+    
+    // 내적 값이 양수이면 노멀 벡터가 위를 향하고 있다고 판단
+    if (dotProduct > 0.2f)
+        Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);   
+
     return Out;
 }
 
-PS_OUT PS_MAIN_TORNADO(PS_IN In)
+PS_OUT PS_TORNADO(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
@@ -140,6 +162,21 @@ PS_OUT PS_MAIN_TORNADO(PS_IN In)
     if (Out.vColor.a <= 0.15f)
         discard;
     
+    return Out;
+}
+
+PS_OUT PS_HOLEWALL(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    float noiseValue = g_VoronoiBlur.Sample(LinearSampler, float2(In.vTexcoord.x * 2, In.vTexcoord.y * 2)).r; // 노이즈 텍스처 샘플링
+    Out.vColor = float4(1, 1, 1, 1 - noiseValue);
+    float2 fireNoiseUV = float2(In.vTexcoord.x * 10, In.vTexcoord.y * 10 - g_fTime * 0.4);
+    float fFireNoise = g_FireNoise.Sample(LinearSampler, fireNoiseUV).r;
+    
+    Out.vColor.a *= fFireNoise *1.2;
+    if (Out.vColor.a <= 0.1f)
+        discard;
     return Out;
 }
 
@@ -178,7 +215,7 @@ technique11 DefaultTechnique
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_SLIMEBOSSROOM();
+        PixelShader = compile ps_5_0 PS_SLIMEBOSSROOM();
     }
 
     pass Knife // 3
@@ -190,7 +227,7 @@ technique11 DefaultTechnique
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_KNIFE();
+        PixelShader = compile ps_5_0 PS_KNIFE();
     }
 
     pass ArenaFire // 4
@@ -202,7 +239,7 @@ technique11 DefaultTechnique
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_ARENAFIRE();
+        PixelShader = compile ps_5_0 PS_ARENAFIRE();
     }
 
     pass SkySphere // 5
@@ -226,7 +263,7 @@ technique11 DefaultTechnique
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_ELEC_ARENA();
+        PixelShader = compile ps_5_0 PS_ELEC_ARENA();
     }
 
     pass Tornado // 7
@@ -238,6 +275,18 @@ technique11 DefaultTechnique
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_TORNADO();
+        PixelShader = compile ps_5_0 PS_TORNADO();
+    }
+
+    pass HoleWall // 8
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_HOLEWALL();
     }
 }

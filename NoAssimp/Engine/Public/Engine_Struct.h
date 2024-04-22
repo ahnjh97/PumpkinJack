@@ -16,7 +16,7 @@ namespace Engine
 
 		XMFLOAT4	vDirection;
 		XMFLOAT4	vPosition;
-		float		vRange;
+		float		fRange;
 
 		XMFLOAT4	vDiffuse;
 		XMFLOAT4	vAmbient;

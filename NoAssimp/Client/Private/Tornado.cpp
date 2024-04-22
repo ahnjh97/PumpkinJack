@@ -133,7 +133,7 @@ HRESULT CTornado::Render()
 
 #ifdef _DEBUG
 	if (m_pColliderCom != nullptr)
-		m_pColliderCom->Render();
+		m_pGameInstance->Add_DebugComponents(m_pColliderCom);
 #endif
 
 	return S_OK;
@@ -264,6 +264,7 @@ HRESULT CTornado::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(m_fTime))))
 		return E_FAIL;
+
 	return S_OK;
 }
 

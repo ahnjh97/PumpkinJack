@@ -114,7 +114,7 @@ CComponent * CTexture::Clone(void * pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Cloned : CTexture"));
+		MSG_BOX(TEXT("Failed To Clone : CTexture"));
 
 		Safe_Release(pInstance);
 	}

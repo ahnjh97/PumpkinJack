@@ -92,7 +92,7 @@ CBounding_AABB* CBounding_AABB::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 
 	if (FAILED(pInstance->Initialize(pBoundingDesc)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CBounding_AABB"));
+		MSG_BOX(TEXT("Failed To Create : CBounding_AABB"));
 
 		Safe_Release(pInstance);
 	}

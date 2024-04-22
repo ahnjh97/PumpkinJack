@@ -88,7 +88,8 @@ HRESULT CArrow::Render()
 	}
 
 #ifdef _DEBUG
-	m_pColliderCom->Render();
+	if(m_pColliderCom != nullptr)
+		m_pGameInstance->Add_DebugComponents(m_pColliderCom);
 #endif
 
 	return S_OK;

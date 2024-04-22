@@ -145,7 +145,7 @@ CBounding_OBB* CBounding_OBB::Create(ID3D11Device* pDevice, ID3D11DeviceContext*
 
 	if (FAILED(pInstance->Initialize(pBoundingDesc)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CBounding_OBB"));
+		MSG_BOX(TEXT("Failed To Create : CBounding_OBB"));
 
 		Safe_Release(pInstance);
 	}

@@ -101,13 +101,15 @@ _float4 CVIBuffer_Instance::Compute_RandPosition(INSTANCE_SHAPE eShape)
 		_float fX = fRadius * cos(fAngle);
 		_float fY = fRadius * sin(fAngle);
 
-		_float4 vPos{};
-		do
-		{
-			vPos = _float4(fX, fY, RangePosZ(m_RandomNumber), 1);
-		} while (XMVector4Length(XMLoadFloat4(&vPos)).m128_f32[0] > m_InstanceDesc.vRange.x);
+		_float fRandRadius = Radius(m_RandomNumber);
+		_float fZSquared = fRandRadius * fRandRadius - fX * fX - fY * fY;
+		_float fZ = sqrt(fZSquared);
 
-		return vPos;
+		_float fDirection = Angle(m_RandomNumber); // 음수 양수 결정을 위한 변수
+		if (fDirection > XM_PI)
+			fZ *= -1;
+
+		return _float4(fX, fY, fZ, 1);
 	}
 	else if (eShape == SHAPE_RING) {
 		_float fOuterRadius = m_InstanceDesc.vRange.x;

@@ -150,7 +150,7 @@ CComponent* CInstance_Model::Clone(void* pArg)
 {
 	CInstance_Model* pInstance = new CInstance_Model(*this);
 	if (FAILED(pInstance->Initialize(pArg))) {
-		MSG_BOX(TEXT("Failed To Cloned : CInstance_Model"));
+		MSG_BOX(TEXT("Failed To Clone : CInstance_Model"));
 		Safe_Release(pInstance);
 	}
 	return pInstance;

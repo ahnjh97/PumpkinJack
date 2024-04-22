@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Map_SlimeBoss.h"
+#include "Player.h"
 
 CMap_SlimeBoss::CMap_SlimeBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -25,7 +26,7 @@ HRESULT CMap_SlimeBoss::Initialize(void* pArg)
 
 	GameObjectDesc.fSpeedPerSec = 10.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-	m_iLevel = GameObjectDesc.iLevel;
+	m_iLevel = LEVEL_SLIMEBOSS;
 
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
@@ -54,6 +55,7 @@ HRESULT CMap_SlimeBoss::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
+	_bool bInSlimeBossRoom = Check_InSlimeBossRoom();
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
 	for (size_t i = 0; i < iNumMeshes; i++)
@@ -65,7 +67,13 @@ HRESULT CMap_SlimeBoss::Render()
 		if (FAILED(m_pShaderCom[m_vecMeshShaderTypes[i]]->Begin(m_vecMeshShaderPassIndices[i])))
 			return E_FAIL;
 
-		m_pModelCom->Render(i);
+		if (true == bInSlimeBossRoom) {
+			if(m_vecMeshShaderTypes[i] == NO_LIGHT)
+				m_pModelCom->Render(i);
+		}
+			
+		else
+			m_pModelCom->Render(i);
 	}
 
 	return S_OK;
@@ -94,6 +102,21 @@ void CMap_SlimeBoss::SetUp_MeshShaderPassIndices(_uint iNumMeshes)
 		m_vecMeshShaderPassIndices[vecSlimeBossRoom.front()] = 2; // SLIMEBOSSROOM
 	else
 		m_vecMeshShaderPassIndices[vecSlimeBossRoom.back()] = 2; // SLIMEBOSSROOM
+}
+
+_bool CMap_SlimeBoss::Check_InSlimeBossRoom()
+{
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_SLIMEBOSS));
+	if (nullptr == pPlayer)
+		return false;
+
+	Safe_AddRef(pPlayer);
+
+	_bool bIsInSlimeBoss = pPlayer->Get_InSlimeBossRoom();
+
+	Safe_Release(pPlayer);
+
+	return bIsInSlimeBoss;
 }
 
 HRESULT CMap_SlimeBoss::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
@@ -141,15 +164,7 @@ HRESULT CMap_SlimeBoss::Bind_ShaderResources()
 			return E_FAIL;
 		if (FAILED(m_pShaderCom[i]->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 			return E_FAIL;
-		if (FAILED(m_pShaderCom[i]->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom[i]->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom[i]->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom[i]->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom[i]->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))
+		if (FAILED(m_pShaderCom[i]->Bind_RawValue("g_fCamFar", m_pGameInstance->Get_CamFarPtr(), sizeof(_float))))
 			return E_FAIL;
 	}
 
@@ -187,7 +202,6 @@ CMap_SlimeBoss* CMap_SlimeBoss::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 	}
 
 	return pInstance;
-
 }
 
 CGameObject* CMap_SlimeBoss::Clone(void* pArg)

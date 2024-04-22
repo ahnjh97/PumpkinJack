@@ -25,12 +25,12 @@ HRESULT CMap_GamePlay::Initialize(void* pArg)
 
 	GameObjectDesc.fSpeedPerSec = 10.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-	m_iLevel = GameObjectDesc.iLevel;
+	m_iLevel = LEVEL_GAMEPLAY;
 
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel), GameObjectDesc.wstrModelTag)))
+	if (FAILED(Add_Components(LEVEL_GAMEPLAY, GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
@@ -46,7 +46,7 @@ void CMap_GamePlay::Tick(_float fTimeDelta)
 
 void CMap_GamePlay::Late_Tick(_float fTimeDelta)
 {
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this); // 알파값 있는 애들때문에 객체 분리해야될거같음
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this); // 알파값 있는 애들때문에 객체 분리해야될거같음
 }
 
 HRESULT CMap_GamePlay::Render()
@@ -121,15 +121,7 @@ HRESULT CMap_GamePlay::Bind_ShaderResources()
 			return E_FAIL;
 		if (FAILED(m_pShaderCom[i]->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 			return E_FAIL;
-		if (FAILED(m_pShaderCom[i]->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom[i]->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom[i]->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom[i]->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom[i]->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))
+		if (FAILED(m_pShaderCom[i]->Bind_RawValue("g_fCamFar", m_pGameInstance->Get_CamFarPtr(), sizeof(_float))))
 			return E_FAIL;
 	}
 
@@ -158,7 +150,6 @@ CMap_GamePlay* CMap_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceContext*
 	}
 
 	return pInstance;
-
 }
 
 CGameObject* CMap_GamePlay::Clone(void* pArg)

@@ -121,7 +121,7 @@ CComponent * CVIBuffer_Rect::Clone(void * pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Cloned : CVIBuffer_Rect"));
+		MSG_BOX(TEXT("Failed To Clone : CVIBuffer_Rect"));
 
 		Safe_Release(pInstance);
 	}

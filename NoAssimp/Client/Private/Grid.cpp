@@ -33,6 +33,7 @@ HRESULT CGrid::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pTransformCom->Set_WorldMatrix(GridDesc.matWorld);
+
 	return S_OK;
 }
 
@@ -113,23 +114,21 @@ HRESULT CGrid::Bind_ShaderResources()
 
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fCamFar", m_pGameInstance->Get_CamFarPtr(), sizeof(_float))))
+		return E_FAIL;
 
 	if (FAILED(m_pTextureCom[TYPE_DIFFUSE]->Bind_ShaderResources(m_pShaderCom, "g_DiffuseTexture")))
 		return E_FAIL;
-
 	if (FAILED(m_pTextureCom[TYPE_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0)))
 		return E_FAIL;
-
 	if (FAILED(m_pTextureCom[TYPE_WATER]->Bind_ShaderResource(m_pShaderCom, "g_WaterTexture", 0)))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))
-		return E_FAIL;
+
 
 	return S_OK;
 }

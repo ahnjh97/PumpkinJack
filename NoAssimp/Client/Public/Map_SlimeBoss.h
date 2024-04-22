@@ -29,6 +29,7 @@ public:
 
 private:
 	void SetUp_MeshShaderPassIndices(_uint iNumMeshes);
+	_bool Check_InSlimeBossRoom();
 
 private:
 	_float m_fTime = {};

@@ -32,6 +32,9 @@ HRESULT CLevel_EffectTool::Initialize()
 void CLevel_EffectTool::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
+
+	if (m_pGameInstance->KeyDown(DIK_E))
+		Ready_Layer_Effect(TEXT("Layer_Effect"));
 }
 
 HRESULT CLevel_EffectTool::Render()
@@ -53,11 +56,9 @@ HRESULT CLevel_EffectTool::Ready_Lights()
 
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
-	LightDesc.vPosition = _float4(0.f, 0.f, 0.f, 1.f);
-	LightDesc.vRange = 100.f;
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vSpecular = _float4(0.1f, 0.1f, 0.1f, 1.f);
+	LightDesc.vAmbient = _float4(.6f, .6f, .6f, 1.f);
+	LightDesc.vSpecular = _float4(0.15f, 0.15f, 0.15f, 1.f);
 
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
@@ -98,9 +99,6 @@ HRESULT CLevel_EffectTool::Ready_Layer_Grid(const wstring& strLayerTag)
 
 HRESULT CLevel_EffectTool::Ready_Layer_Effect(const wstring& strLayerTag)
 {
-	/*if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Book"), &tDesc)))
-		return E_FAIL;*/
-
 	CElecParts::ELECPARTS_DESC tElecPartsDesc{};
 	tElecPartsDesc.iLevel = LEVEL_EFFECTTOOL;
 	tElecPartsDesc.eElecEffect = CElecParts::ELEC_LIGHTNING1;
@@ -108,6 +106,12 @@ HRESULT CLevel_EffectTool::Ready_Layer_Effect(const wstring& strLayerTag)
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
 		return E_FAIL;
 
+	CGameObject::GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = LEVEL_EFFECTTOOL;
+	/*if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Lightning"), &tDesc)))
+		return E_FAIL;*/
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_HoleWall"), &tDesc)))
+		return E_FAIL;
 	return S_OK;
 }
 

@@ -150,6 +150,9 @@ PS_OUT PS_MAIN_ELECPARTS(PS_IN In)
     else // 불투명에서 투명으로 (noiseValue가 더 작으면 알파값 감소)
         Out.vColor.a = 1.0 - smoothstep(0.5, 1.0, (In.fLifeRatio - 0.5) * 2.0) * (1.0 - fNoise);
 	
+    if (Out.vColor.a <= 0.05f)
+        discard;
+	
     return Out;
 }
 

@@ -38,6 +38,7 @@ HRESULT CTerrain::Initialize(void * pArg)
 void CTerrain::Tick(_float fTimeDelta)
 {
 	_int iCurLevel = *m_pGameInstance->Get_CurrentLevelID();
+	
 	if (iCurLevel == LEVEL_SLIMEBOSS)
 	{
 		CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_SLIMEBOSS));
@@ -81,8 +82,8 @@ HRESULT CTerrain::Render()
 		return E_FAIL;
 
 #ifdef _DEBUG
-	if (m_pNavigationCom != nullptr && m_pGameInstance->Get_NavigationMode() == false)
-		m_pNavigationCom->Render();
+	if (m_pNavigationCom != nullptr && m_pGameInstance->Get_NavigationMode() == false) 
+		m_pGameInstance->Add_DebugComponents(m_pNavigationCom);
 #endif
 
 	return S_OK;
@@ -151,17 +152,14 @@ HRESULT CTerrain::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
-	
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fCamFar", m_pGameInstance->Get_CamFarPtr(), sizeof(_float))))
+		return E_FAIL;
+
 	if (FAILED(m_pTextureCom[TYPE_DIFFUSE]->Bind_ShaderResources(m_pShaderCom, "g_DiffuseTexture")))
 		return E_FAIL;
-
 	if (FAILED(m_pTextureCom[TYPE_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0)))
 		return E_FAIL;
-
 	if (FAILED(m_pTextureCom[TYPE_WATER]->Bind_ShaderResource(m_pShaderCom, "g_WaterTexture", 0)))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))
 		return E_FAIL;
 
 	return S_OK;
@@ -179,7 +177,6 @@ CTerrain * CTerrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pConte
 	}
 
 	return pInstance;
-
 }
 
 CGameObject * CTerrain::Clone(void * pArg)

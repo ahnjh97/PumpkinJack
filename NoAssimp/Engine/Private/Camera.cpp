@@ -51,8 +51,7 @@ HRESULT CCamera::Bind_PipeLines()
 	/* dx11 : 사용자 정의 렌더링 파이프라인(ㅅㅖ이더). */
 	m_pGameInstance->Set_Transform(CPipeLine::D3DTS_VIEW, m_pTransformCom->Get_WorldMatrix_Inverse());
 	m_pGameInstance->Set_Transform(CPipeLine::D3DTS_PROJ, ::XMMatrixPerspectiveFovLH(m_fFovy, m_fAspect, m_fNear, m_fFar));	
-	/*m_pGameInstance->Set_Transform(CPipeLine::D3DTS_PROJ, XMMatrixPerspectiveFovLH(XMConvertToRadians(60.0f),
-		(_float)1280 / 720, 0.1f, 1000.0f));*/
+
 	return S_OK;
 }
 

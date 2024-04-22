@@ -2,6 +2,7 @@
 #include "Bone.h"
 #include <fstream>
 #include "GameInstance.h"
+#include "Cell.h"
 
 CMesh::CMesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ifstream& fileStream)
 	: CVIBuffer(pDevice, pContext), m_InputFile(fileStream)
@@ -143,6 +144,34 @@ _float4 CMesh::Get_PickPos(const CTransform* pTransform) const
 	return fResult;
 }
 
+vector<class CCell*> CMesh::SetUp_MeshGroundCells() // 법선벡터가 위를 향하는 삼각형들 추려내기
+{
+	vector<class CCell*> vecGroundCells;
+
+	_uint		iNumIndices = { 0 };
+	for (size_t i = 0; i < m_iFaces; i++)
+	{
+		_vector p0 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
+		_vector p1 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
+		_vector p2 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
+
+		_vector v1 = XMVectorSubtract(p1, p0);
+		_vector v2 = XMVectorSubtract(p2, p0);
+
+		_vector vNormal = XMVector3Cross(v1, v2);
+		vNormal = XMVector3Normalize(vNormal);
+
+		_float fDotProduct = XMVectorGetX(XMVector3Dot(vNormal, XMVectorSet(0, 1, 0, 0)));
+
+		if (fDotProduct > 0.1f) {
+			CCell* pCell = CCell::Create(m_pDevice, m_pContext, p0, p1, p2);
+			vecGroundCells.emplace_back(pCell);
+		}
+	}
+
+	return vecGroundCells;
+}
+
 HRESULT CMesh::Ready_Vertices_For_NonAnimModel(_fmatrix TransformMatrix)
 {
 	m_iVertexStride = sizeof(VTXMESH);
@@ -266,7 +295,6 @@ CMesh* CMesh::Clone(void* pArg)
 
 void CMesh::Free()
 {
-
 	__super::Free();	
 	
 	if (false == m_isCloned)

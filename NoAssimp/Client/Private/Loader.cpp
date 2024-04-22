@@ -49,6 +49,7 @@
 #include "ElecArena.h"
 #include "SkySphere.h"
 #include "ElecParts.h"
+#include "Lightning.h"
 #include "HoleWall.h"
 #include "Tornado.h"
 #include "Wizard.h"
@@ -264,7 +265,7 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 
 	m_strLoadingText = TEXT("Loading GameObject Prototypes for Level_GamePlay...");
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Terrain"), CTerrain);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Free"), CCamera_Free);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Camera_Jack"), CCamera_Jack);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Monster"), CMonster);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Player"), CPlayer); 
@@ -388,7 +389,12 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Noise", "Effects/reaperSolid.dds")))
 		return E_FAIL;
-
+	if (FAILED(Add_Texture(eLevel, "Circle", "Effects/Circle%d.dds" ,2)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "FireNoise", "Effects/ElecNoise.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "VoronoiBlur", "Effects/voronoiNoiseBlur.dds")))
+		return E_FAIL;
 
 	m_strLoadingText = TEXT("Loading VIBuffers for Level_Wizard...");
 
@@ -424,6 +430,8 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ElecArena"), CElecArena);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Book"), CBook);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ElecParts"), CElecParts);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Lightning"), CLightning);
+
 
 	m_strLoadingText = TEXT("Loading Complete: Level_Wizard");
 	m_isFinished = true;
@@ -455,6 +463,14 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Noise", "Effects/reaperSolid.dds")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Portal", "Portal/Portal.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Circle", "Effects/Circle%d.dds", 2)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "FireNoise", "Effects/ElecNoise.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "VoronoiBlur", "Effects/voronoiNoiseBlur.dds")))
+		return E_FAIL;
 
 
 	m_strLoadingText = TEXT("Loading VIBuffers for Level_EffectTool...");
@@ -471,10 +487,11 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 
 
 	m_strLoadingText = TEXT("Loading Models for Level_EffectTool...");
-	/*if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "Tornado")))
-		return E_FAIL;*/
+	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "HoleWall")))
+		return E_FAIL;
 	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "Book")))
 		return E_FAIL;
+
 
 	m_strLoadingText = TEXT("Loading Shaders for Level_EffectTool...");
 	if (FAILED(Add_Shaders(eLevel)))
@@ -488,7 +505,8 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Book"), CBook);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Monster"), CMonster);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ElecParts"), CElecParts);
-
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Lightning"), CLightning);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HoleWall"), CHoleWall);
 
 	m_strLoadingText = TEXT("Loading Complete: Level_EffectTool");
 	m_isFinished = true;
@@ -654,7 +672,8 @@ HRESULT CLoader::Add_VIBuffer_Instance_Points(LEVEL eLevel)
 	vecInstanceDesc[CElecParts::ELEC_TORNADO] = InstanceDesc;
 
 	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
-	InstanceDesc.vRange = _float3(12.f, 12.f, 12.f);
+	InstanceDesc.vRange = _float3(10.f, 10.f, 10.f);
+	InstanceDesc.iNumInstance = 30;
 	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_SPHERE;
 	vecInstanceDesc[CElecParts::ELEC_LIGHTNING1] = InstanceDesc;
 

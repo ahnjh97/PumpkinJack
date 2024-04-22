@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Component.h"
 
 /* 각 형태를 구성하기위한 정점 인덱스를 보유하는 개겣들의 부모다. */

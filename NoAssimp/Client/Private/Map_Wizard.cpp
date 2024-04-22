@@ -25,12 +25,12 @@ HRESULT CMap_Wizard::Initialize(void* pArg)
 
 	GameObjectDesc.fSpeedPerSec = 10.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-	m_iLevel = GameObjectDesc.iLevel;
+	m_iLevel = LEVEL_WIZARD;
 
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel), GameObjectDesc.wstrModelTag)))
+	if (FAILED(Add_Components(LEVEL_WIZARD, GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
@@ -118,6 +118,7 @@ HRESULT CMap_Wizard::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pTextureCom[TEX_NOISE]->Bind_ShaderResource(m_pShaderCom, "g_NoiseTexture")))
 		return E_FAIL;
+
 	return S_OK;
 }
 

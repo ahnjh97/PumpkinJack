@@ -5,7 +5,11 @@
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 texture2D g_DiffuseTexture;
+texture2D g_Circle[2];
 float g_fAlpha;
+float g_fTime;
+float fLightningEndTime = 1.8f;
+float fSecondCircleEndTime = 1;
 
 struct VS_IN
 {
@@ -76,6 +80,64 @@ PS_OUT PS_MAIN_INVEN(PS_IN In)
     return Out;
 }
 
+float fOuterRadius = 0.5;
+float fInnerRadius = 0.4;
+
+PS_OUT PS_MAIN_LIGHTNING(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    Out.vColor = 1.f;
+    
+    float fFirstCircleTime = 0.4f;
+    
+    float2 vCenter = float2(0.5, 0.5);
+    float fDis = distance(In.vTexcoord, vCenter);
+    float fSecondRadius = 0.f;
+    
+    //Out.vColor.a = g_Circle[0].Sample(LinearSampler, In.vTexcoord).a;
+    //return Out;
+    
+    if (g_fTime < fFirstCircleTime)
+    {
+        Out.vColor.a = smoothstep(0, 1, g_fTime * 2.f);
+        if (fDis >= fOuterRadius || fDis <= fInnerRadius || 0.3 > g_Circle[0].Sample(LinearSampler, In.vTexcoord).a)
+            discard;    
+    }
+    else
+    {
+        float fSecondCircle = 0; 
+        
+        if (g_fTime <= 0.8f)
+        {
+            fSecondCircle = (g_fTime - fFirstCircleTime) / (fSecondCircleEndTime - fFirstCircleTime);
+            fSecondRadius = smoothstep(0, 1, fSecondCircle) * 0.4;
+        }
+            
+        if (g_fTime > 0.8f)
+        {
+            fSecondCircle = (g_fTime - 1) / (fLightningEndTime - 1);
+            fSecondRadius = smoothstep(1, 0, fSecondCircle * 1.5) * 0.4;
+            
+            float fFade = (g_fTime - fFirstCircleTime) / (fLightningEndTime - fFirstCircleTime);
+            Out.vColor.a = smoothstep(1, 0, fFade);
+        }
+        
+        if (fDis >= fOuterRadius)
+            discard;
+        
+        if (fDis <= fInnerRadius)
+            Out.vColor.a = fSecondRadius * 2.2;
+    }
+    
+    Out.vColor.a *= g_Circle[1].Sample(LinearSampler, In.vTexcoord).a;
+    
+    if (Out.vColor.a == 0 || g_fTime > fLightningEndTime)
+        discard;
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
 	pass Default // 0
@@ -124,5 +186,17 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_CROWLIFEBAR();
+    }
+
+    pass Lightning // 4
+    {
+        SetRasterizerState(RS_NoCull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_LIGHTNING();
     }
 }

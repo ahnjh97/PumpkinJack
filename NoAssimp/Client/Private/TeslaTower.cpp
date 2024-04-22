@@ -80,7 +80,7 @@ HRESULT CTeslaTower::Render()
 
 #ifdef _DEBUG
 	if (m_pColliderCom != nullptr)
-		m_pColliderCom->Render();
+		m_pGameInstance->Add_DebugComponents(m_pColliderCom);
 #endif // _DEBUG
 
 	return S_OK;

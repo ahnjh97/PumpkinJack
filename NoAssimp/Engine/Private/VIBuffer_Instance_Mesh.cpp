@@ -203,7 +203,7 @@ CVIBuffer_Instance_Mesh* CVIBuffer_Instance_Mesh::Create(ID3D11Device* pDevice, 
 
 	if (FAILED(pInstance->Initialize_Prototype(fileStream, InstanceDesc)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CVIBuffer_Instance_Mesh"));
+		MSG_BOX(TEXT("Failed To Create : CVIBuffer_Instance_Mesh"));
 
 		Safe_Release(pInstance);
 	}

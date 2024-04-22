@@ -76,7 +76,8 @@ HRESULT CPillar_SlimeBossRoom::Render()
 	}
 
 #ifdef _DEBUG
-	m_pColliderCom->Render();
+	if (m_pColliderCom != nullptr)
+		m_pGameInstance->Add_DebugComponents(m_pColliderCom);
 #endif
 
 	return S_OK;
@@ -139,7 +140,6 @@ HRESULT CPillar_SlimeBossRoom::Bind_ShaderResources()
 
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Component.h"
 #include "Animation.h"
 #include <fstream>
@@ -72,6 +71,8 @@ public:
 	void Play_FinalFrame(string& strAnimName);
 	void Reset_Animation(string& strAnimName);
 	void Reset_Animation(_uint iAnimIndex);
+
+	vector<class CCell*> SetUp_GroundCells();
 
 private:
 	TYPE						m_eModelType = { TYPE_END };

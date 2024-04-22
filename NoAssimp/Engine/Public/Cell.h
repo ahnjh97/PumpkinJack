@@ -33,7 +33,9 @@ public:
 
 public:
 	HRESULT Initialize(_int iTerrainIndex, const _float3* pPoints, const _int* pNeighborIndices, _uint iIndex);
+	HRESULT Initialize(_fvector v0, _fvector v1, _gvector v2); // For Mesh Ground Cells
 	_bool IsIn(_fvector vPosition, _fmatrix TerrainWorldMatrix, _int* pNeighborIndex);
+	_bool IsIn(_fvector vPos, _fmatrix matModelWorld);
 
 	_bool Compare_Points(_fvector vSourPoint, _fvector vDestPoint);
 	_bool Check_Redundancy(CCell* pCell);
@@ -64,6 +66,7 @@ private:
 
 public:
 	static CCell* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _int iTerrainIndex, const _float3* vPoints, const _int* pNeighborIndices, _uint iIndex);
+	static CCell* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _fvector v0, _fvector v1, _gvector v2); // For Mesh Ground Cells
 	virtual void Free() override;
 };
 

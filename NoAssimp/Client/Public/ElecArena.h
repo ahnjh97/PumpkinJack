@@ -5,6 +5,7 @@
 BEGIN(Engine)
 class CModel;
 class CShader;
+class CCell;
 END
 
 BEGIN(Client)
@@ -18,6 +19,7 @@ private:
 
 public:
 	void Set_Whiten() { m_bWhiten = true; }
+	vector<CCell*> Get_GroundCells() { return m_vecGroundCells; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -35,6 +37,8 @@ private:
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
+
+	vector<CCell*> m_vecGroundCells;
 
 private:
 	HRESULT Add_Components(LEVEL eLevel, const wstring& _wstrModelTag);

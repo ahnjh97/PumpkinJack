@@ -315,7 +315,7 @@ CComponent * CTransform::Clone(void * pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Cloned : CTransform"));
+		MSG_BOX(TEXT("Failed To Clone : CTransform"));
 
 		Safe_Release(pInstance);
 	}

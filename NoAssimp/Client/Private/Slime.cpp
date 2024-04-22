@@ -144,9 +144,11 @@ HRESULT CSlime::Render()
 	}
 
 #ifdef _DEBUG
-	m_pColliderCom[DEFAULT]->Render();
-	/*if(m_pColliderCom[DAMAGE_RANGE] != nullptr)
-		m_pColliderCom[DAMAGE_RANGE]->Render();*/
+	if (m_pColliderCom[DEFAULT] != nullptr)
+		m_pGameInstance->Add_DebugComponents(m_pColliderCom[DEFAULT]);
+
+	/*if (m_pColliderCom[DAMAGE_RANGE] != nullptr)
+		m_pGameInstance->Add_DebugComponents(m_pColliderCom[DAMAGE_RANGE]);*/
 #endif
 	return S_OK;
 }

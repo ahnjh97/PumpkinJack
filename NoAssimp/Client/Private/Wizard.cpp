@@ -107,8 +107,10 @@ HRESULT CWizard::Render()
 	}
 
 #ifdef _DEBUG
-	if(WIZARD_HIT == m_eState || WIZARD_IDLE == m_eState)
-		m_pColliderCom->Render();
+	if (WIZARD_HIT == m_eState || WIZARD_IDLE == m_eState)	{
+		if (m_pColliderCom != nullptr)
+			m_pGameInstance->Add_DebugComponents(m_pColliderCom);
+	}
 #endif
 
 	return S_OK;
@@ -519,6 +521,8 @@ HRESULT CWizard::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fCamFar", m_pGameInstance->Get_CamFarPtr(), sizeof(_float))))
 		return E_FAIL;
 
 	return S_OK;

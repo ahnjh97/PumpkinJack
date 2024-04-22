@@ -2,12 +2,13 @@
 #include "Bone.h"
 #include "Mesh.h"
 
-#include "Shader.h"
-#include "Texture.h"
 #include "GameInstance.h"
+#include "Texture.h"
+#include "Channel.h"
+#include "Shader.h"
 #include <locale>
 #include <codecvt>
-#include "Channel.h"
+#include "Cell.h"
 
 CModel::CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent{ pDevice, pContext }
@@ -349,6 +350,27 @@ void CModel::Reset_Animation(_uint iAnimIndex)
 	m_Animations[iAnimIndex]->Set_IsFinished(false);
 }
 
+vector<class CCell*> CModel::SetUp_GroundCells()
+{
+	vector<CCell*> vecGroundCells;
+
+	if (m_Meshes.empty())
+		return  vecGroundCells;
+
+	for (auto& mesh : m_Meshes) {
+		if (nullptr == mesh)
+			continue;
+
+		vector<CCell*> vecMeshGroundCells = mesh->SetUp_MeshGroundCells();
+		if (vecMeshGroundCells.empty())
+			continue;
+
+		vecGroundCells.insert(vecGroundCells.end(), vecMeshGroundCells.begin(), vecMeshGroundCells.end());
+	}
+
+	return vecGroundCells;
+}
+
 HRESULT CModel::Ready_Meshes()
 {
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumMeshes), sizeof(m_iNumMeshes));
@@ -473,7 +495,7 @@ CComponent* CModel::Clone(void* pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Cloned : CModel"));
+		MSG_BOX(TEXT("Failed To Clone : CModel"));
 
 		Safe_Release(pInstance);
 	}

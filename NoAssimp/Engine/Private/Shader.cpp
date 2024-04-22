@@ -174,7 +174,7 @@ CComponent* CShader::Clone(void* pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Cloned : CShader"));
+		MSG_BOX(TEXT("Failed To Clone : CShader"));
 
 		Safe_Release(pInstance);
 	}

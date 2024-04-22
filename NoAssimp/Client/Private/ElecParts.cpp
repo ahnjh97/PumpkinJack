@@ -130,7 +130,7 @@ CElecParts* CElecParts::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CElecParts"));
+		MSG_BOX(TEXT("Failed To Create : CElecParts"));
 
 		Safe_Release(pInstance);
 	}
@@ -144,7 +144,7 @@ CGameObject* CElecParts::Clone(void* pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Cloned : CElecParts"));
+		MSG_BOX(TEXT("Failed To Clone : CElecParts"));
 
 		Safe_Release(pInstance);
 	}

@@ -256,7 +256,7 @@ CNavigation* CNavigation::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 	if (FAILED(pInstance->Initialize_Prototype(strDataFile)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CNavigation"));
+		MSG_BOX(TEXT("Failed To Create : CNavigation"));
 
 		Safe_Release(pInstance);
 	}
@@ -270,7 +270,7 @@ CComponent* CNavigation::Clone(void* pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Cloned : CNavigation"));
+		MSG_BOX(TEXT("Failed To Clone : CNavigation"));
 
 		Safe_Release(pInstance);
 	}

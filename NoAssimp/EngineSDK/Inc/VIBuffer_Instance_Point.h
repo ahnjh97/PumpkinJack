@@ -14,10 +14,6 @@ public:
 	virtual HRESULT Initialize_Prototype(const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc);
 	virtual HRESULT Initialize(void* pArg) override;
 
-public:
-
-
-
 private:
 	_uint* m_pSpriteIndexOffsets = { nullptr };
 

@@ -12,6 +12,7 @@ BEGIN(Client)
 
 class CHoleWall final : public CGameObject
 {
+	enum TEX_HOLEWALL { TEX_FIRENOISE, TEX_VORONOIBLUR, TEX_END };
 private:
 	CHoleWall(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CHoleWall(const CHoleWall& rhs);
@@ -35,7 +36,7 @@ private:
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
-	CTexture* m_pTextureCom = { nullptr };
+	CTexture* m_pTextureCom[TEX_END] = {nullptr};
 	CCollider* m_pColliderCom[2] = { nullptr };
 	CGameObject* m_pPlayer = { nullptr };
 	CGameObject* m_pElecParts = { nullptr };

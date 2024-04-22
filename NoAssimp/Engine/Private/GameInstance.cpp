@@ -1,14 +1,17 @@
-#include "..\Public\GameInstance.h"
+#include "GameInstance.h"
 
 #include "Graphic_Device.h"
 #include "Input_Device.h"
+#include "RenderTarget_Manager.h"
+#include "CoordConverter.h"
 #include "Object_Manager.h"
 #include "Level_Manager.h"
 #include "Timer_Manager.h"
 #include "ImGui_Manager.h"
 #include "Light_Manager.h"
-#include "Picking.h"
 #include "Renderer.h"
+#include "Picking.h"
+#include "Camera.h"
 #include <random>
 
 IMPLEMENT_SINGLETON(CGameInstance)
@@ -45,6 +48,10 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	if (nullptr == m_pTimer_Manager)
 		return E_FAIL;
 
+	m_pRenderTarget_Manager = CRenderTarget_Manager::Create(*ppDevice, *ppContext);
+	if (nullptr == m_pRenderTarget_Manager)
+		return E_FAIL;
+
 	m_pRenderer = CRenderer::Create(*ppDevice, *ppContext);
 	if (nullptr == m_pRenderer)
 		return E_FAIL;
@@ -71,6 +78,10 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 
 	m_pPicking = CPicking::Create(*ppDevice, *ppContext, EngineDesc.hWnd, EngineDesc.iWinSizeX, EngineDesc.iWinSizeY);
 	if (nullptr == m_pComponent_Manager)
+		return E_FAIL;
+
+	m_pCoordConverter = CCoordConverter::Create(*ppDevice, *ppContext);
+	if (nullptr == m_pCoordConverter)
 		return E_FAIL;
 
 	return S_OK;
@@ -128,8 +139,8 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 
 	if (m_pImGui_Manager)
 		m_pImGui_Manager->Tick(fTimeDelta);
+	
 	CalculateFPS(fTimeDelta);
-
 }
 
 HRESULT CGameInstance::Draw(const _float4& vClearColor)
@@ -237,6 +248,14 @@ HRESULT CGameInstance::Add_RenderGroup(CRenderer::RENDERGROUP eRenderGroup, CGam
 		return E_FAIL;
 
 	return m_pRenderer->Add_RenderGroup(eRenderGroup, pRenderObject);	
+}
+
+HRESULT CGameInstance::Add_DebugComponents(CComponent* pRenderComponent)
+{
+	if (nullptr == m_pRenderer)
+		return E_FAIL;
+
+	return m_pRenderer->Add_DebugComponents(pRenderComponent);
 }
 
 HRESULT CGameInstance::Open_Level(_uint iNewLevelID, CLevel * pNewLevel)
@@ -350,6 +369,28 @@ _bool CGameInstance::Check_Collision(_uint iLevelIndex, const wstring& wstrLayer
 		return false;
 
 	return  m_pObject_Manager->Check_Collision(iLevelIndex, wstrLayerTag, pMyCollider, wstrColliderTag);
+}
+
+_float* CGameInstance::Get_CamFarPtr()
+{
+	if (nullptr == m_pObject_Manager)
+		return nullptr;
+
+	list<CGameObject*> cameraList = m_pObject_Manager->Get_ObjectList(*Get_CurrentLevelID(), TEXT("Layer_Camera"));
+
+	if (cameraList.empty())
+		return nullptr;
+
+	for (auto& camera : cameraList) {
+		if (nullptr == camera)
+			continue;
+
+		CCamera* pCamera = dynamic_cast<CCamera*>(camera);
+
+		return pCamera->Get_FarPtr();
+	}
+
+	return nullptr;
 }
 
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const wstring & strPrototypeTag, CComponent * pPrototype)
@@ -503,6 +544,63 @@ HRESULT CGameInstance::Add_Light(const LIGHT_DESC& LightDesc)
 	return m_pLight_Manager->Add_Light(LightDesc);
 }
 
+HRESULT CGameInstance::Render_Lights(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
+{
+	return m_pLight_Manager->Render(pShader, pVIBuffer);
+}
+
+HRESULT CGameInstance::Add_RenderTarget(const wstring& strRenderTargetTag, _uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixelFormat, const _float4& vClearColor)
+{
+	return m_pRenderTarget_Manager->Add_RenderTarget(strRenderTargetTag, iSizeX, iSizeY, ePixelFormat, vClearColor);
+}
+
+HRESULT CGameInstance::Add_MRT(const wstring& strMRTTag, const wstring& strRenderTargetTag)
+{
+	return m_pRenderTarget_Manager->Add_MRT(strMRTTag, strRenderTargetTag);
+}
+
+HRESULT CGameInstance::Begin_MRT(const wstring& strMRTTag)
+{
+	return m_pRenderTarget_Manager->Begin_MRT(strMRTTag);
+}
+
+HRESULT CGameInstance::End_MRT()
+{
+	return m_pRenderTarget_Manager->End_MRT();
+}
+
+HRESULT CGameInstance::Bind_RTShaderResource(CShader* pShader, const wstring& strRenderTargetTag, const _char* pConstantName)
+{
+	return m_pRenderTarget_Manager->Bind_ShaderResource(pShader, strRenderTargetTag, pConstantName);
+}
+
+HRESULT CGameInstance::Copy_Resource(const wstring& strRenderTargetTag, ID3D11Texture2D** ppTextureHub)
+{
+	return m_pRenderTarget_Manager->Copy_Resource(strRenderTargetTag, ppTextureHub);
+}
+
+#ifdef _DEBUG
+HRESULT CGameInstance::Ready_RTVDebug(const wstring& strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
+{
+	return m_pRenderTarget_Manager->Ready_Debug(strRenderTargetTag, fX, fY, fSizeX, fSizeY);
+}
+
+HRESULT CGameInstance::Draw_RTVDebug(const wstring& strMRTTag, CShader* pShader, CVIBuffer_Rect* pVIBuffer)
+{
+	return m_pRenderTarget_Manager->Render_Debug(strMRTTag, pShader, pVIBuffer);
+}
+#endif
+
+_vector CGameInstance::Compute_WorldPos(const _float2& vViewportPos, const wstring& strZRenderTargetTag, _uint iOffset)
+{
+	return m_pCoordConverter->Compute_WorldPos(vViewportPos, strZRenderTargetTag, iOffset);
+}
+
+_vector CGameInstance::Compute_WorldPos_Float4(const _float4& vPlayerPos, const wstring& strZRenderTargetTag, _uint iOffset)
+{
+	return m_pCoordConverter->Compute_WorldPos_Float4(vPlayerPos, strZRenderTargetTag, iOffset);
+}
+
 string CGameInstance::WstrToStr(const wstring& wstr)
 {
 	wstring_convert<codecvt_utf8<wchar_t>> cnvt;
@@ -547,6 +645,8 @@ void CGameInstance::Release_Engine()
 
 void CGameInstance::Free()
 {
+	Safe_Release(m_pCoordConverter);
+	Safe_Release(m_pRenderTarget_Manager);
 	Safe_Release(m_pLight_Manager);
 	Safe_Release(m_pPicking);
 	Safe_Release(m_pPipeLine);

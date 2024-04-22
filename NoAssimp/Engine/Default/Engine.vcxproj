@@ -183,7 +183,10 @@
     <ClCompile Include="..\Private\Bounding_Sphere.cpp" />
     <ClCompile Include="..\Private\Camera.cpp" />
     <ClCompile Include="..\Private\Cell.cpp" />
+    <ClCompile Include="..\Private\CoordConverter.cpp" />
     <ClCompile Include="..\Private\Instance_Model.cpp" />
+    <ClCompile Include="..\Private\RenderTarget.cpp" />
+    <ClCompile Include="..\Private\RenderTarget_Manager.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Instance.cpp" />
     <ClCompile Include="..\Private\Navigation.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Cell.cpp" />
@@ -246,7 +249,10 @@
     <ClInclude Include="..\Public\Bounding_Sphere.h" />
     <ClInclude Include="..\Public\Camera.h" />
     <ClInclude Include="..\Public\Cell.h" />
+    <ClInclude Include="..\Public\CoordConverter.h" />
     <ClInclude Include="..\Public\Instance_Model.h" />
+    <ClInclude Include="..\Public\RenderTarget.h" />
+    <ClInclude Include="..\Public\RenderTarget_Manager.h" />
     <ClInclude Include="..\Public\VIBuffer_Instance.h" />
     <ClInclude Include="..\Public\Navigation.h" />
     <ClInclude Include="..\Public\VIBuffer_Cell.h" />
@@ -297,6 +303,7 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_Cell.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_Deferred.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

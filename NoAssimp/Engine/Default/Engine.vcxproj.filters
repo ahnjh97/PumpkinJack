@@ -157,6 +157,18 @@
     <Filter Include="01. Utility\02. Components\Instance_Model">
       <UniqueIdentifier>{b6e73773-8d72-46a0-852d-a9615c0c4099}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\09. RenderTargets">
+      <UniqueIdentifier>{5d86db54-d667-4451-9bf2-ed27bfe7c329}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\09. RenderTargets\Manager">
+      <UniqueIdentifier>{8526d5ee-4638-4b31-b4c4-72060a9da9ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\11. Frustum">
+      <UniqueIdentifier>{93d9aeb9-2a64-47a2-ab73-c56207c3ba73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\10. CoordConverter">
+      <UniqueIdentifier>{57e70264-e8a4-4ec0-af21-ac0364e5006c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -326,6 +338,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Instance_Model.cpp">
       <Filter>01. Utility\02. Components\Instance_Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RenderTarget.cpp">
+      <Filter>01. Utility\09. RenderTargets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RenderTarget_Manager.cpp">
+      <Filter>01. Utility\09. RenderTargets\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CoordConverter.cpp">
+      <Filter>01. Utility\10. CoordConverter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -512,6 +533,15 @@
     <ClInclude Include="..\Public\Instance_Model.h">
       <Filter>01. Utility\02. Components\Instance_Model</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\RenderTarget.h">
+      <Filter>01. Utility\09. RenderTargets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RenderTarget_Manager.h">
+      <Filter>01. Utility\09. RenderTargets\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CoordConverter.h">
+      <Filter>01. Utility\10. CoordConverter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Bin\ShaderFiles\Engine_Shader_Defines.hlsli">
@@ -520,6 +550,9 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_Cell.hlsl">
+      <Filter>01. Utility\98. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_Deferred.hlsl">
       <Filter>01. Utility\98. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

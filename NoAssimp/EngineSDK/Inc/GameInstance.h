@@ -7,7 +7,6 @@
 #include <locale>
 #include <codecvt>
 
-
 BEGIN(Engine)
 
 class ENGINE_DLL CGameInstance final : public CBase
@@ -35,7 +34,10 @@ public: /* For.Input_Device */
 
 public: /* For.Renderer */
 	HRESULT Add_RenderGroup(CRenderer::RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
-
+#ifdef _DEBUG
+public:
+	HRESULT Add_DebugComponents(class CComponent* pRenderComponent);
+#endif
 public: /* For.Level_Manager */
 	HRESULT Open_Level(_uint iNewLevelID, class CLevel* pNewLevel);
 	_uint* Get_CurrentLevelID();
@@ -53,6 +55,7 @@ public: /* For.Object_Manager */
 	void Clear_Layer(_uint iLevelIndex, const wstring& wstrLayerTag);
 	CGameObject* Get_Player(_uint iLevelIndex);
 	_bool Check_Collision(_uint iLevelIndex, const wstring& wstrLayerTag, class CCollider* pMyCollider, const wstring& wstrColliderTag = L"Com_Collider");
+	_float* Get_CamFarPtr();
 
 public: /* For.Component_Manager */
 	HRESULT Add_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag, class CComponent* pPrototype);
@@ -85,6 +88,24 @@ public: /* For.ImGui_Manager */
 public: /* For.Light_Manager */
 	const LIGHT_DESC* Get_LightDesc(_uint iIndex);
 	HRESULT Add_Light(const LIGHT_DESC& LightDesc);
+	HRESULT Render_Lights(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
+
+public: /* For.Target_Manager */
+	HRESULT Add_RenderTarget(const wstring& strRenderTargetTag, _uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixelFormat, const _float4& vClearColor);
+	HRESULT Add_MRT(const wstring& strMRTTag, const wstring& strRenderTargetTag);
+	HRESULT Begin_MRT(const wstring& strMRTTag);
+	HRESULT End_MRT();
+	HRESULT Bind_RTShaderResource(class CShader* pShader, const wstring& strRenderTargetTag, const _char* pConstantName);
+	HRESULT Copy_Resource(const wstring& strRenderTargetTag, ID3D11Texture2D** ppTextureHub);
+
+#ifdef _DEBUG
+	HRESULT Ready_RTVDebug(const wstring& strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
+	HRESULT Draw_RTVDebug(const wstring& strMRTTag, class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
+#endif
+
+public: /* For.CoordConverter */
+	_vector Compute_WorldPos(const _float2& vViewportPos, const wstring& strZRenderTargetTag, _uint iOffset = 0);
+	_vector Compute_WorldPos_Float4(const _float4& vPlayerPos, const wstring& strZRenderTargetTag, _uint iOffset = 0);
 
 	/* For.GameInstance */
 	string WstrToStr(const wstring& wstr);
@@ -109,7 +130,8 @@ private:
 	class CImGui_Manager*			m_pImGui_Manager = { nullptr };
 	class CPicking*					m_pPicking = { nullptr };
 	class CLight_Manager*			m_pLight_Manager = { nullptr };
-
+	class CRenderTarget_Manager*	m_pRenderTarget_Manager = { nullptr };
+	class CCoordConverter*			m_pCoordConverter = { nullptr };
 
 private:
 	_uint iFrameCount = { 0 };

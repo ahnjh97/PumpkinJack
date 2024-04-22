@@ -37,6 +37,20 @@ HRESULT CCell::Initialize(_int iTerrainIndex, const _float3* vPoints, const _int
 	return S_OK;
 }
 
+HRESULT CCell::Initialize(_fvector v0, _fvector v1, _gvector v2)
+{
+	XMStoreFloat3(&m_vPoints[0], v0);
+	XMStoreFloat3(&m_vPoints[1], v1);
+	XMStoreFloat3(&m_vPoints[2], v2);
+
+#ifdef _DEBUG
+		m_pVIBuffer = CVIBuffer_Cell::Create(m_pDevice, m_pContext, m_vPoints);
+	if (nullptr == m_pVIBuffer)
+		return E_FAIL;
+#endif
+	return S_OK;
+}
+
 _bool CCell::IsIn(_fvector vPosition, _fmatrix TerrainWorldMatrix, _int* pNeighborIndex)
 {
 	_vector		vPoints[3];
@@ -57,6 +71,27 @@ _bool CCell::IsIn(_fvector vPosition, _fmatrix TerrainWorldMatrix, _int* pNeighb
 			XMStoreFloat3(&m_vLineDir, vDir);
 			return false;
 		}
+	}
+
+	return true;
+}
+
+_bool CCell::IsIn(_fvector vPos, _fmatrix matModelWorld)
+{
+	_vector		vPoints[3];
+
+	for (size_t i = 0; i < POINT_END; i++)
+		vPoints[i] = XMVector3TransformCoord(XMLoadFloat3(&m_vPoints[i]), matModelWorld);
+
+	for (size_t i = 0; i < LINE_END; i++)
+	{
+		_vector		vSourDir = XMVector3Normalize(vPos - vPoints[i]);
+
+		_vector		vDir = vPoints[i + 1 >= POINT_END ? 0 : i + 1] - vPoints[i];
+		_vector		vDestDir = XMVector3Normalize(XMVectorSet(XMVectorGetZ(vDir) * -1.f, 0.f, XMVectorGetX(vDir), 0.0f));
+
+		if (0 < XMVectorGetX(XMVector3Dot(vSourDir, vDestDir)))
+			return false;
 	}
 
 	return true;
@@ -123,7 +158,21 @@ CCell* CCell::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _int 
 
 	if (FAILED(pInstance->Initialize(iTerrainIndex, pPoints, pNeighborIndices, iIndex)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CCell"));
+		MSG_BOX(TEXT("Failed To Create : CCell"));
+
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+CCell* CCell::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _fvector v0, _fvector v1, _gvector v2)
+{
+	CCell* pInstance = new CCell(pDevice, pContext);
+
+	if (FAILED(pInstance->Initialize(v0, v1, v2)))
+	{
+		MSG_BOX(TEXT("Failed To Create : CCell"));
 
 		Safe_Release(pInstance);
 	}

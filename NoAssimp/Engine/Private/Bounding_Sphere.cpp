@@ -66,7 +66,7 @@ CBounding_Sphere* CBounding_Sphere::Create(ID3D11Device* pDevice, ID3D11DeviceCo
 
 	if (FAILED(pInstance->Initialize(pBoundingDesc)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CBounding_Sphere"));
+		MSG_BOX(TEXT("Failed To Create : CBounding_Sphere"));
 
 		Safe_Release(pInstance);
 	}

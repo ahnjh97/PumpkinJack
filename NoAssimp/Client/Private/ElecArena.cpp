@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ElecArena.h"
+#include "Cell.h"
 
 CElecArena::CElecArena(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -32,6 +33,8 @@ HRESULT CElecArena::Initialize(void* pArg)
 	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel), GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
 
+	m_vecGroundCells = m_pModelCom->SetUp_GroundCells();
+
 	return S_OK;
 }
 
@@ -51,7 +54,7 @@ void CElecArena::Tick(_float fTimeDelta)
 
 void CElecArena::Late_Tick(_float fTimeDelta)
 {
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_FIELD, this);
 }
 
 HRESULT CElecArena::Render()
@@ -138,7 +141,9 @@ CGameObject* CElecArena::Clone(void* pArg)
 void CElecArena::Free()
 {
 	__super::Free();
-
+	
+	for (auto& groundCell : m_vecGroundCells)
+		Safe_Release(groundCell);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
 }

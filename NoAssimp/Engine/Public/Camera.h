@@ -22,6 +22,9 @@ public:
 		_float	fMouseSensor = { 0.0f };
 	}CAMERA_DESC;
 
+public:
+	_float* Get_FarPtr() { return &m_fFar; }
+
 protected:
 	CCamera(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CCamera(const CCamera& rhs);	

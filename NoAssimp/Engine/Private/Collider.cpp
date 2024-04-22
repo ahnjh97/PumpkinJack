@@ -183,7 +183,7 @@ CCollider* CCollider::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 
 	if (FAILED(pInstance->Initialize_Prototype(eType)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CCollider"));
+		MSG_BOX(TEXT("Failed To Create : CCollider"));
 
 		Safe_Release(pInstance);
 	}
@@ -198,7 +198,7 @@ CComponent* CCollider::Clone(void* pArg)
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Created : CCollider"));
+		MSG_BOX(TEXT("Failed To Clone : CCollider"));
 
 		Safe_Release(pInstance);
 	}
