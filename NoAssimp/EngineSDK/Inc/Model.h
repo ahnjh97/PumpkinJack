@@ -72,7 +72,8 @@ public:
 	void Reset_Animation(string& strAnimName);
 	void Reset_Animation(_uint iAnimIndex);
 
-	vector<class CCell*> SetUp_GroundCells();
+	vector<class CCell*>			SetUp_GroundCells();
+	vector<vector<class CCell*>>	SetUp_QuadGroundCells();
 
 private:
 	TYPE						m_eModelType = { TYPE_END };

@@ -250,6 +250,7 @@ HRESULT CGameInstance::Add_RenderGroup(CRenderer::RENDERGROUP eRenderGroup, CGam
 	return m_pRenderer->Add_RenderGroup(eRenderGroup, pRenderObject);	
 }
 
+#ifdef _DEBUG
 HRESULT CGameInstance::Add_DebugComponents(CComponent* pRenderComponent)
 {
 	if (nullptr == m_pRenderer)
@@ -257,6 +258,7 @@ HRESULT CGameInstance::Add_DebugComponents(CComponent* pRenderComponent)
 
 	return m_pRenderer->Add_DebugComponents(pRenderComponent);
 }
+#endif
 
 HRESULT CGameInstance::Open_Level(_uint iNewLevelID, CLevel * pNewLevel)
 {
@@ -374,12 +376,12 @@ _bool CGameInstance::Check_Collision(_uint iLevelIndex, const wstring& wstrLayer
 _float* CGameInstance::Get_CamFarPtr()
 {
 	if (nullptr == m_pObject_Manager)
-		return nullptr;
+		return &m_fTempCamFar;
 
 	list<CGameObject*> cameraList = m_pObject_Manager->Get_ObjectList(*Get_CurrentLevelID(), TEXT("Layer_Camera"));
 
 	if (cameraList.empty())
-		return nullptr;
+		return &m_fTempCamFar;
 
 	for (auto& camera : cameraList) {
 		if (nullptr == camera)
@@ -390,7 +392,7 @@ _float* CGameInstance::Get_CamFarPtr()
 		return pCamera->Get_FarPtr();
 	}
 
-	return nullptr;
+	return &m_fTempCamFar;
 }
 
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const wstring & strPrototypeTag, CComponent * pPrototype)

@@ -149,7 +149,7 @@ HRESULT CShader::Bind_RawValue(const _char* pConstantName, const void* pData, _u
 	ID3DX11EffectVariable* pVariable = m_pEffect->GetVariableByName(pConstantName);
 	if (nullptr == pVariable)
 		return E_FAIL;
-
+	
 	return pVariable->SetRawValue(pData, 0, iLength);
 }
 

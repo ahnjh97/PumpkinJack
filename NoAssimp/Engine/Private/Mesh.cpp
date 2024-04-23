@@ -144,9 +144,9 @@ _float4 CMesh::Get_PickPos(const CTransform* pTransform) const
 	return fResult;
 }
 
-vector<class CCell*> CMesh::SetUp_MeshGroundCells() // 법선벡터가 위를 향하는 삼각형들 추려내기
+vector<CCell*> CMesh::SetUp_MeshGroundCells() // 법선벡터가 위를 향하는 삼각형들 추려내기
 {
-	vector<class CCell*> vecGroundCells;
+	vector<CCell*> vecGroundCells;
 
 	_uint		iNumIndices = { 0 };
 	for (size_t i = 0; i < m_iFaces; i++)
@@ -170,6 +170,58 @@ vector<class CCell*> CMesh::SetUp_MeshGroundCells() // 법선벡터가 위를 향하는 삼
 	}
 
 	return vecGroundCells;
+}
+
+vector<vector<CCell*>> CMesh::SetUp_MeshQuadGroundCells()
+{
+	vector<vector<CCell*>> vectorQuadGroundCells; // 1,2,3,4분면의 셀들을 가지고 있는 벡터들을 가지고 있는 벡터
+	unordered_set<CCell::QUAD> quadSet; // 어떤 몇 사분면의 벡터에 추가할지
+	vectorQuadGroundCells.resize(CCell::QUAD_END);
+
+	_uint		iNumIndices = { 0 };
+	for (size_t i = 0; i < m_iFaces; i++)
+	{
+		_vector p0 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
+		_vector p1 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
+		_vector p2 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
+
+		_vector v1 = XMVectorSubtract(p1, p0);
+		_vector v2 = XMVectorSubtract(p2, p0);
+
+		_vector vNormal = XMVector3Cross(v1, v2);
+		vNormal = XMVector3Normalize(vNormal);
+
+		_float fDotProduct = XMVectorGetX(XMVector3Dot(vNormal, XMVectorSet(0, 1, 0, 0)));
+
+		if (fDotProduct > 0.1f) {
+			quadSet.insert((CCell::QUAD)Check_Quad(p0));
+			quadSet.insert((CCell::QUAD)Check_Quad(p1));
+			quadSet.insert((CCell::QUAD)Check_Quad(p2));
+
+			for (auto& quad : quadSet) {
+				CCell* pCell = CCell::Create(m_pDevice, m_pContext, p0, p1, p2);
+				vectorQuadGroundCells[quad].emplace_back(pCell);
+			}		
+		}
+	}
+
+	return vectorQuadGroundCells;
+}
+
+_int CMesh::Check_Quad(_fvector vPoint)
+{
+	if (XMVectorGetX(vPoint) >= 0) {
+		if (XMVectorGetZ(vPoint) >= 0) 
+			return CCell::RT;		
+		else
+			return CCell::RB;
+	}
+	else {
+		if (XMVectorGetZ(vPoint) <= 0)
+			return CCell::LB;
+		else
+			return CCell::LT;
+	}
 }
 
 HRESULT CMesh::Ready_Vertices_For_NonAnimModel(_fmatrix TransformMatrix)

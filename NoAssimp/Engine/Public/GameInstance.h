@@ -139,6 +139,7 @@ private:
 	_int iFps = { 0 };
 	_bool m_bToggle = { true };
 	_bool m_bNavigationMode = { true };
+	_float m_fTempCamFar = { 1000.f };
 
 public:		
 	static void Release_Engine();

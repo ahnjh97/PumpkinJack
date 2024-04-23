@@ -20,14 +20,14 @@ public:
 	virtual HRESULT Initialize(void* pArg);
 
 public:
-	_float3 Get_PickPos(const class CTransform* pTransform) const; // Object Picking
-	_int Get_TriangleIndex(const class CTransform* pTransform, _float3& vA, _float3& vB, _float3& vC) const; // Cell Picking
+	_float3 Get_PickPos(const class CTransform* pTransform) const; 
+	_int Get_TriangleIndex(const class CTransform* pTransform, _float3& vA, _float3& vB, _float3& vC) const;
 
 private:
 	_uint				m_iNumVerticesX = { 0 };
 	_uint				m_iNumVerticesZ = { 0 };
 
-	_float3*			m_pVerticesPos = { nullptr }; // 정점 위치 
+	_float3*			m_pVerticesPos = { nullptr };  
 
 public:
 	static CVIBuffer_Terrain* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring& strHeightMapFilePath);

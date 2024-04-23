@@ -107,13 +107,13 @@ HRESULT CVIBuffer_Instance_Mesh::Initialize_Prototype(ifstream& fileStream, cons
 
 	ZeroMemory(&m_InstanceBufferDesc, sizeof m_InstanceBufferDesc);
 
-	uniform_real_distribution<float>	ScaleX(InstanceDesc.vMinScale.x, InstanceDesc.vMaxScale.x);
-	uniform_real_distribution<float>	ScaleY(InstanceDesc.vMinScale.y, InstanceDesc.vMaxScale.y);
-	uniform_real_distribution<float>	ScaleZ(InstanceDesc.vMinScale.z, InstanceDesc.vMaxScale.z);
+	uniform_real_distribution<_float>	ScaleX(InstanceDesc.vMinScale.x, InstanceDesc.vMaxScale.x);
+	uniform_real_distribution<_float>	ScaleY(InstanceDesc.vMinScale.y, InstanceDesc.vMaxScale.y);
+	uniform_real_distribution<_float>	ScaleZ(InstanceDesc.vMinScale.z, InstanceDesc.vMaxScale.z);
 
-	uniform_real_distribution<float>	LifeTime(InstanceDesc.vLifeTime.x, InstanceDesc.vLifeTime.y);
-	uniform_real_distribution<float>	Speed(InstanceDesc.vSpeed.x, InstanceDesc.vSpeed.y);
-	uniform_real_distribution<float>	RotationAxis(-1, 1);
+	uniform_real_distribution<_float>	LifeTime(InstanceDesc.vLifeTime.x, InstanceDesc.vLifeTime.y);
+	uniform_real_distribution<_float>	Speed(InstanceDesc.vSpeed.x, InstanceDesc.vSpeed.y);
+	uniform_real_distribution<_float>	RotationAxis(-1, 1);
 
 	/* 인덱스 버퍼의 byte크기 */
 	m_InstanceBufferDesc.ByteWidth = m_iInstanceStride * m_iNumInstance;

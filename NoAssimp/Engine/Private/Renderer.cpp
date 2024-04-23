@@ -32,9 +32,9 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Depth"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 1.f))))
 		return E_FAIL;
 
-	/* For.Target_FieldDepth */
-	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_FieldDepth"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 1.f))))
-		return E_FAIL;
+	///* For.Target_FieldDepth */
+	//if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_FieldDepth"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 1.f))))
+	//	return E_FAIL;
 
 	/* For.Target_Shade */
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Shade"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 1.f))))
@@ -51,8 +51,8 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Depth"))))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_FieldDepth"))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_FieldDepth"))))
+	//	return E_FAIL;
 	/* MRT_LightAcc : 빛들의 연산결과 정보를 받아오기위한 렌더타겟들이다. */
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Shade"))))
 		return E_FAIL;
@@ -90,8 +90,8 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Specular"), 150, 150, 100, 100)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_FieldDepth"), 150, 250, 100, 100)))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_FieldDepth"), 150, 250, 100, 100)))
+	//	return E_FAIL;
 #endif
 
 	return S_OK;
@@ -132,6 +132,7 @@ HRESULT CRenderer::Render()
 	return S_OK;
 }
 
+#ifdef _DEBUG
 HRESULT CRenderer::Add_DebugComponents(CComponent* pRenderComponent)
 {
 	m_DebugComponents.emplace_back(pRenderComponent);
@@ -139,6 +140,7 @@ HRESULT CRenderer::Add_DebugComponents(CComponent* pRenderComponent)
 
 	return S_OK;
 }
+#endif
 
 HRESULT CRenderer::Render_Priority()
 {
@@ -238,7 +240,7 @@ HRESULT CRenderer::Render_Lights()
 		return E_FAIL;
 	if (FAILED(m_pShader->Bind_RawValue("g_fCamFar", m_pGameInstance->Get_CamFarPtr(), sizeof(_float))))
 		return E_FAIL;
-
+	
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Normal"), "g_NormalTexture")))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Depth"), "g_DepthTexture")))

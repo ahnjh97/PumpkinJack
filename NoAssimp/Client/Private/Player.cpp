@@ -193,7 +193,7 @@ void CPlayer::Tick(_float fTimeDelta)
 	for (auto& Pair : m_Parts)
 		Pair.second->Tick(fTimeDelta);
 
-	if (*m_pCurLevel == LEVEL_WIZARD && m_pGameInstance->KeyDown(DIK_1))
+	if (*m_pCurLevel == LEVEL_WIZARD && m_pGameInstance->KeyDown(DIK_3))
 		m_pTransformCom->Set_Pos(XMVectorSet(580, 10, 555, 1));
 
 	m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
@@ -436,13 +436,15 @@ _bool CPlayer::Check_TerrainCol()
 	{
 		if (m_pNavigationCom[DEFAULT] == nullptr)
 		{
-			_float fY{};
-			if (true == Check_GroundCells(fY)) {
-				if (vPos.y <= fY) {
-					m_fPlaneHeight = fY;
+			_float fMinY{}, fMaxY{};
+			if (true == Check_GroundCells(fMinY, fMaxY)) {
+				if (vPos.y <= fMaxY) {
+					m_fPlaneHeight = fMaxY;
 					return true;
 				}
 			}
+			/*if (vPos.y <= 0)
+				return true;*/
 				
 			return false;
 		}
@@ -627,7 +629,7 @@ _bool CPlayer::Check_Kart()
 	return _bool();
 }
 
-_bool CPlayer::Check_GroundCells(_Out_ _float& _fHeight)
+_bool CPlayer::Check_GroundCells(_Out_ _float& _fMinHeight, _Out_ _float& _fMaxHeight)
 {
 	if (*m_pCurLevel != LEVEL_WIZARD)
 		return false;
@@ -638,51 +640,35 @@ _bool CPlayer::Check_GroundCells(_Out_ _float& _fHeight)
 		return false;
 
 	_vector vPos = m_pTransformCom->Get_Pos_Vector();
-	vector<CCell*> vecEncasingCells;
-	vector<_matrix> vecElecArenaWorldMatrices;
+	vector<_float> vecGroundCellHeights;
 
 	for (auto& elecArena : elecArenaList) {
 		if (nullptr == elecArena)
 			continue;
 
 		CElecArena* pElecArena = dynamic_cast<CElecArena*>(elecArena);
-		CTransform* pElecArenaTransform = dynamic_cast<CTransform*>(pElecArena->Get_Component(g_strTransformTag));
 
-		if (nullptr == pElecArenaTransform)
-			continue;
-
-		_matrix matElecArena = pElecArenaTransform->Get_WorldMatrix();
-
-		vector<CCell*> vecGroundCells = pElecArena->Get_GroundCells();
-
-		if (vecGroundCells.empty())
-			continue;
-
-		for (auto& groundCell : vecGroundCells) {
-			if (true == groundCell->IsIn(vPos, matElecArena)) {
-				vecEncasingCells.emplace_back(groundCell);
-				vecElecArenaWorldMatrices.emplace_back(matElecArena);
-				break;
-			}
-		}
+		_float fHeight{};
+		if (true == pElecArena->Check_ElecArenaGroundCell(vPos, fHeight))
+			vecGroundCellHeights.emplace_back(fHeight);
 	}
 
-	if (vecEncasingCells.empty())
+	if (vecGroundCellHeights.empty())
 		return false;
 
-	_float fHeight = -9999;
-	_int iHighestCellIndex{};
-
-	for (_int i = 0; i < vecEncasingCells.size(); i++) {
-		_float fCellHeight = XMVectorGetY(XMVector3TransformCoord(vecEncasingCells[i]->Get_Point(CCell::POINT_A), vecElecArenaWorldMatrices[i]));
-		if (fCellHeight > fHeight) {
-			fHeight = fCellHeight;
-			iHighestCellIndex = i;
+	if (1 == vecGroundCellHeights.size())
+		_fMinHeight = _fMaxHeight = vecGroundCellHeights.front();
+	else // 원소가 2개 이상일때
+	{  
+		_fMinHeight = _fMaxHeight = vecGroundCellHeights[0];
+		for (_int i = 1; i < vecGroundCellHeights.size(); i++) {
+			if (vecGroundCellHeights[i] < _fMinHeight)
+				_fMinHeight = vecGroundCellHeights[i];
+			else if (vecGroundCellHeights[i] > _fMaxHeight)
+				_fMaxHeight = vecGroundCellHeights[i];
 		}
 	}
 
-	_fHeight = fHeight;
-	
 	return true;
 }
 

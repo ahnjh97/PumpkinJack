@@ -8,6 +8,7 @@ class ENGINE_DLL CCell final : public CBase
 public:
 	enum POINT { POINT_A, POINT_B, POINT_C, POINT_END };
 	enum LINE { LINE_AB, LINE_BC, LINE_CA, LINE_END };
+	enum QUAD { RT, RB, LB, LT, QUAD_END };
 private:
 	CCell(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CCell() = default;

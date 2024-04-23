@@ -248,6 +248,7 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../../objects_txt/Level_GamePlay_Cells.txt")))))
 		return E_FAIL;
 
+
 	m_strLoadingText = TEXT("Loading Models for Level_GamePlay...");
 	vector<string> vecAnimModelNames = { "Jack", "Ballista", "Dummy", "SkullCrossBow", "Soldier", "Trabuchet" };
 	vector<string> vecNonAnimModelNames = { "Spear", "Rifle", "Scythe", "LevelGamePlay",
@@ -391,10 +392,11 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Circle", "Effects/Circle%d.dds" ,2)))
 		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "FireNoise", "Effects/ElecNoise.dds")))
+	if (FAILED(Add_Texture(eLevel, "FireNoise", "Effects/fireNoise.dds")))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "VoronoiBlur", "Effects/voronoiNoiseBlur.dds")))
 		return E_FAIL;
+
 
 	m_strLoadingText = TEXT("Loading VIBuffers for Level_Wizard...");
 
@@ -413,6 +415,7 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 
 	if (FAILED(Add_Models(eLevel, vecAnimModelNames, vecNonAnimModelNames)))
 		return E_FAIL;
+
 
 	m_strLoadingText = TEXT("Loading Shaders for Level_Wizard...");
 	if (FAILED(Add_Shaders(eLevel)))
@@ -467,7 +470,7 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Circle", "Effects/Circle%d.dds", 2)))
 		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "FireNoise", "Effects/ElecNoise.dds")))
+	if (FAILED(Add_Texture(eLevel, "FireNoise", "Effects/fireNoise.dds")))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "VoronoiBlur", "Effects/voronoiNoiseBlur.dds")))
 		return E_FAIL;

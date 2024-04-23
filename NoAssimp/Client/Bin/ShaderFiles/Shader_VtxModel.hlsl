@@ -124,25 +124,22 @@ PS_OUT PS_ARENAFIRE(PS_IN In)
     return Out;
 }
 
-PS_OUT PS_ELEC_ARENA(PS_IN In)
+PS_OUT PS_ELECARENA(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
-    float3 upDirection = float3(0, 1, 0);
-    float dotProduct = dot(normalize(In.vNormal), upDirection);
+    //float3 upDirection = float3(0, 1, 0);
+    //float dotProduct = dot(normalize(In.vNormal), upDirection);
     
     Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     if (0.3f >= Out.vColor.a)
         discard;
     
-    //if (In.vWorldPos.y > 0.8f && dotProduct > 0.2f)
-    //    Out.vColor = float4(1, 1, 1, 1);
-    
      Out.vColor.rgb += g_fColorOffset;
     
     // 내적 값이 양수이면 노멀 벡터가 위를 향하고 있다고 판단
-    if (dotProduct > 0.2f)
-        Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);   
+    //if (dotProduct > 0.2f)
+    //    Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);   
 
     return Out;
 }
@@ -168,15 +165,26 @@ PS_OUT PS_TORNADO(PS_IN In)
 PS_OUT PS_HOLEWALL(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
-    
-    float noiseValue = g_VoronoiBlur.Sample(LinearSampler, float2(In.vTexcoord.x * 2, In.vTexcoord.y * 2)).r; // 노이즈 텍스처 샘플링
-    Out.vColor = float4(1, 1, 1, 1 - noiseValue);
-    float2 fireNoiseUV = float2(In.vTexcoord.x * 10, In.vTexcoord.y * 10 - g_fTime * 0.4);
-    float fFireNoise = g_FireNoise.Sample(LinearSampler, fireNoiseUV).r;
-    
-    Out.vColor.a *= fFireNoise *1.2;
+
+// 연기 노이즈 UV 좌표
+    float2 smokeUV = In.vTexcoord;
+// 연기 텍스쳐 샘플링
+    float smokeValue = g_VoronoiBlur.Sample(LinearSampler, smokeUV).r;
+
+// 불 노이즈 UV 좌표
+    float2 fireUV = In.vTexcoord + g_fTime * 0.1;
+// 불 텍스쳐 샘플링
+    float fireNoise = g_FireNoise.Sample(LinearSampler, fireUV).r;
+
+// voronoiBlur의 값이 높을수록 fireNoise의 영향을 많이 줌
+    float finalValue = lerp(1 - smokeValue + 0.2, fireNoise, 1-smokeValue + 0.2);
+
+// 결과 색상 계산
+    Out.vColor = float4(1, 1, 1, 1-finalValue);
+
     if (Out.vColor.a <= 0.1f)
         discard;
+
     return Out;
 }
 
@@ -186,7 +194,7 @@ technique11 DefaultTechnique
 	{
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
 		HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
@@ -263,7 +271,7 @@ technique11 DefaultTechnique
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_ELEC_ARENA();
+        PixelShader = compile ps_5_0 PS_ELECARENA();
     }
 
     pass Tornado // 7
@@ -280,7 +288,7 @@ technique11 DefaultTechnique
 
     pass HoleWall // 8
     {
-        SetRasterizerState(RS_Default);
+        SetRasterizerState(RS_NoCull);
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();

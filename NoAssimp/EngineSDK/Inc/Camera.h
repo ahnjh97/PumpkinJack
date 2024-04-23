@@ -40,7 +40,7 @@ protected:
 	_float			m_fFovy = { 0.0f };
 	_float			m_fAspect = { 0.0f };
 	_float			m_fNear = { 0.0f };
-	_float			m_fFar = { 0.0f };
+	_float			m_fFar = { 1000.0f };
 	_float			m_fMouseSensor = { 0.0f };
 
 protected:

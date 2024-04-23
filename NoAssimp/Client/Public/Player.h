@@ -53,7 +53,7 @@ private:
 	_bool Check_WallColliders_LevelGamePlay();
 	_bool Check_SlimeBossPortalCol(_float fTimeDelta);
 	_bool Check_Kart();
-	_bool Check_GroundCells(_Out_ _float& _fHeight);
+	_bool Check_GroundCells(_Out_ _float& _fMinHeight, _Out_ _float& _fMaxHeight);
 
 	void Check_GoToSlimeBossRoom();
 	void Check_GoBackUp();

@@ -33,7 +33,7 @@ HRESULT CElecArena::Initialize(void* pArg)
 	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel), GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
 
-	m_vecGroundCells = m_pModelCom->SetUp_GroundCells();
+	m_vecQuad = m_pModelCom->SetUp_QuadGroundCells();
 
 	return S_OK;
 }
@@ -77,6 +77,53 @@ HRESULT CElecArena::Render()
 	}
 
 	return S_OK;
+}
+
+_int CElecArena::Compute_Quadrant(_fvector vPlayerPos)
+{
+	if (nullptr == m_pTransformCom)
+		return -1;
+
+	_matrix matWorldInv = m_pTransformCom->Get_WorldMatrix_Inverse();
+	_vector vPlayerElecArenaLocalPos = XMVector3TransformCoord(vPlayerPos, matWorldInv);
+	CCell::QUAD eQuad{};
+
+	if (XMVectorGetX(vPlayerElecArenaLocalPos) >= 0) {
+		if (XMVectorGetZ(vPlayerElecArenaLocalPos) >= 0)
+			eQuad = CCell::RT;
+		else
+			eQuad = CCell::RB;
+	}
+	else {
+		if (XMVectorGetZ(vPlayerElecArenaLocalPos) <= 0)
+			eQuad = CCell::LB;
+		else
+			eQuad = CCell::LT;
+	}
+
+	return eQuad;
+}
+
+_bool CElecArena::Check_ElecArenaGroundCell(_fvector vPlayerPos, _float& fCellHeight)
+{
+	_int iQuad = Compute_Quadrant(vPlayerPos);
+
+	if (m_vecQuad[iQuad].empty())
+		return false;
+
+	if (nullptr == m_pTransformCom)
+		return false;
+
+	_matrix matWorld = m_pTransformCom->Get_WorldMatrix();
+
+	for (auto& groundCell : m_vecQuad[iQuad]) {
+		if (true == groundCell->IsIn(vPlayerPos, matWorld)) {
+			fCellHeight = XMVectorGetY(XMVector3TransformCoord(groundCell->Get_Point(CCell::POINT_A), matWorld));
+			return true;
+		}
+	}
+
+	return false;
 }
 
 HRESULT CElecArena::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
@@ -142,8 +189,11 @@ void CElecArena::Free()
 {
 	__super::Free();
 	
-	for (auto& groundCell : m_vecGroundCells)
-		Safe_Release(groundCell);
+	for (auto& vecCells : m_vecQuad) {
+		for (auto& groundCell : vecCells) {
+			Safe_Release(groundCell);
+		}
+	}
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
 }
