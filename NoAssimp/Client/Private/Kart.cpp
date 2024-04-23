@@ -132,7 +132,6 @@ HRESULT CKart::Render()
 		if(m_pColliderCom[i] != nullptr)
 			m_pGameInstance->Add_DebugComponents(m_pColliderCom[i]);
 	}
-		
 #endif
 
 	return S_OK;

@@ -627,12 +627,12 @@ HRESULT CLoader::Add_Instance_Models(LEVEL eLevel)
 {
 	CVIBuffer_Instance::INSTANCE_DESC		InstanceDesc{};
 	if (eLevel == LEVEL_WIZARD) {
-		InstanceDesc.vPivot = _float3(580.f, -550.f, 580.f);
-		InstanceDesc.vCenter = _float3(580.f, -450.f, 580.f);
-		InstanceDesc.vRange = _float3(1000.f, 800.f, 1000.f);
+		InstanceDesc.vPivot = _float3(580.f, -150.f, 580.f);
+		InstanceDesc.vCenter = _float3(580.f, -50.f, 580.f);
+		InstanceDesc.vRange = _float3(300.f, 50.f, 300.f);
 		InstanceDesc.vMinScale = _float3(6.f, 4.f, 6.f);
 		InstanceDesc.vMaxScale = _float3(9.f, 6.f, 9.f);
-		InstanceDesc.iNumInstance = 2000;
+		InstanceDesc.iNumInstance = 200;
 		InstanceDesc.vLifeTime = _float2(8.f, 12.f);
 		InstanceDesc.isLoop = true;
 		InstanceDesc.vSpeed = _float2(40.f, 70.f);

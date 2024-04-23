@@ -72,11 +72,11 @@ void CCamera_Jack::OnMouseInput(_float fTimeDelta)
 void CCamera_Jack::RevolveAroundPlayer()
 {
 	_vector vCamLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-	/*vCamLook = XMVectorSetY(vCamLook, 0.f);*/
 	vCamLook = XMVector3Normalize(vCamLook);
 	_vector vHeight = XMVectorSet(0, m_fHeight, 0, 0);
 	_vector vResult = XMLoadFloat3(&m_vPlayerPos) - (vCamLook * m_fDistance) + vHeight;
 	vResult = XMVectorSetW(vResult, 1.f);
+
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vResult); 
 }
 

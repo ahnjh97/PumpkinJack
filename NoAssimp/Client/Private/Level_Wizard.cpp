@@ -208,13 +208,6 @@ HRESULT CLevel_Wizard::Ready_UI(const wstring& strLayerTag)
 	return S_OK;
 }
 
-void CLevel_Wizard::Add_Books()
-{
-	CGameObject::GAMEOBJECT_DESC tDesc{};
-	tDesc.iLevel = LEVEL_WIZARD;
-	m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_Book"), TEXT("Prototype_GameObject_Book"), &tDesc);
-}
-
 HRESULT CLevel_Wizard::Ready_Layer_BackGround()
 {
 	CGameObject::GAMEOBJECT_DESC tDesc{};

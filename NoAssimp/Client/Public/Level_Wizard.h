@@ -24,9 +24,6 @@ private:
 	HRESULT Ready_UI(const wstring& strLayerTag);
 
 private:
-	void Add_Books();
-
-private:
 	_bool m_bBooks = { true };
 
 	_float m_fTime = {};

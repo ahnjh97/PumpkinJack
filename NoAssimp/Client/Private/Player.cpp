@@ -104,7 +104,9 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	if (m_pCamera == nullptr)
 	{
-		m_pCamera = dynamic_cast<CCamera_Jack*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Jack")));
+		m_pCamera = dynamic_cast<CCamera_Jack*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), 
+			TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Jack")));
+
 		if(m_pCamera != nullptr)
 			Safe_AddRef(m_pCamera);
 	}
@@ -139,7 +141,7 @@ void CPlayer::Tick(_float fTimeDelta)
 	if (!m_bGroundCol && !m_bIsJumping && !bPortalCol && !m_bIsPushingKart)
 	{
 		m_fGravityTime += fTimeDelta;
-		m_pTransformCom->Fall(m_fGravityTime * 0.05f); // 임시 자유낙하
+		m_pTransformCom->Fall(m_fGravityTime * fTimeDelta * 2.2f); //
 	}
 	else
 		m_fGravityTime = 0;
@@ -965,7 +967,7 @@ void CPlayer::SpearRollAttackDash(_float fTimeDelta)
 
 	if (fAnimPlayRatio > 0.2f && fAnimPlayRatio < 0.4f) {
 		m_fDashTime += fTimeDelta;
-		m_pTransformCom->Move(cosf(m_fDashTime) * 0.079f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);		
+		m_pTransformCom->Move(cosf(m_fDashTime) * fTimeDelta * 6.2f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
 	}
 		
 	if (pBodyModel->isFinished())
@@ -986,25 +988,25 @@ void CPlayer::RifleRecoil(_float fTimeDelta)
 	if (ATTACK1 == m_eState) {
 		if (fAnimPlayRatio > 0.28f && fAnimPlayRatio < 0.305f){
 			m_fDashTime += fTimeDelta * 4.f;
-			m_pTransformCom->Move(-cosf(m_fDashTime) * 0.065f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
+			m_pTransformCom->Move(-cosf(m_fDashTime) * fTimeDelta * 5.5f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
 		}
 	}
 	else if (ATTACK2 == m_eState) {
 		if (fAnimPlayRatio > 0.3f && fAnimPlayRatio < 0.325f) {
 			m_fDashTime += fTimeDelta * 4.f;
-			m_pTransformCom->Move(-cosf(m_fDashTime) * 0.065f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
+			m_pTransformCom->Move(-cosf(m_fDashTime) * fTimeDelta * 5.5f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
 		}
 	}
 	else if (ATTACK3 == m_eState) {
 		if (fAnimPlayRatio > 0.34f && fAnimPlayRatio < 0.365f) {
 			m_fDashTime += fTimeDelta * 4.f;
-			m_pTransformCom->Move(-cosf(m_fDashTime) * 0.065f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
+			m_pTransformCom->Move(-cosf(m_fDashTime) * fTimeDelta * 5.5f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
 		}
 	}
 	else if (AIR_ATTACK == m_eState) {
 		if (fAnimPlayRatio > 0.37f && fAnimPlayRatio < 0.395f) {
 			m_fDashTime += fTimeDelta * 4.f;
-			m_pTransformCom->Move(-cosf(m_fDashTime) * 0.035f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
+			m_pTransformCom->Move(-cosf(m_fDashTime) * fTimeDelta * 3.4f, XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
 		}
 	}
 

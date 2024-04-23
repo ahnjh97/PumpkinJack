@@ -41,7 +41,7 @@ HRESULT CMap_GamePlay::Initialize(void* pArg)
 
 void CMap_GamePlay::Tick(_float fTimeDelta)
 {
-	//m_fOffset_Y -= 0.0015f;
+	
 }
 
 void CMap_GamePlay::Late_Tick(_float fTimeDelta)

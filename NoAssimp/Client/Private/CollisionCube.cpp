@@ -121,7 +121,6 @@ CCollisionCube* CCollisionCube::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 	}
 
 	return pInstance;
-
 }
 
 CGameObject* CCollisionCube::Clone(void* pArg)
