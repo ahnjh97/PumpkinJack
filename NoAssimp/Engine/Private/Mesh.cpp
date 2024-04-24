@@ -155,33 +155,33 @@ _float4 CMesh::Get_PickPos(const CTransform* pTransform) const
 	return fResult;
 }
 
-vector<CCell*> CMesh::SetUp_MeshGroundCells() // 법선벡터가 위를 향하는 삼각형들 추려내기
-{
-	vector<CCell*> vecGroundCells;
-
-	_uint		iNumIndices = { 0 };
-	for (size_t i = 0; i < m_iFaces; i++)
-	{
-		_vector p0 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
-		_vector p1 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
-		_vector p2 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
-
-		_vector v1 = XMVectorSubtract(p1, p0);
-		_vector v2 = XMVectorSubtract(p2, p0);
-
-		_vector vNormal = XMVector3Cross(v1, v2);
-		vNormal = XMVector3Normalize(vNormal);
-
-		_float fDotProduct = XMVectorGetX(XMVector3Dot(vNormal, XMVectorSet(0, 1, 0, 0)));
-
-		if (fDotProduct > 0.1f) {
-			CCell* pCell = CCell::Create(m_pDevice, m_pContext, p0, p1, p2);
-			vecGroundCells.emplace_back(pCell);
-		}
-	}
-
-	return vecGroundCells;
-}
+//vector<CCell*> CMesh::SetUp_MeshGroundCells() // 법선벡터가 위를 향하는 삼각형들 추려내기
+//{
+//	vector<CCell*> vecGroundCells;
+//
+//	_uint		iNumIndices = { 0 };
+//	for (size_t i = 0; i < m_iFaces; i++)
+//	{
+//		_vector p0 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
+//		_vector p1 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
+//		_vector p2 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
+//
+//		_vector v1 = XMVectorSubtract(p1, p0);
+//		_vector v2 = XMVectorSubtract(p2, p0);
+//
+//		_vector vNormal = XMVector3Cross(v1, v2);
+//		vNormal = XMVector3Normalize(vNormal);
+//
+//		_float fDotProduct = XMVectorGetX(XMVector3Dot(vNormal, XMVectorSet(0, 1, 0, 0)));
+//
+//		if (fDotProduct > 0.1f) {
+//			CCell* pCell = CCell::Create(m_pDevice, m_pContext, p0, p1, p2);
+//			vecGroundCells.emplace_back(pCell);
+//		}
+//	}
+//
+//	return vecGroundCells;
+//}
 
 vector<vector<CCell*>> CMesh::SetUp_MeshQuadGroundCells()
 {
@@ -235,22 +235,13 @@ _int CMesh::Check_Quad(_fvector vPoint)
 	}
 }
 
-vector<FACE> CMesh::SetUp_QuadTreeCells()
+vector<FACE> CMesh::SetUp_QuadTreeCells(_float& _fMinX, _float& _fMinZ, _float& _fMaxX, _float& _fMaxZ)
 {
 	vector<FACE> vecMeshFaces;
-	_float fMinX{ FLT_MAX }, fMinZ{ FLT_MAX }, fMaxX{ FLT_MIN }, fMaxZ{ FLT_MIN };
 
 	_uint		iNumIndices = { 0 };
 	for (size_t i = 0; i < m_iFaces; i++)
 	{
-		for (_int j = 0; j < 3; j++) {
-			_int iIndex = m_pIndices[iNumIndices + j]; // 현재 인덱스
-			fMinX = min(fMinX, m_pVerticesPos[iIndex].x);
-			fMinZ = min(fMinZ, m_pVerticesPos[iIndex].z);
-			fMaxX = max(fMinX, m_pVerticesPos[iIndex].x);
-			fMaxZ = max(fMinX, m_pVerticesPos[iIndex].z);
-		}
-
 		_vector p0 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
 		_vector p1 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
 		_vector p2 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
@@ -264,6 +255,14 @@ vector<FACE> CMesh::SetUp_QuadTreeCells()
 		_float fDotProduct = XMVectorGetX(XMVector3Dot(vNormal, XMVectorSet(0, 1, 0, 0)));
 
 		if (fDotProduct > 0.1f) {
+			for (_int j = 0; j < 3; j++) {
+				_int iIndex = m_pIndices[iNumIndices - 3 + j]; // 현재 인덱스
+				_fMinX = min(_fMinX, m_pVerticesPos[iIndex].x);
+				_fMinZ = min(_fMinZ, m_pVerticesPos[iIndex].z);
+				_fMaxX = max(_fMaxX, m_pVerticesPos[iIndex].x);
+				_fMaxZ = max(_fMaxZ, m_pVerticesPos[iIndex].z);
+			}
+
 			FACE tFace{};
 			XMStoreFloat3(&tFace.vA, p0);
 			XMStoreFloat3(&tFace.vB, p1);

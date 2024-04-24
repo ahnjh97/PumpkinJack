@@ -28,13 +28,13 @@ public:
 
 public:
 	HRESULT Stock_Matrices(const vector<CBone*>& Bones, _float4x4* pMeshBoneMatrices);
-
 	_float4 Get_PickPos(const class CTransform* pTransform) const;
-	vector<class CCell*>			SetUp_MeshGroundCells();
+
+	//vector<class CCell*>			SetUp_MeshGroundCells();
 	vector<vector<class CCell*>>	SetUp_MeshQuadGroundCells();
 	_int							Check_Quad(_fvector vPoint);
 
-	vector<FACE> SetUp_QuadTreeCells();
+	vector<FACE>					SetUp_QuadTreeCells(_float& _fMinX, _float& _fMinZ, _float& _fMaxX, _float& _fMaxZ);
 
 private:
 	_char				m_szName[MAX_PATH] = { "" };

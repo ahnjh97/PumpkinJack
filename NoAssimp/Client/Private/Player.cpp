@@ -655,8 +655,8 @@ _bool CPlayer::Check_GroundCells(_Out_ _float& _fMinHeight, _Out_ _float& _fMaxH
 		CElecArena* pElecArena = dynamic_cast<CElecArena*>(elecArena);
 
 		_float fHeight{};
-		/*if (true == pElecArena->Check_ElecArenaGroundCell(vPos, fHeight))
-			vecGroundCellHeights.emplace_back(fHeight);*/
+		if (true == pElecArena->Check_ElecArenaGroundCell(vPos, fHeight))
+			vecGroundCellHeights.emplace_back(fHeight);
 
 		if(true == pElecArena->Check_QuadTreeCells(vPos, fHeight))
 			vecGroundCellHeights.emplace_back(fHeight);

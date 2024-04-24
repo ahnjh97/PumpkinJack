@@ -416,6 +416,7 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 	if (FAILED(Add_Models(eLevel, vecAnimModelNames, vecNonAnimModelNames)))
 		return E_FAIL;
 
+	//for()
 
 	m_strLoadingText = TEXT("Loading Shaders for Level_Wizard...");
 	if (FAILED(Add_Shaders(eLevel)))

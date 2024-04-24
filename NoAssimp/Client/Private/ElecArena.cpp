@@ -34,6 +34,7 @@ HRESULT CElecArena::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_vecQuad = m_pModelCom->SetUp_QuadGroundCells();
+	m_pModelCom->SetUp_QuadTreeCells();
 
 	return S_OK;
 }
@@ -130,7 +131,10 @@ _bool CElecArena::Check_ElecArenaGroundCell(_fvector vPlayerPos, _float& fCellHe
 
 _bool CElecArena::Check_QuadTreeCells(_fvector vPlayerPos, _float& fCellHeight)
 {
-	return m_pModelCom->Check_QuadTreeCell(vPlayerPos, m_pTransformCom->Get_WorldMatrix(), fCellHeight);
+	_matrix matWorldInv = m_pTransformCom->Get_WorldMatrix_Inverse();
+	_vector vNewPos = XMVector3TransformCoord(vPlayerPos, matWorldInv);
+
+	return m_pModelCom->Check_QuadTreeCell(vNewPos, m_pTransformCom->Get_WorldMatrix(), fCellHeight);
 }
 
 HRESULT CElecArena::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)

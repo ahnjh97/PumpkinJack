@@ -20,7 +20,9 @@ public:
 public:
 	_bool Check_QuadTreeCell(_fvector vPlayerPos, _matrix matWorld, _Out_ _float& _fHeight);
 	CORNER Check_Corner(_fvector vPos);
+
 	void PartitionFaces(vector<FACE>& _vecRT, vector<FACE>& _vecRB, vector<FACE>& _vecLB, vector<FACE>& _vecLT, vector<FACE> _vecFaces);
+	void PushIfNotAlreadyInserted(vector<CORNER>& _vecQuad, CORNER eQuad);
 
 private:
 	_float2		m_fCenter = {};

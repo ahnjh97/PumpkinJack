@@ -76,7 +76,7 @@ public:
 	void Reset_Animation(_uint iAnimIndex);
 
 	vector<vector<class CCell*>>	SetUp_QuadGroundCells(); // 단순 4분할
-	void							SetUp_QuadTreeCells();
+	void							SetUp_QuadTreeCells(); // QuadTree
 	_bool							Check_QuadTreeCell(_fvector vPlayerPos, _matrix matWorld, _Out_ _float& _fHeight);
 
 private:

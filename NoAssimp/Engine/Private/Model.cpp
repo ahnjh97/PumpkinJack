@@ -383,14 +383,25 @@ void CModel::SetUp_QuadTreeCells()
 	// 전체 순회하면서 가장 minX, minZ, maxX, maxZ 찾기 
 	vector<FACE> vecQuadTreeFaces;
 	_float fMinX{ FLT_MAX }, fMinZ{ FLT_MAX }, fMaxX{ FLT_MIN }, fMaxZ{ FLT_MIN };
-	vector<_float> vecMinX, vecMinZ, vecMaxX, vecMaxZ;
 
 	for (auto& mesh : m_Meshes) {
 		if (nullptr == mesh)
 			continue;
 
-		mesh->SetUp_QuadTreeCells();
+		vector<FACE> vecMeshQuadTreeFaces = mesh->SetUp_QuadTreeCells(fMinX, fMinZ, fMaxX, fMaxZ);
+		if (vecMeshQuadTreeFaces.empty())
+			continue;
+
+		vecQuadTreeFaces.insert(vecQuadTreeFaces.end(), vecMeshQuadTreeFaces.begin(), vecMeshQuadTreeFaces.end());
 	}
+
+	fMinX -= 1;
+	fMinZ -= 1;
+	fMaxX += 1;
+	fMaxZ += 1;
+
+	m_pQuadTreeCell = CQuadTreeCell::Create(_float2(fMaxX, fMaxZ), _float2(fMaxX, fMinZ), 
+		_float2(fMinX, fMinZ), _float2(fMinX, fMaxZ), vecQuadTreeFaces);
 }
 
 _bool CModel::Check_QuadTreeCell(_fvector vPlayerPos, _matrix matWorld, _float& _fHeight)
