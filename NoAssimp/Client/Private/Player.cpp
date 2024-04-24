@@ -87,6 +87,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 
 	m_pCurLevel = m_pGameInstance->Get_CurrentLevelID();
 	m_iHp = 80;
+
 	return S_OK;
 }
 
@@ -441,6 +442,9 @@ _bool CPlayer::Check_TerrainCol()
 			_float fMinY{}, fMaxY{};
 			if (true == Check_GroundCells(fMinY, fMaxY)) {
 				if (vPos.y <= fMaxY) {
+					if (vPos.y <= fMinY - 2.f)
+						return false;
+
 					m_fPlaneHeight = fMaxY;
 					return true;
 				}
@@ -651,7 +655,10 @@ _bool CPlayer::Check_GroundCells(_Out_ _float& _fMinHeight, _Out_ _float& _fMaxH
 		CElecArena* pElecArena = dynamic_cast<CElecArena*>(elecArena);
 
 		_float fHeight{};
-		if (true == pElecArena->Check_ElecArenaGroundCell(vPos, fHeight))
+		/*if (true == pElecArena->Check_ElecArenaGroundCell(vPos, fHeight))
+			vecGroundCellHeights.emplace_back(fHeight);*/
+
+		if(true == pElecArena->Check_QuadTreeCells(vPos, fHeight))
 			vecGroundCellHeights.emplace_back(fHeight);
 	}
 

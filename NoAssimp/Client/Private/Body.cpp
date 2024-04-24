@@ -35,6 +35,14 @@ HRESULT CBody::Initialize(void* pArg)
 	if (FAILED(Add_Components(LEVEL(BodyDesc.iLevel), BodyDesc.wstrModelTag)))
 		return E_FAIL;
 
+	vector<string> vecExcludingAnims = { "magic", "MAGIC", "FlyingMage", "groundversion", "Sword" };
+
+	if (FAILED(m_pModelCom->Exclude_Animations(vecExcludingAnims)))
+		return E_FAIL;
+
+	if (FAILED(m_pModelCom->SetUp_AnimIndices()))
+		return E_FAIL;
+
 	if(m_pModelCom != nullptr)
 		Initialize_AnimSpeed();
 	

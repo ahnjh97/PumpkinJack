@@ -627,12 +627,12 @@ HRESULT CLoader::Add_Instance_Models(LEVEL eLevel)
 {
 	CVIBuffer_Instance::INSTANCE_DESC		InstanceDesc{};
 	if (eLevel == LEVEL_WIZARD) {
-		InstanceDesc.vPivot = _float3(580.f, -150.f, 580.f);
-		InstanceDesc.vCenter = _float3(580.f, -50.f, 580.f);
-		InstanceDesc.vRange = _float3(300.f, 50.f, 300.f);
+		InstanceDesc.vPivot = _float3(580.f, -700.f, 580.f);
+		InstanceDesc.vCenter = _float3(580.f, 0.f, 580.f);
+		InstanceDesc.vRange = _float3(700.f, 150.f, 700.f);
 		InstanceDesc.vMinScale = _float3(6.f, 4.f, 6.f);
 		InstanceDesc.vMaxScale = _float3(9.f, 6.f, 9.f);
-		InstanceDesc.iNumInstance = 200;
+		InstanceDesc.iNumInstance = 180;
 		InstanceDesc.vLifeTime = _float2(8.f, 12.f);
 		InstanceDesc.isLoop = true;
 		InstanceDesc.vSpeed = _float2(40.f, 70.f);
@@ -717,8 +717,8 @@ void CLoader::SetUp_ModelScaleRotation() // Scale, Degaree, NewScale, RootIndex
 	m_ModelConfigs.emplace("PartSlime", MODEL_CONFIG{ 0.027f, 180.f, 2.7f });
 	m_ModelConfigs.emplace("SlimeBoss", MODEL_CONFIG{ 0.044f, 180.f, 4.4f });
 	m_ModelConfigs.emplace("PartSlimeBoss", MODEL_CONFIG{ 0.044f, 180.f, 4.4f });
-	m_ModelConfigs.emplace("Sniper", MODEL_CONFIG{ 0.042f, 180.f, 4.2f, 3 });
-	m_ModelConfigs.emplace("Soldier", MODEL_CONFIG{ 0.042f, 180.f, 4.2f, 5 });
+	m_ModelConfigs.emplace("Sniper", MODEL_CONFIG{ 0.05f, 180.f, 5.f, 3 });
+	m_ModelConfigs.emplace("Soldier", MODEL_CONFIG{ 0.05f, 180.f, 5.f, 5 });
 	m_ModelConfigs.emplace("Trabuchet", MODEL_CONFIG{ 0.03f, 0.f, 2.6f, 2 });
 
 	m_ModelConfigs.emplace("DestroyedBarn", MODEL_CONFIG{ 3.f, 0.f, 3.f });

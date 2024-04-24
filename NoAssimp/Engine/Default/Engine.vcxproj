@@ -184,7 +184,9 @@
     <ClCompile Include="..\Private\Camera.cpp" />
     <ClCompile Include="..\Private\Cell.cpp" />
     <ClCompile Include="..\Private\CoordConverter.cpp" />
+    <ClCompile Include="..\Private\Frustum.cpp" />
     <ClCompile Include="..\Private\Instance_Model.cpp" />
+    <ClCompile Include="..\Private\QuadTreeCell.cpp" />
     <ClCompile Include="..\Private\RenderTarget.cpp" />
     <ClCompile Include="..\Private\RenderTarget_Manager.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Instance.cpp" />
@@ -250,7 +252,9 @@
     <ClInclude Include="..\Public\Camera.h" />
     <ClInclude Include="..\Public\Cell.h" />
     <ClInclude Include="..\Public\CoordConverter.h" />
+    <ClInclude Include="..\Public\Frustum.h" />
     <ClInclude Include="..\Public\Instance_Model.h" />
+    <ClInclude Include="..\Public\QuadTreeCell.h" />
     <ClInclude Include="..\Public\RenderTarget.h" />
     <ClInclude Include="..\Public\RenderTarget_Manager.h" />
     <ClInclude Include="..\Public\VIBuffer_Instance.h" />

@@ -29,7 +29,7 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	_vector Check_Direction(KART_COLLIDER eKartCollider);
+	_vector Check_Direction(_float fTimeDelta, KART_COLLIDER eKartCollider);
 	void Turn_Kart(_float fTimeDelta);
 	_bool Check_ExplosionTrigger();
 

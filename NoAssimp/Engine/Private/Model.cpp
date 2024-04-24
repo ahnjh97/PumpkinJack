@@ -1,13 +1,13 @@
-#include "Model.h"
-#include "Bone.h"
-#include "Mesh.h"
-
 #include "GameInstance.h"
+#include "QuadTreeCell.h"
 #include "Texture.h"
 #include "Channel.h"
 #include "Shader.h"
-#include <locale>
 #include <codecvt>
+#include "Model.h"
+#include "Bone.h"
+#include "Mesh.h"
+#include <locale>
 #include "Cell.h"
 
 CModel::CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -30,6 +30,7 @@ CModel::CModel(const CModel& rhs)
 	, m_strModelName { rhs.m_strModelName }
 	, m_AnimIndex{ rhs.m_AnimIndex }
 	, m_vOriginalScale{ rhs.m_vOriginalScale }
+	, m_pQuadTreeCell{ rhs.m_pQuadTreeCell }
 {
 	for (auto& pPrototypeAnimation : rhs.m_Animations)
 		m_Animations.push_back(pPrototypeAnimation->Clone());
@@ -137,7 +138,7 @@ _float4 CModel::Check_Meshes(const CTransform* pTransform) const
 	return fResult;
 }
 
-HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelName, _fmatrix TransformMatrix, MODEL_CONFIG tConfig, _bool bNonAnimVersion)
+HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelName, _fmatrix TransformMatrix, MODEL_CONFIG tConfig, _bool bNonAnimVersion, _bool bOctreeCulling)
 {
 	m_eModelType = eType;
 	m_strModelName = strModelName;
@@ -177,7 +178,7 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const string& strModelName, _fm
 
 	/* 모델을 구성하는 메시들을 생성한다. */
 	/* 모델 = 메시 + 메시 + ... */
-	if (FAILED(Ready_Meshes()))
+	if (FAILED(Ready_Meshes(bOctreeCulling)))
 		return E_FAIL;
 
 	if (FAILED(Ready_Materials(strModelName.c_str())))
@@ -350,27 +351,6 @@ void CModel::Reset_Animation(_uint iAnimIndex)
 	m_Animations[iAnimIndex]->Set_IsFinished(false);
 }
 
-vector<class CCell*> CModel::SetUp_GroundCells()
-{
-	vector<CCell*> vecGroundCells;
-
-	if (m_Meshes.empty())
-		return  vecGroundCells;
-
-	for (auto& mesh : m_Meshes) {
-		if (nullptr == mesh)
-			continue;
-
-		vector<CCell*> vecMeshGroundCells = mesh->SetUp_MeshGroundCells();
-		if (vecMeshGroundCells.empty())
-			continue;
-
-		vecGroundCells.insert(vecGroundCells.end(), vecMeshGroundCells.begin(), vecMeshGroundCells.end());
-	}
-
-	return vecGroundCells;
-}
-
 vector<vector<CCell*>> CModel::SetUp_QuadGroundCells()
 {
 	vector<vector<CCell*>> vecQuadGroundCells;
@@ -395,13 +375,39 @@ vector<vector<CCell*>> CModel::SetUp_QuadGroundCells()
 	return vecQuadGroundCells;
 }
 
-HRESULT CModel::Ready_Meshes()
+void CModel::SetUp_QuadTreeCells()
+{
+	if (m_Meshes.empty())
+		return;
+
+	// 전체 순회하면서 가장 minX, minZ, maxX, maxZ 찾기 
+	vector<FACE> vecQuadTreeFaces;
+	_float fMinX{ FLT_MAX }, fMinZ{ FLT_MAX }, fMaxX{ FLT_MIN }, fMaxZ{ FLT_MIN };
+	vector<_float> vecMinX, vecMinZ, vecMaxX, vecMaxZ;
+
+	for (auto& mesh : m_Meshes) {
+		if (nullptr == mesh)
+			continue;
+
+		mesh->SetUp_QuadTreeCells();
+	}
+}
+
+_bool CModel::Check_QuadTreeCell(_fvector vPlayerPos, _matrix matWorld, _float& _fHeight)
+{
+	if (nullptr == m_pQuadTreeCell)
+		return false;
+
+	return m_pQuadTreeCell->Check_QuadTreeCell(vPlayerPos, matWorld, _fHeight);
+}
+
+HRESULT CModel::Ready_Meshes(_bool bOctreeCulling)
 {
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumMeshes), sizeof(m_iNumMeshes));
 
 	for (size_t i = 0; i < m_iNumMeshes; i++)
 	{
-		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_eModelType, m_strDirectory, m_InputFile, m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
+		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_eModelType, m_strDirectory, m_InputFile, m_Bones, XMLoadFloat4x4(&m_TransformMatrix), bOctreeCulling);
 		if (nullptr == pMesh)
 			return E_FAIL;
 
@@ -471,39 +477,67 @@ HRESULT CModel::Ready_Animations()
 		if (nullptr == pAnimation)
 			return E_FAIL;
 
-		if (m_strModelName == "Jack")
-		{
-			string strName = pAnimation->Get_Name();
-			if ((strName.find("magic") != string::npos) || (strName.find("MAGIC") != string::npos)
-				|| (strName.find("FlyingMage") != string::npos) || (strName.find("groundversion") != string::npos)
-				/*|| (strName.find("Shovel") != string::npos)*/ || (strName.find("Sword") != string::npos))
-			{
-				Safe_Release(pAnimation);
-				continue;
-			}		
-		}
-
 		m_Animations.push_back(pAnimation);
 	}
-	m_iNumAnimations = m_Animations.size();
 
-	if (m_strModelName == "Jack" || m_strModelName == "Soldier")
-	{
-		for (size_t i = 0; i < m_iNumAnimations; i++)
-		{
-			string strName = m_Animations[i]->Get_Name();
-			m_AnimIndex.emplace(strName, i);
-		}
-	}
+	m_iNumAnimations = m_Animations.size();
 
 	return S_OK;
 }
 
-CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelName, _fmatrix TransformMatrix, MODEL_CONFIG tConfig, _bool bNonAnimVersion)
+HRESULT CModel::Exclude_Animations(vector<string> vecAnimNames)
+{
+	if (m_Animations.empty() || vecAnimNames.empty())
+		return E_FAIL;
+
+	for (auto& animation : m_Animations) {
+		if (animation == nullptr)
+			continue;
+
+		string strAnimName = animation->Get_Name();
+
+		for (auto& strExcludingAnim : vecAnimNames)
+		{
+			if (strAnimName.find(strExcludingAnim) != string::npos) {
+				Safe_Release(animation);
+				break;
+			}
+		}
+	}
+
+	// 순회하면서 nullptr인 원소를 벡터에서 제거
+	for (auto& iter = m_Animations.begin(); iter != m_Animations.end();) 
+	{
+		if (*iter == nullptr)
+			iter = m_Animations.erase(iter);
+		else
+			iter++;
+	}
+
+	m_iNumAnimations = m_Animations.size();
+	
+	return S_OK;
+}
+
+HRESULT CModel::SetUp_AnimIndices()
+{
+	if (m_Animations.empty())
+		return E_FAIL;
+
+	for (size_t i = 0; i < m_iNumAnimations; i++)
+	{
+		string strName = m_Animations[i]->Get_Name();
+		m_AnimIndex.emplace(strName, i);
+	}
+	
+	return S_OK;
+}
+
+CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelName, _fmatrix TransformMatrix, MODEL_CONFIG tConfig, _bool bNonAnimVersion, _bool bOctreeCulling)
 {
 	CModel* pInstance = new CModel(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(eType, strModelName, TransformMatrix, tConfig, bNonAnimVersion)))
+	if (FAILED(pInstance->Initialize_Prototype(eType, strModelName, TransformMatrix, tConfig, bNonAnimVersion, bOctreeCulling)))
 	{
 		MSG_BOX(TEXT("Failed To Create : CModel"));
 
@@ -530,6 +564,8 @@ CComponent* CModel::Clone(void* pArg)
 void CModel::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pQuadTreeCell);
 
 	for (auto& Material : m_Materials)
 	{

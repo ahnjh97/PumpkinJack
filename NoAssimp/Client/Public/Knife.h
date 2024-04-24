@@ -30,6 +30,7 @@ private:
 	_float m_fTime = {};
 	_float m_fAlpha = { 1.f };
 	_float m_fAccSpeed = {};
+	_float m_fDeathTime = {};
 	
 private:
 	CModel* m_pModelCom = { nullptr };

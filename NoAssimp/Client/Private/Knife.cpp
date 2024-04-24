@@ -49,7 +49,8 @@ void CKnife::Tick(_float fTimeDelta)
 	if (m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y >= -3)
 		m_pTransformCom->Fall(m_fAccSpeed);
 	else {
-		m_fAlpha -= exp(m_fTime * fTimeDelta * 5.f) * fTimeDelta;
+		m_fDeathTime += fTimeDelta;
+		m_fAlpha -= exp(m_fDeathTime * fTimeDelta * 6.f) * fTimeDelta;
 		return;
 	}
 

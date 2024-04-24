@@ -1,13 +1,11 @@
-LevelGamePlay 복구
-book 위치세팅
 터레인 컬링
-추락 지형 태우기 판정
 
 - func Lightning : ElecParts, ElecRay
 
-- ElecArena Dissolving
+-func Charge
 
-- Spell Effects
+- ElecArena Dissolving
+- Solider	Alpha Dissolve
 
 - Trail Buffer-> Geometery Shader
 

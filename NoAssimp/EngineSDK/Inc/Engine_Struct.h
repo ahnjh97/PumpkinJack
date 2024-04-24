@@ -147,6 +147,13 @@ namespace Engine
 		static const D3D11_INPUT_ELEMENT_DESC	Elements[7];
 	}VTXINSTANCE_POINT;
 
+	typedef struct
+	{
+		_float3 vA = {};
+		_float3 vB = {};
+		_float3 vC = {};
+	}FACE;
+
 	// MODEL_NONANIM.mNumMeshes 만큼 반복: MESH_NONANIM. { mName, mMaterialIndex, mNumVertices,	mNumFaces } -> VTXMESH * mNumVertices -> _uint * m_iNumIndices
 	// MODEL_NONANIM.mNumMaterials * 20번 만큼 반복: _tchar szPerfectPath[MAX_PATH]
 	// NoAssimp Client에서는 CMesh에 Get_MeshInfo함수 만들어서 mNumVertices, mNumFaces를 가져와서 파일읽기 시작위치 지정해줄것

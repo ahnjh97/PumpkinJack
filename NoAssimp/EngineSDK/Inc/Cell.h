@@ -11,6 +11,7 @@ public:
 	enum QUAD { RT, RB, LB, LT, QUAD_END };
 private:
 	CCell(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CCell();
 	virtual ~CCell() = default;
 
 public:
@@ -35,8 +36,9 @@ public:
 public:
 	HRESULT Initialize(_int iTerrainIndex, const _float3* pPoints, const _int* pNeighborIndices, _uint iIndex);
 	HRESULT Initialize(_fvector v0, _fvector v1, _gvector v2); // For Mesh Ground Cells
+	HRESULT Initialize(_float3 vA, _float3 vB, _float3 vC); // For Quad Tree Cells
 	_bool IsIn(_fvector vPosition, _fmatrix TerrainWorldMatrix, _int* pNeighborIndex);
-	_bool IsIn(_fvector vPos, _fmatrix matModelWorld);
+	_bool IsIn(_fvector vPos); // GroundMesh의 로컬스페이스 상의 플레이어 위치
 
 	_bool Compare_Points(_fvector vSourPoint, _fvector vDestPoint);
 	_bool Check_Redundancy(CCell* pCell);
@@ -68,6 +70,7 @@ private:
 public:
 	static CCell* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _int iTerrainIndex, const _float3* vPoints, const _int* pNeighborIndices, _uint iIndex);
 	static CCell* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _fvector v0, _fvector v1, _gvector v2); // For Mesh Ground Cells
+	static CCell* Create(_float3 vA, _float3 vB, _float3 vC);
 	virtual void Free() override;
 };
 

@@ -2,6 +2,7 @@
 #include "Bone.h"
 #include <fstream>
 #include "GameInstance.h"
+#include "QuadTreeCell.h"
 #include "Cell.h"
 
 CMesh::CMesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ifstream& fileStream)
@@ -14,7 +15,7 @@ CMesh::CMesh(const CMesh& rhs)
 {
 }
 
-HRESULT CMesh::Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones, _fmatrix TransformMatrix)
+HRESULT CMesh::Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones, _fmatrix TransformMatrix, _bool bOctreeCulling)
 {
 	m_strDirectory = strDirectory;
 	if (!m_InputFile.is_open())
@@ -52,9 +53,19 @@ HRESULT CMesh::Initialize_Prototype(TYPE eModelType, string strDirectory, const 
 
 	/* 인덱스 버퍼의 byte크기 */
 	m_BufferDesc.ByteWidth = m_iIndexStride * m_iNumIndices;
-	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+
+	if(true == bOctreeCulling)
+		m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	else
+		m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+
 	m_BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	m_BufferDesc.CPUAccessFlags = 0;
+
+	if (true == bOctreeCulling)
+		m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	else
+		m_BufferDesc.CPUAccessFlags = 0;
+
 	m_BufferDesc.MiscFlags = 0;
 	m_BufferDesc.StructureByteStride = 0;
 
@@ -224,6 +235,46 @@ _int CMesh::Check_Quad(_fvector vPoint)
 	}
 }
 
+vector<FACE> CMesh::SetUp_QuadTreeCells()
+{
+	vector<FACE> vecMeshFaces;
+	_float fMinX{ FLT_MAX }, fMinZ{ FLT_MAX }, fMaxX{ FLT_MIN }, fMaxZ{ FLT_MIN };
+
+	_uint		iNumIndices = { 0 };
+	for (size_t i = 0; i < m_iFaces; i++)
+	{
+		for (_int j = 0; j < 3; j++) {
+			_int iIndex = m_pIndices[iNumIndices + j]; // 현재 인덱스
+			fMinX = min(fMinX, m_pVerticesPos[iIndex].x);
+			fMinZ = min(fMinZ, m_pVerticesPos[iIndex].z);
+			fMaxX = max(fMinX, m_pVerticesPos[iIndex].x);
+			fMaxZ = max(fMinX, m_pVerticesPos[iIndex].z);
+		}
+
+		_vector p0 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
+		_vector p1 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
+		_vector p2 = ::XMLoadFloat3(&m_pVerticesPos[m_pIndices[iNumIndices++]]);
+
+		_vector v1 = XMVectorSubtract(p1, p0);
+		_vector v2 = XMVectorSubtract(p2, p0);
+
+		_vector vNormal = XMVector3Cross(v1, v2);
+		vNormal = XMVector3Normalize(vNormal);
+
+		_float fDotProduct = XMVectorGetX(XMVector3Dot(vNormal, XMVectorSet(0, 1, 0, 0)));
+
+		if (fDotProduct > 0.1f) {
+			FACE tFace{};
+			XMStoreFloat3(&tFace.vA, p0);
+			XMStoreFloat3(&tFace.vB, p1);
+			XMStoreFloat3(&tFace.vC, p2);
+			vecMeshFaces.emplace_back(tFace);
+		}
+	}
+
+	return vecMeshFaces;
+}
+
 HRESULT CMesh::Ready_Vertices_For_NonAnimModel(_fmatrix TransformMatrix)
 {
 	m_iVertexStride = sizeof(VTXMESH);
@@ -326,11 +377,11 @@ HRESULT CMesh::Ready_Vertices_For_AnimModel(const vector<CBone*>& Bones)
 	return S_OK;
 }
 
-CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, string strDirectory, ifstream& fileStream, const vector<CBone*>& Bones, _fmatrix TransformMatrix)
+CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, string strDirectory, ifstream& fileStream, const vector<CBone*>& Bones, _fmatrix TransformMatrix, _bool bOctreeCulling)
 {
 	CMesh* pInstance = new CMesh(pDevice, pContext, fileStream);
 
-	if (FAILED(pInstance->Initialize_Prototype(eModelType, strDirectory, Bones, TransformMatrix)))
+	if (FAILED(pInstance->Initialize_Prototype(eModelType, strDirectory, Bones, TransformMatrix, bOctreeCulling)))
 	{
 		MSG_BOX(TEXT("Failed To Create : CMesh"));
 

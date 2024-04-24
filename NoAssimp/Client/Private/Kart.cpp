@@ -94,11 +94,11 @@ void CKart::Tick(_float fTimeDelta)
 
 void CKart::Late_Tick(_float fTimeDelta)
 {
-	_vector vFrontDir = Check_Direction(COLLIDER_FRONT);
+	_vector vFrontDir = Check_Direction(fTimeDelta, COLLIDER_FRONT);
 	if (!XMVector3Equal(vFrontDir, XMVectorSet(0, 0, 0, 0)))
 		m_vFrontDir = vFrontDir;
 
-	_vector vRearDir = Check_Direction(COLLIDER_REAR);
+	_vector vRearDir = Check_Direction(fTimeDelta, COLLIDER_REAR);
 	if (!XMVector3Equal(vRearDir, XMVectorSet(0, 0, 0, 0)))
 		m_vRearDir = vRearDir;
 
@@ -137,7 +137,7 @@ HRESULT CKart::Render()
 	return S_OK;
 }
 
-_vector CKart::Check_Direction(KART_COLLIDER eKartCollider)
+_vector CKart::Check_Direction(_float fTimeDelta, KART_COLLIDER eKartCollider)
 {
 	list<CGameObject*> railList = m_pGameInstance->Get_ObjectList(LEVEL_GAMEPLAY, TEXT("Layer_Rail"));
 	if (railList.empty())
@@ -178,13 +178,13 @@ _vector CKart::Check_Direction(KART_COLLIDER eKartCollider)
 		_vector vRight = m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
 		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 		if (pTargetRail->Get_ParseData().wstrModelTag == TEXT("Prototype_Component_Model_RailLeft60"))
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vRight * 0.004f);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vRight * fTimeDelta * 0.26f);
 		else if (pTargetRail->Get_ParseData().wstrModelTag == TEXT("Prototype_Component_Model_RailRight60"))
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos - vRight * 0.004f);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos - vRight * fTimeDelta * 0.26f);
 		else if (pTargetRail->Get_ParseData().wstrModelTag == TEXT("Prototype_Component_Model_RailLeft90"))
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vRight * 0.0055f);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vRight * fTimeDelta * 0.29f);
 		else if (pTargetRail->Get_ParseData().wstrModelTag == TEXT("Prototype_Component_Model_RailRight90"))
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos - vRight * 0.0055f);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos - vRight * fTimeDelta * 0.29f);
 	}
 		
 	return pTargetRail->Compute_Direction(iMax);

@@ -72,6 +72,9 @@ void CImGui_Client::OnKeyInput()
 
 	if (m_pGameInstance->KeyDown(DIK_Q))
 		m_pGameInstance->Toggle_NavigationMode();
+
+	if (m_pGameInstance->KeyDown(DIK_E))
+		m_pGameInstance->Toggle_FrameLimit();
 }
 
 void CImGui_Client::ConvertToString()

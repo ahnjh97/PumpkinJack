@@ -81,14 +81,17 @@ HRESULT CVIBuffer_Instance::Render()
 	return S_OK;
 }
 
-_float4 CVIBuffer_Instance::Compute_RandPosition(INSTANCE_SHAPE eShape)
+_float4 CVIBuffer_Instance::Compute_RandPosition(INSTANCE_SHAPE eShape, _bool bRespawnAtMinHeight)
 {
 	if (eShape == SHAPE_DEFAULT) {
 		uniform_real_distribution<_float>	RangePosX(m_InstanceDesc.vCenter.x - m_InstanceDesc.vRange.x * 0.5f, m_InstanceDesc.vCenter.x + m_InstanceDesc.vRange.x * 0.5f);
 		uniform_real_distribution<_float>	RangePosY(m_InstanceDesc.vCenter.y - m_InstanceDesc.vRange.y * 0.5f, m_InstanceDesc.vCenter.y + m_InstanceDesc.vRange.y * 0.5f);
 		uniform_real_distribution<_float>	RangePosZ(m_InstanceDesc.vCenter.z - m_InstanceDesc.vRange.z * 0.5f, m_InstanceDesc.vCenter.z + m_InstanceDesc.vRange.z * 0.5f);
-
-		return _float4(RangePosX(m_RandomNumber), RangePosY(m_RandomNumber), RangePosZ(m_RandomNumber), 1.f);
+		
+		if(bRespawnAtMinHeight)
+			return _float4(RangePosX(m_RandomNumber), m_InstanceDesc.vCenter.y - m_InstanceDesc.vRange.y * 0.5f, RangePosZ(m_RandomNumber), 1.f);
+		else
+			return _float4(RangePosX(m_RandomNumber), RangePosY(m_RandomNumber), RangePosZ(m_RandomNumber), 1.f);
 	}
 	else if (eShape == SHAPE_SPHERE) {
 		uniform_real_distribution<_float> Angle(0, XM_2PI);
@@ -178,15 +181,28 @@ void CVIBuffer_Instance::Check_LifeTimes(_float fTimeDelta)
 	m_pContext->Unmap(m_pVBInstance, 0);
 }
 
-void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceIndex, _float fTimeDelta)
+void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceIndex, _float fTimeDelta, _bool bRespawnAtMinHeight)
 {
 	m_pLifeTimes[iInstanceIndex].x += fTimeDelta;
 
-	if (m_pLifeTimes[iInstanceIndex].x > m_pLifeTimes[iInstanceIndex].y)
-	{
+	if (m_pLifeTimes[iInstanceIndex].x > m_pLifeTimes[iInstanceIndex].y) {
 		if (true == m_InstanceDesc.isLoop){
 			m_pLifeTimes[iInstanceIndex].x = 0.f;
-			pVertices[iInstanceIndex].vPosition = Compute_RandPosition(m_InstanceDesc.eShape);
+			pVertices[iInstanceIndex].vPosition = Compute_RandPosition(m_InstanceDesc.eShape, bRespawnAtMinHeight);
+		}
+	}
+
+	if (bRespawnAtMinHeight)
+	{
+		if (((m_InstanceDesc.vCenter.x - m_InstanceDesc.vRange.x * 0.5f) > pVertices[iInstanceIndex].vPosition.x)
+			|| ((m_InstanceDesc.vCenter.x + m_InstanceDesc.vRange.x * 0.5f) < pVertices[iInstanceIndex].vPosition.x)
+			|| ((m_InstanceDesc.vCenter.z - m_InstanceDesc.vRange.z * 0.5f) > pVertices[iInstanceIndex].vPosition.z)
+			|| ((m_InstanceDesc.vCenter.z + m_InstanceDesc.vRange.z * 0.5f) < pVertices[iInstanceIndex].vPosition.z)) 
+		{
+			if (true == m_InstanceDesc.isLoop) {
+				m_pLifeTimes[iInstanceIndex].x = 0.f;
+				pVertices[iInstanceIndex].vPosition = Compute_RandPosition(m_InstanceDesc.eShape, bRespawnAtMinHeight);
+			}
 		}
 	}
 

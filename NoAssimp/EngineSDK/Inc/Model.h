@@ -17,7 +17,7 @@ public:
 	_bool isFinished() { return m_Animations[m_iCurrentAnimIndex]->isFinished(); }
 	TYPE Get_ModelType() { return m_eModelType; }
 	string Get_ModelName() { return m_strModelName; }
-	_float3 Get_RootTranslation(){ return m_vRootTranslation; }
+	_float3 Get_RootTranslation() { return m_vRootTranslation; }
 	_float3 Get_HandTranslation() { return m_vHandTranslation; }
 	_bool IsNonAnimVersion() { return m_bIsNonAnimVersion; }
 	_float4x4 Get_ModelTransformMat() { return m_TransformMatrix; }
@@ -30,7 +30,8 @@ public:
 	_float Get_AnimPlayRatio() { return m_Animations[m_iCurrentAnimIndex]->Get_PlayRatio(); }
 	_bool Get_Shrinked() {
 		if (abs(m_vOriginalScale.x / m_vScale.x) > 33.f) { return true; }
-	else { return false; }}
+		else { return false; }
+	}
 	_float Get_LerpRatio() { return m_fLerpRatio; }
 	string Get_MeshName(_uint iMeshIndex);
 	string Get_DiffuseTextureName(_uint iMeshIndex);
@@ -40,7 +41,9 @@ public:
 		if (m_bIsNonAnimVersion) return;
 		m_iCurrentAnimIndex = iAnimIndex; m_isLoop = isLoop;
 		if (m_iCurrentAnimIndex >= m_iNumAnimations) {
-			m_iCurrentAnimIndex = rand() % m_iNumAnimations;}}
+			m_iCurrentAnimIndex = rand() % m_iNumAnimations;
+		}
+	}
 
 	void Set_Hide(_bool bHide) { m_bHide = bHide; }
 	void Copy_Animations(vector<CAnimation*>& vecAnims) { vecAnims = m_Animations; }
@@ -56,7 +59,7 @@ public:
 	_float4 Check_Meshes(const class CTransform* pTransform) const;
 
 public:
-	virtual HRESULT Initialize_Prototype(TYPE eType, const string& strModelName, _fmatrix TransformMatrix, MODEL_CONFIG tConfig, _bool bNonAnimVersion);
+	virtual HRESULT Initialize_Prototype(TYPE eType, const string& strModelName, _fmatrix TransformMatrix, MODEL_CONFIG tConfig, _bool bNonAnimVersion, _bool bOctreeCulling);
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
@@ -72,8 +75,9 @@ public:
 	void Reset_Animation(string& strAnimName);
 	void Reset_Animation(_uint iAnimIndex);
 
-	vector<class CCell*>			SetUp_GroundCells();
-	vector<vector<class CCell*>>	SetUp_QuadGroundCells();
+	vector<vector<class CCell*>>	SetUp_QuadGroundCells(); // 단순 4분할
+	void							SetUp_QuadTreeCells();
+	_bool							Check_QuadTreeCell(_fvector vPlayerPos, _matrix matWorld, _Out_ _float& _fHeight);
 
 private:
 	TYPE						m_eModelType = { TYPE_END };
@@ -105,6 +109,8 @@ private:
 	vector<KEYFRAME>			m_FinalKeyFrames;
 	_float						m_fLerpTime = { 0.08f };
 
+	// QuadTreeCell
+	class CQuadTreeCell*		m_pQuadTreeCell = { nullptr };
 
 	// 파일입출력 변수
 	string						m_strDirectory;
@@ -116,13 +122,18 @@ private:
 	_bool						m_bHide = { false };
 
 private:
-	HRESULT Ready_Meshes();
+	HRESULT Ready_Meshes(_bool bOctreeCulling);
 	HRESULT Ready_Materials(const _char* pModelFilePath);
 	HRESULT Ready_Bones();
 	HRESULT Ready_Animations();
+	
+public: // 클라이언트에서의 애니메이션 제거 및 인덱스 저장을 위한 함수들
+	HRESULT Exclude_Animations(vector<string> vecAnimNames);
+	HRESULT SetUp_AnimIndices();
 
 public:
-	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelName, _fmatrix TransformMatrix, MODEL_CONFIG tConfig, _bool bNonAnimVersion = false);
+	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const string& strModelName
+		, _fmatrix TransformMatrix, MODEL_CONFIG tConfig, _bool bNonAnimVersion = false, _bool bOctreeCulling = false);
 	
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;

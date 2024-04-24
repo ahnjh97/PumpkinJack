@@ -10,6 +10,7 @@
 #include "ImGui_Manager.h"
 #include "Light_Manager.h"
 #include "Renderer.h"
+#include "Frustum.h"
 #include "Picking.h"
 #include "Camera.h"
 #include <random>
@@ -78,6 +79,10 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 
 	m_pPicking = CPicking::Create(*ppDevice, *ppContext, EngineDesc.hWnd, EngineDesc.iWinSizeX, EngineDesc.iWinSizeY);
 	if (nullptr == m_pComponent_Manager)
+		return E_FAIL;
+
+	m_pFrustum = CFrustum::Create();
+	if (nullptr == m_pFrustum)
 		return E_FAIL;
 
 	m_pCoordConverter = CCoordConverter::Create(*ppDevice, *ppContext);
@@ -603,6 +608,20 @@ _vector CGameInstance::Compute_WorldPos_Float4(const _float4& vPlayerPos, const 
 	return m_pCoordConverter->Compute_WorldPos_Float4(vPlayerPos, strZRenderTargetTag, iOffset);
 }
 
+_bool CGameInstance::isInFrustum_WorldSpace(_fvector vWorldPos, _float fRange)
+{
+	return m_pFrustum->isIn_WorldSpace(vWorldPos, fRange);
+}
+
+_bool CGameInstance::isInFrustum_LocalSpace(_fvector vLocalPos, _float fRange)
+{
+	return m_pFrustum->isIn_LocalSpace(vLocalPos, fRange);
+}
+
+void CGameInstance::TransformFrustum_LocalSpace(_fmatrix WorldMatrixInv)
+{
+}
+
 string CGameInstance::WstrToStr(const wstring& wstr)
 {
 	wstring_convert<codecvt_utf8<wchar_t>> cnvt;
@@ -647,6 +666,7 @@ void CGameInstance::Release_Engine()
 
 void CGameInstance::Free()
 {
+	Safe_Release(m_pFrustum);
 	Safe_Release(m_pCoordConverter);
 	Safe_Release(m_pRenderTarget_Manager);
 	Safe_Release(m_pLight_Manager);

@@ -33,12 +33,12 @@ public:
 	virtual HRESULT Render();
 
 public:
-	virtual _float4 Compute_RandPosition(INSTANCE_SHAPE eShape);
+	virtual _float4 Compute_RandPosition(INSTANCE_SHAPE eShape, _bool bRespawnAtMinHeight = false);
 	virtual void Drop(_float fTimeDelta);
 	virtual void Spread(_float fTimeDelta);
 	virtual void Check_LifeTimes(_float fTimeDelta);
 
-	void Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceIndex, _float fTimeDelta);
+	void	Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceIndex, _float fTimeDelta, _bool bRespawnAtMinHeight = false);
 
 
 protected:

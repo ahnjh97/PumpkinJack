@@ -32,6 +32,8 @@ public:
 	_int Compute_Quadrant(_fvector vPlayerPos); // 플레이어가 몇사분면에 있는지
 	_bool Check_ElecArenaGroundCell(_fvector vPlayerPos, _Out_ _float& fCellHeight);
 
+	_bool Check_QuadTreeCells(_fvector vPlayerPos, _Out_ _float& fCellHeight);
+
 private:
 	_bool m_bWhiten = { false };
 

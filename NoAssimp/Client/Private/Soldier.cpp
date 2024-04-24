@@ -33,6 +33,9 @@ HRESULT CSoldier::Initialize(void* pArg)
 	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel), GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
 
+	if (FAILED(m_pModelCom->SetUp_AnimIndices()))
+		return E_FAIL;
+
 	if (FAILED(Add_PartObjects(LEVEL(GameObjectDesc.iLevel))))
 		return E_FAIL;
 
@@ -42,6 +45,7 @@ HRESULT CSoldier::Initialize(void* pArg)
 	m_pModelCom->Set_Animation(10, false); // SPAWN
 	m_iPreHp = m_iHp = 70;
 	m_pNavigationCom->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
+
 	return S_OK;
 }
 
@@ -60,7 +64,7 @@ void CSoldier::Tick(_float fTimeDelta)
 
 	Check_KartCol(fTimeDelta);
 
-	LinkState();
+	LinkState(fTimeDelta);
 	StateToAnimation();
 
 	if (m_eState == SOLDIER_IDLE || m_eState == SOLDIER_RUN || m_eState == SOLDIER_SPAWN || m_eState == SOLDIER_SPIN)	{
@@ -174,14 +178,22 @@ void CSoldier::Get_PlayerWorldMatPtr()
 	Safe_AddRef(m_pPlayer);
 }
 
-void CSoldier::LinkState()
+void CSoldier::LinkState(_float fTimeDelta)
 {
 	if (m_eState == SOLDIER_DEATH)
 	{
 		if (m_pModelCom->isFinished())
 		{
-			DeathEffect();
-			Set_Dead();
+			m_fDeathTime += fTimeDelta;
+
+			if (m_fAlpha <= 0.f)
+				Set_Dead();
+
+			if(m_fAlpha >= 1.f)
+				DeathEffect();
+
+			// 알파값을 점점 감소
+			m_fAlpha -= exp(m_fDeathTime * fTimeDelta * 4.f) * fTimeDelta;
 		}
 		return;
 	}
@@ -365,7 +377,7 @@ HRESULT CSoldier::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 		return E_FAIL;
 
 	CBounding_OBB::BOUNDING_OBB_DESC		ColliderDesc{};
-	ColliderDesc.vSize = _float3(5.5f, 9.f, 5.5f);
+	ColliderDesc.vSize = _float3(5.5f, 10.f, 5.5f);
 	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, 0.f);
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"),
 		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom[DEFAULT], &ColliderDesc)))

@@ -107,7 +107,12 @@ public: /* For.CoordConverter */
 	_vector Compute_WorldPos(const _float2& vViewportPos, const wstring& strZRenderTargetTag, _uint iOffset = 0);
 	_vector Compute_WorldPos_Float4(const _float4& vPlayerPos, const wstring& strZRenderTargetTag, _uint iOffset = 0);
 
-	/* For.GameInstance */
+public: /* For.Frustum */
+	_bool isInFrustum_WorldSpace(_fvector vWorldPos, _float fRange = 0.f);
+	_bool isInFrustum_LocalSpace(_fvector vLocalPos, _float fRange = 0.f);
+	void TransformFrustum_LocalSpace(_fmatrix WorldMatrixInv);
+
+public:	/* For.GameInstance */
 	string WstrToStr(const wstring& wstr);
 	wstring StrToWstr(const string& str);
 	void CalculateFPS(_float fTimeDelta);
@@ -117,6 +122,9 @@ public: /* For.CoordConverter */
 	void Toggle_Toggle() { m_bToggle = !m_bToggle; }
 	_bool Get_NavigationMode() { return m_bNavigationMode; }
 	void Toggle_NavigationMode() { m_bNavigationMode = !m_bNavigationMode; }
+	_float Get_FrameLimit() { return m_fFrameLimit; }
+	void Toggle_FrameLimit() { if (m_fFrameLimit == 60.f) { m_fFrameLimit = 2500.f; } 
+		else if (m_fFrameLimit == 2500.f) { m_fFrameLimit = 60.f; } }
 
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };
@@ -132,13 +140,17 @@ private:
 	class CLight_Manager*			m_pLight_Manager = { nullptr };
 	class CRenderTarget_Manager*	m_pRenderTarget_Manager = { nullptr };
 	class CCoordConverter*			m_pCoordConverter = { nullptr };
+	class CFrustum*					m_pFrustum = { nullptr };
 
 private:
-	_uint iFrameCount = { 0 };
-	_float fElapsedTime = { 0.f };
-	_int iFps = { 0 };
 	_bool m_bToggle = { true };
 	_bool m_bNavigationMode = { true };
+
+	_uint iFrameCount = { 0 };
+	_int iFps = { 0 };
+
+	_float m_fFrameLimit = 60.f;
+	_float fElapsedTime = { 0.f };
 	_float m_fTempCamFar = { 1000.f };
 
 public:		

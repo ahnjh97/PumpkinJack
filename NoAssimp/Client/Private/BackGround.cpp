@@ -74,7 +74,7 @@ void CBackGround::Tick(_float fTimeDelta)
 void CBackGround::Late_Tick(_float fTimeDelta)
 {
 	m_fTime += fTimeDelta;
-	float currentSpeed = 0.5f / (log(m_fTime + 1) * 1.f + 1) * fTimeDelta * 1.4f;
+	float currentSpeed = 0.5f / (log(m_fTime + 1) * 1.f + 1) * fTimeDelta * 1.45f;
 	if (m_fZ == fZ_Jack)
 		m_pTransformCom->Go_Right(currentSpeed);
 	else if (m_fZ == fZ_GameLogo)

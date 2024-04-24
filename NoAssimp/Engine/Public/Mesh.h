@@ -7,6 +7,7 @@
 
 BEGIN(Engine)
 
+class CQuadTreeCell;
 class CMesh final : public CVIBuffer
 {
 private:
@@ -22,7 +23,7 @@ public:
 		else { return m_OffsetMatrices.front()._41; } }
 
 public:
-	virtual HRESULT Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones, _fmatrix TransformMatrix);
+	virtual HRESULT Initialize_Prototype(TYPE eModelType, string strDirectory, const vector<CBone*>& Bones, _fmatrix TransformMatrix, _bool bOctreeCulling);
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
@@ -32,6 +33,8 @@ public:
 	vector<class CCell*>			SetUp_MeshGroundCells();
 	vector<vector<class CCell*>>	SetUp_MeshQuadGroundCells();
 	_int							Check_Quad(_fvector vPoint);
+
+	vector<FACE> SetUp_QuadTreeCells();
 
 private:
 	_char				m_szName[MAX_PATH] = { "" };
@@ -56,7 +59,9 @@ private:
 	HRESULT Ready_Vertices_For_AnimModel(const vector<CBone*>& Bones);
 
 public:
-	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, string strDirectory, ifstream& fileStream, const vector<class CBone*>& Bones, _fmatrix TransformMatrix);
+	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eModelType, string strDirectory
+		, ifstream& fileStream, const vector<class CBone*>& Bones, _fmatrix TransformMatrix, _bool bOctreeCulling);
+
 	virtual CMesh* Clone(void* pArg);
 	virtual void Free() override;
 };

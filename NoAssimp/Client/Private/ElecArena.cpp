@@ -115,15 +115,22 @@ _bool CElecArena::Check_ElecArenaGroundCell(_fvector vPlayerPos, _float& fCellHe
 		return false;
 
 	_matrix matWorld = m_pTransformCom->Get_WorldMatrix();
+	_matrix matWorldInv = m_pTransformCom->Get_WorldMatrix_Inverse();
 
+	_vector vNewPos = XMVector3TransformCoord(vPlayerPos, matWorldInv);
 	for (auto& groundCell : m_vecQuad[iQuad]) {
-		if (true == groundCell->IsIn(vPlayerPos, matWorld)) {
+		if (true == groundCell->IsIn(vNewPos)) {
 			fCellHeight = XMVectorGetY(XMVector3TransformCoord(groundCell->Get_Point(CCell::POINT_A), matWorld));
 			return true;
 		}
 	}
 
 	return false;
+}
+
+_bool CElecArena::Check_QuadTreeCells(_fvector vPlayerPos, _float& fCellHeight)
+{
+	return m_pModelCom->Check_QuadTreeCell(vPlayerPos, m_pTransformCom->Get_WorldMatrix(), fCellHeight);
 }
 
 HRESULT CElecArena::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)

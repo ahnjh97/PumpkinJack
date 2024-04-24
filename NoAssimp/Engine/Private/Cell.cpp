@@ -11,6 +11,10 @@ CCell::CCell(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	Safe_AddRef(m_pContext);
 }
 
+CCell::CCell()
+{
+}
+
 _bool CCell::Get_Alone()
 {
 	for (_int i = 0; i < 3; i++)
@@ -43,11 +47,20 @@ HRESULT CCell::Initialize(_fvector v0, _fvector v1, _gvector v2)
 	XMStoreFloat3(&m_vPoints[1], v1);
 	XMStoreFloat3(&m_vPoints[2], v2);
 
-#ifdef _DEBUG
-		m_pVIBuffer = CVIBuffer_Cell::Create(m_pDevice, m_pContext, m_vPoints);
-	if (nullptr == m_pVIBuffer)
-		return E_FAIL;
-#endif
+//#ifdef _DEBUG
+//		m_pVIBuffer = CVIBuffer_Cell::Create(m_pDevice, m_pContext, m_vPoints);
+//	if (nullptr == m_pVIBuffer)
+//		return E_FAIL;
+//#endif
+	return S_OK;
+}
+
+HRESULT CCell::Initialize(_float3 vA, _float3 vB, _float3 vC)
+{
+	m_vPoints[0] = vA;
+	m_vPoints[1] = vB;
+	m_vPoints[2] = vC;
+
 	return S_OK;
 }
 
@@ -76,12 +89,12 @@ _bool CCell::IsIn(_fvector vPosition, _fmatrix TerrainWorldMatrix, _int* pNeighb
 	return true;
 }
 
-_bool CCell::IsIn(_fvector vPos, _fmatrix matModelWorld)
+_bool CCell::IsIn(_fvector vPos)
 {
 	_vector		vPoints[3];
 
 	for (size_t i = 0; i < POINT_END; i++)
-		vPoints[i] = XMVector3TransformCoord(XMLoadFloat3(&m_vPoints[i]), matModelWorld);
+		vPoints[i] = XMLoadFloat3(&m_vPoints[i]);
 
 	for (size_t i = 0; i < LINE_END; i++)
 	{
@@ -171,6 +184,20 @@ CCell* CCell::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _fvec
 	CCell* pInstance = new CCell(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize(v0, v1, v2)))
+	{
+		MSG_BOX(TEXT("Failed To Create : CCell"));
+
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+CCell* CCell::Create(_float3 vA, _float3 vB, _float3 vC)
+{
+	CCell* pInstance = new CCell();
+
+	if (FAILED(pInstance->Initialize(vA, vB, vC)))
 	{
 		MSG_BOX(TEXT("Failed To Create : CCell"));
 

@@ -191,7 +191,7 @@ void CVIBuffer_Instance_Mesh::TurnAndSpread(_float fTimeDelta, _float fRotationS
 		XMStoreFloat4(&pVertices[i].vPosition,
 			XMLoadFloat4(&pVertices[i].vPosition) + XMVector3Normalize(vDir) * m_pSpeeds[i] * fTimeDelta);
 
-		Compute_LifeTime(pVertices, i, fTimeDelta);
+		Compute_LifeTime(pVertices, i, fTimeDelta, true);
 	}
 
 	m_pContext->Unmap(m_pVBInstance, 0);

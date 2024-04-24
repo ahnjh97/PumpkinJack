@@ -33,7 +33,7 @@ public:
 
 private:
 	void Get_PlayerWorldMatPtr();
-	void LinkState();
+	void LinkState(_float fTimeDelta);
 	void StateToAnimation();
 	void Soldier_AnimSpeed();
 	void DeathEffect();
@@ -55,6 +55,8 @@ private:
 
 	_float m_fIdleTime = {};
 	_float m_fTurnTime = {100.f};
+	_float m_fDeathTime = {};
+	_float m_fAlpha = { 1.f };
 
 private:
 	CModel* m_pModelCom = { nullptr };
