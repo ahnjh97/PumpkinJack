@@ -12,8 +12,6 @@ private:
 	CQuadTreeCell();
 	virtual ~CQuadTreeCell() = default;
 
-public: _int Get_NumGroundCells() { return m_vecGroundCells.size(); }
-
 public:
 	HRESULT Initialize(_float2 fRT, _float2 fRB, _float2 fLB, _float2 fLT, vector<FACE> _vecFaces);
 

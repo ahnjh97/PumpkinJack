@@ -32,6 +32,7 @@ public:
 	_bool Get_GroundCol() { return m_bGroundCol; }
 	_float Get_PlayerHpRatio() { return m_iHp * 0.01f; }
 	CModel* Get_BodyModel();
+	vector<_float> Get_QuadTreeCellHeights() { return m_vecQuadTreeCells; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -74,6 +75,7 @@ private:
 	NAVIGATION m_eNavigation = {};
 	CCollider* m_pNearestEnemyCollider = { nullptr };
 	CCollider::TYPE m_eEnemyColliderType = {};
+	vector<_float> m_vecQuadTreeCells;
 
 	_bool m_bGroundCol = { false };
 	_bool m_bIsJumping = { false };

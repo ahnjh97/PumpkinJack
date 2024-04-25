@@ -134,7 +134,6 @@ CMap_Wizard* CMap_Wizard::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 	}
 
 	return pInstance;
-
 }
 
 CGameObject* CMap_Wizard::Clone(void* pArg)

@@ -40,7 +40,8 @@ HRESULT CLightning::Initialize(void* pArg)
 	/*if (FAILED(Get_PlayerColliderPtr()))
 		return E_FAIL;*/
 
-	m_pTransformCom->Set_Pos(XMVectorSet(-rand() % 50, 0, -rand() % 50, 1));
+	if(GameObjectDesc.iLevel == LEVEL_EFFECTTOOL)
+		m_pTransformCom->Set_Pos(XMVectorSet(-rand() % 50, 0, -rand() % 50, 1));
 
 	return S_OK;
 }

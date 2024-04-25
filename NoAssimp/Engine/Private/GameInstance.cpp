@@ -573,53 +573,82 @@ HRESULT CGameInstance::Begin_MRT(const wstring& strMRTTag)
 
 HRESULT CGameInstance::End_MRT()
 {
+	if (m_pRenderTarget_Manager == nullptr)
+		return S_OK;
+
 	return m_pRenderTarget_Manager->End_MRT();
 }
 
 HRESULT CGameInstance::Bind_RTShaderResource(CShader* pShader, const wstring& strRenderTargetTag, const _char* pConstantName)
 {
+	if (m_pRenderTarget_Manager == nullptr)
+		return S_OK;
+
 	return m_pRenderTarget_Manager->Bind_ShaderResource(pShader, strRenderTargetTag, pConstantName);
 }
 
 HRESULT CGameInstance::Copy_Resource(const wstring& strRenderTargetTag, ID3D11Texture2D** ppTextureHub)
 {
+	if (m_pRenderTarget_Manager == nullptr)
+		return S_OK;
+
 	return m_pRenderTarget_Manager->Copy_Resource(strRenderTargetTag, ppTextureHub);
 }
 
 #ifdef _DEBUG
 HRESULT CGameInstance::Ready_RTVDebug(const wstring& strRenderTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
 {
+	if (m_pRenderTarget_Manager == nullptr)
+		return S_OK;
+
 	return m_pRenderTarget_Manager->Ready_Debug(strRenderTargetTag, fX, fY, fSizeX, fSizeY);
 }
 
 HRESULT CGameInstance::Draw_RTVDebug(const wstring& strMRTTag, CShader* pShader, CVIBuffer_Rect* pVIBuffer)
 {
+	if (m_pRenderTarget_Manager == nullptr)
+		return S_OK;
+
 	return m_pRenderTarget_Manager->Render_Debug(strMRTTag, pShader, pVIBuffer);
 }
 #endif
 
 _vector CGameInstance::Compute_WorldPos(const _float2& vViewportPos, const wstring& strZRenderTargetTag, _uint iOffset)
 {
+	if (m_pCoordConverter == nullptr)
+		return _vector();
+
 	return m_pCoordConverter->Compute_WorldPos(vViewportPos, strZRenderTargetTag, iOffset);
 }
 
 _vector CGameInstance::Compute_WorldPos_Float4(const _float4& vPlayerPos, const wstring& strZRenderTargetTag, _uint iOffset)
 {
+	if (m_pCoordConverter == nullptr)
+		return _vector();
+
 	return m_pCoordConverter->Compute_WorldPos_Float4(vPlayerPos, strZRenderTargetTag, iOffset);
 }
 
 _bool CGameInstance::isInFrustum_WorldSpace(_fvector vWorldPos, _float fRange)
 {
+	if (m_pFrustum == nullptr)
+		return false;
+
 	return m_pFrustum->isIn_WorldSpace(vWorldPos, fRange);
 }
 
 _bool CGameInstance::isInFrustum_LocalSpace(_fvector vLocalPos, _float fRange)
 {
+	if (m_pFrustum == nullptr)
+		return false;
+
 	return m_pFrustum->isIn_LocalSpace(vLocalPos, fRange);
 }
 
 void CGameInstance::TransformFrustum_LocalSpace(_fmatrix WorldMatrixInv)
 {
+	if(m_pFrustum != nullptr)
+		m_pFrustum->Transform_LocalSpace(WorldMatrixInv);
 }
 
 string CGameInstance::WstrToStr(const wstring& wstr)

@@ -363,6 +363,9 @@
     <ClCompile Include="..\Private\QuadTreeCell.cpp">
       <Filter>01. Utility\02. Components\Model\Mesh\QuadTreeCell</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\QuadTree_Terrain.cpp">
+      <Filter>01. Utility\02. Components\VIBuffer\Terrain\QuadTree</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Base.h">
@@ -562,6 +565,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\QuadTreeCell.h">
       <Filter>01. Utility\02. Components\Model\Mesh\QuadTreeCell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\QuadTree_Terrain.h">
+      <Filter>01. Utility\02. Components\VIBuffer\Terrain\QuadTree</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

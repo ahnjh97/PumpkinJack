@@ -13,7 +13,6 @@ CWizard::CWizard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 CWizard::CWizard(const CWizard& rhs)
 	: CGameObject{ rhs }
 {
-
 }
 
 INFO_WIZARD CWizard::Get_WizardInfo()
@@ -26,6 +25,8 @@ INFO_WIZARD CWizard::Get_WizardInfo()
 
 HRESULT CWizard::Initialize_Prototype()
 {
+	m_RandomNumber = mt19937_64(m_RandomDevice());
+
 	return S_OK;
 }
 
@@ -196,11 +197,7 @@ void CWizard::Link_State(_float fTimeDelta)
 
 	if (SPELL_LIGHTNING == m_eSpell){
 		_int iAnimPlayCount = m_pModelCom->Get_AnimPlayCount(WIZARD_ATTACK);
-		if (iAnimPlayCount == 0) {
-			m_iAttackCount = 0;
-			m_iAttackFinishCount = 0;
-		}
-
+	
 		if (iAnimPlayCount == m_iAttackCount) {
 			m_eState = WIZARD_ATTACK;
 			m_iAttackCount++;
@@ -353,7 +350,25 @@ void CWizard::Cast_Spell()
 
 void CWizard::Lightning()
 {
-	
+	GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = LEVEL_WIZARD;
+
+	uniform_real_distribution<_float> Distance(0.f, 45.f);
+	uniform_real_distribution<_float> Angle(0.f, XM_2PI);
+
+	_int iRandNum = m_pGameInstance->RandomNumber(6, 8);
+
+	for (_int i = 0; i < iRandNum; i++) {
+		_float fDistance = Distance(m_RandomNumber);
+		_float fAngle = Angle(m_RandomNumber);
+		tDesc.matWorld._41 = m_pPlayerWorldMatrix->_41 + cosf(fAngle) * fDistance;
+		tDesc.matWorld._42 = 2.8f;
+		tDesc.matWorld._43 = m_pPlayerWorldMatrix->_43 + sinf(fAngle) * fDistance;
+
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD,
+			TEXT("Layer_Lightning"), TEXT("Prototype_GameObject_Lightning"), &tDesc)))
+			return;
+	}
 }
 
 void CWizard::FireBall()
@@ -530,7 +545,7 @@ HRESULT CWizard::Bind_ShaderResources()
 
 void CWizard::SetUp_WizardAnimSpeed()
 {
-	m_pModelCom->Set_AnimSpeed(WIZARD_ATTACK, 1.7f);
+	m_pModelCom->Set_AnimSpeed(WIZARD_ATTACK, 1.8f);
 	m_pModelCom->Set_AnimSpeed(WIZARD_AIR_IDLE, 1.3f);
 }
 

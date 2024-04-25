@@ -54,9 +54,6 @@ _bool CFrustum::isIn_WorldSpace(_fvector vWorldPos, _float fRange)
 {
 	for (size_t i = 0; i < 6; i++)
 	{
-		/*a b c d
-		x y z 1
-		ax + by + cz + d * 1 < 0;*/
 		if (fRange < XMVectorGetX(XMPlaneDotCoord(XMLoadFloat4(&m_vWorldPlanes[i]), vWorldPos)))
 			return false;
 	}
@@ -68,9 +65,6 @@ _bool CFrustum::isIn_LocalSpace(_fvector vLocalPos, _float fRange)
 {
 	for (size_t i = 0; i < 6; i++)
 	{
-		/*a b c d
-		x y z 1
-		ax + by + cz + d * 1 < 0;*/
 		if (fRange < XMVectorGetX(XMPlaneDotCoord(XMLoadFloat4(&m_vLocalPlanes[i]), XMVectorSetW(vLocalPos, 1.f))))
 			return false;
 	}

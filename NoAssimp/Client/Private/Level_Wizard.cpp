@@ -237,6 +237,6 @@ CLevel_Wizard* CLevel_Wizard::Create(ID3D11Device* pDevice, ID3D11DeviceContext*
 
 void CLevel_Wizard::Free()
 {
-	m_pGameInstance->Hide_ImGui();
+	//m_pGameInstance->Hide_ImGui();
 	__super::Free();
 }

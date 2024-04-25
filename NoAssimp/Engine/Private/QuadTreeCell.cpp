@@ -1,5 +1,4 @@
 #include "QuadTreeCell.h"
-#include "GameInstance.h"
 #include "Cell.h"
 
 CQuadTreeCell::CQuadTreeCell()
@@ -9,40 +8,36 @@ CQuadTreeCell::CQuadTreeCell()
 
 HRESULT CQuadTreeCell::Initialize(_float2 fRT, _float2 fRB, _float2 fLB, _float2 fLT, vector<FACE> _vecFaces)
 {
-	if (_vecFaces.empty())
-		return S_OK;
-
-	if (_vecFaces.size() <= 10) {	// 삼각형 개수가 3개 이하일 경우 더 이상 자식을 생성하지 않음
-		for (auto& face : _vecFaces) {
-			CCell* pCell = CCell::Create(face.vA, face.vB, face.vC);
-			m_vecGroundCells.emplace_back(pCell);
-		}
-		return S_OK;
-	}
-
-	if (abs(fRT.x - fLT.x) <= 10.f || abs(fRT.y - fRB.y) <= 10.f) {
-		for (auto& face : _vecFaces) {
-			CCell* pCell = CCell::Create(face.vA, face.vB, face.vC);
-			m_vecGroundCells.emplace_back(pCell);
-		}
-		return S_OK;
-	}
-
 	m_fCorners[CORNER_RT] = fRT;
 	m_fCorners[CORNER_RB] = fRB;
 	m_fCorners[CORNER_LB] = fLB;
 	m_fCorners[CORNER_LT] = fLT;
 	m_fCenter = _float2((m_fCorners[CORNER_LT].x + m_fCorners[CORNER_RB].x) * 0.5f, (m_fCorners[CORNER_LT].y + m_fCorners[CORNER_RB].y) * 0.5f);
 
+	if (_vecFaces.empty())
+		return S_OK;
+
+	if (_vecFaces.size() <= 8) {	// 삼각형 개수가 8개 이하일 경우 더 이상 자식을 생성하지 않음
+		for (auto& face : _vecFaces) {
+			CCell* pCell = CCell::Create(face.vA, face.vB, face.vC);
+			m_vecGroundCells.emplace_back(pCell);
+		}
+		return S_OK;
+	}
+
+	if (abs(fRT.x - fLT.x) <= 8.f || abs(fRT.y - fRB.y) <= 8.f) {
+		for (auto& face : _vecFaces) {
+			CCell* pCell = CCell::Create(face.vA, face.vB, face.vC);
+			m_vecGroundCells.emplace_back(pCell);
+		}
+		return S_OK;
+	}
+
 	_float2 fRC{}, fBC{}, fLC{}, fTC{};
-	fRC = _float2(m_fCorners[CORNER_RT].x, 
-		(m_fCorners[CORNER_RT].y + m_fCorners[CORNER_RB].y) * 0.5f);
-	fBC = _float2((m_fCorners[CORNER_RB].x + m_fCorners[CORNER_LB].x) *	0.5f, 
-		m_fCorners[CORNER_RB].y);
-	fLC = _float2((m_fCorners[CORNER_LB].x + m_fCorners[CORNER_LT].x) * 0.5f, 
-		(m_fCorners[CORNER_LB].y + m_fCorners[CORNER_LT].y) * 0.5f);
-	fTC = _float2((m_fCorners[CORNER_LT].x + m_fCorners[CORNER_RT].x) * 0.5f, 
-		(m_fCorners[CORNER_LT].y + m_fCorners[CORNER_RT].y) * 0.5f);
+	fRC = _float2(m_fCorners[CORNER_RT].x, (m_fCorners[CORNER_RT].y + m_fCorners[CORNER_RB].y) * 0.5f);
+	fBC = _float2((m_fCorners[CORNER_RB].x + m_fCorners[CORNER_LB].x) *	0.5f, m_fCorners[CORNER_RB].y);
+	fLC = _float2(m_fCorners[CORNER_LB].x, (m_fCorners[CORNER_LB].y + m_fCorners[CORNER_LT].y) * 0.5f);
+	fTC = _float2((m_fCorners[CORNER_LT].x + m_fCorners[CORNER_RT].x) * 0.5f, m_fCorners[CORNER_RT].y);
 
 	vector<FACE> vecRT, vecRB, vecLB, vecLT;
 
@@ -59,22 +54,43 @@ HRESULT CQuadTreeCell::Initialize(_float2 fRT, _float2 fRB, _float2 fLB, _float2
 _bool CQuadTreeCell::Check_QuadTreeCell(_fvector vPlayerPos, _matrix matWorld, _Out_ _float& _fHeight)
 {
 	if (m_vecGroundCells.empty()) {
-		if (nullptr == m_pChildren[CORNER_RT])
+		if (nullptr == m_pChildren[CORNER_RT]) 
 			return false;
-
-		CORNER eCorner = Check_Corner(vPlayerPos);
-		m_pChildren[eCorner]->Check_QuadTreeCell(vPlayerPos, matWorld, _fHeight);
 	}
-	else
-	{
+	
+	vector<_float> vecHeights;
+	if (!m_vecGroundCells.empty()) {	// 내가 가진 셀들을 순회하며 검사
+
 		for (auto& groundCell : m_vecGroundCells) {
 			if (true == groundCell->IsIn(vPlayerPos)) {
-				_fHeight = XMVectorGetY(XMVector3TransformCoord(groundCell->Get_Point(CCell::POINT_A), matWorld));
+				_float fTempHeight = XMVectorGetY(XMVector3TransformCoord(groundCell->Get_Point(CCell::POINT_A), matWorld));
+				vecHeights.emplace_back(fTempHeight);
+			}
+		}
+
+		if (!vecHeights.empty()) {
+			for (auto& height : vecHeights)
+				_fHeight = max(_fHeight, height);
+
+			if (nullptr == m_pChildren[CORNER_RT])
+				return true;
+			else
+			{
+				CORNER eCorner = Check_Corner(vPlayerPos);
+				m_pChildren[eCorner]->Check_QuadTreeCell(vPlayerPos, matWorld, _fHeight);
+
 				return true;
 			}
 		}
+
+		if (vecHeights.empty() && nullptr == m_pChildren[CORNER_RT])
+			return false;
 	}
 
+	CORNER eCorner = Check_Corner(vPlayerPos);
+	if (true == m_pChildren[eCorner]->Check_QuadTreeCell(vPlayerPos, matWorld, _fHeight))
+		return true;
+	
 	return false;
 }
 
@@ -103,15 +119,21 @@ void CQuadTreeCell::PartitionFaces(vector<FACE>& _vecRT, vector<FACE>& _vecRB, v
 	for (auto& face : _vecFaces)
 	{
 		vector<CORNER> vecQuad; // 몇 사분면에 추가할건지
-		CORNER eCornerA = Check_Corner(XMLoadFloat3(&face.vA)); // 추가안하는 경우도 생각해야했어야하는데.. 무조건 quater안에 있다고 가정해버렸음
-		vecQuad.emplace_back(eCornerA);
+		CORNER eCornerA = Check_Corner(XMLoadFloat3(&face.vA));
+		PushIfNotAlreadyInserted(vecQuad, eCornerA);;
 		CORNER eCornerB = Check_Corner(XMLoadFloat3(&face.vB));
 		PushIfNotAlreadyInserted(vecQuad, eCornerB);
 		CORNER eCornerC = Check_Corner(XMLoadFloat3(&face.vC));
 		PushIfNotAlreadyInserted(vecQuad, eCornerC);
 
-		for (auto& quad : vecQuad) {
-			switch (quad)
+		if (vecQuad.size() >= 2) // 삼각형이 여러 사분면에 걸쳐있을때
+		{ 
+			CCell* pCell = CCell::Create(face.vA, face.vB, face.vC);
+			m_vecGroundCells.emplace_back(pCell);
+		}
+		else // 삼각형들의 세 점이 속한 사분면이 전부 동일할때
+		{
+			switch (vecQuad.front())
 			{
 			case CORNER_RT:
 				_vecRT.emplace_back(face);
@@ -168,7 +190,9 @@ void CQuadTreeCell::Free()
 	for (auto& groundCell : m_vecGroundCells)
 		Safe_Release(groundCell);
 
-	for (_int i = 0; i < CORNER_END; i++)
-		Safe_Release(m_pChildren[i]);
+	if (m_pChildren[CORNER_RT] != nullptr) {
+		for (_int i = 0; i < CORNER_END; i++)
+			Safe_Release(m_pChildren[i]);
+	}
 }
 

@@ -161,7 +161,7 @@ void CPillar::Free()
 {
 	__super::Free();
 
-	for(_int i = 0; i<COLLIDER_END; i++)
+	for(_int i = 0; i< COLLIDER_END; i++)
 		Safe_Release(m_pColliderCom[i]);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);

@@ -9,6 +9,7 @@ CPicking::CPicking(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	Safe_AddRef(pDevice);
 	Safe_AddRef(pContext);
+	Safe_AddRef(m_pGameInstance);
 }
 
 HRESULT CPicking::Initialize(HWND hWnd, _uint iWinSizeX, _uint iWinSizeY)
@@ -75,6 +76,7 @@ CPicking* CPicking::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,
 
 void CPicking::Free()
 {
+	Safe_Release(m_pGameInstance);
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);
 }

@@ -1,19 +1,25 @@
+#include "VIBuffer_Terrain.h"
+#include "QuadTree_Terrain.h"
 #include "GameInstance.h"
 #include "Transform.h"
-#include "VIBuffer_Terrain.h"
 
 CVIBuffer_Terrain::CVIBuffer_Terrain(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CVIBuffer{ pDevice, pContext }
+	, m_pGameInstance{ CGameInstance::Get_Instance() }
 {
-
+	Safe_AddRef(m_pGameInstance);
 }
 
 CVIBuffer_Terrain::CVIBuffer_Terrain(const CVIBuffer_Terrain & rhs)
 	: CVIBuffer{ rhs }, 
 	m_iNumVerticesX{rhs.m_iNumVerticesX}, 
 	m_iNumVerticesZ{ rhs.m_iNumVerticesZ }, 
-	m_pVerticesPos{rhs.m_pVerticesPos }
+	m_pVerticesPos{rhs.m_pVerticesPos },
+	m_pGameInstance{ rhs.m_pGameInstance }, 
+	m_pQuadTree_Terrain{ rhs.m_pQuadTree_Terrain }
 {
+	Safe_AddRef(m_pQuadTree_Terrain);
+	Safe_AddRef(m_pGameInstance);
 	/*Safe_AddRef(m_pVerticesPos);*/
 }
 
@@ -120,7 +126,7 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(_uint iX, _uint iZ)
 	return S_OK;
 }
 
-HRESULT CVIBuffer_Terrain::Initialize_Prototype(const wstring& strHeightMapFilePath)
+HRESULT CVIBuffer_Terrain::Initialize_Prototype(const wstring& strHeightMapFilePath, _bool bQuadTree)
 {
 	_ulong		dwByte = { 0 };
 
@@ -200,9 +206,9 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const wstring& strHeightMapFileP
 
 	/* 인덱스 버퍼의 byte크기 */
 	m_BufferDesc.ByteWidth = m_iIndexStride * m_iNumIndices;
-	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	m_BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	m_BufferDesc.CPUAccessFlags = 0;
+	m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	m_BufferDesc.MiscFlags = 0;
 	m_BufferDesc.StructureByteStride = 0;
 	
@@ -244,8 +250,18 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const wstring& strHeightMapFileP
 
 	Safe_Delete_Array(pIndices);
 	Safe_Delete_Array(pPixel);
-
 #pragma endregion
+
+	//if (true == bQuadTree) 
+	//{
+	//	m_pQuadTree_Terrain = CQuadTree_Terrain::Create(m_iNumVerticesX * m_iNumVerticesZ - m_iNumVerticesX,
+	//		m_iNumVerticesX * m_iNumVerticesZ - 1, m_iNumVerticesX - 1, 0);
+
+	//	if (nullptr == m_pQuadTree_Terrain)
+	//		return E_FAIL;
+
+	//	m_pQuadTree_Terrain->SetUp_Neighbors();
+	//}
 
 	return S_OK;
 }
@@ -253,6 +269,28 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const wstring& strHeightMapFileP
 HRESULT CVIBuffer_Terrain::Initialize(void * pArg)
 {
 	return S_OK;
+}
+
+void CVIBuffer_Terrain::Culling(_fmatrix WorldMatrixInv)
+{
+	if (nullptr == m_pQuadTree_Terrain)
+		return;
+
+	m_pGameInstance->TransformFrustum_LocalSpace(WorldMatrixInv);
+
+	D3D11_MAPPED_SUBRESOURCE		SubResource{};
+
+	m_pContext->Map(m_pIB, 0, D3D11_MAP_WRITE_DISCARD, 0, &SubResource);
+
+	_uint* pIndices = static_cast<_uint*>(SubResource.pData);
+
+	_uint		iNumIndices = { 0 };
+
+	m_pQuadTree_Terrain->Culling(m_pGameInstance, m_pVerticesPos, pIndices, &iNumIndices);
+
+	m_pContext->Unmap(m_pIB, 0);
+
+	m_iNumIndices = iNumIndices;
 }
 
 _float3 CVIBuffer_Terrain::Get_PickPos(const CTransform* pTransform) const
@@ -338,11 +376,11 @@ _int CVIBuffer_Terrain::Get_TriangleIndex(const CTransform* pTransform, _float3&
 	return -1;
 }
 
-CVIBuffer_Terrain * CVIBuffer_Terrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const wstring& strHeightMapFilePath)
+CVIBuffer_Terrain * CVIBuffer_Terrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const wstring& strHeightMapFilePath, _bool bQuadTree)
 {
 	CVIBuffer_Terrain*		pInstance = new CVIBuffer_Terrain(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(strHeightMapFilePath)))
+	if (FAILED(pInstance->Initialize_Prototype(strHeightMapFilePath, bQuadTree)))
 	{
 		MSG_BOX(TEXT("Failed To Create : CVIBuffer_Rect"));
 
@@ -386,4 +424,7 @@ void CVIBuffer_Terrain::Free()
 
 	if (false == m_isCloned)
 		Safe_Delete_Array(m_pVerticesPos);
+
+	Safe_Release(m_pQuadTree_Terrain);
+	Safe_Release(m_pGameInstance);
 }

@@ -50,8 +50,11 @@ HRESULT CRenderTarget_Manager::Add_MRT(const wstring& strMRTTag, const wstring& 
 	return S_OK;
 }
 
-HRESULT CRenderTarget_Manager::Begin_MRT(const wstring& strMRTTag)
+HRESULT CRenderTarget_Manager::Begin_MRT(const wstring& strMRTTag, ID3D11DepthStencilView* pDSV)
 {
+	ID3D11ShaderResourceView* pSRV[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT] = { nullptr };
+	m_pContext->PSSetShaderResources(0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, pSRV);
+
 	list<CRenderTarget*>* pTargetList = Find_MRT(strMRTTag);
 	if (nullptr == pTargetList)
 		return E_FAIL;
@@ -67,6 +70,9 @@ HRESULT CRenderTarget_Manager::Begin_MRT(const wstring& strMRTTag)
 		pRenderTarget->Clear();
 		pRenderTargets[iNumRenderTargets++] = pRenderTarget->Get_RTV();
 	}
+
+	if (nullptr != pDSV)
+		m_pContext->ClearDepthStencilView(pDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
 	m_pContext->OMSetRenderTargets(iNumRenderTargets, pRenderTargets, m_pDSV);
 

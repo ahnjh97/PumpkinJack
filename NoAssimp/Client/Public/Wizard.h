@@ -77,7 +77,7 @@ private:
 	_float3 m_vTeslaTowerPos[8] = { _float3(483, 0, 483), _float3(641, 0, 466), _float3(685, 0, 667),  _float3(506 ,0, 691),
 		_float3(471, 0, 510), _float3(655, 0, 500), _float3(667, 0, 667), _float3(511 ,0, 685) };
 
-	vector <_int> m_vecSpellThresholds = { 6, 4, 4 };
+	vector <_int> m_vecSpellThresholds = { 8, 4, 4 };
 	vector<_float> m_vecIdleDurations = { 1.f, 1.2f, 1.4f, 1.6f, 1.8f, 2.f };
 
 private:
@@ -86,6 +86,9 @@ private:
 	CGameObject* m_pPlayer = { nullptr };
 	const _float4x4* m_pPlayerWorldMatrix = { nullptr };
 	CCollider* m_pColliderCom = { nullptr };
+
+	random_device	m_RandomDevice;
+	mt19937_64		m_RandomNumber;
 
 private:
 	HRESULT Add_Components(LEVEL eLevel, const wstring& _wstrModelTag);

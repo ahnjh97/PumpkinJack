@@ -48,7 +48,5 @@ namespace Engine
 
 		return iRefCnt;
 	}
-
-
 }
 

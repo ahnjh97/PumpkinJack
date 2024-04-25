@@ -1,5 +1,3 @@
-터레인 컬링
-
 - func Lightning : ElecParts, ElecRay
 
 -func Charge

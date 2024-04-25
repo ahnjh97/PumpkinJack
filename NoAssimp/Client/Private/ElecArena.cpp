@@ -33,7 +33,8 @@ HRESULT CElecArena::Initialize(void* pArg)
 	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel), GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
 
-	m_vecQuad = m_pModelCom->SetUp_QuadGroundCells();
+	//m_vecQuad = m_pModelCom->SetUp_QuadGroundCells();
+
 	m_pModelCom->SetUp_QuadTreeCells();
 
 	return S_OK;

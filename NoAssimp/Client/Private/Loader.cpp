@@ -239,7 +239,7 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	m_strLoadingText = TEXT("Loading NavigationCells for Level_GamePlay...");
 	/* Prototype_Component_VIBuffer_Terrain_GamePlay */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_GamePlay"),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_GamePlay.bmp")))))
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../../../Resources/Textures/Terrain/Level_GamePlay.bmp"), true))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Navigation */

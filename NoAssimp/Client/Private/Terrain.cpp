@@ -60,6 +60,8 @@ void CTerrain::Tick(_float fTimeDelta)
 
 void CTerrain::Late_Tick(_float fTimeDelta)
 {
+	//m_pVIBufferCom->Culling(m_pTransformCom->Get_WorldMatrix_Inverse());
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
