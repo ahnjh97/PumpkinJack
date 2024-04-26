@@ -67,7 +67,6 @@ HRESULT CVIBuffer_Instance_Point::Initialize_Prototype(const CVIBuffer_Instance:
 	m_BufferDesc.StructureByteStride = 0;
 
 
-
 	_ushort* pIndices = new _ushort[m_iNumIndices];
 	ZeroMemory(pIndices, sizeof(_ushort) * m_iNumIndices);
 
@@ -159,7 +158,6 @@ CVIBuffer_Instance_Point* CVIBuffer_Instance_Point::Create(ID3D11Device* pDevice
 	}
 
 	return pInstance;
-
 }
 
 CComponent* CVIBuffer_Instance_Point::Clone(void* pArg)

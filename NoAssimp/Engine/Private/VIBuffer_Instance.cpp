@@ -93,7 +93,7 @@ _float4 CVIBuffer_Instance::Compute_RandPosition(INSTANCE_SHAPE eShape, _bool bR
 		else
 			return _float4(RangePosX(m_RandomNumber), RangePosY(m_RandomNumber), RangePosZ(m_RandomNumber), 1.f);
 	}
-	else if (eShape == SHAPE_SPHERE) {
+	else if (eShape == SHAPE_HEMISPHERE) {
 		uniform_real_distribution<_float> Angle(0, XM_2PI);
 		uniform_real_distribution<_float> Radius(0, m_InstanceDesc.vRange.x);
 		uniform_real_distribution<_float> RangePosZ(m_InstanceDesc.vCenter.z - m_InstanceDesc.vRange.z * 0.5f, m_InstanceDesc.vCenter.z + m_InstanceDesc.vRange.z * 0.5f);
@@ -102,7 +102,7 @@ _float4 CVIBuffer_Instance::Compute_RandPosition(INSTANCE_SHAPE eShape, _bool bR
 		_float fAngle = Angle(m_RandomNumber);
 
 		_float fX = fRadius * cos(fAngle);
-		_float fY = fRadius * sin(fAngle);
+		_float fY = abs(fRadius * sin(fAngle));
 
 		_float fRandRadius = Radius(m_RandomNumber);
 		_float fZSquared = fRandRadius * fRandRadius - fX * fX - fY * fY;

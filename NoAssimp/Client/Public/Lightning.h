@@ -3,15 +3,24 @@
 #include "GameObject.h"
 
 BEGIN(Engine)
-class CShader;
+class CVIBuffer_Instance_Point;
 class CTexture;
-class CVIBuffer_Rect;
+class CShader;
 END
 
 BEGIN(Client)
 
 class CLightning final : public CGameObject
 {
+	enum TEX_ELEC { TEX_LIGHTNING, TEX_NOISE, TEX_END };
+
+public:
+	typedef struct : public CGameObject::GAMEOBJECT_DESC
+	{
+		_uint iLightingIndex = {};
+		const _float4x4* pTargetWorldMat = { nullptr };
+	}LIGHTNING_DESC;
+
 private:
 	CLightning(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CLightning(const CLightning& rhs);
@@ -25,27 +34,21 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	HRESULT Get_PlayerColliderPtr();
-	void Check_PlayerCol();
-	void Add_Collider();
-
-private:
-	_bool m_bAddCollider = { true };
+	_uint m_iSpriteIndex = {};
+	_uint m_iLightningIndex = {};
+	_uint m_iSpriteEnd = {};
 
 	_float m_fTime = {};
 
 private:
-	CShader* m_pShaderCom = { nullptr };
-	CTexture* m_pTextureCom = { nullptr };
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
-	CCollider* m_pColliderCom = { nullptr };
+	CTexture* m_pTextureCom[TEX_END] = {};
+	CShader* m_pShaderCom = { nullptr };
 
-	CGameObject* m_pPlayer = { nullptr };
-	CCollider* m_pPlayerCollider = { nullptr };
-	CGameObject* m_pElecParts[2] = { nullptr, nullptr };
+	const _float4x4* m_pTargetWorldMat = { nullptr };
 
 private:
-	HRESULT Add_Components(LEVEL eLevel);
+	HRESULT Add_Components(LEVEL eLevel, _uint _iLightingIndex);
 	HRESULT Bind_ShaderResources();
 
 public:
@@ -55,3 +58,4 @@ public:
 };
 
 END
+

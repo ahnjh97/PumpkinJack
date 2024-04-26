@@ -72,7 +72,6 @@ CBounding_Sphere* CBounding_Sphere::Create(ID3D11Device* pDevice, ID3D11DeviceCo
 	}
 
 	return pInstance;
-
 }
 
 void CBounding_Sphere::Free()

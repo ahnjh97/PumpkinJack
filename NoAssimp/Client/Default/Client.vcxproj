@@ -192,6 +192,7 @@
     <ClInclude Include="..\Public\Level_Wizard.h" />
     <ClInclude Include="..\Public\LifeBar.h" />
     <ClInclude Include="..\Public\Lightning.h" />
+    <ClInclude Include="..\Public\LightningEffects.h" />
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\Public\Monster.h" />
@@ -260,6 +261,7 @@
     <ClCompile Include="..\Private\Level_Wizard.cpp" />
     <ClCompile Include="..\Private\LifeBar.cpp" />
     <ClCompile Include="..\Private\Lightning.cpp" />
+    <ClCompile Include="..\Private\LightningEffects.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\private\Monster.cpp" />

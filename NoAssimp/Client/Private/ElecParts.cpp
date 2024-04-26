@@ -43,6 +43,8 @@ HRESULT CElecParts::Initialize(void* pArg)
 
 	if (m_pTargetWorldMat != nullptr)
 		m_pTransformCom->Set_Pos(XMVectorSet(m_pTargetWorldMat->_41, m_pTargetWorldMat->_42, m_pTargetWorldMat->_43, 1));
+	else
+		m_pTransformCom->Set_Pos(_float4(tElecPartsDesc.matWorld._41, tElecPartsDesc.matWorld._42, tElecPartsDesc.matWorld._43, 1));
 
 	return S_OK;
 }
@@ -108,12 +110,10 @@ HRESULT CElecParts::Bind_ShaderResources()
 
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))
 		return E_FAIL;
 
@@ -121,6 +121,7 @@ HRESULT CElecParts::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pTextureCom[TEX_NOISE]->Bind_ShaderResource(m_pShaderCom, "g_NoiseTexture")))
 		return E_FAIL;
+
 	return S_OK;
 }
 

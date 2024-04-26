@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Level_EffectTool.h"
 #include "Camera_Free.h"
+#include "Lightning.h"
 #include "ElecParts.h"
 #include "Terrain.h"
 
@@ -103,15 +104,23 @@ HRESULT CLevel_EffectTool::Ready_Layer_Effect(const wstring& strLayerTag)
 	tElecPartsDesc.iLevel = LEVEL_EFFECTTOOL;
 	tElecPartsDesc.eElecEffect = CElecParts::ELEC_LIGHTNING1;
 	
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
+	//	return E_FAIL;
 
 	CGameObject::GAMEOBJECT_DESC tDesc{};
 	tDesc.iLevel = LEVEL_EFFECTTOOL;
-	/*if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Lightning"), &tDesc)))
-		return E_FAIL;*/
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_HoleWall"), &tDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_LightningEffects"), &tDesc)))
 		return E_FAIL;
+	/*if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_HoleWall"), &tDesc)))
+		return E_FAIL;*/
+
+
+	/*CLightning::LIGHTNING_DESC tLightningDesc{};
+	tLightningDesc.iLevel = LEVEL_EFFECTTOOL;
+	tLightningDesc.iLightingIndex = 2;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Lightning"), &tLightningDesc)))
+		return E_FAIL;*/
+
 	return S_OK;
 }
 

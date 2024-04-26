@@ -205,8 +205,11 @@
     <Filter Include="01.Levels\08. EffectTool">
       <UniqueIdentifier>{6b947265-a777-45cf-9a0f-bf77d7cf9029}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Level_Wizard\Lightning">
+    <Filter Include="02.GameObjects\Level_Wizard\LightningEffects">
       <UniqueIdentifier>{ea342247-6fbe-4824-a5f7-3bf4159a16c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_Wizard\Lightning">
+      <UniqueIdentifier>{a162c451-cabf-4976-9f8d-6927eb65f8f5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -408,6 +411,9 @@
     <ClInclude Include="..\Public\ElecParts.h">
       <Filter>02.GameObjects\Level_Wizard\ElecParts</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LightningEffects.h">
+      <Filter>02.GameObjects\Level_Wizard\LightningEffects</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Lightning.h">
       <Filter>02.GameObjects\Level_Wizard\Lightning</Filter>
     </ClInclude>
@@ -601,6 +607,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\ElecParts.cpp">
       <Filter>02.GameObjects\Level_Wizard\ElecParts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LightningEffects.cpp">
+      <Filter>02.GameObjects\Level_Wizard\LightningEffects</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Lightning.cpp">
       <Filter>02.GameObjects\Level_Wizard\Lightning</Filter>

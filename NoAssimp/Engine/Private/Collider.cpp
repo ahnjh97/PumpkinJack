@@ -98,10 +98,6 @@ HRESULT CCollider::Initialize_Prototype(TYPE eType)
 	m_pDevice->CreateInputLayout(VertexPositionColor::InputElements, VertexPositionColor::InputElementCount, pShaderByteCode, iShaderByteCodeLength, &m_pInputLayout);
 #endif
 
-
-
-
-
 	return S_OK;
 }
 

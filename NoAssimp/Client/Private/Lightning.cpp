@@ -18,50 +18,53 @@ HRESULT CLightning::Initialize_Prototype()
 
 HRESULT CLightning::Initialize(void* pArg)
 {
-	GAMEOBJECT_DESC GameObjectDesc = {}; // = (GAMEOBJECT_DESC*)pArg;
+	LIGHTNING_DESC tLightningDesc = {}; // = (GAMEOBJECT_DESC*)pArg;
 	if (pArg)
-		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
+		tLightningDesc = *(LIGHTNING_DESC*)pArg;
 
-	GameObjectDesc.fSpeedPerSec = 10.f;
-	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	m_pTargetWorldMat = tLightningDesc.pTargetWorldMat;
+	m_iLevel = tLightningDesc.iLevel;
 
-	if (FAILED(__super::Initialize(&GameObjectDesc)))
+	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components((LEVEL)GameObjectDesc.iLevel)))
+	if (FAILED(Add_Components((LEVEL)tLightningDesc.iLevel, tLightningDesc.iLightingIndex)))
 		return E_FAIL;
 
+	m_iLightningIndex = tLightningDesc.iLightingIndex;
 
-	_float fScale = 20.f;
+	if (tLightningDesc.iLightingIndex == 0 || tLightningDesc.iLightingIndex == 2)
+		m_iSpriteEnd = 9;
+	else if (tLightningDesc.iLightingIndex == 1)
+		m_iSpriteEnd = 20;
+
+	_float fScale = 30.f;
 	m_pTransformCom->Set_Scaled(fScale, fScale, fScale);
 
-	m_pTransformCom->Turn(XMVectorSet(1, 0, 0, 0), 1);
-
-	/*if (FAILED(Get_PlayerColliderPtr()))
-		return E_FAIL;*/
-
-	if(GameObjectDesc.iLevel == LEVEL_EFFECTTOOL)
-		m_pTransformCom->Set_Pos(XMVectorSet(-rand() % 50, 0, -rand() % 50, 1));
+	if (m_pTargetWorldMat != nullptr)
+		m_pTransformCom->Set_Pos(XMVectorSet(m_pTargetWorldMat->_41, m_pTargetWorldMat->_42, m_pTargetWorldMat->_43, 1));
+	else
+		m_pTransformCom->Set_Pos(_float4(tLightningDesc.matWorld._41, tLightningDesc.matWorld._42 + fScale * 0.48f, tLightningDesc.matWorld._43, 1));
 
 	return S_OK;
 }
 
 void CLightning::Tick(_float fTimeDelta)
 {
-	m_fTime += fTimeDelta;
-	if (m_fTime > 2.5f)
+	if (m_iSpriteIndex >= m_iSpriteEnd)
 		Set_Dead();
 
-	if (m_fTime > 0.5f && true == m_bAddCollider) {
-		Add_Collider();
-		m_bAddCollider = false;
-	}
+	m_pTransformCom->Look_At(m_pGameInstance->Get_CamPosition_Vector());
 
-	if (m_pColliderCom != nullptr)
-	{
-		Check_PlayerCol();
-		m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
+	m_fTime += fTimeDelta;
+
+	if (m_fTime > 0.08f) {
+		m_iSpriteIndex++;
+		m_fTime = 0;
 	}
+		
+	/*if (m_pTargetWorldMat != nullptr)
+		m_pTransformCom->Set_Pos(XMVectorSet(m_pTargetWorldMat->_41, m_pTargetWorldMat->_42, m_pTargetWorldMat->_43, 1));*/
 }
 
 void CLightning::Late_Tick(_float fTimeDelta)
@@ -70,10 +73,13 @@ void CLightning::Late_Tick(_float fTimeDelta)
 }
 HRESULT CLightning::Render()
 {
+	if (m_bDead)
+		return S_OK;
+
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Begin(4)))  // Lightning
+	if (FAILED(m_pShaderCom->Begin(5))) // Lightning
 		return E_FAIL;
 
 	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
@@ -82,54 +88,10 @@ HRESULT CLightning::Render()
 	if (FAILED(m_pVIBufferCom->Render()))
 		return E_FAIL;
 
-#ifdef _DEBUG
-	if (m_pColliderCom != nullptr)
-		m_pGameInstance->Add_DebugComponents(m_pColliderCom);
-#endif
-
 	return S_OK;
 }
 
-HRESULT CLightning::Get_PlayerColliderPtr()
-{
-	m_pPlayer = m_pGameInstance->Get_Player(LEVEL_WIZARD);
-	if (nullptr == m_pPlayer)
-		return E_FAIL;
-
-	Safe_AddRef(m_pPlayer);
-
-	m_pPlayerCollider = dynamic_cast<CCollider*>(m_pPlayer->Get_Component(TEXT("Com_Collider")));
-	if(nullptr == m_pPlayerCollider)
-		return E_FAIL;
-
-	Safe_AddRef(m_pPlayerCollider);
-
-	return S_OK;
-}
-
-void CLightning::Check_PlayerCol()
-{
-	if (m_pPlayerCollider == nullptr)
-		return;
-
-	if (m_pColliderCom->Intersect(m_pPlayerCollider)) {
-		if(false == m_pColliderCom->Check_AlreadyCollided(m_pPlayerCollider))
-			m_pPlayer->Deduct_HP(20);
-	}
-}
-
-void CLightning::Add_Collider()
-{
-	/* For.Com_Collider */
-	CBounding_Sphere::BOUNDING_SPHERE_DESC		ColliderDesc{};
-	ColliderDesc.vCenter = _float3(0.f, 0.f, 0.f);
-	ColliderDesc.fRadius = 0.5f;
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
-		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom, &ColliderDesc)))
-		return;
-}
-
-HRESULT CLightning::Add_Components(LEVEL eLevel)
+HRESULT CLightning::Add_Components(LEVEL eLevel, _uint _iLightingIndex)
 {	
 	/* For.Com_Shader */
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPosTex"),
@@ -137,8 +99,13 @@ HRESULT CLightning::Add_Components(LEVEL eLevel)
 		return E_FAIL;
 
 	/* For.Com_Texture */
-	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_Circle"),
-		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_Lightning"),
+		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom[TEX_LIGHTNING])))
+		return E_FAIL;
+
+	/* For.Com_Texture_Noise */
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_ElecNoise"),
+		TEXT("Com_Texture_Noise"), (CComponent**)&m_pTextureCom[TEX_NOISE])))
 		return E_FAIL;
 
 	/* For.Com_VIBuffer */
@@ -154,15 +121,19 @@ HRESULT CLightning::Bind_ShaderResources()
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldFloat4x4_Ptr())))
+	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
-	if (FAILED(m_pTextureCom->Bind_ShaderResources(m_pShaderCom, "g_Circle")))
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_iSpriteIndex", &m_iSpriteIndex, sizeof(_uint))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(m_fTime))))
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_iLightningIndex", &m_iLightningIndex, sizeof(_uint))))
+		return E_FAIL;
+	if (FAILED(m_pTextureCom[TEX_LIGHTNING]->Bind_ShaderResources(m_pShaderCom, "g_Lightning")))
+		return E_FAIL;
+	if (FAILED(m_pTextureCom[TEX_NOISE]->Bind_ShaderResource(m_pShaderCom, "g_ElecNoise")))
 		return E_FAIL;
 
 	return S_OK;
@@ -200,12 +171,8 @@ void CLightning::Free()
 {
 	__super::Free();
 
-	for (_int i = 0; i < 2; i++)
-		Safe_Release(m_pElecParts[i]);
-	Safe_Release(m_pPlayerCollider);
-	Safe_Release(m_pPlayer);
-	Safe_Release(m_pColliderCom);
-	Safe_Release(m_pShaderCom);
-	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pVIBufferCom);
+	for (_int i = 0; i < TEX_END; i++)
+		Safe_Release(m_pTextureCom[i]);
+	Safe_Release(m_pShaderCom);
 }

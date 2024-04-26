@@ -43,6 +43,7 @@
 #include "Knife.h"
 #include "Slime.h"
 
+#include "LightningEffects.h"
 #include "WizardTower.h"
 #include "Map_Wizard.h"
 #include "TeslaTower.h"
@@ -396,6 +397,10 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "VoronoiBlur", "Effects/voronoiNoiseBlur.dds")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Lightning", "Effects/SeqLightning%d.png", 3)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "ElecNoise", "Effects/ElecNoise.dds")))
+		return E_FAIL;
 
 
 	m_strLoadingText = TEXT("Loading VIBuffers for Level_Wizard...");
@@ -416,7 +421,6 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 	if (FAILED(Add_Models(eLevel, vecAnimModelNames, vecNonAnimModelNames)))
 		return E_FAIL;
 
-	//for()
 
 	m_strLoadingText = TEXT("Loading Shaders for Level_Wizard...");
 	if (FAILED(Add_Shaders(eLevel)))
@@ -434,11 +438,13 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ElecArena"), CElecArena);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Book"), CBook);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ElecParts"), CElecParts);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LightningEffects"), CLightningEffects);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Lightning"), CLightning);
 
 
 	m_strLoadingText = TEXT("Loading Complete: Level_Wizard");
 	m_isFinished = true;
+
 	return S_OK;
 }
 
@@ -475,6 +481,10 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "VoronoiBlur", "Effects/voronoiNoiseBlur.dds")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Lightning", "Effects/SeqLightning%d.png", 3)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "ElecNoise", "Effects/ElecNoise.dds")))
+		return E_FAIL;
 
 
 	m_strLoadingText = TEXT("Loading VIBuffers for Level_EffectTool...");
@@ -509,8 +519,10 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Book"), CBook);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Monster"), CMonster);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ElecParts"), CElecParts);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Lightning"), CLightning);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LightningEffects"), CLightningEffects);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HoleWall"), CHoleWall);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Lightning"), CLightning);
+
 
 	m_strLoadingText = TEXT("Loading Complete: Level_EffectTool");
 	m_isFinished = true;
@@ -675,14 +687,16 @@ HRESULT CLoader::Add_VIBuffer_Instance_Points(LEVEL eLevel)
 	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_DEFAULT;
 	vecInstanceDesc[CElecParts::ELEC_TORNADO] = InstanceDesc;
 
-	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
-	InstanceDesc.vRange = _float3(10.f, 10.f, 10.f);
-	InstanceDesc.iNumInstance = 30;
-	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_SPHERE;
+	InstanceDesc.vCenter = _float3(0.f, 2.f, 0.f);
+	InstanceDesc.vRange = _float3(15.f, 4.f, 15.f);
+	InstanceDesc.iNumInstance = 12;
+	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_DEFAULT;
 	vecInstanceDesc[CElecParts::ELEC_LIGHTNING1] = InstanceDesc;
 
+	// LIGHTNING2 -> 튕겨나가는 파티클 느낌으로 
+
 	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
-	InstanceDesc.vRange = _float3(30.f, 30.f, 20.f);
+	InstanceDesc.vRange = _float3(27.f, 27.f, 15.f);
 	InstanceDesc.iNumInstance = 70;
 	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_RING;
 	vecInstanceDesc[CElecParts::ELEC_HOLE] = InstanceDesc;

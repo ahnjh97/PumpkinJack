@@ -141,12 +141,12 @@ void CImGui_Client::ConvertToString()
 	if (pPlayerNavigationSBR != nullptr)
 		ImGui::Text(strCellIndexSBR.c_str());
 
-	//vector<_float> vecQuadTreeCellHeights = pPlayer->Get_QuadTreeCellHeights();
-	//if (!vecQuadTreeCellHeights.empty()) {
-	//	for (auto& height : vecQuadTreeCellHeights) {
-	//		ImGui::Text((to_string(height).erase(to_string(height).size() - 4)).c_str());
-	//	}
-	//}
+	vector<_float> vecQuadTreeCellHeights = pPlayer->Get_QuadTreeCellHeights();
+	if (!vecQuadTreeCellHeights.empty()) {
+		for (auto& height : vecQuadTreeCellHeights) {
+			ImGui::Text((to_string(height).erase(to_string(height).size() - 4)).c_str());
+		}
+	}
 
 	Safe_Release(pPlayer); 
 }

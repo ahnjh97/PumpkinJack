@@ -2,8 +2,8 @@
 
 /* 전역변수 : 쉐이더 외부에 있는 데이터를 쉐이더 안으로 받아온다. */
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
-texture2D	g_Texture;
-texture2D	g_NoiseTexture, g_NoiseMaskTexture;
+texture2D g_Texture;
+texture2D g_NoiseTexture, g_NoiseMaskTexture;
 
 vector	g_vCamPosition;
 
@@ -130,14 +130,14 @@ PS_OUT PS_MAIN(PS_IN In)
 	return Out;
 }
 
-PS_OUT PS_MAIN_ELECPARTS(PS_IN In)
+PS_OUT PS_ELECPARTS(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
    
     uint iX = In.iSpriteIndexOffset % 3;
     uint iY = In.iSpriteIndexOffset / 3;
-    float2 vNewTexcoord = In.vTexcoord * 0.33f + float2(iX / 3.f, iY / 3.f);
-    Out.vColor = g_Texture.Sample(LinearSampler, vNewTexcoord);
+    float2 vNewTexCoord = In.vTexcoord * 0.33f + float2(iX / 3.f, iY / 3.f);
+    Out.vColor = g_Texture.Sample(LinearSampler, vNewTexCoord);
     float fNoise = g_NoiseMaskTexture.Sample(LinearSampler, In.vTexcoord).r;
 	 
     if (Out.vColor.a <= 0.33f || 1.f <= In.fLifeRatio)
@@ -181,6 +181,6 @@ technique11 DefaultTechnique
         GeometryShader = compile gs_5_0 GS_MAIN();
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_ELECPARTS();
+        PixelShader = compile ps_5_0 PS_ELECPARTS();
     }
 }

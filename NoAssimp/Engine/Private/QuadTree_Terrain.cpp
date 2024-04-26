@@ -277,7 +277,8 @@ void CQuadTree_Terrain::Free()
 {
 	__super::Free();
 
-	if (m_pChildren[CORNER_RT] != nullptr) {
+	if (m_pChildren[CORNER_RT] != nullptr) 
+	{
 		for (_int i = 0; i < CORNER_END; i++)
 			Safe_Release(m_pChildren[i]);
 	}

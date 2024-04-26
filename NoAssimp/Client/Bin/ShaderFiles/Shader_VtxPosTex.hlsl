@@ -6,10 +6,14 @@ matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 texture2D g_DiffuseTexture;
 texture2D g_Circle[2];
+texture2D g_Lightning[3];
 float g_fAlpha;
 float g_fTime;
 float fLightningEndTime = 1.8f;
 float fSecondCircleEndTime = 1;
+
+texture2D g_ElecNoise;
+uint g_iSpriteIndex, g_iLightningIndex;
 
 struct VS_IN
 {
@@ -83,7 +87,7 @@ PS_OUT PS_MAIN_INVEN(PS_IN In)
 float fOuterRadius = 0.5;
 float fInnerRadius = 0.4;
 
-PS_OUT PS_MAIN_LIGHTNING(PS_IN In)
+PS_OUT PS_CIRCLE(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
@@ -138,6 +142,40 @@ PS_OUT PS_MAIN_LIGHTNING(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_LIGHTNING(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    int iNumX, iNumY;
+    if (g_iLightningIndex == 0 || g_iLightningIndex == 2)
+        iNumX = iNumY = 3;
+    else if (g_iLightningIndex == 1)    {
+        iNumX = 4;
+        iNumY = 5;
+    }
+
+    float2 vTexCoordOffset = float2(g_iSpriteIndex % iNumX, g_iSpriteIndex / iNumY);
+	
+    float2 vNewTexCoord = float2((In.vTexcoord.x + vTexCoordOffset.x) / iNumX, (In.vTexcoord.y + vTexCoordOffset.y) / iNumY);
+
+    if (g_iLightningIndex == 0)
+        Out.vColor = g_Lightning[0].Sample(LinearSampler, vNewTexCoord);
+    else if (g_iLightningIndex == 1)
+        Out.vColor = g_Lightning[1].Sample(LinearSampler, vNewTexCoord);
+    else if (g_iLightningIndex == 2)
+        Out.vColor = g_Lightning[2].Sample(LinearSampler, vNewTexCoord);
+    
+    if (Out.vColor.a <= 0.3)
+        discard;
+    
+    //Out.vColor.a = pow(Out.vColor.r + 0.3f, 2);
+    
+    //if (Out.vColor.a <= 0.3)
+    //    discard;
+	
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
 	pass Default // 0
@@ -188,7 +226,19 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_CROWLIFEBAR();
     }
 
-    pass Lightning // 4
+    pass Circle // 4
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_CIRCLE();
+    }
+
+    pass Lightning // 5
     {
         SetRasterizerState(RS_NoCull);
         SetDepthStencilState(DSS_Default, 0);
@@ -197,6 +247,6 @@ technique11 DefaultTechnique
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_LIGHTNING();
+        PixelShader = compile ps_5_0 PS_LIGHTNING();
     }
 }

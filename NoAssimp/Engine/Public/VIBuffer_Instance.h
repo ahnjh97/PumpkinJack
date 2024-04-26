@@ -6,7 +6,7 @@ BEGIN(Engine)
 class ENGINE_DLL CVIBuffer_Instance abstract : public CVIBuffer
 {
 public:
-	enum INSTANCE_SHAPE { SHAPE_DEFAULT, SHAPE_SPHERE, SHAPE_RING, SHAPE_END };
+	enum INSTANCE_SHAPE { SHAPE_DEFAULT, SHAPE_HEMISPHERE, SHAPE_RING, SHAPE_END };
 	typedef struct
 	{
 		_float3		vPivot;

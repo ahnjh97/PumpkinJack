@@ -442,7 +442,7 @@ _bool CPlayer::Check_TerrainCol()
 			_float fMinY{}, fMaxY{};
 			if (true == Check_GroundCells(fMinY, fMaxY)) {
 				if (vPos.y <= fMaxY) {
-					if (vPos.y <= fMinY - 2.f)
+					if (vPos.y <= fMinY - 3.2f)
 						return false;
 
 					m_fPlaneHeight = fMaxY;

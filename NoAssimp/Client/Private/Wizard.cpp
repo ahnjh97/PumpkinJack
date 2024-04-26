@@ -366,7 +366,7 @@ void CWizard::Lightning()
 		tDesc.matWorld._43 = m_pPlayerWorldMatrix->_43 + sinf(fAngle) * fDistance;
 
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD,
-			TEXT("Layer_Lightning"), TEXT("Prototype_GameObject_Lightning"), &tDesc)))
+			TEXT("Layer_Lightning"), TEXT("Prototype_GameObject_LightningEffects"), &tDesc)))
 			return;
 	}
 }

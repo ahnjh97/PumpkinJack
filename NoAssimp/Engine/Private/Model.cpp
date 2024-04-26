@@ -351,29 +351,29 @@ void CModel::Reset_Animation(_uint iAnimIndex)
 	m_Animations[iAnimIndex]->Set_IsFinished(false);
 }
 
-vector<vector<CCell*>> CModel::SetUp_QuadGroundCells()
-{
-	vector<vector<CCell*>> vecQuadGroundCells;
-
-	if (m_Meshes.empty())
-		return  vecQuadGroundCells;
-
-	vecQuadGroundCells.resize(CCell::QUAD_END); // 사분면으로 분해
-
-	for (auto& mesh : m_Meshes) {
-		if (nullptr == mesh)
-			continue;
-
-		vector<vector<CCell*>> vecQuad = mesh->SetUp_MeshQuadGroundCells();
-		if (vecQuad.empty())
-			continue;
-
-		for (_int i = 0; i< CCell::QUAD_END; i++)
-			vecQuadGroundCells[i].insert(vecQuadGroundCells[i].end(), vecQuad[i].begin(), vecQuad[i].end());
-	}
-
-	return vecQuadGroundCells;
-}
+//vector<vector<CCell*>> CModel::SetUp_QuadGroundCells()
+//{
+//	vector<vector<CCell*>> vecQuadGroundCells;
+//
+//	if (m_Meshes.empty())
+//		return  vecQuadGroundCells;
+//
+//	vecQuadGroundCells.resize(CCell::QUAD_END); // 사분면으로 분해
+//
+//	for (auto& mesh : m_Meshes) {
+//		if (nullptr == mesh)
+//			continue;
+//
+//		vector<vector<CCell*>> vecQuad = mesh->SetUp_MeshQuadGroundCells();
+//		if (vecQuad.empty())
+//			continue;
+//
+//		for (_int i = 0; i< CCell::QUAD_END; i++)
+//			vecQuadGroundCells[i].insert(vecQuadGroundCells[i].end(), vecQuad[i].begin(), vecQuad[i].end());
+//	}
+//
+//	return vecQuadGroundCells;
+//}
 
 void CModel::SetUp_QuadTreeCells()
 {
