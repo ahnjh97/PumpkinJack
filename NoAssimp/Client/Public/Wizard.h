@@ -45,6 +45,10 @@ private:
 	void DestroyTeslaTowers();
 	void DestroyElecArena();
 
+	void ChargeEffect();
+	void ScatterEffect();
+	void DestroyChargeEffect();
+
 	_bool AllTowersDestroyed();
 
 	_matrix AttachColliderToBone();
@@ -67,6 +71,7 @@ private:
 	_int m_iAttackFinishCount = { };
 	_int m_iPreHp = {};
 
+	_float m_fInitialHeight = 50.f;
 	_float m_fAlpha = { 1.f };
 	_float m_fTime = {};
 	_float m_fIdleTime = {};

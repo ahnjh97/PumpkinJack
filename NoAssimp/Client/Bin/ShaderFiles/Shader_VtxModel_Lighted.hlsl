@@ -1,5 +1,4 @@
 #include "Engine_Shader_Defines.hlsli"
-
 /* 전역변수 : 쉐이더 외부에 있는 데이터를 쉐이더 안으로 받아온다. */
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D g_DiffuseTexture;

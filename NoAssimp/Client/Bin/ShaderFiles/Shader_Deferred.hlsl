@@ -4,13 +4,17 @@
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 matrix g_ViewMatrixInv, g_ProjMatrixInv;
 
-
 texture2D	g_Texture;
 texture2D	g_NormalTexture;	
 texture2D	g_DiffuseTexture;
 texture2D	g_ShadeTexture;
 texture2D	g_DepthTexture;
 texture2D	g_SpecularTexture;
+texture2D	g_FieldDepthTexture;
+texture2D	g_MagicCircleTexture;
+texture2D	g_SkillEffectTexture;
+texture2D	g_PlayerDepthTexture;
+texture2D	g_SkillDepthTexture;
 
 float4		g_vLightDir;
 float4		g_vLightPos;
@@ -82,10 +86,14 @@ struct PS_OUT_LIGHT
 	float4		vSpecular : SV_TARGET1;
 };
 
+struct PS_OUT_SSD
+{
+    float4 vSkillEffect : SV_TARGET0;
+    //float fDepth : SV_Depth;
+};
 
 /* 빛 하나당 480000 수행되는 쉐이더. */
-
-PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
+PS_OUT_LIGHT PS_DIRECTIONAL(PS_IN In)
 {
 	PS_OUT_LIGHT			Out = (PS_OUT_LIGHT)0;
 
@@ -124,7 +132,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
 	return Out;
 }
 
-PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
+PS_OUT_LIGHT PS_POINT(PS_IN In)
 {
 	PS_OUT_LIGHT			Out = (PS_OUT_LIGHT)0;
 
@@ -170,27 +178,64 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
 	return Out;
 }
 
+PS_OUT_SSD PS_SSD(PS_IN In)
+{
+    PS_OUT_SSD Out = (PS_OUT_SSD) 0;
+
+    Out.vSkillEffect = g_MagicCircleTexture.Sample(LinearSampler, In.vTexcoord);
+    if (Out.vSkillEffect.a < 0.2)
+        Out.vSkillEffect.a = 0;
+    
+	//float depth = In.vPosition.z / In.vPosition.w;
+	
+    //if (Out.vSkillEffect.a ==0)
+    //    discard;
+    //Out.fDepth = g_SkillDepthTexture.Sample(LinearSampler, In.vTexcoord).r + 0.01; // ;
+    ////;
+	
+    //vector vSkillDepth = g_SkillDepthTexture.Sample(PointSampler, In.vTexcoord);
+    //vector vPlayerDepth = g_PlayerDepthTexture.Sample(PointSampler, In.vTexcoord);
+    //if (Out.vSkillEffect.a > 0.1 && vPlayerDepth.r > vSkillDepth.r)
+    //    Out.vSkillEffect.a = 0.f;
+    //if (vPlayerDepth.x != 0 || vPlayerDepth.y != 0 && Out.vSkillEffect.a > 0.3)
+    //    Out.vSkillEffect.a -= 0.5;
+    //Out.fDepth = g_FieldDepthTexture.Sample(LinearSampler, In.vTexcoord);
+	
+        return Out;
+}
+
 /* 최종적ㅇ으로 480000 수행되는 쉐이더. */
-PS_OUT PS_MAIN_FINAL(PS_IN In)
+PS_OUT PS_FINAL(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
 	vector		vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
 	if (0.0f == vDiffuse.a)
 		discard;
-	vector		vShade = g_ShadeTexture.Sample(LinearSampler, In.vTexcoord);
-	vector		vSpecular = g_SpecularTexture.Sample(LinearSampler, In.vTexcoord);
-
-	Out.vColor = vDiffuse * vShade + vSpecular;
+	vector	vShade = g_ShadeTexture.Sample(LinearSampler, In.vTexcoord);
+	vector	vSpecular = g_SpecularTexture.Sample(LinearSampler, In.vTexcoord);
+    float4	vSkillEffect = g_SkillEffectTexture.Sample(LinearSampler, In.vTexcoord);
+    
+	
+	//vector	vSkillDepth = g_SkillDepthTexture.Sample(PointSampler, In.vTexcoord);
+    //vector vPlayerDepth = g_PlayerDepthTexture.Sample(PointSampler, In.vTexcoord);
+    
+    //if (/*vSkillEffect.r > 0.1 && */vSkillEffect.a > 0.1 && vPlayerDepth.r > vSkillDepth.r)
+    //    vSkillEffect.a = 0.f;
+	
+    //vSkillEffect.a = saturate(vSkillEffect.a);
+	
+	
+	//Out.vColor = colorLighted;
+    vector colorLighted = vDiffuse * vShade + vSpecular;
+	Out.vColor = (1.0f - vSkillEffect.a) * colorLighted + vSkillEffect.a * vSkillEffect;
 
 	return Out;
 }
 
-
-
 technique11 DefaultTechnique
 {
-	pass Debug
+	pass Debug  // 0
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
@@ -203,7 +248,7 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN();
 	}
 
-	pass Light_Directional
+	pass Light_Directional  // 1
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
@@ -213,10 +258,10 @@ technique11 DefaultTechnique
 		GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
 		HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
 		DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-		PixelShader = compile ps_5_0 PS_MAIN_DIRECTIONAL();
+		PixelShader = compile ps_5_0 PS_DIRECTIONAL();
 	}
 
-	pass Light_Point
+	pass Light_Point  // 2
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
@@ -226,12 +271,12 @@ technique11 DefaultTechnique
 		GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
 		HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
 		DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-		PixelShader = compile ps_5_0 PS_MAIN_POINT();
+		PixelShader = compile ps_5_0 PS_POINT();
 	}
 
-	pass Final
+	pass Final  // 3
 	{
-		SetRasterizerState(RS_Default);
+        SetRasterizerState(RS_Default);
 		SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
 		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
@@ -239,6 +284,19 @@ technique11 DefaultTechnique
 		GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
 		HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
 		DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-		PixelShader = compile ps_5_0 PS_MAIN_FINAL();
+		PixelShader = compile ps_5_0 PS_FINAL();
 	}
+
+    pass SSD // 4
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_SSD();
+    }
 }

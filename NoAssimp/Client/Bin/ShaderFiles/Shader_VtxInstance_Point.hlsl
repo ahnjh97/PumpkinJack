@@ -6,6 +6,7 @@ texture2D g_Texture;
 texture2D g_NoiseTexture, g_NoiseMaskTexture;
 
 vector	g_vCamPosition;
+bool g_bFadeIn;
 
 struct VS_IN
 {
@@ -140,15 +141,25 @@ PS_OUT PS_ELECPARTS(PS_IN In)
     Out.vColor = g_Texture.Sample(LinearSampler, vNewTexCoord);
     float fNoise = g_NoiseMaskTexture.Sample(LinearSampler, In.vTexcoord).r;
 	 
-    if (Out.vColor.a <= 0.33f || 1.f <= In.fLifeRatio)
+    if (Out.vColor.a <= 0.33f || 1.f <= In.fLifeRatio || 0 > In.fLifeRatio)
         discard;
 
     Out.vColor.rgb = float3(1.f, 1.f, 1.f);
-	
-    if (In.fLifeRatio < 0.5)  // 투명에서 불투명으로 (noiseValue가 더 크면 알파값 증가)
-        Out.vColor.a = smoothstep(0.0, In.fLifeRatio * 2.0, fNoise);
-    else // 불투명에서 투명으로 (noiseValue가 더 작으면 알파값 감소)
-        Out.vColor.a = 1.0 - smoothstep(0.5, 1.0, (In.fLifeRatio - 0.5) * 2.0) * (1.0 - fNoise);
+
+    if (true == g_bFadeIn)
+    {
+        if (In.fLifeRatio >= 0 && In.fLifeRatio < 0.5)  // 투명에서 불투명으로 (noiseValue가 더 크면 알파값 증가)
+            Out.vColor.a = smoothstep(0, In.fLifeRatio * 2, fNoise);
+        else if (In.fLifeRatio < 1) // 불투명에서 투명으로 (noiseValue가 더 작으면 알파값 감소)
+            Out.vColor.a = 1.0 - smoothstep(0.5, 1.0, (In.fLifeRatio - 0.5) * 2.0) * (1.0 - fNoise);
+    }
+	else
+    {
+        if (In.fLifeRatio >= 0.5) // 불투명에서 투명으로 (noiseValue가 더 작으면 알파값 감소)
+            Out.vColor.a = 1.0 - smoothstep(0.5, 1.0, (In.fLifeRatio - 0.5) * 2.0) * (1.0 - fNoise);
+		else
+            Out.vColor.a = 1;
+    }
 	
     if (Out.vColor.a <= 0.05f)
         discard;

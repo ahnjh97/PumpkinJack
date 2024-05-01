@@ -241,7 +241,6 @@ void CWeapon::Check_Collision(CGameObject* pEnemy)
 		pEnemy->Deduct_HP(*m_pDamage);
 }
 
-
 HRESULT CWeapon::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 {
 	/* For.Com_Model */

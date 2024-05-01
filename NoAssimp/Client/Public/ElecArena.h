@@ -19,7 +19,8 @@ private:
 
 public:
 	void Set_Whiten() { m_bWhiten = true; }
-	vector<CCell*> Get_QuadGroundCells(_uint iQuad) { return m_vecQuad[iQuad]; }
+	void Set_CirclePosMatrix(_float4x4 _matCirclePositions, _uint iMatIndex) { matCirclePositions[iMatIndex] = _matCirclePositions; 
+			m_fCircleTime[iMatIndex] = 0; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -29,12 +30,12 @@ public:
 	virtual HRESULT Render() override;
 
 public:
-	_int Compute_Quadrant(_fvector vPlayerPos); // 플레이어가 몇사분면에 있는지
-	_bool Check_ElecArenaGroundCell(_fvector vPlayerPos, _Out_ _float& fCellHeight);
-
 	_bool Check_QuadTreeCells(_fvector vPlayerPos, _Out_ _float& fCellHeight);
 
 private:
+	_float4x4 matCirclePositions[2];
+	_float	m_fCircleTime[2] = { 0, 0 };
+
 	_bool m_bWhiten = { false };
 
 	_float m_fColorOffset = {};
@@ -43,8 +44,9 @@ private:
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
+	CTexture* m_pTextureCom = { nullptr };
 
-	vector<vector<CCell*>> m_vecQuad;
+	//vector<vector<CCell*>> m_vecQuad;
 
 private:
 	HRESULT Add_Components(LEVEL eLevel, const wstring& _wstrModelTag);

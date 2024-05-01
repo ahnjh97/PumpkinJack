@@ -50,7 +50,7 @@ HRESULT CWizard::Initialize(void* pArg)
 	SetUp_WizardAnimSpeed();
 
 	m_iPreHp = m_iHp = 200;
-	m_pTransformCom->Set_Height(60);
+	m_pTransformCom->Set_Height(m_fInitialHeight);
 
 	Summon_LevitationTornado();
 
@@ -62,6 +62,7 @@ void CWizard::Tick(_float fTimeDelta)
 	m_fTime += fTimeDelta;
 	m_fPhaseChangeTime += fTimeDelta;
 	Get_PlayerPtr();
+
 	if (WIZARD_DIE == m_eState && m_pModelCom->isFinished()) {
 		Set_Dead();
 		return;
@@ -163,8 +164,10 @@ void CWizard::Link_State(_float fTimeDelta)
 	if (m_bWait) {
 		m_fWaitTime += fTimeDelta;
 		_float fWaitTime{};
-		if (SPELL_HOLEWALL == m_eSpell || SPELL_END == m_eSpell) // tornado 시전 종료 이후
-			fWaitTime = 6.f;
+		if (SPELL_HOLEWALL == m_eSpell) // tornado 시전 종료 이후
+			fWaitTime = 5.5;
+		else if (SPELL_END == m_eSpell)
+			fWaitTime = 2.f;
 
 		if (m_fWaitTime > fWaitTime)
 			m_bWait = false;
@@ -173,7 +176,7 @@ void CWizard::Link_State(_float fTimeDelta)
 	}
 
 	if (WIZARD_AIR_IDLE == m_eState) {
-		if (m_pTransformCom->Get_Pos_Float4().y < 60.f)
+		if (m_pTransformCom->Get_Pos_Float4().y < m_fInitialHeight)
 			m_pTransformCom->Fall(-fTimeDelta * 5.f);
 		else {
 			if (m_fPhaseChangeTime < 8.f) {
@@ -254,12 +257,13 @@ void CWizard::Link_State(_float fTimeDelta)
 		}
 	}
 
-	if (WIZARD_CHARGE == m_eState && m_fWaitTime >= 6.f) {
+	if (WIZARD_CHARGE == m_eState && m_fWaitTime >= 2.f) {
 		m_fChargeTime += fTimeDelta;
 
 		if (!m_bTowerSpawn)	{
 			TeslaTower();
 			m_bTowerSpawn = true;
+			ChargeEffect();
 		}
 
 		if (m_fChargeTime > 35.f) {
@@ -278,6 +282,9 @@ void CWizard::Link_State(_float fTimeDelta)
 			CGameObject* pTornado = m_pGameInstance->Get_GameObject(LEVEL_WIZARD, TEXT("Layer_Tornado"), TEXT("Prototype_GameObject_Tornado"));
 			if(pTornado != nullptr)
 				pTornado->Set_Dead();
+
+			ScatterEffect();
+			DestroyChargeEffect();
 		}
 	}
 
@@ -357,17 +364,61 @@ void CWizard::Lightning()
 	uniform_real_distribution<_float> Angle(0.f, XM_2PI);
 
 	_int iRandNum = m_pGameInstance->RandomNumber(6, 8);
+	_float4x4 matLightningPositions{};
+	_int iColumn{}, iRow{};
+
+	list<CGameObject*> elecArenaList = m_pGameInstance->Get_ObjectList(LEVEL_WIZARD, TEXT("Layer_ElecArena"));
+
+	if (elecArenaList.empty())
+		return;
 
 	for (_int i = 0; i < iRandNum; i++) {
 		_float fDistance = Distance(m_RandomNumber);
 		_float fAngle = Angle(m_RandomNumber);
-		tDesc.matWorld._41 = m_pPlayerWorldMatrix->_41 + cosf(fAngle) * fDistance;
-		tDesc.matWorld._42 = 2.8f;
-		tDesc.matWorld._43 = m_pPlayerWorldMatrix->_43 + sinf(fAngle) * fDistance;
 
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD,
-			TEXT("Layer_Lightning"), TEXT("Prototype_GameObject_LightningEffects"), &tDesc)))
+		matLightningPositions.m[iColumn][iRow++] = tDesc.matWorld._41 = m_pPlayerWorldMatrix->_41 + cosf(fAngle) * fDistance;
+		matLightningPositions.m[iColumn][iRow++] = tDesc.matWorld._43 = m_pPlayerWorldMatrix->_43 + sinf(fAngle) * fDistance;
+
+		_float fHeight = { -10 };
+
+		vector<_float> vecHeights;
+
+		for (auto& elecArena : elecArenaList)
+		{
+			if (nullptr == elecArena)
+				continue;
+
+			CElecArena* pElecArena = dynamic_cast<CElecArena*>(elecArena);
+
+			if (true == pElecArena->Check_QuadTreeCells(XMVectorSet(tDesc.matWorld._41, 0, tDesc.matWorld._43, 1), fHeight))
+				vecHeights.emplace_back(fHeight);
+		}
+
+		if (vecHeights.empty())
+			continue;
+
+		for (auto& height : vecHeights)
+			fHeight = max(fHeight, height);
+
+		tDesc.matWorld._42 = fHeight;
+
+		if (iRow >= 3) {
+			iColumn++;
+			iRow = 0;
+		}
+
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD,	TEXT("Layer_Lightning"), TEXT("Prototype_GameObject_LightningEffects"), &tDesc)))
 			return;
+	}
+
+	for (auto& elecArena : elecArenaList)
+	{
+		if (nullptr == elecArena)
+			continue;
+
+		CElecArena* pElecArena = dynamic_cast<CElecArena*>(elecArena);
+
+		pElecArena->Set_CirclePosMatrix(matLightningPositions, m_iAttackCount % 2);
 	}
 }
 
@@ -471,6 +522,53 @@ void CWizard::DestroyElecArena()
 			CElecArena* pElecArena = dynamic_cast<CElecArena*>(elecArena);
 			pElecArena->Set_Whiten();
 		}	 
+	}
+}
+
+void CWizard::ChargeEffect()
+{
+	CElecParts::ELECPARTS_DESC tElecPartsDesc{};
+	tElecPartsDesc.iLevel = LEVEL_WIZARD;
+	tElecPartsDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	tElecPartsDesc.matWorld._42 += 35.f;
+	tElecPartsDesc.eElecEffect = CElecParts::ELEC_CHARGE;
+
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_ElecParts"), TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
+		return;
+}
+
+void CWizard::ScatterEffect()
+{
+	CElecParts::ELECPARTS_DESC tElecPartsDesc{};
+	tElecPartsDesc.iLevel = LEVEL_WIZARD;
+	tElecPartsDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	tElecPartsDesc.matWorld._42 += 35.f;
+	tElecPartsDesc.eElecEffect = CElecParts::ELEC_SCATTER;
+	tElecPartsDesc.fDuration = 1.3f;
+
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_ElecParts"), TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
+		return;
+}
+
+void CWizard::DestroyChargeEffect()
+{
+	list<CGameObject*> elecPartsList = m_pGameInstance->Get_ObjectList(LEVEL_WIZARD, TEXT("Layer_ElecParts"));
+
+	if (elecPartsList.empty())
+		return;
+
+	for (auto& elecParts : elecPartsList)
+	{
+		if (nullptr == elecParts)
+			continue;
+
+		CElecParts* pElecParts = dynamic_cast<CElecParts*>(elecParts);
+
+		if (CElecParts::ELEC_CHARGE == pElecParts->Get_ElecEffect()) 
+		{
+			pElecParts->Set_Dead();
+			return;
+		}
 	}
 }
 

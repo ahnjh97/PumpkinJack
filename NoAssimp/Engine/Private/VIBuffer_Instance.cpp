@@ -112,6 +112,9 @@ _float4 CVIBuffer_Instance::Compute_RandPosition(INSTANCE_SHAPE eShape, _bool bR
 		if (fDirection > XM_PI)
 			fZ *= -1;
 
+		if (bRespawnAtMinHeight)
+			fY += fRadius;
+
 		return _float4(fX, fY, fZ, 1);
 	}
 	else if (eShape == SHAPE_RING) {
@@ -125,6 +128,34 @@ _float4 CVIBuffer_Instance::Compute_RandPosition(INSTANCE_SHAPE eShape, _bool bR
 		_float fAngle = Angle(m_RandomNumber);
 
 		return _float4(fRadius * cos(fAngle), fRadius * sin(fAngle), RangePosZ(m_RandomNumber), 1.f);
+	}
+	else if (eShape == SHAPE_CYLINDER)
+	{
+		if (m_InstanceDesc.isLoop == true) // isLoop가 true -> 모이는 형태 (구별 필요시 변수 추가선언 필요)
+		{
+			uniform_real_distribution<_float> Angle(0, XM_2PI);
+			uniform_real_distribution<_float> Radius(0, m_InstanceDesc.vRange.x);
+			uniform_real_distribution<_float> RangePosY(m_InstanceDesc.vCenter.y - m_InstanceDesc.vRange.y, m_InstanceDesc.vCenter.y + m_InstanceDesc.vRange.y);
+
+			_float fRadius = Radius(m_RandomNumber);
+			_float fAngle = Angle(m_RandomNumber);
+
+			if (bRespawnAtMinHeight) // 리스폰 시
+				return _float4(m_InstanceDesc.vRange.x * cos(fAngle), RangePosY(m_RandomNumber), m_InstanceDesc.vRange.x * sin(fAngle), 1.f);
+			else
+				return _float4(fRadius * cos(fAngle), RangePosY(m_RandomNumber), fRadius * sin(fAngle), 1.f);
+		}
+		else // isLoop가 false -> 퍼지는 형태
+		{
+			uniform_real_distribution<_float> Angle(0, XM_2PI);
+			uniform_real_distribution<_float> Radius(m_InstanceDesc.vRange.x, m_InstanceDesc.vRange.z);
+			uniform_real_distribution<_float> RangePosY(-m_InstanceDesc.vRange.y, m_InstanceDesc.vRange.y);
+
+			_float fRadius = Radius(m_RandomNumber);
+			_float fAngle = Angle(m_RandomNumber);
+
+			return _float4(fRadius * cos(fAngle), RangePosY(m_RandomNumber), fRadius * sin(fAngle), 1.f);
+		}
 	}
 
 	return _float4();
@@ -151,9 +182,7 @@ void CVIBuffer_Instance::Drop(_float fTimeDelta)
 void CVIBuffer_Instance::Spread(_float fTimeDelta)
 {
 	D3D11_MAPPED_SUBRESOURCE		SubResource{};
-
 	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
-
 	VTXMATRIX* pVertices = ((VTXMATRIX*)SubResource.pData);
 
 	for (size_t i = 0; i < m_iNumInstance; i++)
@@ -175,8 +204,29 @@ void CVIBuffer_Instance::Check_LifeTimes(_float fTimeDelta)
 	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
 	VTXMATRIX* pVertices = ((VTXMATRIX*)SubResource.pData);
 
+	m_fTime += fTimeDelta;
+
 	for (size_t i = 0; i < m_iNumInstance; i++)
 		Compute_LifeTime(pVertices, i, fTimeDelta);
+
+	m_pContext->Unmap(m_pVBInstance, 0);
+}
+
+void CVIBuffer_Instance::MoveToPivot(_float fTimeDelta)
+{
+	D3D11_MAPPED_SUBRESOURCE		SubResource{};
+	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+	VTXMATRIX* pVertices = ((VTXMATRIX*)SubResource.pData);
+
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		_vector		vDir = XMVectorSetW(XMLoadFloat3(&m_InstanceDesc.vPivot) - XMLoadFloat4(&pVertices[i].vPosition), 0.f);
+
+		XMStoreFloat4(&pVertices[i].vPosition,
+			XMLoadFloat4(&pVertices[i].vPosition) + XMVector3Normalize(vDir) * m_pSpeeds[i] * fTimeDelta);
+
+		Compute_LifeTime(pVertices, i, fTimeDelta);
+	}
 
 	m_pContext->Unmap(m_pVBInstance, 0);
 }
@@ -185,19 +235,28 @@ void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceI
 {
 	m_pLifeTimes[iInstanceIndex].x += fTimeDelta;
 
-	if (m_pLifeTimes[iInstanceIndex].x > m_pLifeTimes[iInstanceIndex].y) {
-		if (true == m_InstanceDesc.isLoop){
+	if (m_pLifeTimes[iInstanceIndex].x > m_pLifeTimes[iInstanceIndex].y) 
+	{
+		if (true == m_InstanceDesc.isLoop && m_InstanceDesc.eShape != SHAPE_CYLINDER) // 원기둥은 리스폰 방식 별개
+		{
 			m_pLifeTimes[iInstanceIndex].x = 0.f;
-			pVertices[iInstanceIndex].vPosition = Compute_RandPosition(m_InstanceDesc.eShape, bRespawnAtMinHeight);
+
+			if (m_InstanceDesc.eShape == SHAPE_HEMISPHERE)
+				pVertices[iInstanceIndex].vPosition = Compute_RandPosition(m_InstanceDesc.eShape, true);
+			else
+			{
+				if(m_fTime > m_InstanceDesc.fDuration)
+					pVertices[iInstanceIndex].vPosition = Compute_RandPosition(m_InstanceDesc.eShape, bRespawnAtMinHeight);
+			}
 		}
 	}
 
-	if (bRespawnAtMinHeight)
+	if (m_InstanceDesc.eShape != SHAPE_HEMISPHERE && m_InstanceDesc.eShape != SHAPE_CYLINDER && bRespawnAtMinHeight)
 	{
 		if (((m_InstanceDesc.vCenter.x - m_InstanceDesc.vRange.x * 0.5f) > pVertices[iInstanceIndex].vPosition.x)
 			|| ((m_InstanceDesc.vCenter.x + m_InstanceDesc.vRange.x * 0.5f) < pVertices[iInstanceIndex].vPosition.x)
 			|| ((m_InstanceDesc.vCenter.z - m_InstanceDesc.vRange.z * 0.5f) > pVertices[iInstanceIndex].vPosition.z)
-			|| ((m_InstanceDesc.vCenter.z + m_InstanceDesc.vRange.z * 0.5f) < pVertices[iInstanceIndex].vPosition.z)) 
+			|| ((m_InstanceDesc.vCenter.z + m_InstanceDesc.vRange.z * 0.5f) < pVertices[iInstanceIndex].vPosition.z))
 		{
 			if (true == m_InstanceDesc.isLoop) {
 				m_pLifeTimes[iInstanceIndex].x = 0.f;
@@ -205,8 +264,27 @@ void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceI
 			}
 		}
 	}
+	
+	if (m_InstanceDesc.eShape == SHAPE_CYLINDER) // 원기둥은 Center와의 거리가 0.5미만이면 리스폰
+	{
+		if (true == m_InstanceDesc.isLoop)
+		{
+			if (XMVectorGetX(XMVector3Length(XMLoadFloat4(&pVertices[iInstanceIndex].vPosition))) <= m_InstanceDesc.fDistanceLimit
+				|| pVertices[iInstanceIndex].fLifeRatio < 0 || pVertices[iInstanceIndex].fLifeRatio > 1)
+				pVertices[iInstanceIndex].vPosition = Compute_RandPosition(m_InstanceDesc.eShape, true);
 
-	pVertices[iInstanceIndex].fLifeRatio = m_pLifeTimes[iInstanceIndex].x / m_pLifeTimes[iInstanceIndex].y;
+			pVertices[iInstanceIndex].fLifeRatio = 1 - XMVectorGetX(XMVector3Length(XMLoadFloat4(&pVertices[iInstanceIndex].vPosition)))
+				/ XMVectorGetX(XMVector3Length(XMLoadFloat3(&m_InstanceDesc.vRange)));
+		}
+		else 
+		{
+			pVertices[iInstanceIndex].fLifeRatio = m_pLifeTimes[iInstanceIndex].x / m_pLifeTimes[iInstanceIndex].y;
+			//pVertices[iInstanceIndex].fLifeRatio = XMVectorGetX(XMVector3Length(XMLoadFloat4(&pVertices[iInstanceIndex].vPosition))) / m_InstanceDesc.fDistanceLimit;
+		}
+					
+	}
+	else
+		pVertices[iInstanceIndex].fLifeRatio = m_pLifeTimes[iInstanceIndex].x / m_pLifeTimes[iInstanceIndex].y;
 }
 
 void CVIBuffer_Instance::Free()

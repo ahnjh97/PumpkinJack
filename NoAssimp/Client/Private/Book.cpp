@@ -42,7 +42,7 @@ void CBook::Tick(_float fTimeDelta)
 
 void CBook::Late_Tick(_float fTimeDelta)
 {
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
 }
 
 HRESULT CBook::Render()

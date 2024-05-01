@@ -16,7 +16,7 @@ private:
 	virtual ~CRenderer() = default;
 public:
 	HRESULT Initialize();
-	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
+	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject, _bool bPushFront);
 	HRESULT Render();
 	
 #ifdef _DEBUG
@@ -43,6 +43,7 @@ private:
 
 private:
 	HRESULT Render_Priority();
+	HRESULT	Render_GroundMesh();
 	HRESULT Render_NonBlend();
 	HRESULT Render_NonLight();
 	HRESULT Render_Blend();
@@ -50,6 +51,7 @@ private:
 
 private:
 	HRESULT Render_Lights();
+	HRESULT	Render_SSD();
 	HRESULT Render_Result();
 
 #ifdef _DEBUG

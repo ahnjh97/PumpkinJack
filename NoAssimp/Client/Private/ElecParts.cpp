@@ -30,8 +30,14 @@ HRESULT CElecParts::Initialize(void* pArg)
 	if (FAILED(Add_Components((LEVEL)tElecPartsDesc.iLevel, tElecPartsDesc.eElecEffect)))
 		return E_FAIL;
 
+	m_eElecEffect = tElecPartsDesc.eElecEffect;
 
-	if (tElecPartsDesc.eElecEffect == ELEC_HOLE) {
+	if (tElecPartsDesc.fDuration != 0) {
+		m_bShareTime = true;
+		m_fDuration = tElecPartsDesc.fDuration;
+	}
+		
+	if (ELEC_HOLE == tElecPartsDesc.eElecEffect) {
 		_vector scale, rotation, translation;
 		XMMatrixDecompose(&scale, &rotation, &translation, XMLoadFloat4x4(m_pTargetWorldMat));
 		_matrix matRotation= XMMatrixRotationQuaternion(rotation);
@@ -40,6 +46,10 @@ HRESULT CElecParts::Initialize(void* pArg)
 		::XMStoreFloat4x4(&matWorld, matRotation);
 		m_pTransformCom->Set_WorldMatrix(matWorld);
 	}
+
+	if (ELEC_CHARGE == tElecPartsDesc.eElecEffect || ELEC_SCATTER == tElecPartsDesc.eElecEffect)
+		m_bFadeIn = false;
+
 
 	if (m_pTargetWorldMat != nullptr)
 		m_pTransformCom->Set_Pos(XMVectorSet(m_pTargetWorldMat->_41, m_pTargetWorldMat->_42, m_pTargetWorldMat->_43, 1));
@@ -51,10 +61,27 @@ HRESULT CElecParts::Initialize(void* pArg)
 
 void CElecParts::Tick(_float fTimeDelta)
 {
+	m_fTime += fTimeDelta;
+
+	if (m_fTime > 2.f && ELEC_SCATTER == m_eElecEffect)
+		Set_Dead();
+
+	if (m_fDuration != 0 &&  m_fTime > m_fDuration)
+		Set_Dead();
+
 	if (m_pTargetWorldMat != nullptr) 
 		m_pTransformCom->Set_Pos(XMVectorSet(m_pTargetWorldMat->_41, m_pTargetWorldMat->_42, m_pTargetWorldMat->_43, 1));
 
-	m_pVIBufferCom->Check_LifeTimes(fTimeDelta);
+	//if (true == m_bShareTime) 
+	//	m_pVIBufferCom->Set_Time(m_fTime);
+		
+	if (ELEC_CHARGE == m_eElecEffect)
+		m_pVIBufferCom->MoveToPivot(fTimeDelta);
+	else if (ELEC_SCATTER == m_eElecEffect)
+		m_pVIBufferCom->Spread(fTimeDelta);
+	else
+		m_pVIBufferCom->Check_LifeTimes(fTimeDelta);
+
 }
 
 void CElecParts::Late_Tick(_float fTimeDelta)
@@ -120,6 +147,8 @@ HRESULT CElecParts::Bind_ShaderResources()
 	if (FAILED(m_pTextureCom[TEX_ELECPARTS]->Bind_ShaderResource(m_pShaderCom, "g_Texture")))
 		return E_FAIL;
 	if (FAILED(m_pTextureCom[TEX_NOISE]->Bind_ShaderResource(m_pShaderCom, "g_NoiseTexture")))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bFadeIn", &m_bFadeIn, sizeof(_bool))))
 		return E_FAIL;
 
 	return S_OK;

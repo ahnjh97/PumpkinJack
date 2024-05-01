@@ -71,7 +71,7 @@ void CHoleWall::Late_Tick(_float fTimeDelta)
 {
 	m_pElecParts->Late_Tick(fTimeDelta);
 
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this, true);
 }
 
 HRESULT CHoleWall::Render()
@@ -87,7 +87,7 @@ HRESULT CHoleWall::Render()
 			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(8))) // HoleWall
+		if (FAILED(m_pShaderCom->Begin(7))) // HoleWall
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -112,7 +112,7 @@ void CHoleWall::Check_PlayerCol()
 	if (m_pColliderCom[0]->Intersect(pPlayerCollider)) { 
 		if (!m_pColliderCom[1]->Intersect(pPlayerCollider)) { // 구멍
 			if (m_fDamageTime >= 3.f) {
-				m_pPlayer->Deduct_HP(40);
+				m_pPlayer->Deduct_HP(30);
 				m_fDamageTime = 0.f;
 			}
 		}

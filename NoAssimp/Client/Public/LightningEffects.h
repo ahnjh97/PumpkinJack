@@ -18,6 +18,9 @@ private:
 	virtual ~CLightningEffects() = default;
 
 public:
+	_float Get_LightningTime() { return m_fTime; }
+
+public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Tick(_float fTimeDelta) override;
@@ -38,9 +41,9 @@ private:
 	_float m_fTime = {};
 
 private:
-	CShader* m_pShaderCom = { nullptr };
+	/*CShader* m_pShaderCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };
-	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
+	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };*/
 	CCollider* m_pColliderCom = { nullptr };
 
 	CGameObject* m_pPlayer = { nullptr };

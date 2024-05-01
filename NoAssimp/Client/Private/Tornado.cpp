@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "ElecArena.h"
 #include "ElecParts.h"
 #include "Tornado.h"
 #include "Wizard.h"
@@ -70,7 +71,7 @@ void CTornado::Tick(_float fTimeDelta)
 			EnlargeTornado(fTimeDelta);
 
 		_float fHeight = m_pTransformCom->Get_Pos_Float4().y;
-		if (fHeight >= 0)
+		if (fHeight >= -2)
 			MoveTowardsPlayer(fTimeDelta);
 		else if(false == m_bFall)
 			m_pTransformCom->Fall(-fTimeDelta * 3.f);
@@ -86,7 +87,7 @@ void CTornado::Tick(_float fTimeDelta)
 				if (m_pElecParts != nullptr)
 					m_pElecParts->Set_Dead();
 			}
-				
+
 			else
 				m_pTransformCom->Fall(fTimeDelta * 3.f);
 		}
@@ -125,7 +126,7 @@ HRESULT CTornado::Render()
 			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(7))) // Tornado
+		if (FAILED(m_pShaderCom->Begin(6))) // Tornado
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -157,16 +158,20 @@ void CTornado::Check_PlayerCol()
 		return;
 
 	CCollider* pPlayerCollider = dynamic_cast<CCollider*>(m_pPlayer->Get_Component(TEXT("Com_Collider")));
+	Safe_AddRef(pPlayerCollider);
+
 	if (m_pColliderCom->Intersect(pPlayerCollider)) {
 		if (m_fDamageTime >= 1.f) {
 			if(m_bMove)
-				m_pPlayer->Deduct_HP(20);
-			else
 				m_pPlayer->Deduct_HP(10);
+			else
+				m_pPlayer->Deduct_HP(5);
 
 			m_fDamageTime = 0.f;
 		}
 	}
+
+	Safe_Release(pPlayerCollider);
 }
 
 void CTornado::Check_TornadoCol(_float fTimeDelta)
@@ -216,6 +221,36 @@ void CTornado::Check_Fall()
 {
 	if(m_fTime > 11.f)
 		m_bFall = true;
+}
+
+void CTornado::Check_ElecArenaHeight()
+{
+	//list<CGameObject*> elecArenaList = m_pGameInstance->Get_ObjectList(LEVEL_WIZARD, TEXT("Layer_ElecArena"));
+
+	//if (elecArenaList.empty())
+	//	return;
+
+	//vector<_float> vecHeights;
+
+	//_float fElecArenaHeight = { -10 };
+
+	//for (auto& elecArena : elecArenaList)
+	//{
+	//	if (nullptr == elecArena)
+	//		continue;
+
+	//	CElecArena* pElecArena = dynamic_cast<CElecArena*>(elecArena);
+	//	if (true == pElecArena->Check_QuadTreeCells(m_pTransformCom->Get_Pos_Vector(), fElecArenaHeight))
+	//		vecHeights.emplace_back(fElecArenaHeight);
+	//}
+
+	//if (vecHeights.empty())
+	//	return;
+
+	//for (auto& height : vecHeights)
+	//	fElecArenaHeight = max(fElecArenaHeight, height);
+
+	//m_pTransformCom->Set_Height(fElecArenaHeight);
 }
 
 HRESULT CTornado::Add_Components(LEVEL eLevel)

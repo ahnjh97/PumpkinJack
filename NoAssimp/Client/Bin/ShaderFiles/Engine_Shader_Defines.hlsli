@@ -62,6 +62,12 @@ DepthStencilState DSS_NO_TEST_WRITE
     DepthWriteMask = zero;
 };
 
+DepthStencilState DSS_NO_TEST_SSD
+{
+    DepthEnable = true;
+    DepthWriteMask = zero;
+};
+
 BlendState BS_Default
 {
     BlendEnable[0] = false;

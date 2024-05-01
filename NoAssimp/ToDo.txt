@@ -1,15 +1,16 @@
-- func Lightning : ElecParts, ElecRay
-
--func Charge
+- TeslaTower LightBeam
+- ElecParts_EarthQuake 
 
 - ElecArena Dissolving
 - Solider	Alpha Dissolve
+- Hit Effect
+- DeathEffect
 
 - Trail Buffer-> Geometery Shader
 
-- Hit Effect
+
 - Arrow Effect
-- DeathEffect
+
 - Attack Effect
 - LevelGamePlay TerrainMask
 - LevelGamePlay Props

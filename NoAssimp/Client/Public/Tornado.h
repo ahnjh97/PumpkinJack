@@ -32,6 +32,7 @@ private:
 	void EnlargeTornado(_float fTimeDelta);
 	void MoveTowardsPlayer(_float fTimeDelta);
 	void Check_Fall();
+	void Check_ElecArenaHeight();
 
 private:
 	_bool m_bMove = { false };

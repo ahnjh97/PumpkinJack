@@ -44,6 +44,23 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Specular"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 
+	/* For.Target_MagicCircle */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_MagicCircle"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
+
+	/* For.Target_SkillEffect */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_SkillEffect"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 1.f))))
+		return E_FAIL;
+
+	/* For.Target_FieldDepth */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_PlayerDepth"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 1.f))))
+		return E_FAIL;
+
+	/* For.Target_SkillDepth */
+	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_SkillDepth"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 1.f))))
+		return E_FAIL;
+
+
 	/* MRT_GameObjects : 객체들의 특정 정보를 받아오기위한 렌더타겟들이다. */
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Diffuse"))))
 		return E_FAIL;
@@ -51,14 +68,24 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Depth"))))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_MagicCircle"))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_PlayerDepth"))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_SkillDepth"))))
+		return E_FAIL;
 	//if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_FieldDepth"))))
 	//	return E_FAIL;
+
 	/* MRT_LightAcc : 빛들의 연산결과 정보를 받아오기위한 렌더타겟들이다. */
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Shade"))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Specular"))))
 		return E_FAIL;
 
+	/* MRT_SSD : 스킬 이펙트를 후처리로 그리기 위한 렌더타겟들 */ 
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_SSD"), TEXT("Target_SkillEffect"))))
+		return E_FAIL;
 
 	m_pVIBuffer = CVIBuffer_Rect::Create(m_pDevice, m_pContext);
 	if (nullptr == m_pVIBuffer)
@@ -90,19 +117,31 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Specular"), 150, 150, 100, 100)))
 		return E_FAIL;
-	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_FieldDepth"), 150, 250, 100, 100)))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_MagicCircle"), 150, 250, 100, 100)))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_PlayerDepth"), 250, 50, 100, 100)))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_SkillDepth"), 250, 150, 100, 100)))
+		return E_FAIL;
+	/*if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_FieldDepth"), 150, 250, 100, 100)))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_MagicCircle"), 50, 350, 100, 100)))
+		return E_FAIL;*/
+
 #endif
 
 	return S_OK;
 }
 
-HRESULT CRenderer::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject * pRenderObject)
+HRESULT CRenderer::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject * pRenderObject, _bool bPushFront)
 {
 	if (eRenderGroup >= RENDER_END)
 		return E_FAIL;
 
-	m_RenderObjects[eRenderGroup].push_back(pRenderObject);
+	if(bPushFront)
+		m_RenderObjects[eRenderGroup].push_front(pRenderObject);
+	else
+		m_RenderObjects[eRenderGroup].push_back(pRenderObject);
 
 	Safe_AddRef(pRenderObject);
 
@@ -114,6 +153,8 @@ HRESULT CRenderer::Render()
 	if (FAILED(Render_Priority()))
 		return E_FAIL;
 	if (FAILED(Render_NonBlend()))
+		return E_FAIL;
+	if (FAILED(Render_SSD()))
 		return E_FAIL;
 	if (FAILED(Render_Lights()))
 		return E_FAIL;
@@ -278,12 +319,57 @@ HRESULT CRenderer::Render_Result()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Specular"), "g_SpecularTexture")))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_SkillEffect"), "g_SkillEffectTexture")))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_PlayerDepth"), "g_PlayerDepthTexture")))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_SkillDepth"), "g_SkillDepthTexture")))
+		return E_FAIL;
+	/*if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_FieldDepth"), "g_FieldDepthTexture")))
+		return E_FAIL;*/
 
 	m_pShader->Begin(3);
 
 	m_pVIBuffer->Bind_Buffers();
 
 	m_pVIBuffer->Render();
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_SSD()
+{
+	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+		return E_FAIL;
+
+	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrixInv", &m_pGameInstance->Get_Transform_Float4x4_Inverse(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrixInv", &m_pGameInstance->Get_Transform_Float4x4_Inverse(CPipeLine::D3DTS_VIEW))))
+		return E_FAIL;
+
+	if (FAILED(m_pVIBuffer->Bind_Buffers()))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_PlayerDepth"), "g_PlayerDepthTexture")))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_MagicCircle"), "g_MagicCircleTexture")))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_SkillDepth"), "g_SkillDepthTexture")))
+		return E_FAIL;
+	/* MRT_SSD */
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_SSD"))))
+		return E_FAIL;
+
+	m_pShader->Begin(4); // SSD
+
+	m_pVIBuffer->Render();
+
+	if (FAILED(m_pGameInstance->End_MRT()))
+		return E_FAIL;
 
 	return S_OK;
 }

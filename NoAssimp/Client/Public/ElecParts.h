@@ -22,7 +22,11 @@ public:
 	{
 		ELEC_EFFECT eElecEffect;
 		const _float4x4* pTargetWorldMat = { nullptr };
+		_float fDuration = { };
 	}ELECPARTS_DESC;
+
+public:
+	ELEC_EFFECT Get_ElecEffect() { return m_eElecEffect; }
 
 private:
 	CElecParts(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -36,16 +40,21 @@ public:
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+
 private:
+	ELEC_EFFECT m_eElecEffect = {};
+	_bool m_bFadeIn = { true };
+	_bool m_bShareTime = { false };
+
 	_uint m_iSpriteIndex = {};
 
 	_float m_fTime = {};
+	_float m_fDuration = {};
 
 private:
 	CVIBuffer_Instance_Point* m_pVIBufferCom = { nullptr };
 	CTexture* m_pTextureCom[TEX_END] = {};
 	CShader* m_pShaderCom = { nullptr };
-
 	const _float4x4* m_pTargetWorldMat = { nullptr };
 
 private:

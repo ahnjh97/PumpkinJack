@@ -37,6 +37,8 @@ HRESULT CCamera_Jack::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+	m_pTransformCom->Turn(XMVectorSet(1, 0, 0, 0), -0.35f);
+
 	return S_OK;
 }
 

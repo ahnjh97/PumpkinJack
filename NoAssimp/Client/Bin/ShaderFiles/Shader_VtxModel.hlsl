@@ -3,14 +3,16 @@
 /* 전역변수 : 쉐이더 외부에 있는 데이터를 쉐이더 안으로 받아온다. */
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
-texture2D g_DiffuseTexture, g_WaterTexture, g_CausticTexture, g_NoiseTexture;
-texture2D g_TigerStripes, g_TopBottomFadeTex;
-texture2D g_FireNoise, g_VoronoiBlur;
-float g_fOffset_Y;
-float g_fTime;
-float g_fAlpha;
-float g_fColorOffset;
-float g_fCamFar;
+texture2D   g_DiffuseTexture, g_WaterTexture, g_CausticTexture, g_NoiseTexture;
+texture2D   g_TigerStripes, g_TopBottomFadeTex;
+texture2D   g_FireNoise, g_VoronoiBlur;
+texture2D   g_Circle[2];
+
+float       g_fOffset_Y;
+float       g_fTime;
+float       g_fAlpha;
+float       g_fColorOffset;
+float       g_fCamFar;
 
 struct VS_IN
 {
@@ -25,8 +27,8 @@ struct VS_OUT
 	float4		vPosition : SV_POSITION;
     float3      vNormal : NORMAL;
 	float2		vTexcoord : TEXCOORD0;
-    float4      vWorldPos : TEXCOORD1;
-    float4      vProjPos : TEXCOORD2;
+    //float4      vWorldPos : TEXCOORD1;
+    //float4      vProjPos : TEXCOORD2;
 };
 
 /* 정점 쉐이더 */
@@ -42,9 +44,9 @@ VS_OUT VS_MAIN(VS_IN In)
 	Out.vPosition = mul(vector(In.vPosition, 1.f), matWVP);
     Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix)).xyz;
 	Out.vTexcoord = In.vTexcoord;
-    Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
-    Out.vProjPos = Out.vPosition;
-
+    //Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
+    //Out.vProjPos = Out.vPosition;
+    
 	return Out;
 }
 
@@ -53,16 +55,15 @@ struct PS_IN
 	float4		vPosition : SV_POSITION;
     float3      vNormal : NORMAL;
 	float2		vTexcoord : TEXCOORD0;
-    float4      vWorldPos : TEXCOORD1;
-    float4      vProjPos : TEXCOORD2;
+    //float4      vWorldPos : TEXCOORD1;
+    //float4      vProjPos : TEXCOORD2;
 };
 
 struct PS_OUT
 {
-	float4		vColor : SV_TARGET0;
+    float4      vColor : SV_TARGET0;
     float4      vNormal : SV_TARGET1;
     float4      vDepth : SV_TARGET2;
-    float4      vFieldDepth : SV_TARGET3;
 };
 
 PS_OUT PS_MAIN(PS_IN In)
@@ -124,26 +125,6 @@ PS_OUT PS_ARENAFIRE(PS_IN In)
     return Out;
 }
 
-PS_OUT PS_ELECARENA(PS_IN In)
-{
-    PS_OUT Out = (PS_OUT) 0;
-    
-    //float3 upDirection = float3(0, 1, 0);
-    //float dotProduct = dot(normalize(In.vNormal), upDirection);
-    
-    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-    if (0.3f >= Out.vColor.a)
-        discard;
-    
-     Out.vColor.rgb += g_fColorOffset;
-    
-    // 내적 값이 양수이면 노멀 벡터가 위를 향하고 있다고 판단
-    //if (dotProduct > 0.2f)
-    //    Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.0f, 0.0f);   
-
-    return Out;
-}
-
 PS_OUT PS_TORNADO(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -166,21 +147,21 @@ PS_OUT PS_HOLEWALL(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
-// 연기 노이즈 UV 좌표
+    // 연기 노이즈 UV 좌표
     float2 smokeUV = In.vTexcoord;
-// 연기 텍스쳐 샘플링
+    // 연기 텍스쳐 샘플링
     float smokeValue = g_VoronoiBlur.Sample(LinearSampler, smokeUV).r;
 
-// 불 노이즈 UV 좌표
+    // 불 노이즈 UV 좌표
     float2 fireUV = In.vTexcoord + g_fTime * 0.1;
-// 불 텍스쳐 샘플링
+    // 불 텍스쳐 샘플링
     float fireNoise = g_FireNoise.Sample(LinearSampler, fireUV).r;
 
-// voronoiBlur의 값이 높을수록 fireNoise의 영향을 많이 줌
-    float finalValue = lerp(1 - smokeValue + 0.2, fireNoise, 1-smokeValue + 0.2);
+    // voronoiBlur의 값이 높을수록 fireNoise의 영향을 많이 줌
+    float finalValue = lerp(1 - smokeValue + 0.2, fireNoise * 0.5, 1 - smokeValue + 0.2);
 
-// 결과 색상 계산
-    Out.vColor = float4(1, 1, 1, 1-finalValue);
+    // 결과 색상 계산
+    Out.vColor = float4(1, 1, 1, 1 - finalValue - 0.2);
 
     if (Out.vColor.a <= 0.1f)
         discard;
@@ -262,19 +243,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN();
     }
 
-    pass ElecArena // 6
-    {
-        SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
-        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
-        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_ELECARENA();
-    }
-
-    pass Tornado // 7
+    pass Tornado // 6
     {
         SetRasterizerState(RS_NoCull);
         SetDepthStencilState(DSS_Default, 0);
@@ -286,7 +255,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_TORNADO();
     }
 
-    pass HoleWall // 8
+    pass HoleWall // 7
     {
         SetRasterizerState(RS_NoCull);
         SetDepthStencilState(DSS_Default, 0);

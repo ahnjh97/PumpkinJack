@@ -117,7 +117,11 @@ HRESULT CVIBuffer_Instance_Point::Initialize_Prototype(const CVIBuffer_Instance:
 		XMStoreFloat4(&m_pInstanceVertices[i].vUp, XMVectorSet(0.f, 1.f, 0.f, 0.f) * ScaleY(m_RandomNumber));
 		XMStoreFloat4(&m_pInstanceVertices[i].vLook, XMVectorSet(0.f, 0.f, 1.f, 0.f) * ScaleZ(m_RandomNumber));
 		m_pInstanceVertices[i].vPosition = Compute_RandPosition(InstanceDesc.eShape);
-		m_pInstanceVertices[i].fLifeRatio = 0;
+
+		/*if(SHAPE_CYLINDER == InstanceDesc.eShape && InstanceDesc.isLoop == true)
+			m_pInstanceVertices[i].fLifeRatio = 0.5f;
+		else*/
+			m_pInstanceVertices[i].fLifeRatio = 0;
 
 		/* 0.f 현재 라이프타임 */
 		/* LifeTime(m_RandomNumber) 인스턴스마다 랜덤하게 설정된 각각의 라이프타임디다. */

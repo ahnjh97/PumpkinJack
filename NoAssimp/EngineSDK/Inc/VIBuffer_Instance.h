@@ -6,7 +6,9 @@ BEGIN(Engine)
 class ENGINE_DLL CVIBuffer_Instance abstract : public CVIBuffer
 {
 public:
-	enum INSTANCE_SHAPE { SHAPE_DEFAULT, SHAPE_HEMISPHERE, SHAPE_RING, SHAPE_END };
+	enum INSTANCE_SHAPE { SHAPE_DEFAULT, SHAPE_HEMISPHERE, SHAPE_RING, SHAPE_CYLINDER, SHAPE_SPHERE, SHAPE_END };
+	//enum INSTANCE_RESPAWN_TYPE
+
 	typedef struct
 	{
 		_float3		vPivot;
@@ -19,6 +21,8 @@ public:
 		_uint		iNumInstance;
 		_uint		iSpriteIndexOffset = {};
 		INSTANCE_SHAPE	eShape = { };
+		_float		fDistanceLimit = {};
+		_float		fDuration = {};
 	}INSTANCE_DESC;
 
 protected:
@@ -34,9 +38,11 @@ public:
 
 public:
 	virtual _float4 Compute_RandPosition(INSTANCE_SHAPE eShape, _bool bRespawnAtMinHeight = false);
+
 	virtual void Drop(_float fTimeDelta);
 	virtual void Spread(_float fTimeDelta);
 	virtual void Check_LifeTimes(_float fTimeDelta);
+	virtual void MoveToPivot(_float fTimeDelta);
 
 	void	Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceIndex, _float fTimeDelta, _bool bRespawnAtMinHeight = false);
 
@@ -47,7 +53,8 @@ protected:
 	_uint					m_iNumInstance = { 0 };
 	_uint					m_iIndexCountPerInstance = { 0 };
 	VTXMATRIX*				m_pInstanceVertices = { nullptr };
-	INSTANCE_DESC			m_InstanceDesc{};
+	INSTANCE_DESC			m_InstanceDesc = {};
+	_float					m_fTime = {};
 
 protected:
 	D3D11_BUFFER_DESC		m_InstanceBufferDesc{};

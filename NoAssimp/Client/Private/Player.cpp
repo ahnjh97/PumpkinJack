@@ -647,7 +647,7 @@ _bool CPlayer::Check_GroundCells(_Out_ _float& _fMinHeight, _Out_ _float& _fMaxH
 
 	_vector vPos = m_pTransformCom->Get_Pos_Vector();
 	vector<_float> vecGroundCellHeights;
-
+	
 	for (auto& elecArena : elecArenaList) {
 		if (nullptr == elecArena)
 			continue;
@@ -659,7 +659,7 @@ _bool CPlayer::Check_GroundCells(_Out_ _float& _fMinHeight, _Out_ _float& _fMaxH
 			vecGroundCellHeights.emplace_back(fHeight);*/
 
 		if (true == pElecArena->Check_QuadTreeCells(vPos, fHeight))
-			vecGroundCellHeights.emplace_back(fHeight);			
+			vecGroundCellHeights.emplace_back(fHeight);
 	}
 
 	if (vecGroundCellHeights.empty())

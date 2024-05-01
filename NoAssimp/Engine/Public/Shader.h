@@ -6,6 +6,7 @@ BEGIN(Engine)
 
 class ENGINE_DLL CShader final : public CComponent
 {
+
 private:
 	CShader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CShader(const CShader& rhs);

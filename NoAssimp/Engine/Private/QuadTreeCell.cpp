@@ -119,12 +119,15 @@ void CQuadTreeCell::PartitionFaces(vector<FACE>& _vecRT, vector<FACE>& _vecRB, v
 	for (auto& face : _vecFaces)
 	{
 		vector<CORNER> vecQuad; // 몇 사분면에 추가할건지
-		CORNER eCornerA = Check_Corner(XMLoadFloat3(&face.vA));
-		PushIfNotAlreadyInserted(vecQuad, eCornerA);;
-		CORNER eCornerB = Check_Corner(XMLoadFloat3(&face.vB));
-		PushIfNotAlreadyInserted(vecQuad, eCornerB);
-		CORNER eCornerC = Check_Corner(XMLoadFloat3(&face.vC));
-		PushIfNotAlreadyInserted(vecQuad, eCornerC);
+
+		CORNER eCorner = Check_Corner(XMLoadFloat3(&face.vA));
+		PushIfNotAlreadyInserted(vecQuad, eCorner);;
+
+		eCorner = Check_Corner(XMLoadFloat3(&face.vB));
+		PushIfNotAlreadyInserted(vecQuad, eCorner);
+
+		eCorner = Check_Corner(XMLoadFloat3(&face.vC));
+		PushIfNotAlreadyInserted(vecQuad, eCorner);
 
 		if (vecQuad.size() >= 2) // 삼각형이 여러 사분면에 걸쳐있을때
 		{ 
@@ -133,7 +136,7 @@ void CQuadTreeCell::PartitionFaces(vector<FACE>& _vecRT, vector<FACE>& _vecRB, v
 		}
 		else // 삼각형들의 세 점이 속한 사분면이 전부 동일할때
 		{
-			switch (vecQuad.front())
+			switch (eCorner)
 			{
 			case CORNER_RT:
 				_vecRT.emplace_back(face);

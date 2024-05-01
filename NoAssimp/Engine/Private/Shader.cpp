@@ -55,6 +55,7 @@ HRESULT CShader::Initialize_Prototype(const wstring& strShaderFilePath, const D3
 
 		m_InputLayouts.push_back(pInputLayout);
 	}
+
 	return S_OK;
 }
 
@@ -149,10 +150,9 @@ HRESULT CShader::Bind_RawValue(const _char* pConstantName, const void* pData, _u
 	ID3DX11EffectVariable* pVariable = m_pEffect->GetVariableByName(pConstantName);
 	if (nullptr == pVariable)
 		return E_FAIL;
-	
+
 	return pVariable->SetRawValue(pData, 0, iLength);
 }
-
 
 CShader* CShader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring& strShaderFilePath, const D3D11_INPUT_ELEMENT_DESC* pElements, _uint iNumElements)
 {
@@ -192,5 +192,4 @@ void CShader::Free()
 		Safe_Release(pInputLayout);
 
 	m_InputLayouts.clear();
-
 }

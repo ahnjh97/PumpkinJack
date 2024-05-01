@@ -81,7 +81,7 @@ HRESULT CTexture::Initialize(void * pArg)
 	return S_OK;
 }
 
-HRESULT CTexture::Bind_ShaderResource(CShader * pShader, const _char * pConstantName, _uint iTextureIndex)
+HRESULT CTexture::Bind_ShaderResource(CShader* pShader, const _char * pConstantName, _uint iTextureIndex)
 {
 	if (iTextureIndex >= m_iNumTextures)
 		return E_FAIL;
@@ -94,7 +94,7 @@ HRESULT CTexture::Bind_ShaderResources(CShader* pShader, const _char* pConstantN
 	return pShader->Bind_Textures(pConstantName, &m_Textures.front(), m_iNumTextures);
 }
 
-CTexture * CTexture::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const wstring & strTextureFilePath, _uint iNumTexture)
+CTexture * CTexture::Create(ID3D11Device* pDevice, ID3D11DeviceContext * pContext, const wstring & strTextureFilePath, _uint iNumTexture)
 {
 	CTexture*		pInstance = new CTexture(pDevice, pContext);
 

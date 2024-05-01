@@ -416,7 +416,7 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 	vector<string> vecAnimModelNames = 	{ "Jack", "Wizard" };
 	vector<string> vecNonAnimModelNames = { "Spear", "Rifle", "Scythe", "LevelWizard",
 		"Amulet", "Book", "elecArena1", "elecArena2", "elecArena3", "HoleWall", "SkySphere",
-		"TeslaTower", "Tornado", "WizardBrickGround", "WizardTower" };
+		"Sphere", "TeslaTower", "Tornado", "WizardBrickGround", "WizardTower" };
 
 	if (FAILED(Add_Models(eLevel, vecAnimModelNames, vecNonAnimModelNames)))
 		return E_FAIL;
@@ -504,6 +504,8 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "HoleWall")))
 		return E_FAIL;
 	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "Book")))
+		return E_FAIL;
+	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "Sphere")))
 		return E_FAIL;
 
 
@@ -621,6 +623,14 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 			return E_FAIL;
 	}
 
+	if (eLevel == LEVEL_WIZARD)
+	{
+		/* For.Prototype_Component_Shader_VtxModel_ElecArena */
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_ElecArena"),
+			CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel_ElecArena.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+			return E_FAIL;
+	}
+
 	return S_OK;
 }
 
@@ -687,19 +697,72 @@ HRESULT CLoader::Add_VIBuffer_Instance_Points(LEVEL eLevel)
 	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_DEFAULT;
 	vecInstanceDesc[CElecParts::ELEC_TORNADO] = InstanceDesc;
 
-	InstanceDesc.vCenter = _float3(0.f, 2.f, 0.f);
-	InstanceDesc.vRange = _float3(15.f, 4.f, 15.f);
-	InstanceDesc.iNumInstance = 12;
+	InstanceDesc.vCenter = _float3(0.f, 1.f, 0.f);
+	InstanceDesc.vRange = _float3(16.f, 1.f, 16.f);
+	InstanceDesc.iNumInstance = 8;
+	InstanceDesc.vLifeTime = _float2(0.1f, 0.5f);
 	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_DEFAULT;
 	vecInstanceDesc[CElecParts::ELEC_LIGHTNING1] = InstanceDesc;
 
 	// LIGHTNING2 -> 튕겨나가는 파티클 느낌으로 
 
 	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
-	InstanceDesc.vRange = _float3(27.f, 27.f, 15.f);
+	InstanceDesc.vRange = _float3(29.f, 29.f, 15.f);
 	InstanceDesc.iNumInstance = 70;
+	InstanceDesc.vLifeTime = _float2(0.5f, 0.8f);
 	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_RING;
 	vecInstanceDesc[CElecParts::ELEC_HOLE] = InstanceDesc;
+
+	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	InstanceDesc.vRange = _float3(115, 100, 115);
+	InstanceDesc.vPivot = _float3(0.f, 0, 0.f);
+	InstanceDesc.vMinScale = _float3(24, 24, 24);
+	InstanceDesc.vMaxScale = _float3(26, 26, 26);
+	InstanceDesc.vSpeed = _float2(120, 125.f);
+	InstanceDesc.iNumInstance = 120;
+	InstanceDesc.vLifeTime = _float2(35, 35);
+	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_CYLINDER;
+	InstanceDesc.fDistanceLimit = 5.f;
+	vecInstanceDesc[CElecParts::ELEC_CHARGE] = InstanceDesc;
+
+	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	InstanceDesc.vRange = _float3(15, 15, 15);
+	InstanceDesc.vMinScale = _float3(24, 24, 24);
+	InstanceDesc.vMaxScale = _float3(26, 26, 26);
+	InstanceDesc.vMinScale = _float3(16.f, 16.f, 16.f);
+	InstanceDesc.vMaxScale = _float3(18, 18, 18);
+	InstanceDesc.iNumInstance = 20;
+	InstanceDesc.vLifeTime = _float2(0.5f, 0.8f);
+	InstanceDesc.isLoop = true;
+	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_SPHERE;
+	vecInstanceDesc[CElecParts::ELEC_TESLATOWER] = InstanceDesc;
+
+	InstanceDesc.vCenter = _float3(0.f, 9.f, 0.f);
+	InstanceDesc.vRange = _float3(10, 18, 10);
+	InstanceDesc.vMinScale = _float3(24, 24, 24);
+	InstanceDesc.vMaxScale = _float3(26, 26, 26);
+	InstanceDesc.vMinScale = _float3(12, 12, 12);
+	InstanceDesc.vMaxScale = _float3(14, 14, 14);
+	InstanceDesc.iNumInstance = 80;
+	InstanceDesc.vLifeTime = _float2(0.3f, 1.f);
+	InstanceDesc.isLoop = false;
+	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_DEFAULT;
+	//InstanceDesc.fDuration = 0.7f;
+	vecInstanceDesc[CElecParts::ELEC_DESTROY] = InstanceDesc;
+
+	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	InstanceDesc.vRange = _float3(0.5f, 1.5f, 1.5f); // x: min, z: max
+	InstanceDesc.vPivot = _float3(0.f, 0.f, 0.f);
+	InstanceDesc.vMinScale = _float3(15, 15, 15);
+	InstanceDesc.vMaxScale = _float3(16, 16, 16);
+	InstanceDesc.vSpeed = _float2(50.f, 52.f);
+	InstanceDesc.iNumInstance = 120;
+	InstanceDesc.vLifeTime = _float2(1.f, 1.3f);
+	InstanceDesc.isLoop = false;
+	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_CYLINDER;
+	InstanceDesc.fDistanceLimit = 60.f;
+	vecInstanceDesc[CElecParts::ELEC_SCATTER] = InstanceDesc;
+
 
 	if (vecInstanceDesc.empty())
 		return S_OK;
@@ -780,7 +843,7 @@ void CLoader::SetUp_ModelScaleRotation() // Scale, Degaree, NewScale, RootIndex
 	m_ModelConfigs.emplace("Amulet", MODEL_CONFIG{ 5.2f, 0.f, 5.2f });
 	m_ModelConfigs.emplace("Book", MODEL_CONFIG{ 4.f, 0.f, 4.f });
 	for (_int i = 1; i < 4; i++)
-		m_ModelConfigs.emplace("elecArena" + to_string(i), MODEL_CONFIG{ 14.f, 0.f, 14.f });
+		m_ModelConfigs.emplace("elecArena" + to_string(i), MODEL_CONFIG{ 13.85f + 0.05f * i, 0.f, 13.85f + 0.05f * i });
 	m_ModelConfigs.emplace("HoleWall", MODEL_CONFIG{ 12.f, 0.f, 12.f });
 	m_ModelConfigs.emplace("TeslaTower", MODEL_CONFIG{ 20.f, 0.f, 20.f });
 	//m_ModelConfigs.emplace("Tornado", MODEL_CONFIG{ 15.f, 0.f, 15.f });

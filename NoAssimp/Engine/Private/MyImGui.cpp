@@ -174,9 +174,9 @@ void CMyImGui::Free()
     //__super::Free();
     //Safe_Release(m_pPickedObject);
  
+    Safe_Release(m_pGameInstance);
     Safe_Release(m_pContext);
     Safe_Release(m_pDevice);
-    Safe_Release(m_pGameInstance);
 
     for (auto& Pair : m_Components)
         Safe_Release(Pair.second);

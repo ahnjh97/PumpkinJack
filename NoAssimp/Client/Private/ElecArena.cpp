@@ -33,8 +33,6 @@ HRESULT CElecArena::Initialize(void* pArg)
 	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel), GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
 
-	//m_vecQuad = m_pModelCom->SetUp_QuadGroundCells();
-
 	m_pModelCom->SetUp_QuadTreeCells();
 
 	return S_OK;
@@ -42,6 +40,13 @@ HRESULT CElecArena::Initialize(void* pArg)
 
 void CElecArena::Tick(_float fTimeDelta)
 {
+	for (_int i = 0; i < 2; i++) {
+		m_fCircleTime[i] += fTimeDelta;
+
+		/*if (m_fCircleTime[i] > 1.8f)
+			m_fCircleTime[i] = 0;*/
+	}
+		
 	if (m_fTime > 4.f) {
 		Set_Dead();
 		return;
@@ -72,62 +77,13 @@ HRESULT CElecArena::Render()
 			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(6))) // ElecArena
+		if (FAILED(m_pShaderCom->Begin(0))) // ElecArena
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
 	}
 
 	return S_OK;
-}
-
-_int CElecArena::Compute_Quadrant(_fvector vPlayerPos)
-{
-	if (nullptr == m_pTransformCom)
-		return -1;
-
-	_matrix matWorldInv = m_pTransformCom->Get_WorldMatrix_Inverse();
-	_vector vPlayerElecArenaLocalPos = XMVector3TransformCoord(vPlayerPos, matWorldInv);
-	CCell::QUAD eQuad{};
-
-	if (XMVectorGetX(vPlayerElecArenaLocalPos) >= 0) {
-		if (XMVectorGetZ(vPlayerElecArenaLocalPos) >= 0)
-			eQuad = CCell::RT;
-		else
-			eQuad = CCell::RB;
-	}
-	else {
-		if (XMVectorGetZ(vPlayerElecArenaLocalPos) <= 0)
-			eQuad = CCell::LB;
-		else
-			eQuad = CCell::LT;
-	}
-
-	return eQuad;
-}
-
-_bool CElecArena::Check_ElecArenaGroundCell(_fvector vPlayerPos, _float& fCellHeight)
-{
-	_int iQuad = Compute_Quadrant(vPlayerPos);
-
-	if (m_vecQuad[iQuad].empty())
-		return false;
-
-	if (nullptr == m_pTransformCom)
-		return false;
-
-	_matrix matWorld = m_pTransformCom->Get_WorldMatrix();
-	_matrix matWorldInv = m_pTransformCom->Get_WorldMatrix_Inverse();
-
-	_vector vNewPos = XMVector3TransformCoord(vPlayerPos, matWorldInv);
-	for (auto& groundCell : m_vecQuad[iQuad]) {
-		if (true == groundCell->IsIn(vNewPos)) {
-			fCellHeight = XMVectorGetY(XMVector3TransformCoord(groundCell->Get_Point(CCell::POINT_A), matWorld));
-			return true;
-		}
-	}
-
-	return false;
 }
 
 _bool CElecArena::Check_QuadTreeCells(_fvector vPlayerPos, _float& fCellHeight)
@@ -141,15 +97,19 @@ _bool CElecArena::Check_QuadTreeCells(_fvector vPlayerPos, _float& fCellHeight)
 HRESULT CElecArena::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 {
 	/* For.Com_Model */
-	wstring wstrModelTag = _wstrModelTag;
-	if (FAILED(__super::Add_Component(eLevel, wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
+	if (FAILED(__super::Add_Component(eLevel, _wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
-	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel");
-
-	if (FAILED(__super::Add_Component(eLevel, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+	/* For.Com_Shader */
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Shader_VtxModel_ElecArena"), 
+		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
+	/* For.Com_Texture */
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_Circle"),
+		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
+		return E_FAIL;
+	
 	return S_OK;
 }
 
@@ -163,7 +123,17 @@ HRESULT CElecArena::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
+	if (FAILED(m_pTextureCom->Bind_ShaderResources(m_pShaderCom, "g_Circle")))
+		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fColorOffset", &m_fColorOffset, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrices("g_CirclePositions", matCirclePositions, 2)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fCircleTime0", &m_fCircleTime[0], sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fCircleTime1", &m_fCircleTime[1], sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fCamFar", m_pGameInstance->Get_CamFarPtr(), sizeof(_float))))
 		return E_FAIL;
 
 	return S_OK;
@@ -201,11 +171,13 @@ void CElecArena::Free()
 {
 	__super::Free();
 	
-	for (auto& vecCells : m_vecQuad) {
-		for (auto& groundCell : vecCells) {
-			Safe_Release(groundCell);
-		}
-	}
+	//for (auto& vecCells : m_vecQuad) {
+	//	for (auto& groundCell : vecCells) {
+	//		Safe_Release(groundCell);
+	//	}
+	//}
+
+	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
 }

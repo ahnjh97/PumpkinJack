@@ -70,6 +70,7 @@ struct PS_OUT
     float4 vDiffuse : SV_TARGET0;
     float4 vNormal : SV_TARGET1;
     float4 vDepth : SV_TARGET2;
+    float4 vPlayerDepth : SV_TARGET4;
 };
 
 PS_OUT PS_MAIN(PS_IN In)
@@ -111,6 +112,22 @@ PS_OUT PS_MAIN_NO_LIGHT(PS_IN In)
     
     Out.vDiffuse = vMtrlDiffuse;
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fCamFar, 0.0f, 0.0f);
+    
+    return Out;
+}
+
+PS_OUT PS_JACK(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (0.3f >= vMtrlDiffuse.a)
+        discard;
+
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector((In.vNormal * 0.5f + 0.5f).xyz, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fCamFar, 0.0f, 0.0f);
+    Out.vPlayerDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fCamFar, 0.0f, 0.0f);
     
     return Out;
 }
@@ -163,5 +180,17 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_NO_LIGHT();
+    }
+
+    pass Jack // 4
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_JACK();
     }
 }

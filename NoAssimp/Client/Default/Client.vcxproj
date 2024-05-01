@@ -316,6 +316,7 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Mesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Point.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_ElecArena.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Lighted.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_LevelSlimeBoss.hlsl" />

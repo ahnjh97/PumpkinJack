@@ -33,7 +33,7 @@ public: /* For.Input_Device */
 	_bool	MouseUp(_int button);
 
 public: /* For.Renderer */
-	HRESULT Add_RenderGroup(CRenderer::RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
+	HRESULT Add_RenderGroup(CRenderer::RENDERGROUP eRenderGroup, class CGameObject* pRenderObject, _bool bPushFront = false);
 #ifdef _DEBUG
 public:
 	HRESULT Add_DebugComponents(class CComponent* pRenderComponent);

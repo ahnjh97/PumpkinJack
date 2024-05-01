@@ -25,6 +25,9 @@ public:
 	virtual HRESULT Render() override;
 
 private:
+	void Add_DestroyEffect();
+
+private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };

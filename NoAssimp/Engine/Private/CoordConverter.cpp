@@ -49,14 +49,6 @@ _vector CCoordConverter::Compute_WorldPos(const _float2& vViewportPos, const wst
 	if (FAILED(m_pGameInstance->Copy_Resource(strZRenderTargetTag, &m_pTextureHub)))
 		return XMVectorZero();
 
-	//for (size_t i = 0; i < Height; i++)
-	//{
-	//	for (size_t j = 0; j < Width; j++)
-	//	{
-	//		_uint iIndex = i * Width + j;
-	//	}
-	//}
-
 	D3D11_MAPPED_SUBRESOURCE		SubResource{};
 
 	m_pContext->Map(m_pTextureHub, 0, D3D11_MAP_READ, 0, &SubResource);

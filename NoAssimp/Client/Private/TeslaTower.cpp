@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "TeslaTower.h"
+#include "ElecParts.h"
 
 CTeslaTower::CTeslaTower(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -40,6 +41,7 @@ HRESULT CTeslaTower::Initialize(void* pArg)
 void CTeslaTower::Tick(_float fTimeDelta)
 {
 	if (m_iHp <= 0) {
+		Add_DestroyEffect();
 		Set_Dead();
 		return;
 	}
@@ -81,9 +83,21 @@ HRESULT CTeslaTower::Render()
 #ifdef _DEBUG
 	if (m_pColliderCom != nullptr)
 		m_pGameInstance->Add_DebugComponents(m_pColliderCom);
-#endif // _DEBUG
+#endif 
 
 	return S_OK;
+}
+
+void CTeslaTower::Add_DestroyEffect()
+{
+	CElecParts::ELECPARTS_DESC tElecPartsDesc{};
+	tElecPartsDesc.iLevel = LEVEL_WIZARD;
+	tElecPartsDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	tElecPartsDesc.eElecEffect = CElecParts::ELEC_DESTROY;
+	tElecPartsDesc.fDuration = 1.2f;
+
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_ElecParts"), TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
+		return;
 }
 
 HRESULT CTeslaTower::Add_Components(LEVEL eLevel)
@@ -135,7 +149,6 @@ CTeslaTower* CTeslaTower::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 	}
 
 	return pInstance;
-
 }
 
 CGameObject* CTeslaTower::Clone(void* pArg)

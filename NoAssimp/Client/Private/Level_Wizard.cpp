@@ -50,20 +50,6 @@ HRESULT CLevel_Wizard::Initialize()
 void CLevel_Wizard::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
-
-	//m_fTime += fTimeDelta;
-
-	//if (m_bBooks && ((m_fTime >= 1.f && m_fTime < 1.5f) || (m_fTime >= 3.f && m_fTime < 3.5f)
-	//	|| (m_fTime >= 5.f && m_fTime < 5.5f) || (m_fTime >= 7.f && m_fTime < 7.5f))) {
-	//	Add_Books();
-	//	m_bBooks = false;
-	//}
-
-	//if (!m_bBooks && ((m_fTime >= 2.f && m_fTime < 2.5f) || (m_fTime >= 4.f && m_fTime < 4.5f)
-	//	|| (m_fTime >= 6.f && m_fTime < 6.5f) || (m_fTime >= 8.f && m_fTime < 8.5f))) {
-	//	Add_Books();
-	//	m_bBooks = true;
-	//}
 }
 
 HRESULT CLevel_Wizard::Render()
@@ -167,7 +153,7 @@ HRESULT CLevel_Wizard::Ready_ParsedObjects()
 		else if (tempDesc.wstrModelTag == TEXT("Prototype_Component_Model_elecArena1")) {
 			for (_int i = 1; i < 4; i++) {
 				tempDesc.wstrModelTag = TEXT("Prototype_Component_Model_elecArena") + to_wstring(i);
-				tempDesc.matWorld._42 += (1.f) * (i - 1);
+				tempDesc.matWorld._42 += (0.8f) * (i - 1);
 				if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_ElecArena"), TEXT("Prototype_GameObject_ElecArena"), &tempDesc)))
 					return E_FAIL;
 			}

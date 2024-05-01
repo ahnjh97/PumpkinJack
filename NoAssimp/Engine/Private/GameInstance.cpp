@@ -247,12 +247,12 @@ _bool CGameInstance::MouseUp(_int button)
 	return m_pInput_Device->MouseUp(button);
 }
 
-HRESULT CGameInstance::Add_RenderGroup(CRenderer::RENDERGROUP eRenderGroup, CGameObject * pRenderObject)
+HRESULT CGameInstance::Add_RenderGroup(CRenderer::RENDERGROUP eRenderGroup, CGameObject * pRenderObject, _bool bPushFront)
 {
 	if (nullptr == m_pRenderer)
 		return E_FAIL;
 
-	return m_pRenderer->Add_RenderGroup(eRenderGroup, pRenderObject);	
+	return m_pRenderer->Add_RenderGroup(eRenderGroup, pRenderObject, bPushFront);	
 }
 
 #ifdef _DEBUG
