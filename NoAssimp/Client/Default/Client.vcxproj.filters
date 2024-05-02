@@ -211,6 +211,9 @@
     <Filter Include="02.GameObjects\Level_Wizard\Lightning">
       <UniqueIdentifier>{a162c451-cabf-4976-9f8d-6927eb65f8f5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Level_Wizard\Sphere">
+      <UniqueIdentifier>{90d079dc-847e-45d4-99ab-694c80d11157}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -417,6 +420,9 @@
     <ClInclude Include="..\Public\Lightning.h">
       <Filter>02.GameObjects\Level_Wizard\Lightning</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Sphere.h">
+      <Filter>02.GameObjects\Level_Wizard\Sphere</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -613,6 +619,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Lightning.cpp">
       <Filter>02.GameObjects\Level_Wizard\Lightning</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Sphere.cpp">
+      <Filter>02.GameObjects\Level_Wizard\Sphere</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

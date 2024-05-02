@@ -35,6 +35,8 @@ void CLevel_EffectTool::Tick(_float fTimeDelta)
 		Add_Effect(TEXT("Layer_Effect"));
 	if (m_pGameInstance->KeyDown(DIK_F))
 		Add_Effect2(TEXT("Layer_Effect2"));
+	if (m_pGameInstance->KeyDown(DIK_C))
+		Add_Object(TEXT("Layer_Object"));
 }
 
 HRESULT CLevel_EffectTool::Render()
@@ -112,7 +114,6 @@ HRESULT CLevel_EffectTool::Add_Effect(const wstring& strLayerTag)
 	/*if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_HoleWall"), &tDesc)))
 		return E_FAIL;*/
 
-
 	/*CLightning::LIGHTNING_DESC tLightningDesc{};
 	tLightningDesc.iLevel = LEVEL_EFFECTTOOL;
 	tLightningDesc.iLightingIndex = 2;
@@ -128,6 +129,25 @@ HRESULT CLevel_EffectTool::Add_Effect2(const wstring& strLayerTag)
 	tElecPartsDesc.iLevel = LEVEL_EFFECTTOOL;
 	tElecPartsDesc.eElecEffect = CElecParts::ELEC_DESTROY;
 	tElecPartsDesc.fDuration = 1.2f;
+
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevel_EffectTool::Add_Object(const wstring& strLayerTag)
+{
+	CGameObject::GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = LEVEL_EFFECTTOOL;
+
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Sphere"), &tDesc)))
+		return E_FAIL;
+
+	CElecParts::ELECPARTS_DESC tElecPartsDesc{};
+	tElecPartsDesc.iLevel = LEVEL_EFFECTTOOL;
+	tElecPartsDesc.eElecEffect = CElecParts::ELEC_TESLATOWER;
+
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
 		return E_FAIL;
 

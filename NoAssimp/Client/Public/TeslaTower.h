@@ -32,6 +32,8 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };
 	CCollider* m_pColliderCom = { nullptr };
+	CGameObject* m_pSphere = { nullptr };
+	CGameObject* m_pElecParts = { nullptr };
 
 private:
 	HRESULT Add_Components(LEVEL eLevel);

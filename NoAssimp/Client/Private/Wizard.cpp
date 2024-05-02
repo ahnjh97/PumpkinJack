@@ -274,7 +274,9 @@ void CWizard::Link_State(_float fTimeDelta)
 			m_eState = WIZARD_ATTACK;
 			m_fChargeTime = 0.f;
 			m_bTowerSpawn = false;
+
 			DestroyTeslaTowers();
+			DestroyChargeEffect();
 		}
 		else if(true == AllTowersDestroyed()){
 			m_eState = WIZARD_IDLE;

@@ -53,6 +53,7 @@
 #include "Lightning.h"
 #include "HoleWall.h"
 #include "Tornado.h"
+#include "Sphere.h"
 #include "Wizard.h"
 #include "Book.h"
 
@@ -401,6 +402,8 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "ElecNoise", "Effects/ElecNoise.dds")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "HighFreq", "Effects/HighFreq.dds")))
+		return E_FAIL;
 
 
 	m_strLoadingText = TEXT("Loading VIBuffers for Level_Wizard...");
@@ -440,7 +443,7 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ElecParts"), CElecParts);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LightningEffects"), CLightningEffects);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Lightning"), CLightning);
-
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Sphere"), CSphere);
 
 	m_strLoadingText = TEXT("Loading Complete: Level_Wizard");
 	m_isFinished = true;
@@ -485,6 +488,8 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "ElecNoise", "Effects/ElecNoise.dds")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "HighFreq", "Effects/HighFreq.dds")))
+		return E_FAIL;
 
 
 	m_strLoadingText = TEXT("Loading VIBuffers for Level_EffectTool...");
@@ -524,7 +529,7 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LightningEffects"), CLightningEffects);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HoleWall"), CHoleWall);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Lightning"), CLightning);
-
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Sphere"), CSphere);
 
 	m_strLoadingText = TEXT("Loading Complete: Level_EffectTool");
 	m_isFinished = true;
@@ -719,31 +724,29 @@ HRESULT CLoader::Add_VIBuffer_Instance_Points(LEVEL eLevel)
 	InstanceDesc.vMinScale = _float3(24, 24, 24);
 	InstanceDesc.vMaxScale = _float3(26, 26, 26);
 	InstanceDesc.vSpeed = _float2(120, 125.f);
-	InstanceDesc.iNumInstance = 120;
+	InstanceDesc.iNumInstance = 100;
 	InstanceDesc.vLifeTime = _float2(35, 35);
 	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_CYLINDER;
 	InstanceDesc.fDistanceLimit = 5.f;
 	vecInstanceDesc[CElecParts::ELEC_CHARGE] = InstanceDesc;
 
 	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
-	InstanceDesc.vRange = _float3(15, 15, 15);
-	InstanceDesc.vMinScale = _float3(24, 24, 24);
-	InstanceDesc.vMaxScale = _float3(26, 26, 26);
-	InstanceDesc.vMinScale = _float3(16.f, 16.f, 16.f);
-	InstanceDesc.vMaxScale = _float3(18, 18, 18);
+	InstanceDesc.vRange = _float3(5.7f, 5.7f, 5.7f);
+	InstanceDesc.vMinScale = _float3(8, 8, 8);
+	InstanceDesc.vMaxScale = _float3(9, 9, 9);
 	InstanceDesc.iNumInstance = 20;
-	InstanceDesc.vLifeTime = _float2(0.5f, 0.8f);
+	InstanceDesc.vLifeTime = _float2(0.15f, 0.25f);
 	InstanceDesc.isLoop = true;
 	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_SPHERE;
 	vecInstanceDesc[CElecParts::ELEC_TESLATOWER] = InstanceDesc;
 
 	InstanceDesc.vCenter = _float3(0.f, 9.f, 0.f);
-	InstanceDesc.vRange = _float3(10, 18, 10);
+	InstanceDesc.vRange = _float3(7.5f, 14, 7.5f);
 	InstanceDesc.vMinScale = _float3(24, 24, 24);
 	InstanceDesc.vMaxScale = _float3(26, 26, 26);
 	InstanceDesc.vMinScale = _float3(12, 12, 12);
 	InstanceDesc.vMaxScale = _float3(14, 14, 14);
-	InstanceDesc.iNumInstance = 80;
+	InstanceDesc.iNumInstance = 60;
 	InstanceDesc.vLifeTime = _float2(0.3f, 1.f);
 	InstanceDesc.isLoop = false;
 	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_DEFAULT;
@@ -850,6 +853,7 @@ void CLoader::SetUp_ModelScaleRotation() // Scale, Degaree, NewScale, RootIndex
 	m_ModelConfigs.emplace("WizardBrickGround", MODEL_CONFIG{ 12.f, 0.f, 12.f });
 	m_ModelConfigs.emplace("WizardTower", MODEL_CONFIG{ 15.f, 0.f, 15.f });
 	m_ModelConfigs.emplace("SkySphere", MODEL_CONFIG{ 0.2f, 0.f, 0.2f });
+	m_ModelConfigs.emplace("Sphere", MODEL_CONFIG{ 10.f, 0.f, 10.f });
 }
 
 void CLoader::TraverseAnimModels(LEVEL eLevel, const wstring& rootFolderPath)

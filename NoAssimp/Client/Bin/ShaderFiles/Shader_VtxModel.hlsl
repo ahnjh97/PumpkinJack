@@ -147,25 +147,31 @@ PS_OUT PS_HOLEWALL(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
-    // 연기 노이즈 UV 좌표
     float2 smokeUV = In.vTexcoord;
-    // 연기 텍스쳐 샘플링
     float smokeValue = g_VoronoiBlur.Sample(LinearSampler, smokeUV).r;
 
-    // 불 노이즈 UV 좌표
     float2 fireUV = In.vTexcoord + g_fTime * 0.1;
-    // 불 텍스쳐 샘플링
     float fireNoise = g_FireNoise.Sample(LinearSampler, fireUV).r;
 
     // voronoiBlur의 값이 높을수록 fireNoise의 영향을 많이 줌
     float finalValue = lerp(1 - smokeValue + 0.2, fireNoise * 0.5, 1 - smokeValue + 0.2);
 
-    // 결과 색상 계산
     Out.vColor = float4(1, 1, 1, 1 - finalValue - 0.2);
 
     if (Out.vColor.a <= 0.1f)
         discard;
 
+    return Out;
+}
+
+PS_OUT PS_SPHERE(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    Out.vColor.rgb = float3(1, 1, 1);
+    Out.vColor.a = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord - g_fTime).r;
+    if (0.3f >= Out.vColor.a)
+        discard;
+    
     return Out;
 }
 
@@ -265,5 +271,17 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_HOLEWALL();
+    }
+
+    pass Sphere // 8
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_SPHERE();
     }
 }

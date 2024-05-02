@@ -35,6 +35,20 @@ HRESULT CTeslaTower::Initialize(void* pArg)
 
 	m_iHp = 30;
 
+	GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = GameObjectDesc.iLevel;
+	tDesc.matWorld = GameObjectDesc.matWorld;
+	tDesc.matWorld._42 = 24.f;
+	m_pSphere = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Sphere"), &tDesc);
+
+
+	CElecParts::ELECPARTS_DESC tElecPartsDesc{};
+	tElecPartsDesc.iLevel = GameObjectDesc.iLevel;
+	tElecPartsDesc.matWorld = GameObjectDesc.matWorld;
+	tElecPartsDesc.matWorld._42 = 24.f;
+	tElecPartsDesc.eElecEffect = CElecParts::ELEC_TESLATOWER;
+	m_pElecParts = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc);
+
 	return S_OK;
 }
 
@@ -49,6 +63,12 @@ void CTeslaTower::Tick(_float fTimeDelta)
 	if (m_pTransformCom->Get_Pos_Float4().y < 0)
 		m_pTransformCom->Fall(-fTimeDelta * 2.5f);
 
+	if (m_pSphere != nullptr)
+		m_pSphere->Tick(fTimeDelta);
+
+	if (m_pElecParts != nullptr)
+		m_pElecParts->Tick(fTimeDelta);
+
 	if (m_pColliderCom != nullptr)
 		m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
 }
@@ -57,6 +77,12 @@ void CTeslaTower::Late_Tick(_float fTimeDelta)
 {
 	if (m_bDead)
 		return;
+
+	if (m_pSphere != nullptr)
+		m_pSphere->Late_Tick(fTimeDelta);
+
+	if (m_pElecParts != nullptr)
+		m_pElecParts->Late_Tick(fTimeDelta);
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
@@ -169,6 +195,8 @@ void CTeslaTower::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pElecParts);
+	Safe_Release(m_pSphere);
 	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pShaderCom);

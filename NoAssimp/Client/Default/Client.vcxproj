@@ -212,6 +212,7 @@
     <ClInclude Include="..\Public\Slime_Slime.h" />
     <ClInclude Include="..\Public\Soldier.h" />
     <ClInclude Include="..\Public\SoldierWeapon.h" />
+    <ClInclude Include="..\Public\Sphere.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\Terrain_SlimeBossRoom.h" />
     <ClInclude Include="..\Public\TeslaTower.h" />
@@ -281,6 +282,7 @@
     <ClCompile Include="..\Private\Slime_Slime.cpp" />
     <ClCompile Include="..\Private\Soldier.cpp" />
     <ClCompile Include="..\Private\SoldierWeapon.cpp" />
+    <ClCompile Include="..\Private\Sphere.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\Terrain_SlimeBossRoom.cpp" />
     <ClCompile Include="..\Private\TeslaTower.cpp" />

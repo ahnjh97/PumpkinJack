@@ -157,6 +157,20 @@ _float4 CVIBuffer_Instance::Compute_RandPosition(INSTANCE_SHAPE eShape, _bool bR
 			return _float4(fRadius * cos(fAngle), RangePosY(m_RandomNumber), fRadius * sin(fAngle), 1.f);
 		}
 	}
+	else if (eShape == SHAPE_SPHERE)
+	{
+		uniform_real_distribution<_float> Angle(0, XM_2PI);
+		uniform_real_distribution<_float> ElevationAngle(-1, 1);
+		_float fAngle = Angle(m_RandomNumber);
+		_float fElevationAngle = ElevationAngle(m_RandomNumber);
+		_float fPhi = acosf(fElevationAngle);
+
+		_float fX = m_InstanceDesc.vRange.x * sinf(fPhi) * cosf(fAngle);
+		_float fY = m_InstanceDesc.vRange.x * sinf(fPhi) * sinf(fAngle);
+		_float fZ = m_InstanceDesc.vRange.x * cosf(fPhi);
+
+		return _float4(fX, fY, fZ, 1);
+	}
 
 	return _float4();
 }
