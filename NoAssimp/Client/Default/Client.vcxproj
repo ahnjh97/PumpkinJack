@@ -174,6 +174,7 @@
     <ClInclude Include="..\Public\CollisionCube.h" />
     <ClInclude Include="..\Public\CrateBox.h" />
     <ClInclude Include="..\Public\ElecArena.h" />
+    <ClInclude Include="..\Public\ElecChain.h" />
     <ClInclude Include="..\Public\ElecParts.h" />
     <ClInclude Include="..\Public\Grid.h" />
     <ClInclude Include="..\Public\HoleWall.h" />
@@ -244,6 +245,7 @@
     <ClCompile Include="..\Private\CollisionCube.cpp" />
     <ClCompile Include="..\Private\CrateBox.cpp" />
     <ClCompile Include="..\Private\ElecArena.cpp" />
+    <ClCompile Include="..\Private\ElecChain.cpp" />
     <ClCompile Include="..\Private\ElecParts.cpp" />
     <ClCompile Include="..\Private\Grid.cpp" />
     <ClCompile Include="..\Private\HoleWall.cpp" />

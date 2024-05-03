@@ -91,7 +91,7 @@ PS_OUT PS_SLIMEBOSSROOM(PS_IN In)
     vector vDiffuseColor = g_WaterTexture.Sample(LinearSampler, In.vTexcoord);
     vector vCausticColor = g_CausticTexture.Sample(LinearSampler, In.vTexcoord);
     float3 resultColor = lerp(vDiffuseColor, slimeLightGreen, vCausticColor);
-    Out.vColor = float4(resultColor, 0.5f);
+    Out.vColor = float4(resultColor, 0.5);
     
     return Out;
 }
@@ -168,8 +168,8 @@ PS_OUT PS_SPHERE(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     Out.vColor.rgb = float3(1, 1, 1);
-    Out.vColor.a = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord - g_fTime).r;
-    if (0.3f >= Out.vColor.a)
+    Out.vColor.a = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord - g_fTime * 0.2).r;
+    if (0.4 >= Out.vColor.a)
         discard;
     
     return Out;

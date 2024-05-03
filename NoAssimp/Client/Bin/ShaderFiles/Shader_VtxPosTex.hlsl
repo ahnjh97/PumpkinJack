@@ -15,6 +15,8 @@ texture2D g_ElecNoise;
 texture2D g_FieldDepth;
 uint g_iSpriteIndex, g_iLightningIndex;
 
+texture2D g_ElecChain[8];
+
 float2 ScreenSize = float2(1280, 720);
 
 struct VS_IN
@@ -203,6 +205,19 @@ PS_OUT PS_LIGHTNING(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_ELECCHAIN(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    Out.vColor = g_ElecChain[1].Sample(LinearSampler, In.vTexcoord);
+    //Out.vColor.xyz = 1.f;
+    Out.vColor.a = g_ElecChain[1].Sample(LinearSampler, In.vTexcoord).r;
+    if (0.7 > Out.vColor.a)
+        discard;
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
 	pass Default // 0
@@ -243,7 +258,7 @@ technique11 DefaultTechnique
 
     pass Portal // 3
     {
-        SetRasterizerState(RS_NoCull);
+        SetRasterizerState(RS_Sky);
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
@@ -267,7 +282,7 @@ technique11 DefaultTechnique
 
     pass Lightning // 5
     {
-        SetRasterizerState(RS_NoCull);
+        SetRasterizerState(RS_Sky);
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
@@ -275,5 +290,17 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_LIGHTNING();
+    }
+
+    pass ElecChain // 6
+    {
+        SetRasterizerState(RS_Sky);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_ELECCHAIN();
     }
 }

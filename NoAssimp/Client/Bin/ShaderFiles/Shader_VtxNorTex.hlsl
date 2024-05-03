@@ -74,7 +74,7 @@ PS_OUT PS_MAIN(PS_IN In)
     Out.vDiffuse = vector(vDiffuse.xyz, 1.f);
     Out.vNormal = vector((In.vNormal * 0.5f + 0.5f).xyz, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fCamFar, 0.0f, 0.0f);
-	
+    
 	return Out;
 }
 

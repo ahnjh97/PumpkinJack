@@ -3,7 +3,7 @@
 #include "GameObject.h"
 
 BEGIN(Engine)
-class CVIBuffer_Instance_Point;
+class CVIBuffer_Rect;
 class CTexture;
 class CShader;
 END

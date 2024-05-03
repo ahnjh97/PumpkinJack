@@ -51,6 +51,7 @@
 #include "SkySphere.h"
 #include "ElecParts.h"
 #include "Lightning.h"
+#include "ElecChain.h"
 #include "HoleWall.h"
 #include "Tornado.h"
 #include "Sphere.h"
@@ -319,7 +320,6 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 	if (FAILED(Add_Texture(eLevel, "Portal", "Portal/Portal.dds")))
 		return E_FAIL;
 
-
 	m_strLoadingText = TEXT("Loading NavigationCells for Level_SlimeBoss...");
 	/* Prototype_Component_VIBuffer_Terrain_SlimeBoss */
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_VIBuffer_Terrain_SlimeBoss"),
@@ -404,6 +404,10 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "HighFreq", "Effects/HighFreq.dds")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "BaseBeam", "Effects/BaseBeam.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "ElecChain", "Effects/ElecChain%d.png", 8)))
+		return E_FAIL;
 
 
 	m_strLoadingText = TEXT("Loading VIBuffers for Level_Wizard...");
@@ -444,6 +448,8 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LightningEffects"), CLightningEffects);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Lightning"), CLightning);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Sphere"), CSphere);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ElecBeam"), CElecChain);
+
 
 	m_strLoadingText = TEXT("Loading Complete: Level_Wizard");
 	m_isFinished = true;
@@ -490,6 +496,10 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "HighFreq", "Effects/HighFreq.dds")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "BaseBeam", "Effects/BaseBeam.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "ElecChain", "Effects/ElecChain%d.png", 8)))
+		return E_FAIL;
 
 
 	m_strLoadingText = TEXT("Loading VIBuffers for Level_EffectTool...");
@@ -530,6 +540,8 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HoleWall"), CHoleWall);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Lightning"), CLightning);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Sphere"), CSphere);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ElecBeam"), CElecChain);
+
 
 	m_strLoadingText = TEXT("Loading Complete: Level_EffectTool");
 	m_isFinished = true;
@@ -731,10 +743,10 @@ HRESULT CLoader::Add_VIBuffer_Instance_Points(LEVEL eLevel)
 	vecInstanceDesc[CElecParts::ELEC_CHARGE] = InstanceDesc;
 
 	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
-	InstanceDesc.vRange = _float3(5.7f, 5.7f, 5.7f);
+	InstanceDesc.vRange = _float3(5.6f, 5.6f, 5.6f);
 	InstanceDesc.vMinScale = _float3(8, 8, 8);
 	InstanceDesc.vMaxScale = _float3(9, 9, 9);
-	InstanceDesc.iNumInstance = 20;
+	InstanceDesc.iNumInstance = 10;
 	InstanceDesc.vLifeTime = _float2(0.15f, 0.25f);
 	InstanceDesc.isLoop = true;
 	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_SPHERE;

@@ -1,8 +1,10 @@
+5/3
 - TeslaTower LightBeam
 - ElecParts_EarthQuake 
-
 - ElecArena Dissolving
-- Solider	Alpha Dissolve
+
+5/4, 5/5
+- Soldier	Alpha Dissolve
 - Hit Effect
 - DeathEffect
 
@@ -16,3 +18,7 @@
 - LevelGamePlay Props
 - LevelSlimeBoss TerrainMask
 - LevelSlimeBoss Props
+
+5/10~5/12
+- Fmod, Sound
+- Video Recording

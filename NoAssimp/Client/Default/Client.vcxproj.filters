@@ -214,6 +214,9 @@
     <Filter Include="02.GameObjects\Level_Wizard\Sphere">
       <UniqueIdentifier>{90d079dc-847e-45d4-99ab-694c80d11157}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Level_Wizard\ElecBeam">
+      <UniqueIdentifier>{89c4dc43-f9d5-42af-a20a-9583ea973184}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -423,6 +426,9 @@
     <ClInclude Include="..\Public\Sphere.h">
       <Filter>02.GameObjects\Level_Wizard\Sphere</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\ElecChain.h">
+      <Filter>02.GameObjects\Level_Wizard\ElecBeam</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -622,6 +628,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Sphere.cpp">
       <Filter>02.GameObjects\Level_Wizard\Sphere</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ElecChain.cpp">
+      <Filter>02.GameObjects\Level_Wizard\ElecBeam</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

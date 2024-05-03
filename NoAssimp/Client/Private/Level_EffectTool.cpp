@@ -3,6 +3,7 @@
 #include "Camera_Free.h"
 #include "Lightning.h"
 #include "ElecParts.h"
+#include "ElecChain.h"
 #include "Terrain.h"
 
 CLevel_EffectTool::CLevel_EffectTool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -101,11 +102,11 @@ HRESULT CLevel_EffectTool::Ready_Layer_Grid(const wstring& strLayerTag)
 
 HRESULT CLevel_EffectTool::Add_Effect(const wstring& strLayerTag)
 {
-	CElecParts::ELECPARTS_DESC tElecPartsDesc{};
-	tElecPartsDesc.iLevel = LEVEL_EFFECTTOOL;
-	tElecPartsDesc.eElecEffect = CElecParts::ELEC_TESLATOWER;
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
-		return E_FAIL;
+	//CElecParts::ELECPARTS_DESC tElecPartsDesc{};
+	//tElecPartsDesc.iLevel = LEVEL_EFFECTTOOL;
+	//tElecPartsDesc.eElecEffect = CElecParts::ELEC_TESLATOWER;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
+	//	return E_FAIL;
 
 	//CGameObject::GAMEOBJECT_DESC tDesc{};
 	//tDesc.iLevel = LEVEL_EFFECTTOOL;
@@ -120,18 +121,25 @@ HRESULT CLevel_EffectTool::Add_Effect(const wstring& strLayerTag)
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Lightning"), &tLightningDesc)))
 		return E_FAIL;*/
 
+	CElecChain::ELEC_BEAM_DESC tElecBeamDesc{};
+	tElecBeamDesc.iLevel = LEVEL_EFFECTTOOL;
+	tElecBeamDesc.iElecBeamIndex = 0;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_ElecBeam"), &tElecBeamDesc)))
+		return E_FAIL;
+
+
 	return S_OK;
 }
 
 HRESULT CLevel_EffectTool::Add_Effect2(const wstring& strLayerTag)
 {
-	CElecParts::ELECPARTS_DESC tElecPartsDesc{};
-	tElecPartsDesc.iLevel = LEVEL_EFFECTTOOL;
-	tElecPartsDesc.eElecEffect = CElecParts::ELEC_DESTROY;
-	tElecPartsDesc.fDuration = 1.2f;
+	//CElecParts::ELECPARTS_DESC tElecPartsDesc{};
+	//tElecPartsDesc.iLevel = LEVEL_EFFECTTOOL;
+	//tElecPartsDesc.eElecEffect = CElecParts::ELEC_DESTROY;
+	//tElecPartsDesc.fDuration = 1.2f;
 
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
+	//	return E_FAIL;
 
 	return S_OK;
 }

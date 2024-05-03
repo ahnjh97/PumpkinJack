@@ -218,16 +218,16 @@ PS_OUT PS_FINAL(PS_IN In)
     
 	
 	//vector	vSkillDepth = g_SkillDepthTexture.Sample(PointSampler, In.vTexcoord);
-    //vector vPlayerDepth = g_PlayerDepthTexture.Sample(PointSampler, In.vTexcoord);
-    
-    //if (/*vSkillEffect.r > 0.1 && */vSkillEffect.a > 0.1 && vPlayerDepth.r > vSkillDepth.r)
+    vector vPlayerDepth = g_PlayerDepthTexture.Sample(PointSampler, In.vTexcoord);
+    if (vPlayerDepth.r != 0)
+        vSkillEffect.a = 0;
+    //if (vPlayerDepth.r < vSkillDepth.r)
     //    vSkillEffect.a = 0.f;
 	
     //vSkillEffect.a = saturate(vSkillEffect.a);
 	
-	
 	//Out.vColor = colorLighted;
-    vector colorLighted = vDiffuse * vShade + vSpecular;
+        vector colorLighted = vDiffuse * vShade + vSpecular;
 	Out.vColor = (1.0f - vSkillEffect.a) * colorLighted + vSkillEffect.a * vSkillEffect;
 
 	return Out;

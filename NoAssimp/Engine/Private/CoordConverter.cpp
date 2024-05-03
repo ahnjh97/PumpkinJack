@@ -137,9 +137,8 @@ CCoordConverter* CCoordConverter::Create(ID3D11Device* pDevice, ID3D11DeviceCont
 
 void CCoordConverter::Free()
 {
-	Safe_Release(m_pGameInstance);
 	Safe_Release(m_pTextureHub);
-
+	Safe_Release(m_pGameInstance);
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);
 }

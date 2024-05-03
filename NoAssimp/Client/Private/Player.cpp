@@ -80,7 +80,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 	if (FAILED(Add_PartObjects((LEVEL)GameObjectDesc.iLevel)))
 		return E_FAIL;
 
-	XMStoreFloat3(&m_vDirection, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
+	::XMStoreFloat3(&m_vDirection, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
 
 	if(m_pNavigationCom[DEFAULT] != nullptr)
 		m_pNavigationCom[DEFAULT]->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
@@ -723,13 +723,17 @@ void CPlayer::Check_GoBackUp()
 
 		if (bNullPointers == true)
 		{
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vTeleportPos);
 			m_bInSlimeBossRoom = false;
 			m_iSlimeBossRoomEscapeCount++;
 			m_eNavigation = DEFAULT;
-			// curCell 다시검사
-			if(m_pNavigationCom[m_eNavigation] != nullptr)
-				m_pNavigationCom[m_eNavigation]->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
+
+			if(m_pNavigationCom[m_eNavigation] != nullptr)	// curCell 다시검사
+				m_pNavigationCom[m_eNavigation]->Find_CurrentIndex(vTeleportPos);
+
+			_float4 vPosFloat{};
+			::XMStoreFloat4(&vPosFloat, vTeleportPos);
+			vPosFloat.y = m_pNavigationCom[m_eNavigation]->Get_PlaneHeight(vPosFloat);
+			m_pTransformCom->Set_Pos(vPosFloat);
 		}
 	}
 }

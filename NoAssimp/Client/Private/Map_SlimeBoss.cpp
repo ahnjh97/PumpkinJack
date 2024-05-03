@@ -47,7 +47,10 @@ void CMap_SlimeBoss::Tick(_float fTimeDelta)
 
 void CMap_SlimeBoss::Late_Tick(_float fTimeDelta)
 {
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this); // 알파값 있는 애들때문에 객체 분리해야될거같음
+	if(true == Check_InSlimeBossRoom())
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this); // 알파값 있는 애들때문에 객체 분리해야될거같음
+	else
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this); // 알파값 있는 애들때문에 객체 분리해야될거같음
 }
 
 HRESULT CMap_SlimeBoss::Render()

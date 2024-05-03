@@ -5,9 +5,8 @@
 
 CVIBuffer_Terrain::CVIBuffer_Terrain(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CVIBuffer{ pDevice, pContext }
-	, m_pGameInstance{ CGameInstance::Get_Instance() }
 {
-	Safe_AddRef(m_pGameInstance);
+
 }
 
 CVIBuffer_Terrain::CVIBuffer_Terrain(const CVIBuffer_Terrain & rhs)
@@ -15,12 +14,9 @@ CVIBuffer_Terrain::CVIBuffer_Terrain(const CVIBuffer_Terrain & rhs)
 	m_iNumVerticesX{rhs.m_iNumVerticesX}, 
 	m_iNumVerticesZ{ rhs.m_iNumVerticesZ }, 
 	m_pVerticesPos{rhs.m_pVerticesPos },
-	m_pGameInstance{ rhs.m_pGameInstance }, 
 	m_pQuadTree_Terrain{ rhs.m_pQuadTree_Terrain }
 {
 	Safe_AddRef(m_pQuadTree_Terrain);
-	Safe_AddRef(m_pGameInstance);
-	/*Safe_AddRef(m_pVerticesPos);*/
 }
 
 HRESULT CVIBuffer_Terrain::Initialize_Prototype(_uint iX, _uint iZ)
@@ -159,16 +155,6 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const wstring& strHeightMapFileP
 	m_ePrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
 #pragma region VERTEX_BUFFER
-	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
-
-	/* 정점버퍼의 byte크기 */
-	m_BufferDesc.ByteWidth = m_iVertexStride * m_iNumVertices;
-	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	m_BufferDesc.CPUAccessFlags = 0;
-	m_BufferDesc.MiscFlags = 0;
-	m_BufferDesc.StructureByteStride = m_iVertexStride;
-
 	_float fDivideBy{};
 	if (strHeightMapFilePath == TEXT("../../../Resources/Textures/Terrain/Level_GamePlay.bmp"))
 		fDivideBy = 18.8f;
@@ -190,27 +176,10 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const wstring& strHeightMapFileP
 		}
 	}
 
-	ZeroMemory(&m_InitialData, sizeof m_InitialData);
-	m_InitialData.pSysMem = pVertices;
-
-	if (FAILED(__super::Create_Buffer(&m_pVB)))
-		return E_FAIL;
-
-	Safe_Delete_Array(pVertices);
 #pragma endregion
 
 
 #pragma region INDEX_BUFFER
-
-	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
-
-	/* 인덱스 버퍼의 byte크기 */
-	m_BufferDesc.ByteWidth = m_iIndexStride * m_iNumIndices;
-	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	m_BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	m_BufferDesc.MiscFlags = 0;
-	m_BufferDesc.StructureByteStride = 0;
 	
 	_uint*		pIndices = new _uint[m_iNumIndices];
 	ZeroMemory(pIndices, sizeof(_uint) * m_iNumIndices);
@@ -231,16 +200,65 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const wstring& strHeightMapFileP
 				iIndex
 			};
 
+			_vector		vSour, vDest, vNormal;
+
 			/* 오른쪽 위 삼각형의 인덱스 */
 			pIndices[iNumIndices++] = iIndices[0];
 			pIndices[iNumIndices++] = iIndices[1];
 			pIndices[iNumIndices++] = iIndices[2];
 
+			vSour = XMLoadFloat3(&pVertices[iIndices[1]].vPosition) - XMLoadFloat3(&pVertices[iIndices[0]].vPosition);
+			vDest = XMLoadFloat3(&pVertices[iIndices[2]].vPosition) - XMLoadFloat3(&pVertices[iIndices[1]].vPosition);
+			vNormal = XMVector3Normalize(XMVector3Cross(vSour, vDest));
+
+			XMStoreFloat3(&pVertices[iIndices[0]].vNormal, XMLoadFloat3(&pVertices[iIndices[0]].vNormal) + vNormal);
+			XMStoreFloat3(&pVertices[iIndices[1]].vNormal, XMLoadFloat3(&pVertices[iIndices[1]].vNormal) + vNormal);
+			XMStoreFloat3(&pVertices[iIndices[2]].vNormal, XMLoadFloat3(&pVertices[iIndices[2]].vNormal) + vNormal);
+
 			pIndices[iNumIndices++] = iIndices[0];
 			pIndices[iNumIndices++] = iIndices[2];
 			pIndices[iNumIndices++] = iIndices[3];
+
+			vSour = XMLoadFloat3(&pVertices[iIndices[2]].vPosition) - XMLoadFloat3(&pVertices[iIndices[0]].vPosition);
+			vDest = XMLoadFloat3(&pVertices[iIndices[3]].vPosition) - XMLoadFloat3(&pVertices[iIndices[2]].vPosition);
+			vNormal = XMVector3Normalize(XMVector3Cross(vSour, vDest));
+
+			XMStoreFloat3(&pVertices[iIndices[0]].vNormal, XMLoadFloat3(&pVertices[iIndices[0]].vNormal) + vNormal);
+			XMStoreFloat3(&pVertices[iIndices[2]].vNormal, XMLoadFloat3(&pVertices[iIndices[2]].vNormal) + vNormal);
+			XMStoreFloat3(&pVertices[iIndices[3]].vNormal, XMLoadFloat3(&pVertices[iIndices[3]].vNormal) + vNormal);
 		}
 	}
+
+	for (_uint i = 0; i < m_iNumVertices; ++i)
+		XMStoreFloat3(&pVertices[i].vNormal, XMVector3Normalize(XMLoadFloat3(&pVertices[i].vNormal)));
+
+	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+
+	/* 정점버퍼의 byte크기 */
+	m_BufferDesc.ByteWidth = m_iVertexStride * m_iNumVertices;
+	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	m_BufferDesc.CPUAccessFlags = 0;
+	m_BufferDesc.MiscFlags = 0;
+	m_BufferDesc.StructureByteStride = m_iVertexStride;
+
+	ZeroMemory(&m_InitialData, sizeof m_InitialData);
+	m_InitialData.pSysMem = pVertices;
+
+	if (FAILED(__super::Create_Buffer(&m_pVB)))
+		return E_FAIL;
+
+	Safe_Delete_Array(pVertices);
+
+	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+
+	/* 인덱스 버퍼의 byte크기 */
+	m_BufferDesc.ByteWidth = m_iIndexStride * m_iNumIndices;
+	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	m_BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	m_BufferDesc.MiscFlags = 0;
+	m_BufferDesc.StructureByteStride = 0;
 
 	ZeroMemory(&m_InitialData, sizeof m_InitialData);
 	m_InitialData.pSysMem = pIndices;
@@ -336,7 +354,7 @@ _float3 CVIBuffer_Terrain::Get_PickPos(const CTransform* pTransform) const
 	return _float3();
 }
 
-_int CVIBuffer_Terrain::Get_TriangleIndex(const CTransform* pTransform, _float3& vA, _float3& vB, _float3& vC ) const
+_int CVIBuffer_Terrain::Get_TriangleIndex(const CTransform* pTransform, _float3& vA, _float3& vB, _float3& vC) const
 {
 	_float3 vRayDir, vRayPos;
 	m_pGameInstance->Transform_PickingToLocalSpace(pTransform, &vRayDir, &vRayPos);
@@ -426,5 +444,4 @@ void CVIBuffer_Terrain::Free()
 		Safe_Delete_Array(m_pVerticesPos);
 
 	Safe_Release(m_pQuadTree_Terrain);
-	Safe_Release(m_pGameInstance);
 }

@@ -7,9 +7,9 @@ CMyImGui::CMyImGui(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     m_pContext{ pContext },
     m_pGameInstance{ CGameInstance::Get_Instance() }
 {
+    Safe_AddRef(m_pGameInstance);
     Safe_AddRef(m_pDevice);
     Safe_AddRef(m_pContext);
-    Safe_AddRef(m_pGameInstance);
 }
 
 void CMyImGui::Set_Vectors(vector<string> vecAnim, vector<string> vecNonAnim)
@@ -174,10 +174,6 @@ void CMyImGui::Free()
     //__super::Free();
     //Safe_Release(m_pPickedObject);
  
-    Safe_Release(m_pGameInstance);
-    Safe_Release(m_pContext);
-    Safe_Release(m_pDevice);
-
     for (auto& Pair : m_Components)
         Safe_Release(Pair.second);
 
@@ -186,4 +182,8 @@ void CMyImGui::Free()
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
+
+    Safe_Release(m_pGameInstance);
+    Safe_Release(m_pContext);
+    Safe_Release(m_pDevice);
 }
