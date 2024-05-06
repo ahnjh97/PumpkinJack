@@ -2,10 +2,13 @@
 
 /* 전역변수 : 쉐이더 외부에 있는 데이터를 쉐이더 안으로 받아온다. */
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
-
 matrix g_BoneMatrices[512];
+
 texture2D g_DiffuseTexture, g_SlimeEmitTexture;
+
 float g_fCamFar;
+float g_fAlpha;
+float g_fPlayRatio;
 
 struct VS_IN
 {
@@ -88,7 +91,7 @@ PS_OUT PS_MAIN(PS_IN In)
     return Out;
 }
 
-PS_OUT PS_MAIN_SLIME(PS_IN In)
+PS_OUT PS_SLIME(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
@@ -102,7 +105,7 @@ PS_OUT PS_MAIN_SLIME(PS_IN In)
     return Out;
 }
 
-PS_OUT PS_MAIN_NO_LIGHT(PS_IN In)
+PS_OUT PS_NO_LIGHT(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
@@ -128,6 +131,32 @@ PS_OUT PS_JACK(PS_IN In)
     Out.vNormal = vector((In.vNormal * 0.5f + 0.5f).xyz, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fCamFar, 0.0f, 0.0f);
     Out.vPlayerDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fCamFar, 0.0f, 0.0f);
+    
+    float3 vDamageColor = float3(2.f, 0.45f, 0);
+    
+    if (g_fPlayRatio < 0.5f)
+        Out.vDiffuse.rgb += vDamageColor * g_fPlayRatio;
+    else if (g_fPlayRatio < 1.f)
+        Out.vDiffuse.rgb += vDamageColor * (1 - g_fPlayRatio);
+    
+    return Out;
+}
+
+PS_OUT PS_SOLDIER(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (0.3f >= vMtrlDiffuse.a)
+        discard;
+
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector((In.vNormal * 0.5f + 0.5f).xyz, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fCamFar, 0.0f, 0.0f);
+    Out.vDiffuse.a = g_fAlpha;
+    
+    if (0.1 > Out.vDiffuse.a)
+        discard;
     
     return Out;
 }
@@ -167,30 +196,42 @@ technique11 DefaultTechnique
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_SLIME();
+        PixelShader = compile ps_5_0 PS_SLIME();
     }
 
     pass Wizard // 3
     {
         SetRasterizerState(RS_NoCull);
         SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_NO_LIGHT();
+        PixelShader = compile ps_5_0 PS_NO_LIGHT();
     }
 
     pass Jack // 4
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_JACK();
+    }
+
+    pass Soldier // 4
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_SOLDIER();
     }
 }

@@ -167,7 +167,7 @@ PS_OUT PS_HOLEWALL(PS_IN In)
 PS_OUT PS_SPHERE(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
-    Out.vColor.rgb = float3(1, 1, 1);
+    Out.vColor.rgb = float3(2, 2, 2);
     Out.vColor.a = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord - g_fTime * 0.2).r;
     if (0.4 >= Out.vColor.a)
         discard;

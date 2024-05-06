@@ -1,10 +1,4 @@
-5/3
-- TeslaTower LightBeam
-- ElecParts_EarthQuake 
-- ElecArena Dissolving
-
 5/4, 5/5
-- Soldier	Alpha Dissolve
 - Hit Effect
 - DeathEffect
 

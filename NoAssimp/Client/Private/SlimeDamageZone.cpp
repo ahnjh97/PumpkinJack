@@ -56,7 +56,7 @@ void CSlimeDamageZone::Tick(_float fTimeDelta)
 		{
 			if (m_fDamageTime >= 1.f)
 			{
-				pPlayer->Deduct_HP(20);
+				pPlayer->Deduct_HP(15);
 				m_fDamageTime = 0.f;
 			}
 		}

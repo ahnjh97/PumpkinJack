@@ -7,6 +7,7 @@
 #include "Indicator.h"
 #include "BackGround.h"
 #include "GameInstance.h"
+#include "DamageEffect.h"
 #include "Level_Loading.h"
 
 
@@ -119,6 +120,12 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		return E_FAIL;
 	if (FAILED(Add_Texture(LEVEL_STATIC, "Sky", "SkyBox/skybox.dds")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(LEVEL_STATIC, "Hit", "Effects/HitFX.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(LEVEL_STATIC, "Soul", "Effects/soulTex%d.dds", 2)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(LEVEL_STATIC, "Damage", "Effects/Damage.dds")))
+		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_LoadingScreen"),
 		CBackGround::Create(m_pDevice, m_pContext, true))))
@@ -128,6 +135,9 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Inven"),
 		CInven::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_DamageEffect"),
+		CDamageEffect::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI_Weapon"),
 		CUI_Weapon::Create(m_pDevice, m_pContext))))

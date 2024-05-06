@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "TeslaTower.h"
+#include "ElecChain.h"
 #include "ElecParts.h"
 
 CTeslaTower::CTeslaTower(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -20,34 +21,27 @@ HRESULT CTeslaTower::Initialize_Prototype()
 
 HRESULT CTeslaTower::Initialize(void* pArg)
 {
-	GAMEOBJECT_DESC GameObjectDesc = {}; // = (GAMEOBJECT_DESC*)pArg;
+	TESLATOWER_DESC tTeslaTowerDesc = {}; // = (GAMEOBJECT_DESC*)pArg;
 	if (pArg)
-		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
+		tTeslaTowerDesc = *(TESLATOWER_DESC*)pArg;
 
-	GameObjectDesc.fSpeedPerSec = 10.f;
-	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	tTeslaTowerDesc.fSpeedPerSec = 10.f;
+	tTeslaTowerDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-	if (FAILED(__super::Initialize(&GameObjectDesc)))
+
+	if (FAILED(__super::Initialize(&tTeslaTowerDesc)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel))))
+	if (FAILED(Add_Components(LEVEL(tTeslaTowerDesc.iLevel))))
 		return E_FAIL;
 
 	m_iHp = 30;
 
-	GAMEOBJECT_DESC tDesc{};
-	tDesc.iLevel = GameObjectDesc.iLevel;
-	tDesc.matWorld = GameObjectDesc.matWorld;
-	tDesc.matWorld._42 = 24.f;
-	m_pSphere = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Sphere"), &tDesc);
-
-
-	CElecParts::ELECPARTS_DESC tElecPartsDesc{};
-	tElecPartsDesc.iLevel = GameObjectDesc.iLevel;
-	tElecPartsDesc.matWorld = GameObjectDesc.matWorld;
-	tElecPartsDesc.matWorld._42 = 24.f;
-	tElecPartsDesc.eElecEffect = CElecParts::ELEC_TESLATOWER;
-	m_pElecParts = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc);
+	m_pSphere = Add_Sphere(LEVEL(tTeslaTowerDesc.iLevel), tTeslaTowerDesc.matWorld);
+	m_pElecParts = Add_ElecParts(LEVEL(tTeslaTowerDesc.iLevel), tTeslaTowerDesc.matWorld);
+	
+	for (_uint i = 0; i < m_iNumElecChains; i++) 
+		m_pElecChain[i] = Add_ElecChain(LEVEL(tTeslaTowerDesc.iLevel), tTeslaTowerDesc.matWorld, tTeslaTowerDesc.vReactorPos, i);
 
 	return S_OK;
 }
@@ -69,6 +63,11 @@ void CTeslaTower::Tick(_float fTimeDelta)
 	if (m_pElecParts != nullptr)
 		m_pElecParts->Tick(fTimeDelta);
 
+	for (_uint i = 0; i < m_iNumElecChains; i++) {
+		if (m_pElecChain[i] != nullptr)
+			m_pElecChain[i]->Tick(fTimeDelta);
+	}
+
 	if (m_pColliderCom != nullptr)
 		m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
 }
@@ -83,6 +82,11 @@ void CTeslaTower::Late_Tick(_float fTimeDelta)
 
 	if (m_pElecParts != nullptr)
 		m_pElecParts->Late_Tick(fTimeDelta);
+
+	for (_uint i = 0; i < m_iNumElecChains; i++) {
+		if (m_pElecChain[i] != nullptr)
+			m_pElecChain[i]->Late_Tick(fTimeDelta);
+	}
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
@@ -112,6 +116,49 @@ HRESULT CTeslaTower::Render()
 #endif 
 
 	return S_OK;
+}
+
+CGameObject* CTeslaTower::Add_Sphere(LEVEL eLevel, _float4x4 _matWorld)
+{
+	GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = eLevel;
+	tDesc.matWorld = _matWorld;
+	tDesc.matWorld._42 = 24.f;
+
+	return m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Sphere"), &tDesc);
+}
+
+CGameObject* CTeslaTower::Add_ElecParts(LEVEL eLevel, _float4x4 _matWorld)
+{
+	CElecParts::ELECPARTS_DESC tElecPartsDesc{};
+	tElecPartsDesc.iLevel = eLevel;
+	tElecPartsDesc.matWorld = _matWorld;
+	tElecPartsDesc.matWorld._42 = 24.f;
+	tElecPartsDesc.eElecEffect = CElecParts::ELEC_TESLATOWER;
+
+	return m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc);
+}
+
+CGameObject* CTeslaTower::Add_ElecChain(LEVEL eLevel, _float4x4 _matWorld, _fvector vReactorPos, _uint iChainIndex)
+{
+	_vector vSpherePos = m_pTransformCom->Get_Pos_Vector();
+	vSpherePos = XMVectorSetY(vSpherePos, 24);
+
+	_float fDistance = XMVectorGetX(XMVector4Length(vReactorPos - vSpherePos));
+	_vector vTempLook = XMVector4Normalize(vReactorPos - vSpherePos);
+
+	_float4 vElecChainPos{};
+	XMStoreFloat4(&vElecChainPos, vSpherePos + (vTempLook * fDistance / _float(m_iNumElecChains + 1) * (iChainIndex + 1)));
+
+	CElecChain::ELEC_CHAIN_DESC tElecChainDesc{};
+	tElecChainDesc.iLevel = eLevel;
+	tElecChainDesc.matWorld._41 = vElecChainPos.x;
+	tElecChainDesc.matWorld._42 = vElecChainPos.y;
+	tElecChainDesc.matWorld._43 = vElecChainPos.z;
+	tElecChainDesc.iElecChainIndex = iChainIndex;
+	tElecChainDesc.vReactorPos = vReactorPos;
+
+	return m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_ElecChain"), &tElecChainDesc);
 }
 
 void CTeslaTower::Add_DestroyEffect()
@@ -195,6 +242,8 @@ void CTeslaTower::Free()
 {
 	__super::Free();
 
+	for (_uint i = 0; i < m_iNumElecChains; i++)
+		Safe_Release(m_pElecChain[i]);
 	Safe_Release(m_pElecParts);
 	Safe_Release(m_pSphere);
 	Safe_Release(m_pColliderCom);

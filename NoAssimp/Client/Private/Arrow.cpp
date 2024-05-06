@@ -1,7 +1,9 @@
 #include "stdafx.h"
-#include "Arrow.h"
+#include "ArrowEffect.h"
 #include "Ballista.h"
 #include "Player.h"
+#include "Arrow.h"
+#include "Part.h"
 
 CArrow::CArrow(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -31,7 +33,12 @@ HRESULT CArrow::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
+	m_iLevel = GameObjectDesc.iLevel;
+
 	if (FAILED(Add_Components(GameObjectDesc.wstrModelTag)))
+		return E_FAIL;
+
+	if (FAILED(Add_PartObjects(LEVEL(GameObjectDesc.iLevel))))
 		return E_FAIL;
 
 	return S_OK;
@@ -44,8 +51,10 @@ void CArrow::Tick(_float fTimeDelta)
 
 	m_fTime += fTimeDelta;
 
-	if (m_fCollisionTime < 0.01f)
-		m_pTransformCom->Go_Straight(fTimeDelta * 16.f);
+	if (m_fCollisionTime < 0.01f) {
+		if(m_iLevel == LEVEL_GAMEPLAY)
+			m_pTransformCom->Go_Straight(fTimeDelta * 16.f);
+	}
 	else
 		m_fAlpha -= exp(m_fTime * 0.12f) * fTimeDelta;
 	
@@ -58,11 +67,17 @@ void CArrow::Tick(_float fTimeDelta)
 	if(false == m_bObstacleCol)
 		Check_PlayerCol();
 
+	if (m_pArrowEffect != nullptr)
+		m_pArrowEffect->Tick(fTimeDelta);
+
 	m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
 }
 
 void CArrow::Late_Tick(_float fTimeDelta)
 {
+	if (m_pArrowEffect != nullptr)
+		m_pArrowEffect->Late_Tick(fTimeDelta);
+
 	if(m_fAlpha == 1.f)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	else
@@ -97,7 +112,7 @@ HRESULT CArrow::Render()
 
 void CArrow::Check_CollisionCubeCol()
 {
-	list<CGameObject*> collisionCubeList = m_pGameInstance->Get_ObjectList(LEVEL_GAMEPLAY, TEXT("Layer_CollisionCube"));
+	list<CGameObject*> collisionCubeList = m_pGameInstance->Get_ObjectList(m_iLevel, TEXT("Layer_CollisionCube"));
 	if (collisionCubeList.empty())
 		return;
 
@@ -116,7 +131,7 @@ void CArrow::Check_CollisionCubeCol()
 
 void CArrow::Check_PlayerCol()
 {
-	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_GAMEPLAY));
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(m_iLevel));
 	if (pPlayer) {
 		CCollider* pPlayerCollider = dynamic_cast<CCollider*>(pPlayer->Get_Component(TEXT("Com_Collider")));
 		if (!m_pColliderCom->Check_AlreadyCollided(pPlayerCollider)) {
@@ -130,12 +145,12 @@ HRESULT CArrow::Add_Components(const wstring& _wstrModelTag)
 {
 	/* For.Com_Shader */
 	wstring wstrShaderTag = TEXT("Prototype_Component_Shader_VtxModel");
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+	if (FAILED(__super::Add_Component(m_iLevel, wstrShaderTag, TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	/* For.Com_Model */
 	wstring wstrModelTag = _wstrModelTag;
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
+	if (FAILED(__super::Add_Component(m_iLevel, wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
 	/* For.Com_Collider */
@@ -145,6 +160,16 @@ HRESULT CArrow::Add_Components(const wstring& _wstrModelTag)
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"),
 		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom, &ColliderDesc)))
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CArrow::Add_PartObjects(LEVEL eLevel)
+{
+	CPart::PART_DESC tPartDesc{};
+	tPartDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	tPartDesc.iLevel = eLevel;
+	m_pArrowEffect = dynamic_cast<CArrowEffect*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Part_ArrowEffect"), &tPartDesc));
 
 	return S_OK;
 }
@@ -175,7 +200,6 @@ CArrow* CArrow::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 		Safe_Release(pInstance);
 	}
 	return pInstance;
-
 }
 
 CGameObject* CArrow::Clone(void* pArg)
@@ -193,6 +217,7 @@ void CArrow::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pArrowEffect);
 	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);

@@ -62,9 +62,6 @@ void CLightning::Tick(_float fTimeDelta)
 		m_iSpriteIndex++;
 		m_fTime = 0;
 	}
-		
-	/*if (m_pTargetWorldMat != nullptr)
-		m_pTransformCom->Set_Pos(XMVectorSet(m_pTargetWorldMat->_41, m_pTargetWorldMat->_42, m_pTargetWorldMat->_43, 1));*/
 }
 
 void CLightning::Late_Tick(_float fTimeDelta)

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ElecArena.h"
+#include "ElecParts.h"
 #include "Cell.h"
 
 CElecArena::CElecArena(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -33,6 +34,8 @@ HRESULT CElecArena::Initialize(void* pArg)
 	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel), GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
 
+	m_iLevel = GameObjectDesc.iLevel;
+
 	m_pModelCom->SetUp_QuadTreeCells();
 
 	return S_OK;
@@ -40,23 +43,32 @@ HRESULT CElecArena::Initialize(void* pArg)
 
 void CElecArena::Tick(_float fTimeDelta)
 {
-	for (_int i = 0; i < 2; i++) {
+	for (_int i = 0; i < 2; i++) 
 		m_fCircleTime[i] += fTimeDelta;
 
-		/*if (m_fCircleTime[i] > 1.8f)
-			m_fCircleTime[i] = 0;*/
-	}
-		
 	if (m_fTime > 4.f) {
 		Set_Dead();
 		return;
 	}
-		
+
+	if (m_pGameInstance->KeyDown(DIK_X)) // 이펙트 확인용
+		m_bWhiten = true;
+
 	if (m_bWhiten && m_fColorOffset < 0.5f)
 		m_fColorOffset += fTimeDelta * 0.25f;
 
 	if (m_fColorOffset >= 0.5f)
 		m_fTime += fTimeDelta;
+
+	if (m_fTime > 3.12f) {
+		if (m_bAddElecParts) {
+			Add_ElecParts();
+			m_bAddElecParts = false;
+		}
+	}
+
+	if (m_fTime > 3.3f) 
+		m_fDissolveTime += fTimeDelta;		
 }
 
 void CElecArena::Late_Tick(_float fTimeDelta)
@@ -94,6 +106,19 @@ _bool CElecArena::Check_QuadTreeCells(_fvector vPlayerPos, _float& fCellHeight)
 	return m_pModelCom->Check_QuadTreeCell(vNewPos, m_pTransformCom->Get_WorldMatrix(), fCellHeight);
 }
 
+void CElecArena::Add_ElecParts()
+{
+	CElecParts::ELECPARTS_DESC tElecPartsDesc{};
+	tElecPartsDesc.iLevel = m_iLevel;
+	tElecPartsDesc.eElecEffect = CElecParts::ELEC_EARTHQUAKE;
+	tElecPartsDesc.fDuration = 1.f;
+	tElecPartsDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	tElecPartsDesc.matWorld._42 = m_pTransformCom->Get_Pos_Float4().y + 2.f;
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_ElecParts"), TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
+		return;
+}
+
 HRESULT CElecArena::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 {
 	/* For.Com_Model */
@@ -107,9 +132,13 @@ HRESULT CElecArena::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
 
 	/* For.Com_Texture */
 	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_Circle"),
-		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
+		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom[TEX_CIRCLE])))
 		return E_FAIL;
 	
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_HighFreq"),
+		TEXT("Com_Texture_HighFreq"), (CComponent**)&m_pTextureCom[TEX_HIGHFREQ])))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -123,7 +152,7 @@ HRESULT CElecArena::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
-	if (FAILED(m_pTextureCom->Bind_ShaderResources(m_pShaderCom, "g_Circle")))
+	if (FAILED(m_pTextureCom[TEX_CIRCLE]->Bind_ShaderResources(m_pShaderCom, "g_Circle")))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fColorOffset", &m_fColorOffset, sizeof(_float))))
 		return E_FAIL;
@@ -134,6 +163,10 @@ HRESULT CElecArena::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fCircleTime1", &m_fCircleTime[1], sizeof(_float))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fCamFar", m_pGameInstance->Get_CamFarPtr(), sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveTime", &m_fDissolveTime, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pTextureCom[TEX_HIGHFREQ]->Bind_ShaderResources(m_pShaderCom, "g_HighFreq")))
 		return E_FAIL;
 
 	return S_OK;
@@ -170,14 +203,9 @@ CGameObject* CElecArena::Clone(void* pArg)
 void CElecArena::Free()
 {
 	__super::Free();
-	
-	//for (auto& vecCells : m_vecQuad) {
-	//	for (auto& groundCell : vecCells) {
-	//		Safe_Release(groundCell);
-	//	}
-	//}
 
-	Safe_Release(m_pTextureCom);
+	for(_int i = 0; i < TEX_END; i++)
+		Safe_Release(m_pTextureCom[i]);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);
 }

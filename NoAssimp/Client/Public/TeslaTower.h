@@ -12,6 +12,12 @@ BEGIN(Client)
 
 class CTeslaTower final : public CGameObject
 {
+public:
+	typedef struct : public CGameObject::GAMEOBJECT_DESC
+	{
+		_vector vReactorPos;
+	}TESLATOWER_DESC;
+
 private:
 	CTeslaTower(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CTeslaTower(const CTeslaTower& rhs);
@@ -25,7 +31,14 @@ public:
 	virtual HRESULT Render() override;
 
 private:
+	CGameObject* Add_Sphere(LEVEL eLevel, _float4x4 _matWorld);
+	CGameObject* Add_ElecParts(LEVEL eLevel, _float4x4 _matWorld);
+	CGameObject* Add_ElecChain(LEVEL eLevel, _float4x4 _matWorld, _fvector vReactorPos, _uint iChainIndex);
+
 	void Add_DestroyEffect();
+
+private:
+	_uint m_iNumElecChains = 6;
 
 private:
 	CModel* m_pModelCom = { nullptr };
@@ -34,6 +47,7 @@ private:
 	CCollider* m_pColliderCom = { nullptr };
 	CGameObject* m_pSphere = { nullptr };
 	CGameObject* m_pElecParts = { nullptr };
+	CGameObject* m_pElecChain[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 
 private:
 	HRESULT Add_Components(LEVEL eLevel);

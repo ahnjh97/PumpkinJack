@@ -31,6 +31,7 @@ public:
 	void Reset_Damagable();
 	void Activate_WeaponCollider() { m_bActivated = true; }
 	void DeActivate_WeaponCollider() { m_bActivated = false; }
+	void SavePlayerPos(_fvector vPlayerPos) { m_vPlayerPos = vPlayerPos; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -48,11 +49,15 @@ private:
 	void Check_WizardCol();
 	void Check_TeslaTowerCol();
 
-	void Check_Collision(CGameObject* pEnemy);
+	void Check_Collision(CGameObject* pEnemy, _float fHitEffectScale = 1.f);
+
+	_vector Compute_HitEffectPos(_uint iColliderIndex, CCollider* pEnemyCollider);
+	void Add_HitEffect(_fvector vHitEffectPos, _float fHitEffectScale);
 
 private:
 	_bool m_bCorrectWeapon = { false };
 	_bool m_bActivated = { false };
+	_vector m_vPlayerPos;
 
 private:
 	CModel* m_pModelCom = { nullptr };

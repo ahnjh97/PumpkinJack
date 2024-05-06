@@ -33,6 +33,8 @@ HRESULT CSoldier::Initialize(void* pArg)
 	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel), GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
 
+	m_iLevel = GameObjectDesc.iLevel;
+
 	if (FAILED(m_pModelCom->SetUp_AnimIndices()))
 		return E_FAIL;
 
@@ -152,7 +154,7 @@ HRESULT CSoldier::Render()
 			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(0)))
+		if (FAILED(m_pShaderCom->Begin(5)))  // Soldier
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -186,14 +188,16 @@ void CSoldier::LinkState(_float fTimeDelta)
 		{
 			m_fDeathTime += fTimeDelta;
 
-			if (m_fAlpha <= 0.f)
+			if (m_fAlpha <= 0.5 && m_bDeathEffect) {
+				DeathEffect();
+				m_bDeathEffect = false;
+			}
+
+			if (m_fAlpha <= 0.f) 
 				Set_Dead();
 
-			if(m_fAlpha >= 1.f)
-				DeathEffect();
-
 			// 알파값을 점점 감소
-			m_fAlpha -= exp(m_fDeathTime * fTimeDelta * 4.f) * fTimeDelta;
+			m_fAlpha -= exp(m_fDeathTime * fTimeDelta * 5.f) * fTimeDelta;
 		}
 		return;
 	}
@@ -283,6 +287,28 @@ void CSoldier::Soldier_AnimSpeed()
 
 void CSoldier::DeathEffect()
 {
+	// 뼈 위치 찾아서 할까 생각중..
+	_float4 vPos = m_pTransformCom->Get_Pos_Float4();
+
+	CBone* pBone = m_pModelCom->Get_BonePtr("Head");
+	if (nullptr == pBone)
+		return;
+
+	_matrix matBoneWorld = XMLoadFloat4x4(pBone->Get_CombinedTransformationMatrix()) * m_pTransformCom->Get_WorldMatrix();
+
+	_float3 vBonePos{};
+	_vector vScale, vRotation, vTranslation;
+	::XMMatrixDecompose(&vScale, &vRotation, &vTranslation, matBoneWorld);
+	XMStoreFloat3(&vBonePos, vTranslation);
+
+	CGameObject::GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = m_iLevel;
+	tDesc.matWorld._41 = vBonePos.x;
+	tDesc.matWorld._42 = vBonePos.y + 2.f;
+	tDesc.matWorld._43 = vBonePos.z;
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_SoulEffect"), TEXT("Prototype_GameObject_SoulEffect"), &tDesc)))
+		return;
 }
 
 void CSoldier::ActivateSoldierWeapon()
@@ -341,10 +367,10 @@ _bool CSoldier::Check_KartCol(_float fTimeDelta)
 	if (nullptr == pKartCollider)
 		return false;
 
-	_float3 vSrcPosFloat = m_pColliderCom[DEFAULT]->Get_Center(CCollider::TYPE_OBB);
+	_float3 vSrcPosFloat = m_pColliderCom[DEFAULT]->Get_Center();
 	_vector vSrsPos = XMLoadFloat3(&vSrcPosFloat);
 	if (m_pColliderCom[DEFAULT]->Intersect(pKartCollider))	{
-		_float3 vDstPosFloat = pKartCollider->Get_Center(CCollider::TYPE_OBB);
+		_float3 vDstPosFloat = pKartCollider->Get_Center();
 		_vector vDstPos = XMLoadFloat3(&vDstPosFloat);
 
 		_vector vDir = XMVector3Normalize(vSrsPos - vDstPos);
@@ -431,6 +457,8 @@ HRESULT CSoldier::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fCamFar", m_pGameInstance->Get_CamFarPtr(), sizeof(_float))))
 		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -447,7 +475,6 @@ CSoldier* CSoldier::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	}
 
 	return pInstance;
-
 }
 
 CGameObject* CSoldier::Clone(void* pArg)

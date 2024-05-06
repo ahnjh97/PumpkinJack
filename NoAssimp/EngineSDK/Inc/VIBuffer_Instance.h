@@ -6,7 +6,7 @@ BEGIN(Engine)
 class ENGINE_DLL CVIBuffer_Instance abstract : public CVIBuffer
 {
 public:
-	enum INSTANCE_SHAPE { SHAPE_DEFAULT, SHAPE_HEMISPHERE, SHAPE_RING, SHAPE_CYLINDER, SHAPE_SPHERE, SHAPE_END };
+	enum INSTANCE_SHAPE { SHAPE_DEFAULT, SHAPE_HEMISPHERE, SHAPE_RING, SHAPE_CYLINDER, SHAPE_SPHERE, SHAPE_RING_ROTATED, SHAPE_ARROW, SHAPE_END };
 	//enum INSTANCE_RESPAWN_TYPE
 
 	typedef struct
@@ -41,7 +41,8 @@ public:
 
 	virtual void Drop(_float fTimeDelta);
 	virtual void Spread(_float fTimeDelta);
-	virtual void Check_LifeTimes(_float fTimeDelta);
+	virtual void Spread_XZ(_float fTimeDelta);
+	virtual void Check_LifeTimes(_float fTimeDelta); // 위치이동 X, LifeTime만 확인
 	virtual void MoveToPivot(_float fTimeDelta);
 
 	void	Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceIndex, _float fTimeDelta, _bool bRespawnAtMinHeight = false);

@@ -126,8 +126,6 @@ HRESULT CBallista::Render()
 
 void CBallista::Add_Arrow()
 {
-	_float4 vPos = m_pTransformCom->Get_Pos_Float4();
-
 	CGameObject::GAMEOBJECT_DESC tDesc{};
 	tDesc.iLevel = LEVEL_GAMEPLAY;
 	tDesc.wstrModelTag = TEXT("Prototype_Component_Model_ballistaArrow");

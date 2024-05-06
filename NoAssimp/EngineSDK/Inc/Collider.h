@@ -13,13 +13,14 @@ private:
 	virtual ~CCollider() = default;
 
 public: 
-	_float Get_HightestPoint(TYPE eType);
-	_float3 Get_Center(TYPE eType);
+	_float Get_HightestPoint();
+	_float3 Get_Center();
 	_bool Get_Disabled() { return m_bDisabled; }
 	void Set_Disabled(_bool bDisabled) { m_bDisabled = bDisabled; }
 	_float3 Get_ColliderLook();
 	void Clear_CollidedColliders() { m_CollidedColliders.clear(); }
 	_bool Check_AlreadyCollided(CCollider* pEnemyCollider);
+	TYPE Get_ColliderType() { return m_eType; }
 
 public:
 	virtual HRESULT Initialize_Prototype(TYPE eType);

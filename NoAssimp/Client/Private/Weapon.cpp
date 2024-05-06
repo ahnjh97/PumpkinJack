@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "HitEffect.h"
 #include "Weapon.h"
 #include "Bone.h"
 
@@ -171,7 +172,7 @@ void CWeapon::Check_SlimeCol()
 		return;
 
 	for (auto& slime : slimeList)
-		Check_Collision(slime);
+		Check_Collision(slime, 0.65f);
 }
 
 void CWeapon::Check_SlimeBossRoomPillarCol()
@@ -222,7 +223,7 @@ void CWeapon::Check_TeslaTowerCol()
 		Check_Collision(teslaTower);
 }
 
-void CWeapon::Check_Collision(CGameObject* pEnemy)
+void CWeapon::Check_Collision(CGameObject* pEnemy, _float fHitEffectScale)
 {
 	if (nullptr == pEnemy)
 		return;
@@ -237,8 +238,45 @@ void CWeapon::Check_Collision(CGameObject* pEnemy)
 	if (m_pColliderCom[0]->Check_AlreadyCollided(pEnemyCollider) || m_pColliderCom[1]->Check_AlreadyCollided(pEnemyCollider))
 		return;
 
-	if (m_pColliderCom[0]->Intersect(pEnemyCollider) || m_pColliderCom[1]->Intersect(pEnemyCollider))
-		pEnemy->Deduct_HP(*m_pDamage);
+	for (_int i = 0; i < 2; i++) {
+		if (m_pColliderCom[i]->Intersect(pEnemyCollider)) {
+			if (pEnemy->Get_HP() > 0) {
+				_vector vHitEffectPos = Compute_HitEffectPos(i, pEnemyCollider);
+				Add_HitEffect(vHitEffectPos, fHitEffectScale);
+			}
+
+			pEnemy->Deduct_HP(*m_pDamage);
+			return;
+		}
+	}
+}
+
+_vector CWeapon::Compute_HitEffectPos(_uint iColliderIndex, CCollider* pEnemyCollider)
+{
+	_float fDistance;
+	_vector vEnemyColliderCenter = XMLoadFloat3(&pEnemyCollider->Get_Center());
+	_vector vRayDir = XMVector3Normalize(vEnemyColliderCenter - m_vPlayerPos);
+
+	if (pEnemyCollider->Intersect_Ray(m_vPlayerPos, vRayDir, fDistance))
+		return m_vPlayerPos + vRayDir * fDistance;
+	else
+		return _vector();
+}
+
+void CWeapon::Add_HitEffect(_fvector vHitEffectPos, _float fHitEffectScale)
+{
+	CHitEffect::HITEFFECT_DESC tHitEffectDesc{};
+	tHitEffectDesc.iLevel = *m_pGameInstance->Get_CurrentLevelID();
+	tHitEffectDesc.matWorld._41 = XMVectorGetX(vHitEffectPos);
+	tHitEffectDesc.matWorld._42 = XMVectorGetY(vHitEffectPos);
+	tHitEffectDesc.matWorld._43 = XMVectorGetZ(vHitEffectPos);
+	tHitEffectDesc.fNewScale = fHitEffectScale;
+
+	if (tHitEffectDesc.matWorld._42 > -50 && tHitEffectDesc.matWorld._42 < 4.5f)
+		tHitEffectDesc.matWorld._42 = 4.5f;
+
+	if (FAILED(m_pGameInstance->Add_Clone(tHitEffectDesc.iLevel, TEXT("Layer_HitEffect"), TEXT("Prototype_GameObject_HitEffect"), &tHitEffectDesc)))
+		return;
 }
 
 HRESULT CWeapon::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)

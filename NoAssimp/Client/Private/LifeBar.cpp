@@ -204,8 +204,6 @@ HRESULT CLifeBar::Bind_ShaderResources()
 	return S_OK;
 }
 
-
-
 CLifeBar* CLifeBar::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CLifeBar* pInstance = new CLifeBar(pDevice, pContext);

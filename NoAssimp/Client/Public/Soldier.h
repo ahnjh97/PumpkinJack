@@ -49,12 +49,12 @@ private:
 
 	_bool m_bSpinAttack = { false };
 	_bool m_bResetSpinAttack = { true };
+	_bool m_bDeathEffect = { true };
 
-	_int m_iPreHp = {};
 	_uint m_iDamage = { };
 
 	_float m_fIdleTime = {};
-	_float m_fTurnTime = {100.f};
+	_float m_fTurnTime = { 100.f };
 	_float m_fDeathTime = {};
 	_float m_fAlpha = { 1.f };
 

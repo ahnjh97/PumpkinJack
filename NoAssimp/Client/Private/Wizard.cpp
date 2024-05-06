@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "TeslaTower.h"
 #include "ElecArena.h"
 #include "ElecParts.h"
 #include "Wizard.h"
@@ -51,6 +52,7 @@ HRESULT CWizard::Initialize(void* pArg)
 
 	m_iPreHp = m_iHp = 200;
 	m_pTransformCom->Set_Height(m_fInitialHeight);
+	m_RandomNumber = mt19937_64(m_RandomDevice());
 
 	Summon_LevitationTornado();
 
@@ -74,6 +76,9 @@ void CWizard::Tick(_float fTimeDelta)
 	Link_State(fTimeDelta);
 	StateToAnimation();
 
+	if (m_pSphere != nullptr)
+		m_pSphere->Tick(fTimeDelta);
+
 	_matrix matBoneWorld = AttachColliderToBone();
 	if(m_pColliderCom != nullptr)
 		m_pColliderCom->Tick(matBoneWorld);
@@ -84,6 +89,9 @@ void CWizard::Late_Tick(_float fTimeDelta)
 	m_pModelCom->Play_Animation(fTimeDelta);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_iPreHp = m_iHp;
+
+	if (m_pSphere != nullptr)
+		m_pSphere->Late_Tick(fTimeDelta);
 }
 
 HRESULT CWizard::Render()
@@ -262,8 +270,9 @@ void CWizard::Link_State(_float fTimeDelta)
 
 		if (!m_bTowerSpawn)	{
 			TeslaTower();
-			m_bTowerSpawn = true;
 			ChargeEffect();
+			Sphere();
+			m_bTowerSpawn = true;
 		}
 
 		if (m_fChargeTime > 35.f) {
@@ -277,6 +286,7 @@ void CWizard::Link_State(_float fTimeDelta)
 
 			DestroyTeslaTowers();
 			DestroyChargeEffect();
+			Safe_Release(m_pSphere);
 		}
 		else if(true == AllTowersDestroyed()){
 			m_eState = WIZARD_IDLE;
@@ -287,6 +297,7 @@ void CWizard::Link_State(_float fTimeDelta)
 
 			ScatterEffect();
 			DestroyChargeEffect();
+			Safe_Release(m_pSphere);
 		}
 	}
 
@@ -472,9 +483,10 @@ void CWizard::TeslaTower()
 
 	_float fRadius = 140.f;
 
-	GAMEOBJECT_DESC tDesc{};
+	CTeslaTower::TESLATOWER_DESC tDesc{};
 	tDesc.iLevel = LEVEL_WIZARD;
 	tDesc.matWorld._42 = -30;
+	tDesc.vReactorPos = m_pTransformCom->Get_Pos_Vector() + XMVectorSet(0, 35, 0, 0);
 
 	for (_int i = 0; i < 4; i++) {
 		if (m_iWizardPhase == 0) {
@@ -537,6 +549,19 @@ void CWizard::ChargeEffect()
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_ElecParts"), TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
 		return;
+}
+
+void CWizard::Sphere()
+{
+	GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = LEVEL_WIZARD;
+	tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	tDesc.matWorld._11 = 2.f;
+	tDesc.matWorld._22 = 2.f;
+	tDesc.matWorld._33 = 2.f;
+	tDesc.matWorld._42 += 35.f;
+	
+	m_pSphere = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Sphere"), &tDesc);
 }
 
 void CWizard::ScatterEffect()
@@ -681,6 +706,7 @@ void CWizard::Free()
 {
 	__super::Free();
 	
+	Safe_Release(m_pSphere);
 	Safe_Release(m_pPlayer);
 	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pShaderCom);

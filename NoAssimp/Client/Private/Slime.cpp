@@ -105,10 +105,11 @@ void CSlime::Tick(_float fTimeDelta)
 	if (Check_DeathTrigger())
 		Set_Dead();
 
-	m_pColliderCom[DEFAULT]->Tick(m_pTransformCom->Get_WorldMatrix());
-	if(m_pColliderCom[DAMAGE_RANGE] != nullptr)
-		m_pColliderCom[DAMAGE_RANGE]->Tick(m_pTransformCom->Get_WorldMatrix());
-
+	for (_int i = 0; i < COLLIDER_END; i++) {
+		if (m_pColliderCom[i] != nullptr)
+			m_pColliderCom[i]->Tick(m_pTransformCom->Get_WorldMatrix());
+	}
+	
 	for (auto& Pair : m_Parts)
 		Pair.second->Tick(fTimeDelta);
 }
@@ -144,8 +145,8 @@ HRESULT CSlime::Render()
 	}
 
 #ifdef _DEBUG
-	if (m_pColliderCom[DEFAULT] != nullptr)
-		m_pGameInstance->Add_DebugComponents(m_pColliderCom[DEFAULT]);
+	if (m_pColliderCom[HIT] != nullptr)
+		m_pGameInstance->Add_DebugComponents(m_pColliderCom[HIT]);
 
 	/*if (m_pColliderCom[DAMAGE_RANGE] != nullptr)
 		m_pGameInstance->Add_DebugComponents(m_pColliderCom[DAMAGE_RANGE]);*/
@@ -186,7 +187,7 @@ void CSlime::Check_SlimeCol(_float fTimeDelta)
 	if (slimeList.empty())
 		return;
 
-	_float3 vSrcPosFloat = m_pColliderCom[DEFAULT]->Get_Center(CCollider::TYPE_SPHERE);
+	_float3 vSrcPosFloat = m_pColliderCom[DEFAULT]->Get_Center();
 	_vector vSrsPos = XMLoadFloat3(&vSrcPosFloat);
 
 	for (auto& slime : slimeList)
@@ -194,14 +195,14 @@ void CSlime::Check_SlimeCol(_float fTimeDelta)
 		if (slime == nullptr || slime == this)
 			continue;
 
-		CCollider* pSlimeCollider = dynamic_cast<CCollider*>(slime->Get_Component(TEXT("Com_Collider")));
+		CCollider* pSlimeCollider = dynamic_cast<CCollider*>(slime->Get_Component(TEXT("Com_Collider_Default")));
 
 		if (pSlimeCollider == nullptr)
 			continue;
 
 		if (m_pColliderCom[DEFAULT]->Intersect(pSlimeCollider))
 		{
-			_float3 vDstPosFloat = pSlimeCollider->Get_Center(CCollider::TYPE_SPHERE);
+			_float3 vDstPosFloat = pSlimeCollider->Get_Center();
 			_vector vDstPos = XMLoadFloat3(&vDstPosFloat);
 
 			_vector vDir = XMVector3Normalize(vSrsPos - vDstPos);
@@ -218,7 +219,7 @@ void CSlime::Check_PillarCol(_float fTimeDelta)
 	if (pillarList.empty())
 		return;
 
-	_float3 vSrcPosFloat = m_pColliderCom[DEFAULT]->Get_Center(CCollider::TYPE_SPHERE);
+	_float3 vSrcPosFloat = m_pColliderCom[DEFAULT]->Get_Center();
 	_vector vSrsPos = XMLoadFloat3(&vSrcPosFloat);
 
 	for (auto& pillar : pillarList)
@@ -233,7 +234,7 @@ void CSlime::Check_PillarCol(_float fTimeDelta)
 
 		if (m_pColliderCom[DEFAULT]->Intersect(pPillarWallCollider))
 		{
-			_float3 vDstPosFloat = pPillarWallCollider->Get_Center(CCollider::TYPE_OBB);
+			_float3 vDstPosFloat = pPillarWallCollider->Get_Center();
 			_vector vDstPos = XMLoadFloat3(&vDstPosFloat);
 			
 			_vector vTemp = vSrsPos - vDstPos;
@@ -262,10 +263,10 @@ void CSlime::Check_SlimeBossCol(_float fTimeDelta)
 
 	if (m_pColliderCom[DEFAULT]->Intersect(m_pSlimeBossCollider))
 	{
-		_float3 vSrcPosFloat = m_pColliderCom[DEFAULT]->Get_Center(CCollider::TYPE_SPHERE);
+		_float3 vSrcPosFloat = m_pColliderCom[DEFAULT]->Get_Center();
 		_vector vSrsPos = XMLoadFloat3(&vSrcPosFloat);
 
-		_float3 vDstPosFloat = m_pSlimeBossCollider->Get_Center(CCollider::TYPE_SPHERE);
+		_float3 vDstPosFloat = m_pSlimeBossCollider->Get_Center();
 		_vector vDstPos = XMLoadFloat3(&vDstPosFloat);
 
 		_vector vDir = XMVector3Normalize(vSrsPos - vDstPos);
@@ -299,12 +300,18 @@ HRESULT CSlime::Add_Components(const wstring& _wstrModelTag)
 	ColliderDesc.fRadius = 5.2f;
 	ColliderDesc.vCenter = _float3(0.f, 0, 0.f);
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
-		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom[DEFAULT], &ColliderDesc)))
+		TEXT("Com_Collider_Default"), (CComponent**)&m_pColliderCom[DEFAULT], &ColliderDesc)))
 		return E_FAIL;
 
 	ColliderDesc.fRadius = 15.f;
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Range"), (CComponent**)&m_pColliderCom[DAMAGE_RANGE], &ColliderDesc)))
+		return E_FAIL;
+
+	ColliderDesc.fRadius = 2.5f;
+	ColliderDesc.vCenter = _float3(0.f, 3.6f, 0.f);
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
+		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom[HIT], &ColliderDesc)))
 		return E_FAIL;
 
 	return S_OK;

@@ -50,14 +50,12 @@ _bool CBounding_Sphere::Intersect_Ray(_fvector vRayOrigin, _fvector vRayDir, _fl
 }
 
 #ifdef _DEBUG
-
 HRESULT CBounding_Sphere::Render(PrimitiveBatch<VertexPositionColor>* pBatch)
 {
 	DX::Draw(pBatch, *m_pBoundingDesc, m_isCollision == true ? XMVectorSet(1.f, 0.f, 0.f, 1.f) : XMVectorSet(0.f, 1.f, 0.f, 1.f));
 
 	return S_OK;
 }
-
 #endif
 
 CBounding_Sphere* CBounding_Sphere::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CBounding::BOUNDING_DESC* pBoundingDesc)

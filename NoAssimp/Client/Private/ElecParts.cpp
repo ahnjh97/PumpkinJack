@@ -47,7 +47,7 @@ HRESULT CElecParts::Initialize(void* pArg)
 		m_pTransformCom->Set_WorldMatrix(matWorld);
 	}
 
-	if (ELEC_CHARGE == tElecPartsDesc.eElecEffect || ELEC_SCATTER == tElecPartsDesc.eElecEffect)
+	if (ELEC_CHARGE == tElecPartsDesc.eElecEffect || ELEC_SCATTER == tElecPartsDesc.eElecEffect || ELEC_EARTHQUAKE == tElecPartsDesc.eElecEffect)
 		m_bFadeIn = false;
 
 
@@ -79,6 +79,8 @@ void CElecParts::Tick(_float fTimeDelta)
 		m_pVIBufferCom->MoveToPivot(fTimeDelta);
 	else if (ELEC_SCATTER == m_eElecEffect)
 		m_pVIBufferCom->Spread(fTimeDelta);
+	else if (ELEC_EARTHQUAKE == m_eElecEffect)
+		m_pVIBufferCom->Spread_XZ(fTimeDelta);
 	else
 		m_pVIBufferCom->Check_LifeTimes(fTimeDelta);
 

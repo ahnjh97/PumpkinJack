@@ -12,7 +12,7 @@ BEGIN(Client)
 
 class CSlime : public CGameObject
 {
-	enum COLLIDER { DEFAULT, DAMAGE_RANGE, COLLIDER_END };
+	enum COLLIDER { DEFAULT, DAMAGE_RANGE, HIT, COLLIDER_END };
 private:
 	CSlime(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CSlime(const CSlime& rhs);

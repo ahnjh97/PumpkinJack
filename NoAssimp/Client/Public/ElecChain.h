@@ -13,12 +13,12 @@ BEGIN(Client)
 class CElecChain final : public CGameObject
 {
 	enum TEX_ELEC { TEX_ELEC, TEX_NOISE, TEX_END };
-
 public:
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{
-		_uint iElecBeamIndex = {};
-	}ELEC_BEAM_DESC;
+		_uint iElecChainIndex = {};
+		_vector vReactorPos;
+	}ELEC_CHAIN_DESC;
 
 private:
 	CElecChain(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -33,17 +33,21 @@ public:
 	virtual HRESULT Render() override;
 	
 private:
-	HRESULT Add_ElecChain(LEVEL eLevel, _uint iBeamIndex);
+	void Randomize_Chain();
 
 private:
-	_uint m_iElecBeamIndex = {};
+	_uint m_iElecChainIndex = {};
 
 	_float m_fTime = {};
+	_float m_fChangeTime = {};
 
 private:
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
 	CTexture* m_pTextureCom[TEX_END] = {};
 	CShader* m_pShaderCom = { nullptr };
+
+	random_device	m_RandomDevice;
+	mt19937_64		m_RandomNumber;
 
 private:
 	HRESULT Add_Components(LEVEL eLevel);

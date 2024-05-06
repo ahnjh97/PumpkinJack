@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "DamageEffect.h"
 #include "ElecArena.h"
 #include "Collider.h"
 #include "Player.h"
@@ -55,6 +56,20 @@ CModel* CPlayer::Get_BodyModel()
 		return nullptr;
 
 	return pBodyModel;
+}
+
+CWeapon* CPlayer::Get_WeaponPtr()
+{
+	CPart* pPart = { nullptr };
+
+	if(WPN_SPEAR == m_eWeapon)
+		pPart = Get_Part(TEXT("Part_Spear"));
+	else if(WPN_RIFLE== m_eWeapon)
+		pPart = Get_Part(TEXT("Part_Rifle"));
+	else if (WPN_SCYTHE == m_eWeapon)
+		pPart = Get_Part(TEXT("Part_Scythe"));
+
+	return dynamic_cast<CWeapon*>(pPart);
 }
 
 HRESULT CPlayer::Initialize_Prototype()
@@ -193,6 +208,8 @@ void CPlayer::Tick(_float fTimeDelta)
 		m_fDashTime = 0.f;
 	}
 
+	Get_WeaponPtr()->SavePlayerPos(m_pTransformCom->Get_Pos_Vector());
+
 	for (auto& Pair : m_Parts)
 		Pair.second->Tick(fTimeDelta);
 
@@ -206,6 +223,7 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 {
 	for (auto& Pair : m_Parts)
 		Pair.second->Late_Tick(fTimeDelta);
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 
 	for (_int i = 0; i < NAVIGATION_END; i++)
@@ -221,8 +239,12 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 	if (m_bIsAttacking && pBodyModel->isFinished())
 		Reset_WeaponCollider(m_eWeapon);
 
+	if (m_iPreHp > m_iHp)
+		Damage_Effect();
+
 	m_bPreInSlimeBossRoom = m_bInSlimeBossRoom;
 	m_bPreIsPushingKart = m_bIsPushingKart;
+	m_iPreHp = m_iHp;
 }
 
 HRESULT CPlayer::Render()
@@ -499,7 +521,7 @@ _bool CPlayer::Check_GroundColliders()
 
 		if (m_pColliderCom->Intersect(pPillarGroundCollider))
 		{
-			_float fPillarGroundColliderHeight = pPillarGroundCollider->Get_HightestPoint(CCollider::TYPE_OBB);
+			_float fPillarGroundColliderHeight = pPillarGroundCollider->Get_HightestPoint();
 			if (fPillarGroundColliderHeight <= fY + 2.0f && m_pTransformCom->Get_JumpPower() <= 0.f)
 			{
 				m_fPlaneHeight = fPillarGroundColliderHeight - 1.5f;
@@ -511,7 +533,7 @@ _bool CPlayer::Check_GroundColliders()
 	return false;
 }
 
-_bool CPlayer::Check_WallColliders(list<CGameObject*> objList, CCollider::TYPE eColliderType, const wstring& wstrColliderTag)
+_bool CPlayer::Check_WallColliders(list<CGameObject*> objList, const wstring& wstrColliderTag)
 {
 	CCollider* pWallCollider = { nullptr };
 	_vector vPlayerPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
@@ -526,7 +548,7 @@ _bool CPlayer::Check_WallColliders(list<CGameObject*> objList, CCollider::TYPE e
 		if (pWallCollider == nullptr)
 			continue;
 
-		_float3 vCenterPosFloat = pWallCollider->Get_Center(eColliderType);
+		_float3 vCenterPosFloat = pWallCollider->Get_Center();
 		_vector vCenterPos = XMLoadFloat3(&vCenterPosFloat);
 		_vector vDirectionToWallCenter = vCenterPos - vPlayerPos;
 		vDirectionToWallCenter = ::XMVectorSetY(vDirectionToWallCenter, 0.f);
@@ -543,11 +565,22 @@ _bool CPlayer::Check_WallColliders(list<CGameObject*> objList, CCollider::TYPE e
 
 _bool CPlayer::Check_WallColliders_LevelSlimeBoss()
 {
-	list<CGameObject*> objList = m_pGameInstance->Get_ObjectList(LEVEL_SLIMEBOSS, TEXT("Layer_Pillar"));
-	if (objList.empty())
-		return false;
+	if (false == m_bInSlimeBossRoom)
+	{
+		list<CGameObject*> pillarList = m_pGameInstance->Get_ObjectList(LEVEL_SLIMEBOSS, TEXT("Layer_Pillar"));
+		if (pillarList.empty())
+			return false;
 
-	return Check_WallColliders(objList, CCollider::TYPE_OBB);
+		return Check_WallColliders(pillarList);
+	}
+	else
+	{
+		list<CGameObject*> SBR_PillarList = m_pGameInstance->Get_ObjectList(LEVEL_SLIMEBOSS, TEXT("Layer_Pillar2"));
+		if (SBR_PillarList.empty())
+			return false;
+
+		return Check_WallColliders(SBR_PillarList, TEXT("Com_Collider"));
+	}
 }
 
 _bool CPlayer::Check_WallColliders_LevelGamePlay()
@@ -556,7 +589,7 @@ _bool CPlayer::Check_WallColliders_LevelGamePlay()
 	if (kartList.empty())
 		return false;
 
-	_bool bWallCol = Check_WallColliders(kartList, CCollider::TYPE_OBB);
+	_bool bWallCol = Check_WallColliders(kartList);
 	if (bWallCol)
 		return bWallCol;
 	
@@ -564,7 +597,7 @@ _bool CPlayer::Check_WallColliders_LevelGamePlay()
 	if (crateBoxList.empty())
 		return false;
 
-	return Check_WallColliders(crateBoxList, CCollider::TYPE_OBB);
+	return Check_WallColliders(crateBoxList);
 }
 
 _bool CPlayer::Check_SlimeBossPortalCol(_float fTimeDelta)
@@ -585,7 +618,7 @@ _bool CPlayer::Check_SlimeBossPortalCol(_float fTimeDelta)
 
 		if (m_pColliderCom->Intersect(pPortalCollider))
 		{
-			_vector vPortalCenter = XMLoadFloat3(&pPortalCollider->Get_Center(CCollider::TYPE_OBB));
+			_vector vPortalCenter = XMLoadFloat3(&pPortalCollider->Get_Center());
 			::XMVectorSetW(vPortalCenter, 1);
 			m_pTransformCom->Move_toTarget(vPortalCenter, fTimeDelta * 0.25f, 1.5f);
 			m_fHighFallTime += fTimeDelta;
@@ -613,7 +646,7 @@ _bool CPlayer::Check_Kart()
 
 	if (m_pColliderCom->Intersect(pPushCollider))
 	{
-		_float3 vCenterPosFloat = pPushCollider->Get_Center(CCollider::TYPE_OBB);
+		_float3 vCenterPosFloat = pPushCollider->Get_Center();
 		_vector vCenterPos = XMLoadFloat3(&vCenterPosFloat);
 		_vector vDirectionToWallCenter = vCenterPos - vPlayerPos;
 		vDirectionToWallCenter = ::XMVectorSetY(vDirectionToWallCenter, 0.f);
@@ -655,8 +688,6 @@ _bool CPlayer::Check_GroundCells(_Out_ _float& _fMinHeight, _Out_ _float& _fMaxH
 		CElecArena* pElecArena = dynamic_cast<CElecArena*>(elecArena);
 
 		_float fHeight{ -FLT_MAX };
-		/*if (true == pElecArena->Check_ElecArenaGroundCell(vPos, fHeight))
-			vecGroundCellHeights.emplace_back(fHeight);*/
 
 		if (true == pElecArena->Check_QuadTreeCells(vPos, fHeight))
 			vecGroundCellHeights.emplace_back(fHeight);
@@ -775,23 +806,23 @@ void CPlayer::TargetNearestEnemy()
 	m_fEnemyDistance = 50.f;
 	
 	if (LEVEL_GAMEPLAY == *m_pCurLevel)	
-		Check_EnemyDistance(LEVEL_GAMEPLAY, TEXT("Layer_Soldier"), CCollider::TYPE_OBB);
+		Check_EnemyDistance(LEVEL_GAMEPLAY, TEXT("Layer_Soldier"));
 	
 	else if (LEVEL_SLIMEBOSS == *m_pCurLevel) {
 		if (!m_bInSlimeBossRoom)
-			Check_EnemyDistance(LEVEL_SLIMEBOSS, TEXT("Layer_Slime"), CCollider::TYPE_SPHERE);
+			Check_EnemyDistance(LEVEL_SLIMEBOSS, TEXT("Layer_Slime"));
 		else
-			Check_EnemyDistance(LEVEL_SLIMEBOSS, TEXT("Layer_Pillar2"), CCollider::TYPE_OBB);
+			Check_EnemyDistance(LEVEL_SLIMEBOSS, TEXT("Layer_Pillar2"));
 	}
 	else if(LEVEL_WIZARD == *m_pCurLevel) { 
-		Check_EnemyDistance(LEVEL_WIZARD, TEXT("Layer_Wizard"), CCollider::TYPE_SPHERE);
-		Check_EnemyDistance(LEVEL_WIZARD, TEXT("Layer_TeslaTower"), CCollider::TYPE_SPHERE);
+		Check_EnemyDistance(LEVEL_WIZARD, TEXT("Layer_Wizard"));
+		Check_EnemyDistance(LEVEL_WIZARD, TEXT("Layer_TeslaTower"));
 	}
 
 	if (nullptr == m_pNearestEnemyCollider)
 		return;
 
-	_float3 vCenterPos = m_pNearestEnemyCollider->Get_Center(m_eEnemyColliderType);
+	_float3 vCenterPos = m_pNearestEnemyCollider->Get_Center();
 
 	_float4 vRightFloat, vLookFloat;
 	m_pTransformCom->Get_Look_LandObject(XMVectorSet(vCenterPos.x, vCenterPos.y, vCenterPos.z, 1), vRightFloat, vLookFloat);
@@ -802,7 +833,7 @@ void CPlayer::TargetNearestEnemy()
 		m_bIsDashDirDetermined = true;
 }
 
-void CPlayer::Check_EnemyDistance(LEVEL eLevel, const wstring& wstrLayerTag, CCollider::TYPE eColliderType, const wstring& wstrColliderTag)
+void CPlayer::Check_EnemyDistance(LEVEL eLevel, const wstring& wstrLayerTag, const wstring& wstrColliderTag)
 {
 	_vector vPlayerPos = m_pTransformCom->Get_Pos_Vector();
 
@@ -822,16 +853,13 @@ void CPlayer::Check_EnemyDistance(LEVEL eLevel, const wstring& wstrLayerTag, CCo
 		if (nullptr == pEnemyCollider)
 			continue;
 
-		_float3 vCenter = pEnemyCollider->Get_Center(eColliderType);
+		_float3 vCenter = pEnemyCollider->Get_Center();
 
 		_vector vResult = vPlayerPos - XMLoadFloat3(&vCenter);
 		_float fDis = ::XMVectorGetX(::XMVector3Length(vResult));
 
 		if (fDis < m_fEnemyDistance) 
-		{
 			m_pNearestEnemyCollider = pEnemyCollider;
-			m_eEnemyColliderType = eColliderType;
-		}
 	}
 }
 
@@ -1025,6 +1053,20 @@ void CPlayer::RifleRecoil(_float fTimeDelta)
 
 	if (pBodyModel->isFinished())
 		m_fDashTime = 0.f;
+}
+
+void CPlayer::Damage_Effect()
+{
+	CDamageEffect* pDamageEffect = dynamic_cast<CDamageEffect*>(m_pGameInstance->Get_GameObject(*m_pCurLevel, 
+		TEXT("Layer_DamageEffect"), TEXT("Prototype_GameObject_DamageEffect")));
+	if (nullptr == pDamageEffect)
+		return;
+	pDamageEffect->Reset_Time();
+
+	CBody* pBody = dynamic_cast<CBody*>(Get_Part(TEXT("Part_Body")));
+	if (nullptr == pBody)
+		return;
+	pBody->Reset_Time();
 }
 
 HRESULT CPlayer::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)

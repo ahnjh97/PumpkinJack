@@ -92,8 +92,8 @@ _vector CRail::Compute_Direction(_int iColliderIndex)
 	if (iColliderIndex < 0)
 		iColliderIndex = 0;
 
-	_float3 vDstPos = m_pColliderCom[iColliderIndex]->Get_Center(CCollider::TYPE_OBB);
-	_float3 vSrcPos = m_pColliderCom[iColliderIndex + 1]->Get_Center(CCollider::TYPE_OBB);
+	_float3 vDstPos = m_pColliderCom[iColliderIndex]->Get_Center();
+	_float3 vSrcPos = m_pColliderCom[iColliderIndex + 1]->Get_Center();
 
 	_vector vDir = XMVector3Normalize(XMLoadFloat3(&vSrcPos) - XMLoadFloat3(&vDstPos));
 	return vDir;

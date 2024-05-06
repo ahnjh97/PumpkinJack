@@ -1,20 +1,23 @@
 #include "stdafx.h"
 #include "Loader.h"
 #include <process.h>
-#include <locale>
 #include <codecvt>
+#include <locale>
+
 #include "GameInstance.h"
+#include "Tool_NonAnim.h"
 #include "Camera_Free.h"
 #include "Camera_Jack.h"
 #include "BackGround.h"
+#include "SoulEffect.h"
+#include "Tool_Anim.h"
+#include "HitEffect.h"
 #include "Terrain.h"
 #include "Monster.h"
 #include "Player.h"
-#include "Grid.h"
-#include "Tool_Anim.h"
-#include "Tool_NonAnim.h"
-#include "Body.h"
 #include "Weapon.h"
+#include "Grid.h"
+#include "Body.h"
 #include "Sky.h"
 
 #include "BallistaRotator.h"
@@ -22,6 +25,7 @@
 #include "SoldierWeapon.h"
 #include "CollisionCube.h"
 #include "Map_GamePlay.h"
+#include "ArrowEffect.h"
 #include "Ballista.h"
 #include "CrateBox.h"
 #include "Trigger.h"
@@ -237,7 +241,9 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Water", "Terrain/Water.dds")))
 		return E_FAIL;
-
+	if (FAILED(Add_Texture(eLevel, "SmokePuff", "Effects/smokePuff.dds")))
+		return E_FAIL;
+		
 
 	m_strLoadingText = TEXT("Loading NavigationCells for Level_GamePlay...");
 	/* Prototype_Component_VIBuffer_Terrain_GamePlay */
@@ -261,6 +267,8 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	if (FAILED(Add_Models(eLevel, vecAnimModelNames, vecNonAnimModelNames)))
 		return E_FAIL;
 
+	if (FAILED(Add_VIBuffer_Instance_Points(eLevel)))
+		return E_FAIL;
 
 	m_strLoadingText = TEXT("Loading Shaders for Level_GamePlay...");
 	if (FAILED(Add_Shaders(eLevel)))
@@ -277,6 +285,8 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Spear"), CWeapon);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Rifle"), CWeapon);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Scythe"), CWeapon);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HitEffect"), CHitEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SoulEffect"), CSoulEffect);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TongMap_GamePlay"), CMap_GamePlay);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Ballista"), CBallista);
@@ -290,6 +300,8 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Soldier"), CSoldier);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_SoldierWeapon"), CSoldierWeapon);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CollisionCube"), CCollisionCube);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_ArrowEffect"), CArrowEffect);
+
 
 	m_strLoadingText = TEXT("Loading Complete: Level_GamePlay");
 
@@ -448,7 +460,7 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LightningEffects"), CLightningEffects);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Lightning"), CLightning);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Sphere"), CSphere);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ElecBeam"), CElecChain);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ElecChain"), CElecChain);
 
 
 	m_strLoadingText = TEXT("Loading Complete: Level_Wizard");
@@ -500,6 +512,8 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "ElecChain", "Effects/ElecChain%d.png", 8)))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "SmokePuff", "Effects/smokePuff.dds")))
+		return E_FAIL;
 
 
 	m_strLoadingText = TEXT("Loading VIBuffers for Level_EffectTool...");
@@ -522,7 +536,10 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "Sphere")))
 		return E_FAIL;
-
+	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "elecArena1")))
+		return E_FAIL;
+	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "ballistaArrow")))
+		return E_FAIL;
 
 	m_strLoadingText = TEXT("Loading Shaders for Level_EffectTool...");
 	if (FAILED(Add_Shaders(eLevel)))
@@ -540,7 +557,12 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HoleWall"), CHoleWall);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Lightning"), CLightning);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Sphere"), CSphere);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ElecBeam"), CElecChain);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ElecChain"), CElecChain);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ElecArena"), CElecArena);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HitEffect"), CHitEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SoulEffect"), CSoulEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Arrow"), CArrow);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_ArrowEffect"), CArrowEffect);
 
 
 	m_strLoadingText = TEXT("Loading Complete: Level_EffectTool");
@@ -640,7 +662,7 @@ HRESULT CLoader::Add_Shaders(LEVEL eLevel)
 			return E_FAIL;
 	}
 
-	if (eLevel == LEVEL_WIZARD)
+	if (eLevel == LEVEL_WIZARD || eLevel == LEVEL_EFFECTTOOL)
 	{
 		/* For.Prototype_Component_Shader_VtxModel_ElecArena */
 		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, TEXT("Prototype_Component_Shader_VtxModel_ElecArena"),
@@ -698,96 +720,123 @@ HRESULT CLoader::Add_Instance_Models(LEVEL eLevel)
 
 HRESULT CLoader::Add_VIBuffer_Instance_Points(LEVEL eLevel)
 {
-	vector<CVIBuffer_Instance::INSTANCE_DESC> vecInstanceDesc;
-	vecInstanceDesc.resize(CElecParts::ELEC_END);
+	if (eLevel == LEVEL_WIZARD || eLevel == LEVEL_EFFECTTOOL) 
+	{
+		vector<CVIBuffer_Instance::INSTANCE_DESC> vecInstanceDesc;
+		vecInstanceDesc.resize(CElecParts::ELEC_END);
 
-	// ELEC_TORNADO
-	CVIBuffer_Instance::INSTANCE_DESC		InstanceDesc{};
-	InstanceDesc.vCenter = _float3(0.f, 18.f, 0.f);
-	InstanceDesc.vRange = _float3(20.f, 36.f, 20.f);
-	InstanceDesc.vMinScale = _float3(16.f, 16.f, 16.f);
-	InstanceDesc.vMaxScale = _float3(18, 18, 18);
-	InstanceDesc.iNumInstance = 30;
-	InstanceDesc.vLifeTime = _float2(0.5f, 0.8f);
-	InstanceDesc.isLoop = true;
-	InstanceDesc.iSpriteIndexOffset = 8;
-	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_DEFAULT;
-	vecInstanceDesc[CElecParts::ELEC_TORNADO] = InstanceDesc;
+		// ELEC_TORNADO
+		CVIBuffer_Instance::INSTANCE_DESC		InstanceDesc{};
+		InstanceDesc.vCenter = _float3(0.f, 18.f, 0.f);
+		InstanceDesc.vRange = _float3(20.f, 36.f, 20.f);
+		InstanceDesc.vMinScale = _float3(16.f, 16.f, 16.f);
+		InstanceDesc.vMaxScale = _float3(18, 18, 18);
+		InstanceDesc.iNumInstance = 30;
+		InstanceDesc.vLifeTime = _float2(0.5f, 0.8f);
+		InstanceDesc.isLoop = true;
+		InstanceDesc.iSpriteIndexOffset = 8;
+		InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_DEFAULT;
+		vecInstanceDesc[CElecParts::ELEC_TORNADO] = InstanceDesc;
 
-	InstanceDesc.vCenter = _float3(0.f, 1.f, 0.f);
-	InstanceDesc.vRange = _float3(16.f, 1.f, 16.f);
-	InstanceDesc.iNumInstance = 8;
-	InstanceDesc.vLifeTime = _float2(0.1f, 0.5f);
-	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_DEFAULT;
-	vecInstanceDesc[CElecParts::ELEC_LIGHTNING1] = InstanceDesc;
+		InstanceDesc.vCenter = _float3(0.f, 1.f, 0.f);
+		InstanceDesc.vRange = _float3(16.f, 1.f, 16.f);
+		InstanceDesc.iNumInstance = 8;
+		InstanceDesc.vLifeTime = _float2(0.1f, 0.5f);
+		InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_DEFAULT;
+		vecInstanceDesc[CElecParts::ELEC_LIGHTNING1] = InstanceDesc;
 
-	// LIGHTNING2 -> 튕겨나가는 파티클 느낌으로 
+		// LIGHTNING2 -> 튕겨나가는 파티클 느낌으로 
 
-	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
-	InstanceDesc.vRange = _float3(29.f, 29.f, 15.f);
-	InstanceDesc.iNumInstance = 70;
-	InstanceDesc.vLifeTime = _float2(0.5f, 0.8f);
-	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_RING;
-	vecInstanceDesc[CElecParts::ELEC_HOLE] = InstanceDesc;
+		InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+		InstanceDesc.vRange = _float3(29.f, 29.f, 15.f);
+		InstanceDesc.iNumInstance = 70;
+		InstanceDesc.vLifeTime = _float2(0.5f, 0.8f);
+		InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_RING;
+		vecInstanceDesc[CElecParts::ELEC_HOLE] = InstanceDesc;
 
-	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
-	InstanceDesc.vRange = _float3(115, 100, 115);
-	InstanceDesc.vPivot = _float3(0.f, 0, 0.f);
-	InstanceDesc.vMinScale = _float3(24, 24, 24);
-	InstanceDesc.vMaxScale = _float3(26, 26, 26);
-	InstanceDesc.vSpeed = _float2(120, 125.f);
-	InstanceDesc.iNumInstance = 100;
-	InstanceDesc.vLifeTime = _float2(35, 35);
-	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_CYLINDER;
-	InstanceDesc.fDistanceLimit = 5.f;
-	vecInstanceDesc[CElecParts::ELEC_CHARGE] = InstanceDesc;
+		InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+		InstanceDesc.vRange = _float3(85, 80, 85);
+		InstanceDesc.vPivot = _float3(0.f, 0, 0.f);
+		InstanceDesc.vMinScale = _float3(24, 24, 24);
+		InstanceDesc.vMaxScale = _float3(26, 26, 26);
+		InstanceDesc.vSpeed = _float2(120, 125.f);
+		InstanceDesc.iNumInstance = 50;
+		InstanceDesc.vLifeTime = _float2(35, 35);
+		InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_CYLINDER;
+		InstanceDesc.fDistanceLimit = 5.f;
+		vecInstanceDesc[CElecParts::ELEC_CHARGE] = InstanceDesc;
 
-	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
-	InstanceDesc.vRange = _float3(5.6f, 5.6f, 5.6f);
-	InstanceDesc.vMinScale = _float3(8, 8, 8);
-	InstanceDesc.vMaxScale = _float3(9, 9, 9);
-	InstanceDesc.iNumInstance = 10;
-	InstanceDesc.vLifeTime = _float2(0.15f, 0.25f);
-	InstanceDesc.isLoop = true;
-	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_SPHERE;
-	vecInstanceDesc[CElecParts::ELEC_TESLATOWER] = InstanceDesc;
+		InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+		InstanceDesc.vRange = _float3(5.6f, 5.6f, 5.6f);
+		InstanceDesc.vMinScale = _float3(8, 8, 8);
+		InstanceDesc.vMaxScale = _float3(9, 9, 9);
+		InstanceDesc.iNumInstance = 30;
+		InstanceDesc.vLifeTime = _float2(0.15f, 0.25f);
+		InstanceDesc.isLoop = true;
+		InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_SPHERE;
+		vecInstanceDesc[CElecParts::ELEC_TESLATOWER] = InstanceDesc;
 
-	InstanceDesc.vCenter = _float3(0.f, 9.f, 0.f);
-	InstanceDesc.vRange = _float3(7.5f, 14, 7.5f);
-	InstanceDesc.vMinScale = _float3(24, 24, 24);
-	InstanceDesc.vMaxScale = _float3(26, 26, 26);
-	InstanceDesc.vMinScale = _float3(12, 12, 12);
-	InstanceDesc.vMaxScale = _float3(14, 14, 14);
-	InstanceDesc.iNumInstance = 60;
-	InstanceDesc.vLifeTime = _float2(0.3f, 1.f);
-	InstanceDesc.isLoop = false;
-	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_DEFAULT;
-	//InstanceDesc.fDuration = 0.7f;
-	vecInstanceDesc[CElecParts::ELEC_DESTROY] = InstanceDesc;
+		InstanceDesc.vCenter = _float3(0.f, 9.f, 0.f);
+		InstanceDesc.vRange = _float3(7.5f, 14, 7.5f);
+		InstanceDesc.vMinScale = _float3(12, 12, 12);
+		InstanceDesc.vMaxScale = _float3(14, 14, 14);
+		InstanceDesc.iNumInstance = 60;
+		InstanceDesc.vLifeTime = _float2(0.3f, 1.f);
+		InstanceDesc.isLoop = false;
+		InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_DEFAULT;
+		//InstanceDesc.fDuration = 0.7f;
+		vecInstanceDesc[CElecParts::ELEC_DESTROY] = InstanceDesc;
 
-	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
-	InstanceDesc.vRange = _float3(0.5f, 1.5f, 1.5f); // x: min, z: max
-	InstanceDesc.vPivot = _float3(0.f, 0.f, 0.f);
-	InstanceDesc.vMinScale = _float3(15, 15, 15);
-	InstanceDesc.vMaxScale = _float3(16, 16, 16);
-	InstanceDesc.vSpeed = _float2(50.f, 52.f);
-	InstanceDesc.iNumInstance = 120;
-	InstanceDesc.vLifeTime = _float2(1.f, 1.3f);
-	InstanceDesc.isLoop = false;
-	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_CYLINDER;
-	InstanceDesc.fDistanceLimit = 60.f;
-	vecInstanceDesc[CElecParts::ELEC_SCATTER] = InstanceDesc;
+		InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+		InstanceDesc.vRange = _float3(0.5f, 1.5f, 1.5f); // x: min, z: max
+		InstanceDesc.vPivot = _float3(0.f, 0.f, 0.f);
+		InstanceDesc.vMinScale = _float3(15, 15, 15);
+		InstanceDesc.vMaxScale = _float3(16, 16, 16);
+		InstanceDesc.vSpeed = _float2(50.f, 52.f);
+		InstanceDesc.iNumInstance = 120;
+		InstanceDesc.vLifeTime = _float2(1.f, 1.3f);
+		InstanceDesc.isLoop = false;
+		InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_CYLINDER;
+		InstanceDesc.fDistanceLimit = 60.f;
+		vecInstanceDesc[CElecParts::ELEC_SCATTER] = InstanceDesc;
 
+		InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+		InstanceDesc.vRange = _float3(1.f, 50, 1.f);
+		InstanceDesc.vPivot = _float3(0.f, 0.f, 0.f);
+		InstanceDesc.vMinScale = _float3(40, 40, 40);
+		InstanceDesc.vMaxScale = _float3(50, 50, 50);
+		InstanceDesc.vSpeed = _float2(250, 250);
+		InstanceDesc.iNumInstance = 250;
+		InstanceDesc.vLifeTime = _float2(1.f, 1.f);
+		InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_RING_ROTATED;
+		vecInstanceDesc[CElecParts::ELEC_EARTHQUAKE] = InstanceDesc;
 
-	if (vecInstanceDesc.empty())
-		return S_OK;
+		if (vecInstanceDesc.empty())
+			return S_OK;
 
-	for (_int i = 0; i < CElecParts::ELEC_END; i++) {
-		if (vecInstanceDesc[i].iSpriteIndexOffset != 0) {
-			wstring wstrPrototypeTag = TEXT("Prototype_Component_VIBuffer_Instance_Point") + to_wstring(i);
-			if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext, vecInstanceDesc[i]))))
-				return E_FAIL;
+		for (_int i = 0; i < CElecParts::ELEC_END; i++) {
+			if (vecInstanceDesc[i].iSpriteIndexOffset != 0) {
+				wstring wstrPrototypeTag = TEXT("Prototype_Component_VIBuffer_Instance_Point") + to_wstring(i);
+				if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext, vecInstanceDesc[i]))))
+					return E_FAIL;
+			}
 		}
+	}
+
+	if (eLevel == LEVEL_GAMEPLAY || eLevel == LEVEL_EFFECTTOOL) 
+	{
+		CVIBuffer_Instance::INSTANCE_DESC		InstanceDesc{};
+		InstanceDesc.vCenter = _float3(0.f, 0.f, -17.f);
+		InstanceDesc.vRange = _float3(1, 0, 32);
+		InstanceDesc.vPivot = _float3(0.f, 0.f, 0.f);
+		InstanceDesc.vMinScale = _float3(1.5f, 1.5f, 1.5f);
+		InstanceDesc.vMaxScale = _float3(1.8f, 1.8f, 1.8f);
+		InstanceDesc.iNumInstance = 90;
+		InstanceDesc.vLifeTime = _float2(1.f, 1.f);
+		InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_DEFAULT;
+		wstring wstrPrototypeTag = TEXT("Prototype_Component_VIBuffer_Instance_Point_Arrow");
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext, InstanceDesc))))
+			return E_FAIL;
 	}
 
 	return S_OK;

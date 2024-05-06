@@ -27,6 +27,7 @@ public:
 	void Set_Dead() { m_bDead = true; }
 	_uint Get_Level() { return m_iLevel; }
 	void Set_Hide(_bool bHide) { m_bHide = bHide; }
+	_int Get_HP() { return m_iHp; }
 	void Deduct_HP(_int iDamage) { m_iHp -= iDamage; }
 
 public:
@@ -58,6 +59,7 @@ protected:
 	wstring wstrPrototypeTag = {};
 	_uint m_iLevel = {};
 	_int m_iHp = {};
+	_int m_iPreHp = {};
 	_uint* m_pCurLevel = { nullptr };
 
 public:

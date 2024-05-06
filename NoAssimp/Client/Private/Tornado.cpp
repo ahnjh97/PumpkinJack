@@ -180,7 +180,7 @@ void CTornado::Check_TornadoCol(_float fTimeDelta)
 	if (tornadoList.empty())
 		return;
 
-	_float3 vSrcPosFloat = m_pColliderCom->Get_Center(CCollider::TYPE_SPHERE);
+	_float3 vSrcPosFloat = m_pColliderCom->Get_Center();
 	_vector vSrsPos = XMLoadFloat3(&vSrcPosFloat);
 
 	for (auto& tornado : tornadoList)
@@ -194,7 +194,7 @@ void CTornado::Check_TornadoCol(_float fTimeDelta)
 
 		if (m_pColliderCom->Intersect(pTornadoCollider))
 		{
-			_float3 vDstPosFloat = pTornadoCollider->Get_Center(CCollider::TYPE_SPHERE);
+			_float3 vDstPosFloat = pTornadoCollider->Get_Center();
 			_vector vDstPos = XMLoadFloat3(&vDstPosFloat);
 
 			_vector vDir = XMVector3Normalize(vSrsPos - vDstPos);

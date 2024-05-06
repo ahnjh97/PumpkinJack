@@ -33,6 +33,7 @@ public:
 	_float Get_PlayerHpRatio() { return m_iHp * 0.01f; }
 	CModel* Get_BodyModel();
 	vector<_float> Get_QuadTreeCellHeights() { return m_vecQuadTreeCells; }
+	class CWeapon* Get_WeaponPtr();
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -49,7 +50,7 @@ private:
 	void Link_Animation();
 	_bool Check_TerrainCol();
 	_bool Check_GroundColliders();
-	_bool Check_WallColliders(list<CGameObject*> objList, CCollider::TYPE eColliderType, const wstring& wstrColliderTag = TEXT("Com_Collider_Wall"));
+	_bool Check_WallColliders(list<CGameObject*> objList, const wstring& wstrColliderTag = TEXT("Com_Collider_Wall"));
 	_bool Check_WallColliders_LevelSlimeBoss();
 	_bool Check_WallColliders_LevelGamePlay();
 	_bool Check_SlimeBossPortalCol(_float fTimeDelta);
@@ -61,11 +62,13 @@ private:
 	void Update_KartPush(_bool bPush);
 	void Reset_WeaponCollider(WEAPON eWeapon);
 	void TargetNearestEnemy();
-	void Check_EnemyDistance(LEVEL eLevel, const wstring& wstrLayerTag, CCollider::TYPE eColliderType, const wstring& wstrColliderTag = TEXT("Com_Collider"));
+	void Check_EnemyDistance(LEVEL eLevel, const wstring& wstrLayerTag, const wstring& wstrColliderTag = TEXT("Com_Collider"));
 	void SetUp_Damage();
 	void Activate_Weapon();
 	void SpearRollAttackDash(_float fTimeDelta);
 	void RifleRecoil(_float fTimeDelta);
+
+	void Damage_Effect();
 
 private:
 	STATE m_eState = { PLAYER_END };

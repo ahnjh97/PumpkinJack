@@ -55,6 +55,13 @@ void CBody::Tick(_float fTimeDelta)
 {
 	if (m_pModelCom == nullptr)
 		return;
+
+	m_fTime += fTimeDelta;
+
+	m_fPlayRatio = m_fTime / m_fEndTime;
+	if (m_fPlayRatio > 1.f)
+		m_fPlayRatio = 1.f;
+
 	StateToAnimation();
 }
 
@@ -219,6 +226,8 @@ HRESULT CBody::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fCamFar", m_pGameInstance->Get_CamFarPtr(), sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fPlayRatio", &m_fPlayRatio, sizeof(_float))))
 		return E_FAIL;
 
 	return S_OK;

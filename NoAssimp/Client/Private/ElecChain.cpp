@@ -18,29 +18,31 @@ HRESULT CElecChain::Initialize_Prototype()
 
 HRESULT CElecChain::Initialize(void* pArg)
 {
-	ELEC_BEAM_DESC tElecBeamDesc = {}; // = (GAMEOBJECT_DESC*)pArg;
+	ELEC_CHAIN_DESC tElecChainDesc = {}; // = (GAMEOBJECT_DESC*)pArg;
 	if (pArg)
-		tElecBeamDesc = *(ELEC_BEAM_DESC*)pArg;
+		tElecChainDesc = *(ELEC_CHAIN_DESC*)pArg;
 
-	m_iLevel = tElecBeamDesc.iLevel;
+	m_iLevel = tElecChainDesc.iLevel;
+	tElecChainDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-	if (FAILED(__super::Initialize(pArg)))
+	if (FAILED(__super::Initialize(&tElecChainDesc)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components((LEVEL)tElecBeamDesc.iLevel)))
+	if (FAILED(Add_Components((LEVEL)tElecChainDesc.iLevel)))
 		return E_FAIL;
 
-	m_iElecBeamIndex = tElecBeamDesc.iElecBeamIndex;
+	m_iElecChainIndex = tElecChainDesc.iElecChainIndex;
 
-	_float fScale = 10.f;
-		m_pTransformCom->Set_Scaled(fScale, fScale, fScale);
+	_float fScale = 28.f;
+		m_pTransformCom->Set_Scaled(fScale, fScale * 1.2f, fScale);
 
-	m_pTransformCom->Set_Pos(_float4(tElecBeamDesc.matWorld._41, tElecBeamDesc.matWorld._42, tElecBeamDesc.matWorld._43, 1));
+	m_pTransformCom->Set_Pos(_float4(tElecChainDesc.matWorld._41, tElecChainDesc.matWorld._42, tElecChainDesc.matWorld._43, 1));
+	m_pTransformCom->Look_At(tElecChainDesc.vReactorPos);
+	m_pTransformCom->Turn(XMVector4Normalize(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP)), 1);
 
-	if (m_iElecBeamIndex < 1) {
-		if (FAILED(Add_ElecChain((LEVEL)tElecBeamDesc.iLevel, ++m_iElecBeamIndex)))
-			return E_FAIL;
-	}
+	m_RandomNumber = mt19937_64(m_RandomDevice());
+
+	Randomize_Chain();
 
 	return S_OK;
 }
@@ -48,6 +50,9 @@ HRESULT CElecChain::Initialize(void* pArg)
 void CElecChain::Tick(_float fTimeDelta)
 {
 	m_fTime += fTimeDelta;
+
+	if (m_fChangeTime < m_fTime)
+		Randomize_Chain();
 
 	m_pTransformCom->LookAt_RightFixed(m_pGameInstance->Get_CamPosition_Vector());
 }
@@ -65,7 +70,7 @@ HRESULT CElecChain::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Begin(6))) // ElecBeam
+	if (FAILED(m_pShaderCom->Begin(6))) // ElecChain
 		return E_FAIL;
 
 	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
@@ -77,27 +82,12 @@ HRESULT CElecChain::Render()
 	return S_OK;
 }
 
-HRESULT CElecChain::Add_ElecChain(LEVEL eLevel, _uint iBeamIndex)
+void CElecChain::Randomize_Chain()
 {
-	ELEC_BEAM_DESC tElecBeamDesc{};
-	tElecBeamDesc.iLevel = eLevel;
-	tElecBeamDesc.iElecBeamIndex = iBeamIndex;
-	tElecBeamDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
-
-	_float4 vNewPos{};
-	/*if (0 == iBeamIndex)
-		XMStoreFloat4(&vNewPos, m_pTransformCom->Get_Pos_Vector() - m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT));
-	else if(2 == iBeamIndex)*/
-		XMStoreFloat4(&vNewPos, m_pTransformCom->Get_Pos_Vector() + m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT));
-
-	tElecBeamDesc.matWorld._41 = vNewPos.x;
-	tElecBeamDesc.matWorld._42 = vNewPos.y;
-	tElecBeamDesc.matWorld._43 = vNewPos.z;
-
-	if (FAILED(m_pGameInstance->Add_Clone(eLevel, TEXT("Layer_ElecBeam"), TEXT("Prototype_GameObject_ElecBeam"), &tElecBeamDesc)))
-		return E_FAIL;
-		
-	return S_OK;
+	m_iElecChainIndex = m_pGameInstance->RandomNumber(0, 7);
+	m_fTime = 0;
+	uniform_real_distribution<_float> ChangeTime(0.04f, 0.08f);
+	m_fChangeTime = ChangeTime(m_RandomNumber);
 }
 
 HRESULT CElecChain::Add_Components(LEVEL eLevel)
@@ -135,6 +125,8 @@ HRESULT CElecChain::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_iElecChainIndex", &m_iElecChainIndex, sizeof(_uint))))
 		return E_FAIL;
 	if (FAILED(m_pTextureCom[TEX_ELEC]->Bind_ShaderResources(m_pShaderCom, "g_ElecChain")))
 		return E_FAIL;

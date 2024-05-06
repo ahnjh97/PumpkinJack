@@ -1,9 +1,11 @@
 #include "Engine_Shader_Defines.hlsli"
 /* 전역변수 : 쉐이더 외부에 있는 데이터를 쉐이더 안으로 받아온다. */
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
+matrix g_CirclePositions[2];
 
 texture2D   g_DiffuseTexture;
 texture2D   g_Circle[2];
+texture2D   g_HighFreq;
 
 float       g_fOffset_Y;
 float       g_fTime;
@@ -11,9 +13,9 @@ float       g_fAlpha;
 float       g_fColorOffset;
 float       g_fCamFar;
 
-matrix      g_CirclePositions[2];
 float       g_fCircleTime0;
 float       g_fCircleTime1;
+float       g_fDissolveTime;
 
 struct VS_IN
 {
@@ -252,6 +254,11 @@ PS_OUT_ELECARENA PS_ELECARENA(PS_IN In)
             }
         }
     }
+    
+    float fDissolve = g_HighFreq.Sample(LinearSampler, In.vTexcoord).r;
+      
+    if (fDissolve < g_fDissolveTime * 1.3f)
+        discard;
     
     //Out.vNormal = vector((In.vNormal * 0.5f + 0.5f).xyz, 0.f);
     //Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fCamFar, 0.0f, 0.0f);

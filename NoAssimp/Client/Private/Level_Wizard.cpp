@@ -177,6 +177,9 @@ HRESULT CLevel_Wizard::Ready_UI(const wstring& strLayerTag)
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, strLayerTag, TEXT("Prototype_GameObject_LifeBar"), &tDesc)))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_DamageEffect"), TEXT("Prototype_GameObject_DamageEffect"), &tDesc)))
+		return E_FAIL;
+
 	CInven::INVEN_DESC tInvenDesc{};
 	for (_int i = 0; i < WPN_END; i++)
 	{

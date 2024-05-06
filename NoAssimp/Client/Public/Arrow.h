@@ -5,6 +5,7 @@
 BEGIN(Engine)
 class CModel;
 class CShader;
+class CPart;
 END
 
 BEGIN(Client)
@@ -38,9 +39,11 @@ private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 	CCollider* m_pColliderCom = { nullptr };
+	CPart* m_pArrowEffect = { nullptr };
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);
+	HRESULT Add_PartObjects(LEVEL eLevel);
 	HRESULT Bind_ShaderResources();
 
 public:

@@ -6,18 +6,21 @@ matrix g_matViewInverse, g_matProjInverse;
 texture2D g_DiffuseTexture;
 texture2D g_Circle[2];
 texture2D g_Lightning[3];
+texture2D g_ElecNoise;
+texture2D g_FieldDepth;
+texture2D g_ElecChain[8];
+texture2D g_SoulTexture[2];
+
+float2 ScreenSize = float2(1280, 720);
+
 float g_fAlpha;
 float g_fTime;
 float fLightningEndTime = 1.8f;
 float fSecondCircleEndTime = 1;
+float g_fPlayRatio;
 
-texture2D g_ElecNoise;
-texture2D g_FieldDepth;
 uint g_iSpriteIndex, g_iLightningIndex;
-
-texture2D g_ElecChain[8];
-
-float2 ScreenSize = float2(1280, 720);
+uint g_iElecChainIndex;
 
 struct VS_IN
 {
@@ -209,10 +212,79 @@ PS_OUT PS_ELECCHAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
-    Out.vColor = g_ElecChain[1].Sample(LinearSampler, In.vTexcoord);
-    //Out.vColor.xyz = 1.f;
-    Out.vColor.a = g_ElecChain[1].Sample(LinearSampler, In.vTexcoord).r;
-    if (0.7 > Out.vColor.a)
+    if (0 == g_iElecChainIndex)
+        Out.vColor = g_ElecChain[0].Sample(LinearSampler, In.vTexcoord);
+    else if (1 == g_iElecChainIndex)
+        Out.vColor = g_ElecChain[1].Sample(LinearSampler, In.vTexcoord);
+    else if (2 == g_iElecChainIndex)
+        Out.vColor = g_ElecChain[2].Sample(LinearSampler, In.vTexcoord);
+    else if (3 == g_iElecChainIndex)
+        Out.vColor = g_ElecChain[3].Sample(LinearSampler, In.vTexcoord);
+    else if (4 == g_iElecChainIndex)
+        Out.vColor = g_ElecChain[4].Sample(LinearSampler, In.vTexcoord);
+    else if (5 == g_iElecChainIndex)
+        Out.vColor = g_ElecChain[5].Sample(LinearSampler, In.vTexcoord);
+    else if (6 == g_iElecChainIndex)
+        Out.vColor = g_ElecChain[6].Sample(LinearSampler, In.vTexcoord);
+    else if (7 == g_iElecChainIndex)
+        Out.vColor = g_ElecChain[7].Sample(LinearSampler, In.vTexcoord);
+
+    if (0.3 > Out.vColor.a)
+        discard;
+    
+    return Out;
+}
+
+PS_OUT PS_HIT(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord).a;
+    Out.vColor.rgb += 0.45;
+    
+    if (0.3 > Out.vColor.a)
+        discard;
+    
+    return Out;
+}
+
+PS_OUT PS_SOUL(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    vector vSoul0 = g_SoulTexture[0].Sample(LinearSampler, In.vTexcoord);
+    //vector vSoul1 = g_SoulTexture[1].Sample(LinearSampler, In.vTexcoord);
+    
+    //Out.vColor = lerp(vSoul0, vSoul1, g_fPlayRatio);
+    
+    Out.vColor.rgb = float3(1, 1, 1);
+    Out.vColor.a = vSoul0.r;
+    
+    if (g_fPlayRatio > 0.4f)
+        Out.vColor.a -= g_fPlayRatio - 0.4f;
+    
+    if (0.f >= Out.vColor.a)
+        discard;
+    
+    return Out;
+}
+
+PS_OUT PS_DAMAGE(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+
+    float fAlpha;
+    
+    if (g_fPlayRatio < 0.5f)
+        fAlpha = g_fPlayRatio * 2.f;
+    else
+        fAlpha = 1 - (g_fPlayRatio - 0.5f) * 2.f;
+    
+    Out.vColor.a *= fAlpha;
+    
+    if (g_fPlayRatio >= 1.f || 0.f >= Out.vColor.a)
         discard;
     
     return Out;
@@ -302,5 +374,41 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_ELECCHAIN();
+    }
+
+    pass HitEffect // 7
+    {
+        SetRasterizerState(RS_Sky);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_HIT();
+    }
+
+    pass SoulEffect // 8
+    {
+        SetRasterizerState(RS_Sky);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_SOUL();
+    }
+
+    pass DamageEffect // 9
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_DAMAGE();
     }
 }

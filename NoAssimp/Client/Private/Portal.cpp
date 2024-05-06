@@ -198,7 +198,6 @@ CPortal* CPortal::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	}
 
 	return pInstance;
-
 }
 
 CGameObject* CPortal::Clone(void* pArg)

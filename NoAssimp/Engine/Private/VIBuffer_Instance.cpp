@@ -171,6 +171,16 @@ _float4 CVIBuffer_Instance::Compute_RandPosition(INSTANCE_SHAPE eShape, _bool bR
 
 		return _float4(fX, fY, fZ, 1);
 	}
+	else if (eShape == SHAPE_RING_ROTATED)
+	{
+		_float fRadius = m_InstanceDesc.vRange.x;
+		uniform_real_distribution<_float> Angle(0, XM_2PI);
+		uniform_real_distribution<_float> RangePosY(0, m_InstanceDesc.vRange.y);
+
+		_float fAngle = Angle(m_RandomNumber);
+
+		return _float4(fRadius * cos(fAngle), RangePosY(m_RandomNumber), fRadius * sin(fAngle), 1.f);
+	}
 
 	return _float4();
 }
@@ -202,6 +212,26 @@ void CVIBuffer_Instance::Spread(_float fTimeDelta)
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
 		_vector		vDir = XMVectorSetW(XMLoadFloat4(&pVertices[i].vPosition) - XMLoadFloat3(&m_InstanceDesc.vPivot), 0.f);
+
+		XMStoreFloat4(&pVertices[i].vPosition,
+			XMLoadFloat4(&pVertices[i].vPosition) + XMVector3Normalize(vDir) * m_pSpeeds[i] * fTimeDelta);
+
+		Compute_LifeTime(pVertices, i, fTimeDelta);
+	}
+
+	m_pContext->Unmap(m_pVBInstance, 0);
+}
+
+void CVIBuffer_Instance::Spread_XZ(_float fTimeDelta)
+{
+	D3D11_MAPPED_SUBRESOURCE		SubResource{};
+	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+	VTXMATRIX* pVertices = ((VTXMATRIX*)SubResource.pData);
+
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		_vector		vDir = XMVectorSetW(XMLoadFloat4(&pVertices[i].vPosition) - XMLoadFloat3(&m_InstanceDesc.vPivot), 0.f);
+		vDir = XMVectorSetY(vDir, 0);
 
 		XMStoreFloat4(&pVertices[i].vPosition,
 			XMLoadFloat4(&pVertices[i].vPosition) + XMVector3Normalize(vDir) * m_pSpeeds[i] * fTimeDelta);

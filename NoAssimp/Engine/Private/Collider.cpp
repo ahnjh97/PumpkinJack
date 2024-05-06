@@ -24,19 +24,19 @@ CCollider::CCollider(const CCollider& rhs)
 #endif
 }
 
-_float CCollider::Get_HightestPoint(TYPE eType)
+_float CCollider::Get_HightestPoint()
 {
-	if (eType == TYPE_AABB)
+	if (m_eType == TYPE_AABB)
 	{
 		BoundingBox* pAABB = (BoundingBox*)m_pBounding->Get_BoundingDesc();
 		return _float(pAABB->Center.y + pAABB->Extents.y);
 	}
-	else if (eType == TYPE_OBB)
+	else if (m_eType == TYPE_OBB)
 	{
 		BoundingOrientedBox* pOBB = (BoundingOrientedBox*)m_pBounding->Get_BoundingDesc();
 		return _float(pOBB->Center.y + pOBB->Extents.y);
 	}
-	else if (eType == TYPE_SPHERE)
+	else if (m_eType == TYPE_SPHERE)
 	{
 		BoundingSphere* pSphere = (BoundingSphere*)m_pBounding->Get_BoundingDesc();
 		return _float(pSphere->Center.y + pSphere->Radius);
@@ -45,19 +45,19 @@ _float CCollider::Get_HightestPoint(TYPE eType)
 	return _float();
 }
 
-_float3 CCollider::Get_Center(TYPE eType)
+_float3 CCollider::Get_Center()
 {
-	if (eType == TYPE_AABB)
+	if (m_eType == TYPE_AABB)
 	{
 		BoundingBox* pAABB = (BoundingBox*)m_pBounding->Get_BoundingDesc();
 		return pAABB->Center;
 	}
-	else if (eType == TYPE_OBB)
+	else if (m_eType == TYPE_OBB)
 	{
 		BoundingOrientedBox* pOBB = (BoundingOrientedBox*)m_pBounding->Get_BoundingDesc();
 		return pOBB->Center;
 	}
-	else if (eType == TYPE_SPHERE)
+	else if (m_eType == TYPE_SPHERE)
 	{
 		BoundingSphere* pSphere = (BoundingSphere*)m_pBounding->Get_BoundingDesc();
 		return pSphere->Center;

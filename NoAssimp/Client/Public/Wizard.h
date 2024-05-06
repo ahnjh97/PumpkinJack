@@ -46,6 +46,7 @@ private:
 	void DestroyElecArena();
 
 	void ChargeEffect();
+	void Sphere();
 	void ScatterEffect();
 	void DestroyChargeEffect();
 
@@ -69,7 +70,6 @@ private:
 	_int m_iWizardPhase = {};
 	_int m_iAttackCount = {};
 	_int m_iAttackFinishCount = { };
-	_int m_iPreHp = {};
 
 	_float m_fInitialHeight = 50.f;
 	_float m_fAlpha = { 1.f };
@@ -91,6 +91,7 @@ private:
 	CGameObject* m_pPlayer = { nullptr };
 	const _float4x4* m_pPlayerWorldMatrix = { nullptr };
 	CCollider* m_pColliderCom = { nullptr };
+	CGameObject* m_pSphere = { nullptr };
 
 	random_device	m_RandomDevice;
 	mt19937_64		m_RandomNumber;

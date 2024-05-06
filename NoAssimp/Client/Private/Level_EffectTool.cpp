@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Level_EffectTool.h"
 #include "Camera_Free.h"
+#include "HitEffect.h"
 #include "Lightning.h"
 #include "ElecParts.h"
 #include "ElecChain.h"
@@ -23,6 +24,10 @@ HRESULT CLevel_EffectTool::Initialize()
 		return E_FAIL;
 
 	if (FAILED(Ready_Layer_Grid(TEXT("Layer_Grid"))))
+		return E_FAIL;
+
+	CGameObject::GAMEOBJECT_DESC tDesc = {};
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, TEXT("Layer_DamageEffect"), TEXT("Prototype_GameObject_DamageEffect"), &tDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -102,44 +107,22 @@ HRESULT CLevel_EffectTool::Ready_Layer_Grid(const wstring& strLayerTag)
 
 HRESULT CLevel_EffectTool::Add_Effect(const wstring& strLayerTag)
 {
-	//CElecParts::ELECPARTS_DESC tElecPartsDesc{};
-	//tElecPartsDesc.iLevel = LEVEL_EFFECTTOOL;
-	//tElecPartsDesc.eElecEffect = CElecParts::ELEC_TESLATOWER;
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
-	//	return E_FAIL;
-
-	//CGameObject::GAMEOBJECT_DESC tDesc{};
-	//tDesc.iLevel = LEVEL_EFFECTTOOL;
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_LightningEffects"), &tDesc)))
-	//	return E_FAIL;
-	/*if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_HoleWall"), &tDesc)))
-		return E_FAIL;*/
-
-	/*CLightning::LIGHTNING_DESC tLightningDesc{};
-	tLightningDesc.iLevel = LEVEL_EFFECTTOOL;
-	tLightningDesc.iLightingIndex = 2;
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Lightning"), &tLightningDesc)))
-		return E_FAIL;*/
-
-	CElecChain::ELEC_BEAM_DESC tElecBeamDesc{};
-	tElecBeamDesc.iLevel = LEVEL_EFFECTTOOL;
-	tElecBeamDesc.iElecBeamIndex = 0;
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_ElecBeam"), &tElecBeamDesc)))
+	CHitEffect::HITEFFECT_DESC tDesc{};
+	tDesc.iLevel = LEVEL_EFFECTTOOL;
+	
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_HitEffect"), &tDesc)))
 		return E_FAIL;
-
 
 	return S_OK;
 }
 
 HRESULT CLevel_EffectTool::Add_Effect2(const wstring& strLayerTag)
 {
-	//CElecParts::ELECPARTS_DESC tElecPartsDesc{};
-	//tElecPartsDesc.iLevel = LEVEL_EFFECTTOOL;
-	//tElecPartsDesc.eElecEffect = CElecParts::ELEC_DESTROY;
-	//tElecPartsDesc.fDuration = 1.2f;
+	CGameObject::GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = LEVEL_EFFECTTOOL;
 
-	//if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_SoulEffect"), &tDesc)))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -148,15 +131,8 @@ HRESULT CLevel_EffectTool::Add_Object(const wstring& strLayerTag)
 {
 	CGameObject::GAMEOBJECT_DESC tDesc{};
 	tDesc.iLevel = LEVEL_EFFECTTOOL;
-
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Sphere"), &tDesc)))
-		return E_FAIL;
-
-	CElecParts::ELECPARTS_DESC tElecPartsDesc{};
-	tElecPartsDesc.iLevel = LEVEL_EFFECTTOOL;
-	tElecPartsDesc.eElecEffect = CElecParts::ELEC_TESLATOWER;
-
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
+	tDesc.wstrModelTag = TEXT("Prototype_Component_Model_ballistaArrow");
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, TEXT("Layer_Arrow"), TEXT("Prototype_GameObject_Arrow"), &tDesc)))
 		return E_FAIL;
 
 	return S_OK;
