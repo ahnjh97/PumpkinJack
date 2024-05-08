@@ -265,7 +265,7 @@ void CVIBuffer_Instance::MoveToPivot(_float fTimeDelta)
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
 		_vector		vDir = XMVectorSetW(XMLoadFloat3(&m_InstanceDesc.vPivot) - XMLoadFloat4(&pVertices[i].vPosition), 0.f);
-
+		
 		XMStoreFloat4(&pVertices[i].vPosition,
 			XMLoadFloat4(&pVertices[i].vPosition) + XMVector3Normalize(vDir) * m_pSpeeds[i] * fTimeDelta);
 

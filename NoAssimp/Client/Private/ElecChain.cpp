@@ -130,8 +130,8 @@ HRESULT CElecChain::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pTextureCom[TEX_ELEC]->Bind_ShaderResources(m_pShaderCom, "g_ElecChain")))
 		return E_FAIL;
-	if (FAILED(m_pTextureCom[TEX_NOISE]->Bind_ShaderResource(m_pShaderCom, "g_ElecNoise")))
-		return E_FAIL;
+	/*if (FAILED(m_pTextureCom[TEX_NOISE]->Bind_ShaderResource(m_pShaderCom, "g_ElecNoise")))
+		return E_FAIL;*/
 
 	return S_OK;
 }

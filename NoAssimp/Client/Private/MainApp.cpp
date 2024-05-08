@@ -126,6 +126,14 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		return E_FAIL;
 	if (FAILED(Add_Texture(LEVEL_STATIC, "Damage", "Effects/Damage.dds")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(LEVEL_STATIC, "SmokePuff", "Effects/smokePuff.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(LEVEL_STATIC, "Cloud", "Effects/Cloud.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(LEVEL_STATIC, "Slash", "Weapon/Slash%d.png", 6)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(LEVEL_STATIC, "Dash", "Weapon/Dash%d.png", 6)))
+		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_LoadingScreen"),
 		CBackGround::Create(m_pDevice, m_pContext, true))))

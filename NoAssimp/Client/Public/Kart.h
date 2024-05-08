@@ -32,6 +32,7 @@ private:
 	_vector Check_Direction(_float fTimeDelta, KART_COLLIDER eKartCollider);
 	void Turn_Kart(_float fTimeDelta);
 	_bool Check_ExplosionTrigger();
+	void Add_Explosion(CGameObject* pGameObject);
 
 private:
 	_bool m_bPush = { false };

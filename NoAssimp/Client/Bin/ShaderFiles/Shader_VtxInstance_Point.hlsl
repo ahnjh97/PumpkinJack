@@ -3,10 +3,11 @@
 /* 전역변수 : 쉐이더 외부에 있는 데이터를 쉐이더 안으로 받아온다. */
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D g_Texture;
-texture2D g_NoiseTexture, g_NoiseMaskTexture;
+texture2D g_NoiseTexture;
 
 vector	g_vCamPosition;
-bool g_bFadeIn;
+float   g_fTime;
+bool    g_bFadeIn;
 
 struct VS_IN
 {
@@ -63,10 +64,10 @@ void GS_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
 
 	float3		vLook = normalize((g_vCamPosition - In[0].vPosition).xyz);
 	float3		vRight = normalize(cross(float3(0.f, 1.f, 0.f), vLook.xyz)) * In[0].vPSize.x * 0.5f;
-	float3		vUp = normalize(cross(vLook, vRight)) * In[0].vPSize.y * 0.5f;
-
+	float3		vUp = normalize(cross(vLook, vRight)) * In[0].vPSize.y * 0.5f;    
+    
 	matrix		matVP = mul(g_ViewMatrix, g_ProjMatrix);
-
+    
 	Out[0].vPosition = vector(In[0].vPosition.xyz + vRight + vUp, 1.f);
 	Out[0].vTexcoord = float2(0.0f, 0.0f);
 	Out[0].vPosition = mul(Out[0].vPosition, matVP);
@@ -139,7 +140,6 @@ PS_OUT PS_ELECPARTS(PS_IN In)
     uint iY = In.iSpriteIndexOffset / 3;
     float2 vNewTexCoord = In.vTexcoord * 0.33f + float2(iX / 3.f, iY / 3.f);
     Out.vColor = g_Texture.Sample(LinearSampler, vNewTexCoord);
-    float fNoise = g_NoiseMaskTexture.Sample(LinearSampler, In.vTexcoord).r;
 	 
     if (Out.vColor.a <= 0.33f || 1.f <= In.fLifeRatio || 0 > In.fLifeRatio)
         discard;
@@ -148,15 +148,15 @@ PS_OUT PS_ELECPARTS(PS_IN In)
 
     if (true == g_bFadeIn)
     {
-        if (In.fLifeRatio >= 0 && In.fLifeRatio < 0.5)  // 투명에서 불투명으로 (noiseValue가 더 크면 알파값 증가)
-            Out.vColor.a = smoothstep(0, In.fLifeRatio * 2, fNoise);
-        else if (In.fLifeRatio < 1) // 불투명에서 투명으로 (noiseValue가 더 작으면 알파값 감소)
-            Out.vColor.a = 1.0 - smoothstep(0.5, 1.0, (In.fLifeRatio - 0.5) * 2.0) * (1.0 - fNoise);
+        if (In.fLifeRatio >= 0 && In.fLifeRatio < 0.5)  // 투명에서 불투명으로 
+            Out.vColor.a = smoothstep(0, In.fLifeRatio * 2, 0);
+        else if (In.fLifeRatio < 1) // 불투명에서 투명으로
+            Out.vColor.a = 1.0 - smoothstep(0.5, 1.0, (In.fLifeRatio - 0.5) * 2.0);
     }
 	else
     {
-        if (In.fLifeRatio >= 0.5) // 불투명에서 투명으로 (noiseValue가 더 작으면 알파값 감소)
-            Out.vColor.a = 1.0 - smoothstep(0.5, 1.0, (In.fLifeRatio - 0.5) * 2.0) * (1.0 - fNoise);
+        if (In.fLifeRatio >= 0.5) // 불투명에서 투명으로 
+            Out.vColor.a = 1.0 - smoothstep(0.5, 1.0, (In.fLifeRatio - 0.5) * 2.0);
 		else
             Out.vColor.a = 1;
     }
@@ -171,13 +171,59 @@ PS_OUT PS_ARROWEFFECT(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 	
+    float fNoise = g_NoiseTexture.Sample(LinearSampler, In.vTexcoord * 0.2f).r;
+    float2 vNewUV = In.vTexcoord + (fNoise - 0.5) * 0.05;
+    
+    Out.vColor = g_Texture.Sample(LinearSampler, vNewUV);
+
+    if (Out.vColor.a <= 0.33f)
+        discard;
+
+    Out.vColor.rgb = float3(1.f, 0.6f, 0.f);
+    
+    return Out;
+}
+
+PS_OUT PS_EXPLOSION(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    float2 vCenter = float2(0.5, 0.5);
+    float fDistance = length(In.vTexcoord - vCenter);
+    
+    if (1.f <= In.fLifeRatio)
+        discard;
+    
+    if (fDistance <= 0.5)
+        Out.vColor = float4(1.f, 0.65f, 0.f, 1);
+    else
+        discard;
+    
+    float2 vUV = float2(In.vTexcoord.x * 0.15f, In.vTexcoord.y * 0.15f + In.iSpriteIndexOffset * 0.01f);
+    float fNoise = g_NoiseTexture.Sample(LinearSampler, vUV).r;
+    
+    if (fNoise < 0.1)
+        discard;
+    
+     return Out;
+}
+
+PS_OUT PS_JUMP(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    float fNoise = g_NoiseTexture.Sample(LinearSampler, In.vTexcoord * 0.5f).r;
+    
     Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
 
     if (Out.vColor.a <= 0.33f)
         discard;
 
-    Out.vColor.rgb = float3(1.f, 0.4f, 0.f);
-	
+    if (fNoise < In.fLifeRatio)
+        discard;
+    
+    Out.vColor.rgb = float3(0.8f, 0.8f, 0.8f);
+    
     return Out;
 }
 
@@ -220,5 +266,31 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_ARROWEFFECT();
+    }
+
+    pass Explosion // 3
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = compile gs_5_0 GS_MAIN();
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_EXPLOSION();
+    }
+
+    pass JumpEffect // 4
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = compile gs_5_0 GS_MAIN();
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_JUMP();
     }
 }

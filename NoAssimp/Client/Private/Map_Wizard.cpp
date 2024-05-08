@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Map_Wizard.h"
+#include "Player.h"
 
 CMap_Wizard::CMap_Wizard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -153,6 +154,7 @@ CGameObject* CMap_Wizard::Clone(void* pArg)
 void CMap_Wizard::Free()
 {
 	__super::Free();
+
 	for (_int i = 0; i < TEX_END; i++)
 		Safe_Release(m_pTextureCom[i]);
 	Safe_Release(m_pShaderCom);

@@ -13,6 +13,7 @@ BEGIN(Client)
 
 class CArrowEffect final : public CPart
 {
+	enum TEX_ARROWEFFECT { TEX_SMOKE, TEX_NOISE, TEX_END };
 private:
 	CArrowEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CArrowEffect(const CArrowEffect& rhs);
@@ -27,17 +28,11 @@ public:
 
 
 private:
-	_bool m_bFadeIn = { true };
-	_bool m_bShareTime = { false };
-
-	_uint m_iSpriteIndex = {};
-
 	_float m_fTime = {};
-	_float m_fDuration = {};
 
 private:
 	CVIBuffer_Instance_Point* m_pVIBufferCom = { nullptr };
-	CTexture* m_pTextureCom = { nullptr };
+	CTexture* m_pTextureCom[TEX_END] = { nullptr, nullptr };
 	CShader* m_pShaderCom = { nullptr };
 	CCamera_Jack* m_pCamera = { nullptr };
 

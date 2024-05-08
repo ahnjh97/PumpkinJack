@@ -175,9 +175,11 @@
     <ClInclude Include="..\Public\CollisionCube.h" />
     <ClInclude Include="..\Public\CrateBox.h" />
     <ClInclude Include="..\Public\DamageEffect.h" />
+    <ClInclude Include="..\Public\Dash.h" />
     <ClInclude Include="..\Public\ElecArena.h" />
     <ClInclude Include="..\Public\ElecChain.h" />
     <ClInclude Include="..\Public\ElecParts.h" />
+    <ClInclude Include="..\Public\Explosion.h" />
     <ClInclude Include="..\Public\Grid.h" />
     <ClInclude Include="..\Public\HitEffect.h" />
     <ClInclude Include="..\Public\HoleWall.h" />
@@ -185,6 +187,7 @@
     <ClInclude Include="..\Public\ImGui_MapTool.h" />
     <ClInclude Include="..\Public\Indicator.h" />
     <ClInclude Include="..\Public\Inven.h" />
+    <ClInclude Include="..\Public\JumpEffect.h" />
     <ClInclude Include="..\Public\Kart.h" />
     <ClInclude Include="..\Public\Knife.h" />
     <ClInclude Include="..\Public\Level_EffectTool.h" />
@@ -217,6 +220,7 @@
     <ClInclude Include="..\Public\Soldier.h" />
     <ClInclude Include="..\Public\SoldierWeapon.h" />
     <ClInclude Include="..\Public\SoulEffect.h" />
+    <ClInclude Include="..\Public\Slash.h" />
     <ClInclude Include="..\Public\Sphere.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\Terrain_SlimeBossRoom.h" />
@@ -250,9 +254,11 @@
     <ClCompile Include="..\Private\CollisionCube.cpp" />
     <ClCompile Include="..\Private\CrateBox.cpp" />
     <ClCompile Include="..\Private\DamageEffect.cpp" />
+    <ClCompile Include="..\Private\Dash.cpp" />
     <ClCompile Include="..\Private\ElecArena.cpp" />
     <ClCompile Include="..\Private\ElecChain.cpp" />
     <ClCompile Include="..\Private\ElecParts.cpp" />
+    <ClCompile Include="..\Private\Explosion.cpp" />
     <ClCompile Include="..\Private\Grid.cpp" />
     <ClCompile Include="..\Private\HitEffect.cpp" />
     <ClCompile Include="..\Private\HoleWall.cpp" />
@@ -260,6 +266,7 @@
     <ClCompile Include="..\Private\ImGui_MapTool.cpp" />
     <ClCompile Include="..\Private\Indicator.cpp" />
     <ClCompile Include="..\Private\Inven.cpp" />
+    <ClCompile Include="..\Private\JumpEffect.cpp" />
     <ClCompile Include="..\Private\Kart.cpp" />
     <ClCompile Include="..\Private\Knife.cpp" />
     <ClCompile Include="..\Private\Level_EffectTool.cpp" />
@@ -292,6 +299,7 @@
     <ClCompile Include="..\Private\Soldier.cpp" />
     <ClCompile Include="..\Private\SoldierWeapon.cpp" />
     <ClCompile Include="..\Private\SoulEffect.cpp" />
+    <ClCompile Include="..\Private\Slash.cpp" />
     <ClCompile Include="..\Private\Sphere.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\Terrain_SlimeBossRoom.cpp" />

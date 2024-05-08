@@ -6,6 +6,8 @@
 #include "ElecParts.h"
 #include "ElecChain.h"
 #include "Terrain.h"
+#include "Dash.h"
+#include "Part.h"
 
 CLevel_EffectTool::CLevel_EffectTool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -107,10 +109,10 @@ HRESULT CLevel_EffectTool::Ready_Layer_Grid(const wstring& strLayerTag)
 
 HRESULT CLevel_EffectTool::Add_Effect(const wstring& strLayerTag)
 {
-	CHitEffect::HITEFFECT_DESC tDesc{};
+	CPart::PART_DESC tDesc{};
 	tDesc.iLevel = LEVEL_EFFECTTOOL;
 	
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_HitEffect"), &tDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Dash"), &tDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -121,7 +123,7 @@ HRESULT CLevel_EffectTool::Add_Effect2(const wstring& strLayerTag)
 	CGameObject::GAMEOBJECT_DESC tDesc{};
 	tDesc.iLevel = LEVEL_EFFECTTOOL;
 
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_SoulEffect"), &tDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Slash"), &tDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -131,8 +133,8 @@ HRESULT CLevel_EffectTool::Add_Object(const wstring& strLayerTag)
 {
 	CGameObject::GAMEOBJECT_DESC tDesc{};
 	tDesc.iLevel = LEVEL_EFFECTTOOL;
-	tDesc.wstrModelTag = TEXT("Prototype_Component_Model_ballistaArrow");
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, TEXT("Layer_Arrow"), TEXT("Prototype_GameObject_Arrow"), &tDesc)))
+	tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Slash");
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, TEXT("Layer_Arrow"), TEXT("Prototype_GameObject_Monster"), &tDesc)))
 		return E_FAIL;
 
 	return S_OK;

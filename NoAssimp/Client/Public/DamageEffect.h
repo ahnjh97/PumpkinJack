@@ -17,7 +17,7 @@ private:
 	virtual ~CDamageEffect() = default;
 
 public:
-	void Reset_Time() { m_fTime = 0.f; }
+	void Reset_Time() { if (m_fTime >= 0.5f) { m_fTime = 0.f; } }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -30,7 +30,7 @@ private:
 	_float		m_fX, m_fY, m_fZ, m_fSizeX, m_fSizeY;
 	_float4x4	m_WorldMatrix, m_ViewMatrix, m_ProjMatrix;
 	_float		m_fTime = { 100.f };
-	_float		m_fEndTime = { 0.8f };
+	_float		m_fEndTime = { 1.f };
 	_float		m_fPlayRatio = {};
 
 private:

@@ -32,6 +32,7 @@ public:
 	void Activate_WeaponCollider() { m_bActivated = true; }
 	void DeActivate_WeaponCollider() { m_bActivated = false; }
 	void SavePlayerPos(_fvector vPlayerPos) { m_vPlayerPos = vPlayerPos; }
+	void Reset_DashEffect();
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -67,6 +68,7 @@ private:
 	const STATE* m_pState = {};
 	const _uint* m_pDamage = {};
 	CCollider* m_pColliderCom[2] = {nullptr};
+	class CDash* m_pDash[2] = { nullptr, nullptr };
 
 private:
 	HRESULT Add_Components(LEVEL eLevel, const wstring& _wstrModelTag);

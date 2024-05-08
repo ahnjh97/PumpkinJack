@@ -34,6 +34,8 @@ HRESULT CArrowEffect::Initialize(void* pArg)
 
 void CArrowEffect::Tick(_float fTimeDelta)
 {
+    m_fTime += fTimeDelta;
+
     if (m_pCamera == nullptr)
     {
         m_pCamera = dynamic_cast<CCamera_Jack*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(),
@@ -88,8 +90,12 @@ HRESULT CArrowEffect::Add_Components(LEVEL eLevel)
         return E_FAIL;
 
     /* For.Com_Texture */
-    if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_SmokePuff"),
-        TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
+    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SmokePuff"),
+        TEXT("Com_Texture"), (CComponent**)&m_pTextureCom[TEX_SMOKE])))
+        return E_FAIL;
+
+    if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_NewNoise"),
+        TEXT("Com_Texture_Noise"), (CComponent**)&m_pTextureCom[TEX_NOISE])))
         return E_FAIL;
 
     /* For.Com_VIBuffer */
@@ -113,7 +119,11 @@ HRESULT CArrowEffect::Bind_ShaderResources()
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))
         return E_FAIL;
-    if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture")))
+    if (FAILED(m_pTextureCom[TEX_SMOKE]->Bind_ShaderResource(m_pShaderCom, "g_Texture")))
+        return E_FAIL;
+    if (FAILED(m_pTextureCom[TEX_NOISE]->Bind_ShaderResource(m_pShaderCom, "g_NoiseTexture")))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(_float))))
         return E_FAIL;
 
     return S_OK;
@@ -153,6 +163,7 @@ void CArrowEffect::Free()
 
     Safe_Release(m_pCamera);
     Safe_Release(m_pVIBufferCom);
-    Safe_Release(m_pTextureCom);
+    for(_int i =0; i<TEX_END; i++)
+        Safe_Release(m_pTextureCom[i]);
     Safe_Release(m_pShaderCom);
 }

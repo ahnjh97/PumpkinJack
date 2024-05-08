@@ -7,12 +7,17 @@ texture2D   g_DiffuseTexture, g_WaterTexture, g_CausticTexture, g_NoiseTexture;
 texture2D   g_TigerStripes, g_TopBottomFadeTex;
 texture2D   g_FireNoise, g_VoronoiBlur;
 texture2D   g_Circle[2];
+texture2D   g_AttackEffect[6];
 
 float       g_fOffset_Y;
 float       g_fTime;
 float       g_fAlpha;
 float       g_fColorOffset;
 float       g_fCamFar;
+float       g_fPlayRatio;
+
+uint        g_iWeaponIndex;
+uint        g_iSpriteIndex;
 
 struct VS_IN
 {
@@ -28,7 +33,7 @@ struct VS_OUT
     float3      vNormal : NORMAL;
 	float2		vTexcoord : TEXCOORD0;
     //float4      vWorldPos : TEXCOORD1;
-    //float4      vProjPos : TEXCOORD2;
+    float4      vProjPos : TEXCOORD2;
 };
 
 /* 정점 쉐이더 */
@@ -45,7 +50,7 @@ VS_OUT VS_MAIN(VS_IN In)
     Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix)).xyz;
 	Out.vTexcoord = In.vTexcoord;
     //Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
-    //Out.vProjPos = Out.vPosition;
+    Out.vProjPos = Out.vPosition;
     
 	return Out;
 }
@@ -56,7 +61,7 @@ struct PS_IN
     float3      vNormal : NORMAL;
 	float2		vTexcoord : TEXCOORD0;
     //float4      vWorldPos : TEXCOORD1;
-    //float4      vProjPos : TEXCOORD2;
+    float4      vProjPos : TEXCOORD2;
 };
 
 struct PS_OUT
@@ -73,7 +78,7 @@ PS_OUT PS_MAIN(PS_IN In)
 	Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     if (0.3f >= Out.vColor.a)
         discard;
-    
+       
 	return Out;
 }
 
@@ -173,6 +178,63 @@ PS_OUT PS_SPHERE(PS_IN In)
         discard;
     
     return Out;
+}
+
+PS_OUT PS_SLASH(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    float2 adjustedUV = In.vTexcoord;
+    adjustedUV.y = (adjustedUV.y * 0.8) + 0.1; // Y 좌표 조정
+    // 텍스처에서 색상 정보를 샘플링
+    float4 color;
+    if (g_iSpriteIndex == 0)
+        color = g_AttackEffect[0].Sample(LinearSampler, adjustedUV);
+    else if (g_iSpriteIndex == 1)
+        color = g_AttackEffect[1].Sample(LinearSampler, adjustedUV);
+    else if (g_iSpriteIndex == 2)
+        color = g_AttackEffect[2].Sample(LinearSampler, adjustedUV);
+    else if (g_iSpriteIndex == 3)
+        color = g_AttackEffect[3].Sample(LinearSampler, adjustedUV);
+    else if (g_iSpriteIndex == 4)
+        color = g_AttackEffect[4].Sample(LinearSampler, adjustedUV);
+    else if (g_iSpriteIndex == 5)
+        color = g_AttackEffect[5].Sample(LinearSampler, adjustedUV);
+
+    // 알파값 기반으로 불필요한 픽셀 제거
+    if (0.1f >= color.a)
+        discard;
+
+    if (g_fPlayRatio < (/*1 - */In.vTexcoord.x) * 0.25f)
+        discard;
+    if (g_fPlayRatio > 0.75f + (/*1 - */In.vTexcoord.x) * 0.25f)
+        discard;
+    
+    vector vResult;
+    
+    if (g_iWeaponIndex == 0)
+    {
+        if (color.b > color.r && color.b > color.g)
+        {
+            // 파란색-> 초록색
+            float avg = (color.r + color.b) * 0.5;
+            vResult = vector(color.r * 0.8f, 1, color.g * 0.8f, color.a);
+        }
+    }
+    else
+    {
+        if (color.b > color.r && color.b > color.g)
+        {
+            // 파란색-> 보라색
+            float avg = (color.r + color.b) * 0.5;
+            vResult = vector(avg, color.g * 0.2, avg, color.a);
+        }
+    }
+    
+    Out.vColor = vResult;
+    if (0.3f >= Out.vColor.a)
+        discard;
+        
+     return Out;
 }
 
 technique11 DefaultTechnique
@@ -283,5 +345,17 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_SPHERE();
+    }
+
+    pass Slash // 9
+    {
+        SetRasterizerState(RS_NoCull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_SLASH();
     }
 }

@@ -25,7 +25,7 @@ private:
 
 public:
 	_bool Get_IsFinished() { return m_pModelCom->isFinished(); }
-	void Reset_Time() { m_fTime = 0; }
+	void Reset_Time() { if (m_fTime >= 0.5f) { m_fTime = 0.f; } }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -40,7 +40,7 @@ private:
 
 private:
 	_float m_fTime = { 100.f };
-	_float m_fEndTime = { 0.55f };
+	_float m_fEndTime = { 0.7f };
 	_float m_fPlayRatio = {};
 
 private:

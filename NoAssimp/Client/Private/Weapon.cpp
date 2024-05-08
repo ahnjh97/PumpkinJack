@@ -2,6 +2,7 @@
 #include "HitEffect.h"
 #include "Weapon.h"
 #include "Bone.h"
+#include "Dash.h"
 
 CWeapon::CWeapon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CPart{ pDevice, pContext }
@@ -25,6 +26,14 @@ void CWeapon::Reset_Damagable()
 	}
 }
 
+void CWeapon::Reset_DashEffect()
+{
+	for (_int i = 0; i < 2; i++) {
+		if (m_pDash[i] != nullptr)
+			m_pDash[i]->Reset_Time();
+	}	
+}
+
 HRESULT CWeapon::Initialize_Prototype()
 {
 	return S_OK;
@@ -43,13 +52,20 @@ HRESULT CWeapon::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components((LEVEL)pWeaponDesc->iLevel, pWeaponDesc->wstrModelTag)))
+	if (FAILED(Add_Components(LEVEL(pWeaponDesc->iLevel), pWeaponDesc->wstrModelTag)))
 		return E_FAIL;
 
 	
 	if (m_pModelCom->Get_ModelName() == "Spear")	{
 		m_pTransformCom->Rotation(XMVectorSet(0, 0, 1, 0), -XM_PIDIV2 + 0.1f);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0, 0, 0, 1));
+
+		PART_DESC tDashDesc{};
+		tDashDesc.iLevel = pWeaponDesc->iLevel;
+		tDashDesc.pParentMatrix = &m_WorldMatrix;
+		m_pDash[0] = dynamic_cast<CDash*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Dash"), &tDashDesc));
+		tDashDesc.matWorld._11 = 100;
+		m_pDash[1] = dynamic_cast<CDash*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Dash"), &tDashDesc));
 	}
 		
 	if (m_pModelCom->Get_ModelName() == "Rifle")	{
@@ -73,7 +89,13 @@ void CWeapon::Tick(_float fTimeDelta)
 	if (!m_bCorrectWeapon)
 		return;
 
-	if (m_bActivated) {
+	for (_int i = 0; i < 2; i++) {
+		if (m_pDash[i] != nullptr) {
+			m_pDash[i]->Tick(fTimeDelta);
+		}
+	}
+
+	if (m_bActivated) {	
 		Check_SlimeCol();
 		Check_SlimeBossRoomPillarCol();
 		Check_SoldierCol();
@@ -105,6 +127,9 @@ void CWeapon::Late_Tick(_float fTimeDelta)
 	if (m_bCorrectWeapon)
 	{
 		for (_int i = 0; i < 2; i++) {
+			if (m_pDash[i] != nullptr)
+				m_pDash[i]->Late_Tick(fTimeDelta);
+
 			if (m_pColliderCom[i] != nullptr)
 				m_pColliderCom[i]->Tick(XMLoadFloat4x4(&m_WorldMatrix));
 		}
@@ -378,8 +403,11 @@ void CWeapon::Free()
 {
 	__super::Free();
 
-	for(_int i = 0; i < 2; i++)
+	for (_int i = 0; i < 2; i++) {
+		Safe_Release(m_pDash[i]);
 		Safe_Release(m_pColliderCom[i]);
+	}
+
 	Safe_Release(m_pSocket);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pModelCom);

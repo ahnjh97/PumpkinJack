@@ -116,12 +116,7 @@ HRESULT CElecParts::Add_Components(LEVEL eLevel, ELEC_EFFECT eElecEffect)
 
 	/* For.Com_Texture */
 	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_ElecParts"),
-		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom[TEX_ELECPARTS])))
-		return E_FAIL;
-
-	/* For.Com_Texture_Noise */
-	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_Noise"),
-		TEXT("Com_Texture_Noise"), (CComponent**)&m_pTextureCom[TEX_NOISE])))
+		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
 	/* For.Com_VIBuffer */
@@ -145,10 +140,7 @@ HRESULT CElecParts::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))
 		return E_FAIL;
-
-	if (FAILED(m_pTextureCom[TEX_ELECPARTS]->Bind_ShaderResource(m_pShaderCom, "g_Texture")))
-		return E_FAIL;
-	if (FAILED(m_pTextureCom[TEX_NOISE]->Bind_ShaderResource(m_pShaderCom, "g_NoiseTexture")))
+	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture")))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bFadeIn", &m_bFadeIn, sizeof(_bool))))
 		return E_FAIL;
@@ -189,7 +181,6 @@ void CElecParts::Free()
 	__super::Free();
 
 	Safe_Release(m_pVIBufferCom);
-	for(_int i = 0; i< TEX_END; i++)
-		Safe_Release(m_pTextureCom[i]);
+	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pShaderCom);
 }

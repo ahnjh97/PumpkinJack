@@ -51,31 +51,49 @@ void CKart::Tick(_float fTimeDelta)
 		{
 			for (auto& crateBox : crateBoxList)
 			{
-				if (crateBox != nullptr)
+				if (crateBox != nullptr) {
 					crateBox->Set_Dead();
+					Add_Explosion(crateBox);
+				}
+					
 			}
 		}
 		CGameObject* pMinePlatform = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_MinePlatform"), TEXT("Prototype_GameObject_Monster"));
-		if (pMinePlatform != nullptr)
+		if (pMinePlatform != nullptr) {
 			pMinePlatform->Set_Dead();
+			Add_Explosion(pMinePlatform);
+		}
+			
 
 		CGameObject* pBallistaBase = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_BallistaBase"), TEXT("Prototype_GameObject_Monster"));
-		if (pBallistaBase != nullptr)
+		if (pBallistaBase != nullptr) {
 			pBallistaBase->Set_Dead();
+			Add_Explosion(pBallistaBase);
+		}
+			
 
 		CGameObject* pBallista = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Ballista"), TEXT("Prototype_GameObject_Ballista"));
-		if (pBallista != nullptr)
+		if (pBallista != nullptr) {
 			pBallista->Set_Dead();
+			Add_Explosion(pBallista);
+		}
+			
 
 		CGameObject* pBallistaRotator = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_BallistaRotator"), TEXT("Prototype_GameObject_BallistaRotator"));
-		if (pBallistaRotator != nullptr)
+		if (pBallistaRotator != nullptr) {
 			pBallistaRotator->Set_Dead();
+			Add_Explosion(pBallistaRotator);
+		}
+			
 	
 		CGameObject* pSkullCrossBow = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_SkullCrossBow"), TEXT("Prototype_GameObject_SkullCrossBow"));
-		if (pSkullCrossBow != nullptr)
+		if (pSkullCrossBow != nullptr) {
 			pSkullCrossBow->Set_Dead();
-
+			Add_Explosion(pSkullCrossBow);
+		}
+			
 		Set_Dead();
+		Add_Explosion(this);
 	}
 
 	for (_int i = 0; i < COLLIDER_END; i++)
@@ -222,6 +240,20 @@ _bool CKart::Check_ExplosionTrigger()
 	}
 		
 	return _bool();
+}
+
+void CKart::Add_Explosion(CGameObject* pGameObject)
+{
+	CTransform* pTransform = dynamic_cast<CTransform*>(pGameObject->Get_Component(g_strTransformTag));
+	if (nullptr == pTransform)
+		return;
+
+	CGameObject::GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = m_iLevel;
+	tDesc.matWorld = pTransform->Get_WorldFloat4x4();
+
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Explosion"), TEXT("Prototype_GameObject_Explosion"), &tDesc)))
+		return;
 }
 
 HRESULT CKart::Add_Components(const wstring& _wstrModelTag)

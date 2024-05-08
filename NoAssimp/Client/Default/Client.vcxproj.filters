@@ -229,6 +229,18 @@
     <Filter Include="02.GameObjects\Level_GamePlay\Arrow\ArrowEffect">
       <UniqueIdentifier>{4b1ecaf4-d0a8-41e2-ab0a-8579868e6eb4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay\Explosion">
+      <UniqueIdentifier>{a17c350a-00e5-4d89-b4a4-ba5ffb65aa01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effects\Jump">
+      <UniqueIdentifier>{0c096452-869d-42c8-9ea8-bd33e038e5b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effects\Slash">
+      <UniqueIdentifier>{86ab40e1-aade-48ec-963f-c51124d27201}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effects\Dash">
+      <UniqueIdentifier>{86f01734-9e12-485b-beef-1efa0f89d3a7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -453,6 +465,18 @@
     <ClInclude Include="..\Public\ArrowEffect.h">
       <Filter>02.GameObjects\Level_GamePlay\Arrow\ArrowEffect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Explosion.h">
+      <Filter>02.GameObjects\Level_GamePlay\Explosion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\JumpEffect.h">
+      <Filter>02.GameObjects\Effects\Jump</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Slash.h">
+      <Filter>02.GameObjects\Effects\Slash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Dash.h">
+      <Filter>02.GameObjects\Effects\Dash</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -667,6 +691,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\ArrowEffect.cpp">
       <Filter>02.GameObjects\Level_GamePlay\Arrow\ArrowEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Explosion.cpp">
+      <Filter>02.GameObjects\Level_GamePlay\Explosion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\JumpEffect.cpp">
+      <Filter>02.GameObjects\Effects\Jump</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Slash.cpp">
+      <Filter>02.GameObjects\Effects\Slash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Dash.cpp">
+      <Filter>02.GameObjects\Effects\Dash</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

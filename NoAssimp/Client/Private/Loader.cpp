@@ -10,14 +10,17 @@
 #include "Camera_Jack.h"
 #include "BackGround.h"
 #include "SoulEffect.h"
+#include "JumpEffect.h"
 #include "Tool_Anim.h"
 #include "HitEffect.h"
 #include "Terrain.h"
 #include "Monster.h"
 #include "Player.h"
 #include "Weapon.h"
+#include "Slash.h"
 #include "Grid.h"
 #include "Body.h"
+#include "Dash.h"
 #include "Sky.h"
 
 #include "BallistaRotator.h"
@@ -26,6 +29,7 @@
 #include "CollisionCube.h"
 #include "Map_GamePlay.h"
 #include "ArrowEffect.h"
+#include "Explosion.h"
 #include "Ballista.h"
 #include "CrateBox.h"
 #include "Trigger.h"
@@ -241,9 +245,8 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Water", "Terrain/Water.dds")))
 		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "SmokePuff", "Effects/smokePuff.dds")))
+	if (FAILED(Add_Texture(eLevel, "NewNoise", "Effects/NewNoise.dds")))
 		return E_FAIL;
-		
 
 	m_strLoadingText = TEXT("Loading NavigationCells for Level_GamePlay...");
 	/* Prototype_Component_VIBuffer_Terrain_GamePlay */
@@ -262,7 +265,8 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	vector<string> vecAnimModelNames = { "Jack", "Ballista", "Dummy", "SkullCrossBow", "Soldier", "Trabuchet" };
 	vector<string> vecNonAnimModelNames = { "Spear", "Rifle", "Scythe", "LevelGamePlay",
 		"ballistaArrow", "ballistaBase", "ballistaRotator", "crateBoxPotion", "fenceStack_SmallCol", "Cube",
-		"Kart", "MinePlatform", "Rail", "RailLeft60", "RailLeft90", "RailRight60", "RailRight90" };
+		"Kart", "MinePlatform", "Rail", "RailLeft60", "RailLeft90", "RailRight60", "RailRight90",
+		"Slash" };
 
 	if (FAILED(Add_Models(eLevel, vecAnimModelNames, vecNonAnimModelNames)))
 		return E_FAIL;
@@ -287,6 +291,7 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_Scythe"), CWeapon);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HitEffect"), CHitEffect);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SoulEffect"), CSoulEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("JumpEffect"), CJumpEffect);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("TongMap_GamePlay"), CMap_GamePlay);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Ballista"), CBallista);
@@ -301,6 +306,9 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_SoldierWeapon"), CSoldierWeapon);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CollisionCube"), CCollisionCube);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_ArrowEffect"), CArrowEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Explosion"), CExplosion);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Slash"), CSlash);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Dash"), CDash);
 
 
 	m_strLoadingText = TEXT("Loading Complete: Level_GamePlay");
@@ -358,7 +366,7 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 	m_strLoadingText = TEXT("Loading Models for Level_SlimeBoss...");
 	vector<string> vecAnimModelNames = { "Jack", "PartSlime", "PartSlimeBoss", "Slime", "SlimeBoss" };
 	vector<string> vecNonAnimModelNames = { "Spear", "Rifle", "Scythe", "LevelSlimeBoss",
-		"cemeteryFence1", "cemeteryPillar", "Knife", "NotOpen", "SlimeBossHead", "SlimeDamageZone"};
+		"cemeteryFence1", "cemeteryPillar", "Knife", "NotOpen", "SlimeBossHead", "SlimeDamageZone", "Slash"  };
 
 	if (FAILED(Add_Models(eLevel, vecAnimModelNames, vecNonAnimModelNames)))
 		return E_FAIL;
@@ -366,6 +374,9 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 
 	m_strLoadingText = TEXT("Loading Shaders for Level_SlimeBoss...");
 	if (FAILED(Add_Shaders(eLevel)))
+		return E_FAIL;
+
+	if (FAILED(Add_VIBuffer_Instance_Points(eLevel)))
 		return E_FAIL;
 
 
@@ -435,7 +446,7 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 	vector<string> vecAnimModelNames = 	{ "Jack", "Wizard" };
 	vector<string> vecNonAnimModelNames = { "Spear", "Rifle", "Scythe", "LevelWizard",
 		"Amulet", "Book", "elecArena1", "elecArena2", "elecArena3", "HoleWall", "SkySphere",
-		"Sphere", "TeslaTower", "Tornado", "WizardBrickGround", "WizardTower" };
+		"Sphere", "TeslaTower", "Tornado", "WizardBrickGround", "WizardTower", "Slash" };
 
 	if (FAILED(Add_Models(eLevel, vecAnimModelNames, vecNonAnimModelNames)))
 		return E_FAIL;
@@ -512,7 +523,7 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "ElecChain", "Effects/ElecChain%d.png", 8)))
 		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "SmokePuff", "Effects/smokePuff.dds")))
+	if (FAILED(Add_Texture(eLevel, "NewNoise", "Effects/NewNoise.dds")))
 		return E_FAIL;
 
 
@@ -540,6 +551,8 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "ballistaArrow")))
 		return E_FAIL;
+	if (FAILED(Add_Model(eLevel, TYPE_NONANIM, "Slash")))
+		return E_FAIL;
 
 	m_strLoadingText = TEXT("Loading Shaders for Level_EffectTool...");
 	if (FAILED(Add_Shaders(eLevel)))
@@ -563,6 +576,10 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SoulEffect"), CSoulEffect);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Arrow"), CArrow);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Part_ArrowEffect"), CArrowEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Explosion"), CExplosion);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("JumpEffect"), CJumpEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Slash"), CSlash);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Dash"), CDash);
 
 
 	m_strLoadingText = TEXT("Loading Complete: Level_EffectTool");
@@ -793,7 +810,7 @@ HRESULT CLoader::Add_VIBuffer_Instance_Points(LEVEL eLevel)
 		InstanceDesc.vMinScale = _float3(15, 15, 15);
 		InstanceDesc.vMaxScale = _float3(16, 16, 16);
 		InstanceDesc.vSpeed = _float2(50.f, 52.f);
-		InstanceDesc.iNumInstance = 120;
+		InstanceDesc.iNumInstance = 150;
 		InstanceDesc.vLifeTime = _float2(1.f, 1.3f);
 		InstanceDesc.isLoop = false;
 		InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_CYLINDER;
@@ -837,7 +854,34 @@ HRESULT CLoader::Add_VIBuffer_Instance_Points(LEVEL eLevel)
 		wstring wstrPrototypeTag = TEXT("Prototype_Component_VIBuffer_Instance_Point_Arrow");
 		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext, InstanceDesc))))
 			return E_FAIL;
+
+		InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+		InstanceDesc.vRange = _float3(10, 10, 10);
+		InstanceDesc.vPivot = _float3(0.f, 0.f, 0.f);
+		InstanceDesc.vMinScale = _float3(1.f, 1.f, 1.f);
+		InstanceDesc.vMaxScale = _float3(2.f, 2.f, 2.f);
+		InstanceDesc.vSpeed = _float2(36, 45);
+		InstanceDesc.iNumInstance = 220;
+		InstanceDesc.vLifeTime = _float2(0.3f, 0.7f);
+		InstanceDesc.iSpriteIndexOffset = 99;
+		InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_SPHERE;
+		wstrPrototypeTag = TEXT("Prototype_Component_VIBuffer_Instance_Point_Explosion");
+
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext, InstanceDesc))))
+			return E_FAIL;
 	}
+
+	CVIBuffer_Instance::INSTANCE_DESC		InstanceDesc{};
+	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	InstanceDesc.vRange = _float3(4.1f, 1.5f, 4.1f);
+	InstanceDesc.vMinScale = _float3(2.f, 2.f, 2.f);
+	InstanceDesc.vMaxScale = _float3(2.2f, 2.2f, 2.2f);
+	InstanceDesc.iNumInstance = 50;
+	InstanceDesc.vLifeTime = _float2(0.6f, 0.6f);
+	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_RING_ROTATED;
+	wstring wstrPrototypeTag = TEXT("Prototype_Component_VIBuffer_Instance_Point_Jump");
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext, InstanceDesc))))
+		return E_FAIL;
 
 	return S_OK;
 }

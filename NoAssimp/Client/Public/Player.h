@@ -68,7 +68,9 @@ private:
 	void SpearRollAttackDash(_float fTimeDelta);
 	void RifleRecoil(_float fTimeDelta);
 
-	void Damage_Effect();
+	void DamageEffect();
+	void Add_JumpEffect();
+	void Add_AttackEffect();
 
 private:
 	STATE m_eState = { PLAYER_END };

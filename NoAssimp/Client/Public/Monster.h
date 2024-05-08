@@ -24,8 +24,8 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	CModel*					m_pModelCom = { nullptr };
-	CShader*				m_pShaderCom = { nullptr };	
+	CModel*		m_pModelCom = { nullptr };
+	CShader*	m_pShaderCom = { nullptr };	
 
 private:
 	HRESULT Add_Components(LEVEL eLevel, const wstring& _wstrModelTag);

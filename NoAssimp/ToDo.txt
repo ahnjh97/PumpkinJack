@@ -1,17 +1,8 @@
-5/4, 5/5
-- Hit Effect
-- DeathEffect
+- ScytheRollAttackEffect
+- Rifle Effect
 
-- Trail Buffer-> Geometery Shader
-
-
-- Arrow Effect
-
-- Attack Effect
-- LevelGamePlay TerrainMask
-- LevelGamePlay Props
 - LevelSlimeBoss TerrainMask
-- LevelSlimeBoss Props
+- LevelSlimeBoss
 
 5/10~5/12
 - Fmod, Sound

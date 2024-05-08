@@ -4,6 +4,7 @@
 #include "Collider.h"
 #include "Player.h"
 #include "Weapon.h"
+#include "Slash.h"
 #include "Body.h"
 #include "Kart.h"
 #include "Cell.h"
@@ -240,7 +241,7 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 		Reset_WeaponCollider(m_eWeapon);
 
 	if (m_iPreHp > m_iHp)
-		Damage_Effect();
+		DamageEffect();
 
 	m_bPreInSlimeBossRoom = m_bInSlimeBossRoom;
 	m_bPreIsPushingKart = m_bIsPushingKart;
@@ -332,6 +333,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 		m_bIsJumping = true;
 		m_iJumpCount--;
 		pBodyModel->Reset_Animation(m_vecWeaponName[m_eWeapon] + "_Jump");
+		Add_JumpEffect();
 	}
 
 	if (m_pGameInstance->MouseDown(DIMKS_LBUTTON) && !m_bIsAttacking && !m_bIsRolling && !m_bIsPushingKart)
@@ -339,25 +341,27 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 		if (m_fRollEndTime < 0.5f && !m_bIsJumping)
 			m_eState = ROLL_ATTACK;
 		else if (m_bIsJumping == true)
-		{
 			m_eState = AIR_ATTACK;
-		}
-		else if (m_iLastAttack == 0 || m_iLastAttack == 3)
-		{
+		else if (m_iLastAttack == 0 || m_iLastAttack == 3) {
 			m_eState = ATTACK1;
 			m_iLastAttack = 1;
 		}
-		else if (m_iLastAttack == 1)
-		{
+		else if (m_iLastAttack == 1) {
 			m_eState = ATTACK2;
 			m_iLastAttack = 2;
 		}
-		else if (m_iLastAttack == 2)
-		{
+		else if (m_iLastAttack == 2) {
 			m_eState = ATTACK3;
 			m_iLastAttack = 3;
 		}
 		m_bIsAttacking = true;
+		Add_AttackEffect();
+
+		if (WPN_SPEAR == m_eWeapon && (ATTACK3 == m_eState || ROLL_ATTACK == m_eState)) {
+			CWeapon* pSpear = dynamic_cast<CWeapon*>(Get_Part(TEXT("Part_Spear")));
+			if(nullptr != pSpear)
+				pSpear->Reset_DashEffect();
+		}
 	}
 
 	if (!(m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) && !(m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80) &&
@@ -1055,7 +1059,7 @@ void CPlayer::RifleRecoil(_float fTimeDelta)
 		m_fDashTime = 0.f;
 }
 
-void CPlayer::Damage_Effect()
+void CPlayer::DamageEffect()
 {
 	CDamageEffect* pDamageEffect = dynamic_cast<CDamageEffect*>(m_pGameInstance->Get_GameObject(*m_pCurLevel, 
 		TEXT("Layer_DamageEffect"), TEXT("Prototype_GameObject_DamageEffect")));
@@ -1067,6 +1071,47 @@ void CPlayer::Damage_Effect()
 	if (nullptr == pBody)
 		return;
 	pBody->Reset_Time();
+}
+
+void CPlayer::Add_JumpEffect()
+{
+	GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = *m_pCurLevel;
+	tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurLevel, TEXT("Layer_JumpEffect"), TEXT("Prototype_GameObject_JumpEffect"), &tDesc)))
+		return;
+}
+
+void CPlayer::Add_AttackEffect()
+{
+	_bool bAddSlash = { false };
+
+	if (WPN_SPEAR == m_eWeapon)
+	{
+		if (ATTACK1 == m_eState || ATTACK2 == m_eState) {
+			if (m_iLastAttack == 1 || m_iLastAttack == 2) 
+				bAddSlash = true;
+		}
+		else if(AIR_ATTACK == m_eState)
+			bAddSlash = true;
+	}
+	else if (WPN_SCYTHE == m_eWeapon) 
+		bAddSlash = true;
+
+	if (true == bAddSlash)
+	{
+		CSlash::SLASH_DESC tDesc{};
+		tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+		tDesc.iLevel = *m_pCurLevel;
+		tDesc.eWeapon = m_eWeapon;
+		tDesc.eState = m_eState;
+		tDesc.vPlayerLook = m_pTransformCom->Get_State_Float4(CTransform::STATE_LOOK);
+		tDesc.vPlayerRight = m_pTransformCom->Get_State_Float4(CTransform::STATE_RIGHT);
+		tDesc.pPlayerWorldMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurLevel, TEXT("Layer_AttackEffect"), TEXT("Prototype_GameObject_Slash"), &tDesc)))
+			return;
+	}
 }
 
 HRESULT CPlayer::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)
