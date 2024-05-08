@@ -38,7 +38,6 @@ public:
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
-
 private:
 	ELEC_EFFECT m_eElecEffect = {};
 	_bool m_bFadeIn = { true };

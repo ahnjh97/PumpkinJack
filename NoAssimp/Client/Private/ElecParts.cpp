@@ -27,7 +27,7 @@ HRESULT CElecParts::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components((LEVEL)tElecPartsDesc.iLevel, tElecPartsDesc.eElecEffect)))
+	if (FAILED(Add_Components(LEVEL(tElecPartsDesc.iLevel), tElecPartsDesc.eElecEffect)))
 		return E_FAIL;
 
 	m_eElecEffect = tElecPartsDesc.eElecEffect;

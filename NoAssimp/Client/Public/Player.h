@@ -70,7 +70,7 @@ private:
 
 	void DamageEffect();
 	void Add_JumpEffect();
-	void Add_AttackEffect();
+	void Add_AttackEffect(_fvector vDir);
 
 private:
 	STATE m_eState = { PLAYER_END };
@@ -93,6 +93,7 @@ private:
 	_bool m_bKartCol = { false };
 	_bool m_bScytheRifleRollAttack = { true };
 	_bool m_bIsDashDirDetermined = { false };
+	_bool m_bAddAttackEffect = { false };
 
 	_uint m_iJumpCount = { 2 };
 	_uint m_iSlimeBossRoomEscapeCount = {};

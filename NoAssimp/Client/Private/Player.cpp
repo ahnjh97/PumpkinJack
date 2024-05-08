@@ -93,7 +93,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel), GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
 
-	if (FAILED(Add_PartObjects((LEVEL)GameObjectDesc.iLevel)))
+	if (FAILED(Add_PartObjects(LEVEL(GameObjectDesc.iLevel))))
 		return E_FAIL;
 
 	::XMStoreFloat3(&m_vDirection, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
@@ -192,11 +192,17 @@ void CPlayer::Tick(_float fTimeDelta)
 	if (m_bIsAttacking)
 		TargetNearestEnemy();
 
+	if (true == m_bAddAttackEffect) {
+		Add_AttackEffect(XMLoadFloat3(&m_vDirection));
+		m_bAddAttackEffect = false;
+	}
+
 	Update_PositionToCam();
 	Turn_Body(fTimeDelta);
+
 	SetUp_Damage();
 
-	if (m_bIsAttacking)	
+	if (m_bIsAttacking)	{}
 		Activate_Weapon();
 
 	if (WPN_RIFLE == m_eWeapon)
@@ -355,7 +361,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 			m_iLastAttack = 3;
 		}
 		m_bIsAttacking = true;
-		Add_AttackEffect();
+		m_bAddAttackEffect = true;
 
 		if (WPN_SPEAR == m_eWeapon && (ATTACK3 == m_eState || ROLL_ATTACK == m_eState)) {
 			CWeapon* pSpear = dynamic_cast<CWeapon*>(Get_Part(TEXT("Part_Spear")));
@@ -1083,7 +1089,7 @@ void CPlayer::Add_JumpEffect()
 		return;
 }
 
-void CPlayer::Add_AttackEffect()
+void CPlayer::Add_AttackEffect(_fvector vDir)
 {
 	_bool bAddSlash = { false };
 
@@ -1102,12 +1108,19 @@ void CPlayer::Add_AttackEffect()
 	if (true == bAddSlash)
 	{
 		CSlash::SLASH_DESC tDesc{};
-		tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
 		tDesc.iLevel = *m_pCurLevel;
 		tDesc.eWeapon = m_eWeapon;
 		tDesc.eState = m_eState;
-		tDesc.vPlayerLook = m_pTransformCom->Get_State_Float4(CTransform::STATE_LOOK);
-		tDesc.vPlayerRight = m_pTransformCom->Get_State_Float4(CTransform::STATE_RIGHT);
+		XMStoreFloat4(&tDesc.vPlayerLook, XMVector3Normalize(vDir));
+		XMStoreFloat4(&tDesc.vPlayerRight,  XMVector3Cross(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), XMVector3Normalize(vDir)));
+
+		tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+		tDesc.matWorld._12 = tDesc.vPlayerRight.y;
+		tDesc.matWorld._13 = tDesc.vPlayerRight.z;
+		tDesc.matWorld._31 = tDesc.vPlayerLook.x;
+		tDesc.matWorld._32 = tDesc.vPlayerLook.y;
+		//tDesc.vPlayerLook = m_pTransformCom->Get_State_Float4(CTransform::STATE_LOOK);
+		//tDesc.vPlayerRight = m_pTransformCom->Get_State_Float4(CTransform::STATE_RIGHT);
 		tDesc.pPlayerWorldMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurLevel, TEXT("Layer_AttackEffect"), TEXT("Prototype_GameObject_Slash"), &tDesc)))
 			return;

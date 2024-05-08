@@ -35,7 +35,7 @@ HRESULT CSlimeBoss::Initialize(void* pArg)
 	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel), GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
 
-	if (FAILED(Add_PartObjects((LEVEL)GameObjectDesc.iLevel)))
+	if (FAILED(Add_PartObjects(LEVEL(GameObjectDesc.iLevel))))
 		return E_FAIL;
 
 	m_pModelCom->Set_Animation(SLIMEBOSS_SPAWN, false);

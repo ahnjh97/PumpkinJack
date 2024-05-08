@@ -23,6 +23,7 @@ public:
 		INSTANCE_SHAPE	eShape = { };
 		_float		fDistanceLimit = {};
 		_float		fDuration = {};
+		_bool		bUpFixed = { false };
 	}INSTANCE_DESC;
 
 protected:

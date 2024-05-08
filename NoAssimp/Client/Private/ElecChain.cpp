@@ -28,7 +28,7 @@ HRESULT CElecChain::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&tElecChainDesc)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components((LEVEL)tElecChainDesc.iLevel)))
+	if (FAILED(Add_Components(LEVEL(tElecChainDesc.iLevel))))
 		return E_FAIL;
 
 	m_iElecChainIndex = tElecChainDesc.iElecChainIndex;

@@ -95,8 +95,8 @@ HRESULT CLevel_Wizard::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fSpeedPerSec = 20.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-	CameraDesc.fDistance = 82.f;
-	CameraDesc.fHeight = 30.f;
+	CameraDesc.fDistance = 65.f;
+	CameraDesc.fHeight = 28.f;
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, strLayerTag, TEXT("Prototype_GameObject_Camera_Jack"), &CameraDesc)))
 		return E_FAIL;

@@ -35,7 +35,7 @@ HRESULT CInven::Initialize(void* pArg)
 	if (FAILED(Add_Components(InvenDesc.eWeapon)))
 		return E_FAIL;
 
-	if (FAILED(Add_PartObjects((LEVEL)InvenDesc.iLevel)))
+	if (FAILED(Add_PartObjects(LEVEL(InvenDesc.iLevel))))
 		return E_FAIL;
 
 	m_fX = g_iWinSizeX * 0.5f;

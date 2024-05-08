@@ -112,8 +112,8 @@ HRESULT CLevel_SlimeBoss::Ready_Layer_Camera(const wstring& strLayerTag)
 	CameraDesc.fSpeedPerSec = 60.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-	CameraDesc.fDistance = 72.f;
-	CameraDesc.fHeight = 26.f;
+	CameraDesc.fDistance = 60.f;
+	CameraDesc.fHeight = 24.f;
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, strLayerTag, TEXT("Prototype_GameObject_Camera_Jack"), &CameraDesc)))
 		return E_FAIL;

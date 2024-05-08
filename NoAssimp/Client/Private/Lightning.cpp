@@ -28,7 +28,7 @@ HRESULT CLightning::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components((LEVEL)tLightningDesc.iLevel, tLightningDesc.iLightingIndex)))
+	if (FAILED(Add_Components(LEVEL(tLightningDesc.iLevel), tLightningDesc.iLightingIndex)))
 		return E_FAIL;
 
 	m_iLightningIndex = tLightningDesc.iLightingIndex;

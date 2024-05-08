@@ -61,31 +61,49 @@ HRESULT CSlash::Initialize(void* pArg)
     else if (WPN_SCYTHE == pGameObjectDesc->eWeapon)
     {
         if (ATTACK1 == pGameObjectDesc->eState) {
+            m_pTransformCom->Set_Scaled(fScale * 1.25f, fScale * 0.6f * 1.25f, fScale * 1.35f);
             m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), -0.25f);
-            m_pTransformCom->Set_Pos(vPos + XMVectorSet(0, 8.f, 0, 0) + XMLoadFloat4(&pGameObjectDesc->vPlayerLook) * 3.f);
-            m_fEndTime = 0.8f;
+            m_pTransformCom->Set_Pos(vPos + XMVectorSet(0, 8.f, 0, 0) + XMLoadFloat4(&pGameObjectDesc->vPlayerLook) * 4.5f);
+            m_fWaitTime = 0.1f;
+            m_fEndTime = 0.7f;
         }
         else if (ATTACK2 == pGameObjectDesc->eState)
         {
+            m_pTransformCom->Set_Scaled(fScale * 1.25f, fScale * 0.6f * 1.25f, fScale * 1.35f);
             m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), 2.25f);
-            m_pTransformCom->Set_Pos(vPos + XMVectorSet(0, 7.5f, 0, 0) + XMLoadFloat4(&pGameObjectDesc->vPlayerLook) * 3.f);
-            m_fEndTime = 0.55f;
+            m_pTransformCom->Set_Pos(vPos + XMVectorSet(0, 7.5f, 0, 0) + XMLoadFloat4(&pGameObjectDesc->vPlayerLook) * 4.5f);
+            m_fWaitTime = 0.2f;
+            m_fEndTime = 0.45f;
         }
         else if (ATTACK3 == pGameObjectDesc->eState)
         {
+            m_pTransformCom->Set_Scaled(fScale * 1.25f, fScale * 0.6f * 1.25f, fScale * 1.35f);
             m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), 1.35f);
-            m_pTransformCom->Set_Pos(vPos + XMVectorSet(0, 8.f, 0, 0) + XMLoadFloat4(&pGameObjectDesc->vPlayerLook) * 3.f);
+            m_pTransformCom->Set_Pos(vPos + XMVectorSet(0, 8.f, 0, 0) + XMLoadFloat4(&pGameObjectDesc->vPlayerLook) * 4.5f);
             m_fWaitTime = 0.15f;
+            m_fEndTime = 0.45f;
         }
         else if (AIR_ATTACK == pGameObjectDesc->eState)
         {
+            m_pTransformCom->Set_Scaled(fScale * 1.25f, fScale * 0.6f * 1.25f, fScale * 1.35f);
             m_pPlayerWorldMat = pGameObjectDesc->pPlayerWorldMat;
             m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), 0.7f);
             //m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), .f);
-            m_vOffset = XMVectorSet(0, 7.f, 0, 0) - XMLoadFloat4(&pGameObjectDesc->vPlayerRight) * 1.5f + XMLoadFloat4(&pGameObjectDesc->vPlayerLook) * 4.f;
+            m_vOffset = XMVectorSet(0, 7.f, 0, 0) - XMLoadFloat4(&pGameObjectDesc->vPlayerRight) * 1.5f 
+                + XMLoadFloat4(&pGameObjectDesc->vPlayerLook) * 4.f;
             m_pTransformCom->Set_Pos(vPos + m_vOffset);
             m_fWaitTime = 0.45f;
             m_fEndTime = 0.5f;
+        }
+        else if (ROLL_ATTACK == pGameObjectDesc->eState)
+        {
+            m_pTransformCom->Set_Scaled(fScale * 1.55f, fScale * 0.6f * 1.55f, fScale * 1.65f);
+
+            m_bTurn = true;
+            //m_vOffset = XMLoadFloat4(&pGameObjectDesc->vPlayerLook) * 5.f;
+            m_pTransformCom->Set_Pos(vPos + XMVectorSet(0, 4.f, 0, 0));
+            m_fWaitTime = 0.35f;
+            m_fEndTime = 1.2f;
         }
     }
 
@@ -109,7 +127,10 @@ void CSlash::Tick(_float fTimeDelta)
 
         if (m_pPlayerWorldMat != nullptr) 
             m_pTransformCom->Set_Pos(XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1) + m_vOffset);
-            
+        
+        if (true == m_bTurn) 
+            m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), fTimeDelta * 15.5f);
+    
         if (m_fSpriteTime >= m_fEndTime / 6.f) {
             m_iSpriteIndex--;
             m_fSpriteTime = 0.f;

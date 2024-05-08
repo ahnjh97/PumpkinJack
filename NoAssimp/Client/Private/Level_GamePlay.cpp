@@ -100,7 +100,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & strLayerTag)
 	CameraDesc.fSpeedPerSec = 20.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	
-	CameraDesc.fDistance = 70.f;
+	CameraDesc.fDistance = 55.f;
 	CameraDesc.fHeight = 20.f;
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Camera_Jack"), &CameraDesc)))

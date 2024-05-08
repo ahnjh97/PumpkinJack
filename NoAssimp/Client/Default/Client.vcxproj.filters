@@ -241,6 +241,9 @@
     <Filter Include="02.GameObjects\Effects\Dash">
       <UniqueIdentifier>{86f01734-9e12-485b-beef-1efa0f89d3a7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effects\Bullets">
+      <UniqueIdentifier>{1412b6b7-7200-4b83-8b1f-b87f19413b98}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -477,6 +480,9 @@
     <ClInclude Include="..\Public\Dash.h">
       <Filter>02.GameObjects\Effects\Dash</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Bullets.h">
+      <Filter>02.GameObjects\Effects\Bullets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -703,6 +709,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Dash.cpp">
       <Filter>02.GameObjects\Effects\Dash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bullets.cpp">
+      <Filter>02.GameObjects\Effects\Bullets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

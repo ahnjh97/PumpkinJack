@@ -109,10 +109,10 @@ HRESULT CLevel_EffectTool::Ready_Layer_Grid(const wstring& strLayerTag)
 
 HRESULT CLevel_EffectTool::Add_Effect(const wstring& strLayerTag)
 {
-	CPart::PART_DESC tDesc{};
+	CGameObject::GAMEOBJECT_DESC tDesc{};;
 	tDesc.iLevel = LEVEL_EFFECTTOOL;
 	
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Dash"), &tDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Bullets"), &tDesc)))
 		return E_FAIL;
 
 	return S_OK;

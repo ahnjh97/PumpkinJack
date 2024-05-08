@@ -4,6 +4,7 @@
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D g_Texture;
 texture2D g_NoiseTexture;
+texture2D g_AttackEffect[6];
 
 vector	g_vCamPosition;
 float   g_fTime;
@@ -227,6 +228,29 @@ PS_OUT PS_JUMP(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_BULLETS(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+	
+    if (In.fLifeRatio < 1 / 6.f)
+        Out.vColor = g_AttackEffect[0].Sample(LinearSampler, In.vTexcoord);
+    else if (In.fLifeRatio < 2 / 6.f)
+        Out.vColor = g_AttackEffect[1].Sample(LinearSampler, In.vTexcoord);
+    else if (In.fLifeRatio < 3 / 6.f)
+        Out.vColor = g_AttackEffect[2].Sample(LinearSampler, In.vTexcoord);
+    else if (In.fLifeRatio < 4 / 6.f)
+        Out.vColor = g_AttackEffect[3].Sample(LinearSampler, In.vTexcoord);
+    else if (In.fLifeRatio < 5 / 6.f)
+        Out.vColor = g_AttackEffect[4].Sample(LinearSampler, In.vTexcoord);
+    else if (In.fLifeRatio < 1.f)
+        Out.vColor = g_AttackEffect[5].Sample(LinearSampler, In.vTexcoord);
+    
+    if (Out.vColor.a <= 0.3f || 1.f <= In.fLifeRatio)
+        discard;
+
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
 	pass Default // 0
@@ -292,5 +316,18 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_JUMP();
+    }
+
+    pass Bullets // 5
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = compile gs_5_0 GS_MAIN();
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_BULLETS();
     }
 }

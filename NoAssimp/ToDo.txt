@@ -1,5 +1,7 @@
-- ScytheRollAttackEffect
 - Rifle Effect
+- Soldier Hit Effect, AttackEffect
+- SBR_Pillar Hit Effect
+- TeslaTower Hit Effect
 
 - LevelSlimeBoss TerrainMask
 - LevelSlimeBoss

@@ -169,6 +169,7 @@
     <ClInclude Include="..\Public\BallistaRotator.h" />
     <ClInclude Include="..\Public\Body.h" />
     <ClInclude Include="..\Public\Book.h" />
+    <ClInclude Include="..\Public\Bullets.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
     <ClInclude Include="..\Public\Camera_Jack.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
@@ -249,6 +250,7 @@
     <ClCompile Include="..\Private\BallistaRotator.cpp" />
     <ClCompile Include="..\Private\Body.cpp" />
     <ClCompile Include="..\Private\Book.cpp" />
+    <ClCompile Include="..\Private\Bullets.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Camera_Jack.cpp" />
     <ClCompile Include="..\Private\CollisionCube.cpp" />

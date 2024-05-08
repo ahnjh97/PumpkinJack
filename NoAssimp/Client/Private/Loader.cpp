@@ -15,6 +15,7 @@
 #include "HitEffect.h"
 #include "Terrain.h"
 #include "Monster.h"
+#include "Bullets.h"
 #include "Player.h"
 #include "Weapon.h"
 #include "Slash.h"
@@ -309,6 +310,7 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Explosion"), CExplosion);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Slash"), CSlash);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Dash"), CDash);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Bullets"), CBullets);
 
 
 	m_strLoadingText = TEXT("Loading Complete: Level_GamePlay");
@@ -580,6 +582,7 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("JumpEffect"), CJumpEffect);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Slash"), CSlash);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Dash"), CDash);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Bullets"), CBullets);
 
 
 	m_strLoadingText = TEXT("Loading Complete: Level_EffectTool");
@@ -880,6 +883,19 @@ HRESULT CLoader::Add_VIBuffer_Instance_Points(LEVEL eLevel)
 	InstanceDesc.vLifeTime = _float2(0.6f, 0.6f);
 	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_RING_ROTATED;
 	wstring wstrPrototypeTag = TEXT("Prototype_Component_VIBuffer_Instance_Point_Jump");
+	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext, InstanceDesc))))
+		return E_FAIL;
+
+	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	InstanceDesc.vRange = _float3(4.f, 4.f, 4.f);
+	InstanceDesc.vPivot = _float3(0.f, 0.f, -27.f);
+	InstanceDesc.vMinScale = _float3(5.f, 5.f, 5.f);
+	InstanceDesc.vMaxScale = _float3(7.f, 7.f, 7.f);
+	InstanceDesc.iNumInstance = 25;
+	InstanceDesc.vSpeed = _float2(50, 60);
+	InstanceDesc.vLifeTime = _float2(0.3f, 0.7f);
+	InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_SPHERE;
+	wstrPrototypeTag = TEXT("Prototype_Component_VIBuffer_Instance_Point_Bullets");
 	if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext, InstanceDesc))))
 		return E_FAIL;
 

@@ -29,7 +29,7 @@ HRESULT CBook::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components((LEVEL)GameObjectDesc.iLevel)))
+	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel))))
 		return E_FAIL;
 
 	return S_OK;

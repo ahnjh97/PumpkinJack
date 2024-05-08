@@ -30,7 +30,7 @@ HRESULT CHitEffect::Initialize(void* pArg)
 
 	m_fNewScale = GameObjectDesc.fNewScale;
 
-	if (FAILED(Add_Components((LEVEL)GameObjectDesc.iLevel)))
+	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel))))
 		return E_FAIL;
 
 	m_pTransformCom->Set_WorldMatrix(GameObjectDesc.matWorld);

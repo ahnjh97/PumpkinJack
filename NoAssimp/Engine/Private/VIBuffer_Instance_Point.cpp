@@ -110,7 +110,6 @@ HRESULT CVIBuffer_Instance_Point::Initialize_Prototype(const CVIBuffer_Instance:
 	m_pSpeeds = new _float[m_iNumInstance];
 	ZeroMemory(m_pSpeeds, sizeof(_float) * m_iNumInstance);
 
-
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
 		XMStoreFloat4(&m_pInstanceVertices[i].vRight, XMVectorSet(1.f, 0.f, 0.f, 0.f) * ScaleX(m_RandomNumber));

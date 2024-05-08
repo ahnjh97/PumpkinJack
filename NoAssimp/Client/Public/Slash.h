@@ -22,6 +22,7 @@ public:
 		_float fDuration = { 0.6f };
 		WEAPON eWeapon;
 		STATE eState;
+		_bool bRollSecond = { false };
 	}SLASH_DESC;
 
 private:
@@ -40,6 +41,7 @@ private:
 	_vector m_vOffset = { };
 
 	_bool	m_bEnabled = { false };
+	_bool	m_bTurn = { false };
 
 	_uint	m_iWeaponIndex = {};
 	_uint	m_iSpriteIndex = { 5 };
