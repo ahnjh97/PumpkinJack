@@ -35,6 +35,7 @@ private:
 	void SlimeDamageZoneSpawn(_uint iNum);
 	void DeathEffect();
 	void Add_SwipeEffect();
+	void Add_ShockWave();
 
 private:
 	CModel* m_pModelCom = { nullptr };
@@ -53,6 +54,7 @@ private:
 	_bool m_bSlimeDamageZoneSpawn = { false };
 	_bool m_bTurnToPlayer = { false };
 	_bool m_bAddSwipeEffect = { false };
+	_bool m_bAddShockWave = { false };
 
 	_int m_iCurPattern = { -1};
 	_int m_iLightningCount = {};

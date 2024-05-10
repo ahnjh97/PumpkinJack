@@ -2,6 +2,7 @@
 #include "SlimeBoss.h"
 #include "SlimeBoss_Slime.h"
 #include "SwipeEffect.h"
+#include "ShockWave.h"
 #include "Player.h"
 #include "Portal.h"
 
@@ -172,11 +173,31 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 		{
 			if (m_eState == SLIMEBOSS_INVOKE_BEGIN && m_pModelCom->Get_AnimPlayRatio() > 0.32f)
 			{
+				/*_float fAnimPlayRatio = m_pModelCom->Get_AnimPlayRatio();
+
+				if (fAnimPlayRatio < 0.37f || (fAnimPlayRatio > 0.42f && fAnimPlayRatio < 0.47f) 
+					|| (fAnimPlayRatio > 0.52f && fAnimPlayRatio < 0.57f) 
+					|| (fAnimPlayRatio > 0.62f && fAnimPlayRatio < 0.67f)) {
+					if (false == m_bAddShockWave) {
+						Add_ShockWave();
+						m_bAddShockWave = true;
+					}
+				}
+
+				if ((fAnimPlayRatio > 0.37f && fAnimPlayRatio < 0.42f)
+					|| (fAnimPlayRatio > 0.47f && fAnimPlayRatio < 0.52f)
+					|| (fAnimPlayRatio > 0.57f && fAnimPlayRatio < 0.62f)
+					|| fAnimPlayRatio > 0.67f)
+					m_bAddShockWave = false;*/
+
 				if (m_pPlayer->Get_SlimeBossRoomEscapeCount() >= 1 && m_bSlimeDamageZoneSpawn == false)
 				{
 					SlimeDamageZoneSpawn(10);
 					m_bSlimeDamageZoneSpawn = true;
 				}
+
+				if (SLIMEBOSS_INVOKE_BEGIN == m_ePreState && SLIMEBOSS_INVOKE_BEGIN != m_eState)
+					m_bAddShockWave = false;
 			}
 
 			if (m_eState == SLIMEBOSS_FORK && m_bAddSwipeEffect == false) {
@@ -206,12 +227,21 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 		}
 		else if (m_eState == SLIMEBOSS_INVOKE)
 		{
+			_float fAnimPlayRatio = m_pModelCom->Get_AnimPlayRatio();
+			if (fAnimPlayRatio < 0.1f) {
+				if (false == m_bAddShockWave) {
+					Add_ShockWave();
+					m_bAddShockWave = true;
+				}
+			}
+			else
+				m_bAddShockWave = false;
+			
 			if (m_pModelCom->Get_AnimPlayCount(SLIMEBOSS_INVOKE) >= 3)
 			{
 				m_eState = m_vecSlimeBossPattern[++m_iCurPattern];
 				m_pModelCom->Reset_AnimPlayCount(SLIMEBOSS_INVOKE);
-			}
-				
+			}	
 		}
 		else if (m_eState == SLIMEBOSS_LIGHTNING)
 		{
@@ -375,6 +405,18 @@ void CSlimeBoss::Add_SwipeEffect()
 	tDesc.vSlimeBossRight = m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_AttactEffect"), TEXT("Prototype_GameObject_SwipeEffect"), &tDesc)))
 		return;
+}
+
+void CSlimeBoss::Add_ShockWave()
+{
+	CShockWave::SHOCKWAVE_DESC tDesc{};
+	tDesc.iLevel = LEVEL_SLIMEBOSS;
+	tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	for (_int i = -7; i < 8; i++) {
+		tDesc.iRotation = i;
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_AttackEffect"), TEXT("Prototype_GameObject_ShockWave"), &tDesc)))
+			return;
+	}
 }
 
 HRESULT CSlimeBoss::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)

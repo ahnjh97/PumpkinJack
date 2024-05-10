@@ -98,7 +98,7 @@ PS_OUT PS_SLIME(PS_IN In)
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     vector vEmitColor = g_SlimeEmitTexture.Sample(LinearSampler, In.vTexcoord); // Emissive Texture 에서 색상 가져오기
     
-    Out.vDiffuse = vMtrlDiffuse;
+    Out.vDiffuse = vMtrlDiffuse + float4(0.2, 0.28, 0.2, 0);
     Out.vDiffuse += vEmitColor;
     Out.vDiffuse.a = 0.65f;
     

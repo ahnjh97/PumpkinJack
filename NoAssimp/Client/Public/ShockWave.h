@@ -13,6 +13,12 @@ BEGIN(Client)
 class CShockWave final : public CGameObject
 {
 	enum TEX_SHOCKWAVE { TEX_DEFAULT, TEX_MASK, TEX_END };
+
+public:
+	typedef struct : public GAMEOBJECT_DESC
+	{
+		_int iRotation;
+	}SHOCKWAVE_DESC;
 private:
 	CShockWave(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CShockWave(const CShockWave& rhs);

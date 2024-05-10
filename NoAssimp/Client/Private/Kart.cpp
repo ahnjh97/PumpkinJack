@@ -44,6 +44,16 @@ void CKart::Tick(_float fTimeDelta)
 	if(m_bExplode)
 		m_fTime += fTimeDelta;
 	
+	if (m_fTime < 0.6f || (m_fTime > 1.2f && m_fTime < 1.8f) ||
+		(m_fTime > 2.4f && m_fTime < 3.0f))
+		m_fAlarmTime += fTimeDelta;
+	else if((m_fTime > 0.6f && m_fTime < 1.2f) || (m_fTime > 1.8f && m_fTime < 2.4f))
+		m_fAlarmTime -= fTimeDelta;
+
+	m_fPlayRatio = m_fAlarmTime / m_fEndTime;
+	if (m_fPlayRatio > 1.f)
+		m_fPlayRatio = 1.f;
+
 	if (m_fTime >= 3.f)
 	{
 		list<CGameObject*> crateBoxList = m_pGameInstance->Get_ObjectList(LEVEL_GAMEPLAY, TEXT("Layer_CrateBox"));
@@ -120,9 +130,12 @@ void CKart::Late_Tick(_float fTimeDelta)
 	if (!XMVector3Equal(vRearDir, XMVectorSet(0, 0, 0, 0)))
 		m_vRearDir = vRearDir;
 
-	if (false == m_bExplode)
+	if (false == m_bExplode) {
 		m_bExplode = Check_ExplosionTrigger();
-
+		if (true == m_bExplode)
+			m_fAlarmTime = 0.f;
+	}
+	
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
@@ -138,7 +151,7 @@ HRESULT CKart::Render()
 		m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE);
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(0)))
+		if (FAILED(m_pShaderCom->Begin(2)))  // Damagable
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -312,6 +325,8 @@ HRESULT CKart::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fCamFar", m_pGameInstance->Get_CamFarPtr(), sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fPlayRatio", &m_fPlayRatio, sizeof(_float))))
 		return E_FAIL;
 
 	return S_OK;

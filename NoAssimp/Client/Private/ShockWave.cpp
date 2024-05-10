@@ -18,9 +18,9 @@ HRESULT CShockWave::Initialize_Prototype()
 
 HRESULT CShockWave::Initialize(void* pArg)
 {
-	GAMEOBJECT_DESC GameObjectDesc = {};
+	SHOCKWAVE_DESC GameObjectDesc = {};
 	if (pArg)
-		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
+		GameObjectDesc = *(SHOCKWAVE_DESC*)pArg;
 
 	GameObjectDesc.fSpeedPerSec = 10.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
@@ -31,10 +31,10 @@ HRESULT CShockWave::Initialize(void* pArg)
 	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel))))
 		return E_FAIL;
 
-	m_fDuration = 0.3f;
+	m_fDuration = 8.f;
 
-	if (GameObjectDesc.iLevel == LEVEL_EFFECTTOOL)
-		m_pTransformCom->Set_Pos(XMVectorSet(m_pGameInstance->RandomNumber(-30, 0), 0, 0, 1));
+	_float fAngle = 0.1f;
+	m_pTransformCom->Turn(XMVectorSet(0, 1, 0, 0), fAngle * GameObjectDesc.iRotation);
 
 	//_vector vOffset = XMVectorSet(0, 3.5f, 0, 0) - m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 2.f;
 	//m_pTransformCom->Set_Pos(m_pTransformCom->Get_Pos_Vector() + vOffset);
@@ -47,6 +47,8 @@ void CShockWave::Tick(_float fTimeDelta)
 	m_fTime += fTimeDelta;
 	if (m_fTime > m_fDuration)
 		Set_Dead();
+
+	m_pTransformCom->Go_Straight(fTimeDelta * 9.f);
 
 	m_pVIBufferCom->Check_LifeTimes(fTimeDelta);
 }
@@ -61,7 +63,7 @@ HRESULT CShockWave::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Begin(5))) // SlimeParticles
+	if (FAILED(m_pShaderCom->Begin(6))) // ShockWave
 		return E_FAIL;
 
 	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
@@ -81,16 +83,16 @@ HRESULT CShockWave::Add_Components(LEVEL eLevel)
 		return E_FAIL;
 
 	/* For.Com_Texture */
-	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_Slime"),
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_NewTex"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom[TEX_DEFAULT])))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Texture_Particle"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_SmokePuff"),
 		TEXT("Com_Texture_Mask"), (CComponent**)&m_pTextureCom[TEX_MASK])))
 		return E_FAIL;
 
 	/* For.Com_VIBuffer */
-	wstring wstrPrototypeTag = TEXT("Prototype_Component_VIBuffer_Instance_Point_SlimeParticles");
+	wstring wstrPrototypeTag = TEXT("Prototype_Component_VIBuffer_Instance_Point_ShockWave");
 	if (FAILED(__super::Add_Component(eLevel, wstrPrototypeTag, TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
 
@@ -110,10 +112,13 @@ HRESULT CShockWave::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))
 		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(_float))))
+		return E_FAIL;
 	if (FAILED(m_pTextureCom[TEX_DEFAULT]->Bind_ShaderResource(m_pShaderCom, "g_Texture")))
 		return E_FAIL;
 	if (FAILED(m_pTextureCom[TEX_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture")))
 		return E_FAIL;
+
 
 	return S_OK;
 }

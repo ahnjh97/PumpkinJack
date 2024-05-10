@@ -6,6 +6,7 @@ BEGIN(Engine)
 class CModel;
 class CShader;
 class CPart;
+class CNavigation;
 END
 
 BEGIN(Client)
@@ -50,6 +51,7 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	map<const wstring, CPart*> m_Parts;
 	CCollider* m_pColliderCom[COLLIDER_END] = {nullptr};
+	CNavigation* m_pNavigationCom = { nullptr };
 	class CPlayer* m_pPlayer = { nullptr };
 	const _float4x4* m_pPlayerWorldMat = { nullptr };
 	CCollider* m_pPlayerCollider = { nullptr };

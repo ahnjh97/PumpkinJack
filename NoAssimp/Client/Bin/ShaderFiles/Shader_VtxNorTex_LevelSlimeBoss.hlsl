@@ -68,12 +68,13 @@ PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-    vector vSourDiffuse = g_DiffuseTexture[0].Sample(LinearSampler, In.vTexcoord);
+    //vector vSourDiffuse = g_DiffuseTexture[0].Sample(LinearSampler, In.vTexcoord);
     vector vDestDiffuse = g_DiffuseTexture[3].Sample(LinearSampler, In.vTexcoord );
-    vector vMask = g_MaskTexture.Sample(PointSampler, In.vTexcoord / 18.f);
-    vector vDiffuse = vDestDiffuse * vMask + vSourDiffuse * (1.f - vMask);
+    //vector vMask = g_MaskTexture.Sample(PointSampler, In.vTexcoord / 18.f);
+    //vMask = vector(1, 1, 1, 1);
+    //vector vDiffuse = vDestDiffuse * vMask + vSourDiffuse * (1.f - vMask);
 	
-    Out.vDiffuse = vector(vDiffuse.xyz, 1.f);
+    Out.vDiffuse = vector(vDestDiffuse.xyz, 1.f);
     Out.vNormal = vector((In.vNormal * 0.5f + 0.5f).xyz, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fCamFar, 0.0f, 0.0f);
 	

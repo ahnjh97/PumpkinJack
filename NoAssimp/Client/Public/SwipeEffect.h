@@ -12,6 +12,7 @@ BEGIN(Client)
 
 class CSwipeEffect final : public CGameObject
 {
+	enum TEX_SWIPE { TEX_SLASH, TEX_NOISE, TEX_END };
 public:
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{
@@ -37,14 +38,14 @@ private:
 	_uint m_iWeaponIndex = {};
 
 	_float	m_fTime = { };
-	_float	m_fEndTime = { 0.45f };
+	_float	m_fEndTime = { 0.5f };
 	_float	m_fWaitTime = {};
 	_float	m_fPlayRatio = {};
 	_float	m_fSpriteTime = {};
 
 private:
 	CModel* m_pModelCom = { nullptr };
-	CTexture* m_pTextureCom = { nullptr };
+	CTexture* m_pTextureCom[TEX_END] = { nullptr, nullptr };
 	CShader* m_pShaderCom = { nullptr };
 
 private:

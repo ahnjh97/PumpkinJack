@@ -34,6 +34,7 @@ private:
 	_float m_fTime = {};
 	_float m_fCollisionTime = {};
 	_float m_fAlpha = { 1.f };
+	_float m_fAccSpeed = { 4.f };
 
 private:
 	CModel* m_pModelCom = { nullptr };

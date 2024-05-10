@@ -291,6 +291,71 @@ PS_OUT PS_DAMAGABLE(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_SLIMEDAMAGEZONE(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    Out.vColor.rgb += float3(0.2, 0.28, 0.2);
+    Out.vColor.a = g_fAlpha;
+    if (0.1f >= Out.vColor.a)
+        discard;
+    
+    return Out;
+}
+
+PS_OUT PS_SWIPEEFFECT(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    if (g_fPlayRatio < In.vTexcoord.x * 0.25f)
+        discard;
+    if (g_fPlayRatio > 0.75f + In.vTexcoord.x * 0.25f)
+        discard;
+    
+    float2 adjustedUV = In.vTexcoord;
+    adjustedUV.y = (adjustedUV.y * 0.8) + 0.5; // Y 좌표 조정
+    // 텍스처에서 색상 정보를 샘플링
+    float4 color = float4(0, 0, 0, 0);
+    //color = g_AttackEffect[0].Sample(LinearSampler, In.vTexcoord);
+    if (g_iSpriteIndex == 0)
+        color = g_AttackEffect[0].Sample(LinearSampler, In.vTexcoord);
+    else if (g_iSpriteIndex == 1)
+        color = g_AttackEffect[1].Sample(LinearSampler, In.vTexcoord);
+    else if (g_iSpriteIndex == 2)
+        color = g_AttackEffect[2].Sample(LinearSampler, In.vTexcoord);
+    else if (g_iSpriteIndex == 3)
+        color = g_AttackEffect[3].Sample(LinearSampler, In.vTexcoord);
+    else if (g_iSpriteIndex == 4)
+        color = g_AttackEffect[4].Sample(LinearSampler, In.vTexcoord);
+    else if (g_iSpriteIndex == 5)
+        color = g_AttackEffect[5].Sample(LinearSampler, In.vTexcoord);
+    
+    if (0.1f >= color.a)
+        discard;
+    
+    float4 vResult = float4(0, 0, 0, 0);
+    
+    if (g_iWeaponIndex == 0)
+    {
+        if (color.b > color.r && color.b > color.g)
+        {
+            // 파란색-> 초록색
+            float avg = (color.r + color.b) * 0.5;
+            vResult = vector(color.r * 0.8f, 1, color.g * 0.8f, color.a);
+        }
+    }
+    
+    float fNoise = g_NoiseTexture.Sample(LinearSampler, In.vTexcoord * 2.f);
+    vResult.rgb *= fNoise * 0.8f;
+    Out.vColor = vResult;
+    
+    if (0.3f >= Out.vColor.a)
+        discard;
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
 	pass Default // 0
@@ -435,5 +500,29 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_DAMAGABLE();
+    }
+
+    pass SlimeDamageZone // 12
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_SLIMEDAMAGEZONE();
+    }
+
+    pass SwipeEffect // 13
+    {
+        SetRasterizerState(RS_NoCull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_SWIPEEFFECT();
     }
 }

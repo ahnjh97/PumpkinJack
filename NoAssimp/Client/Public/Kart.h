@@ -40,6 +40,9 @@ private:
 	_bool m_bExplode = { false };
 
 	_float m_fTime = {};
+	_float m_fAlarmTime = { 100.f };
+	_float m_fEndTime = { 0.6f };
+	_float m_fPlayRatio = {};
 
 	_vector m_vFrontDir = {};
 	_vector m_vRearDir = {};

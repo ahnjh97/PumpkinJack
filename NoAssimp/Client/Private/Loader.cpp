@@ -49,6 +49,7 @@
 #include "Map_SlimeBoss.h"
 #include "Slime_Slime.h"
 #include "SwipeEffect.h"
+#include "ShockWave.h"
 #include "SlimeBoss.h"
 #include "Pillar.h"
 #include "Portal.h"
@@ -251,6 +252,9 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "NewNoise", "Effects/NewNoise.dds")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "NewTex", "Effects/NewTex.png")))
+		return E_FAIL;
+
 
 	m_strLoadingText = TEXT("Loading NavigationCells for Level_GamePlay...");
 	/* Prototype_Component_VIBuffer_Terrain_GamePlay */
@@ -349,7 +353,10 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Slime", "Effects/Slime.dds")))
 		return E_FAIL;
-
+	if (FAILED(Add_Texture(eLevel, "NewTex", "Effects/NewTex.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Noise", "Effects/reaperSolid.dds")))
+		return E_FAIL;
 
 	m_strLoadingText = TEXT("Loading NavigationCells for Level_SlimeBoss...");
 	/* Prototype_Component_VIBuffer_Terrain_SlimeBoss */
@@ -406,6 +413,7 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Terrain_SlimeBossRoom"), CTerrain_SlimeBossRoom);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SlimeParticles"), CSlimeParticles);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SwipeEffect"), CSwipeEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ShockWave"), CShockWave);
 
 
 	m_strLoadingText = TEXT("Loading Complete: Level_SlimeBoss");
@@ -542,6 +550,8 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Slime", "Effects/Slime.dds")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "NewTex", "Effects/NewTex.png")))
+		return E_FAIL;
 
 
 	m_strLoadingText = TEXT("Loading VIBuffers for Level_EffectTool...");
@@ -603,6 +613,7 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Bullets"), CBullets);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SlimeParticles"), CSlimeParticles);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SwipeEffect"), CSwipeEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ShockWave"), CShockWave);
 
 
 	m_strLoadingText = TEXT("Loading Complete: Level_EffectTool");
@@ -832,7 +843,6 @@ HRESULT CLoader::Add_VIBuffer_Instance_Points(LEVEL eLevel)
 		InstanceDesc.vLifeTime = _float2(0.3f, 1.f);
 		InstanceDesc.isLoop = false;
 		InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_DEFAULT;
-		//InstanceDesc.fDuration = 0.7f;
 		vecInstanceDesc[CElecParts::ELEC_DESTROY] = InstanceDesc;
 
 		InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
@@ -913,9 +923,22 @@ HRESULT CLoader::Add_VIBuffer_Instance_Points(LEVEL eLevel)
 		InstanceDesc.vSpeed = _float2(18, 24);
 		InstanceDesc.iNumInstance = 35;
 		InstanceDesc.vLifeTime = _float2(0.2f, 0.3f);
-		InstanceDesc.iSpriteIndexOffset = 99;
 		InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_SPHERE;
 		wstring wstrPrototypeTag = TEXT("Prototype_Component_VIBuffer_Instance_Point_SlimeParticles");
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext, InstanceDesc))))
+			return E_FAIL;
+
+		InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+		InstanceDesc.vRange = _float3(25, 11.f, 6.5f);
+		InstanceDesc.vMinScale = _float3(2.f, 2.f, 2.f);
+		InstanceDesc.vMaxScale = _float3(2.2f, 2.2f, 2.2f);
+		InstanceDesc.vSpeed = _float2(0, 0);
+		InstanceDesc.iNumInstance = 300;
+		InstanceDesc.vLifeTime = _float2(8.f, 8.f);
+		InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_DEFAULT;
+		InstanceDesc.isLoop = true;
+		InstanceDesc.iSpriteIndexOffset = 99;
+		wstrPrototypeTag = TEXT("Prototype_Component_VIBuffer_Instance_Point_ShockWave");
 		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext, InstanceDesc))))
 			return E_FAIL;
 	}

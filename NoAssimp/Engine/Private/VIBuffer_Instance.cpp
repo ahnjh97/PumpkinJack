@@ -204,6 +204,24 @@ void CVIBuffer_Instance::Drop(_float fTimeDelta)
 	m_pContext->Unmap(m_pVBInstance, 0);
 }
 
+void CVIBuffer_Instance::Rise(_float fTimeDelta)
+{
+	D3D11_MAPPED_SUBRESOURCE		SubResource{};
+
+	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+
+	VTXMATRIX* pVertices = ((VTXMATRIX*)SubResource.pData);
+
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		pVertices[i].vPosition.y += m_pSpeeds[i] * fTimeDelta;
+
+		Compute_LifeTime(pVertices, i, fTimeDelta, true);
+	}
+
+	m_pContext->Unmap(m_pVBInstance, 0);
+}
+
 void CVIBuffer_Instance::Spread(_float fTimeDelta)
 {
 	D3D11_MAPPED_SUBRESOURCE		SubResource{};
@@ -318,7 +336,7 @@ void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceI
 				pVertices[iInstanceIndex].vPosition = Compute_RandPosition(m_InstanceDesc.eShape, true);
 			else
 			{
-				if(m_fTime > m_InstanceDesc.fDuration)
+				/*if(m_fTime > m_InstanceDesc.fDuration)*/
 					pVertices[iInstanceIndex].vPosition = Compute_RandPosition(m_InstanceDesc.eShape, bRespawnAtMinHeight);
 			}
 		}

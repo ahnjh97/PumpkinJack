@@ -31,7 +31,7 @@ HRESULT CSoldierSlash::Initialize(void* pArg)
 
     m_iLevel = pSoldierSlashDesc->iLevel;
 
-    _float fScale = 6.4f;
+    _float fScale = 5.8f;
     m_pTransformCom->Set_Scaled(fScale, fScale * 0.6f, fScale * 1.05f);
 
     m_pTransformCom->Set_Pos(XMVectorSet(0, 5.3f, 0, 1));

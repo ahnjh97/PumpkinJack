@@ -42,6 +42,7 @@ HRESULT CSlime::Initialize(void* pArg)
 	m_pModelCom->Set_LerpTime(0.2f);
 	m_iHp = 10;
 	m_pModelCom->Set_AnimSpeed(SLIME_ATTACK, 2.5f);
+	m_pNavigationCom->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 	return S_OK;
 }
 
@@ -94,7 +95,9 @@ void CSlime::Tick(_float fTimeDelta)
 	_vector vPlayerPos = XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1);
 	m_pTransformCom->Look_At_ForLandObject(vPlayerPos);
 	if(m_eState != SLIME_ATTACK)
-		m_pTransformCom->Move(fTimeDelta * 2.f, XMVector3Normalize(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK)));
+		m_pTransformCom->Move(fTimeDelta * 2.f, XMVector3Normalize(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK)), m_pNavigationCom);
+
+	m_pTransformCom->Set_Height(m_pNavigationCom);
 
 	if(m_pColliderCom[DEFAULT]->Intersect(m_pPlayerCollider))
 		m_bAttackTrigger = true;
@@ -212,7 +215,7 @@ void CSlime::Check_SlimeCol(_float fTimeDelta)
 
 			_vector vDir = XMVector3Normalize(vSrsPos - vDstPos);
 
-			m_pTransformCom->Move(fTimeDelta, vDir);
+			m_pTransformCom->Move(fTimeDelta, vDir, m_pNavigationCom);
 		}
 	}
 }
@@ -246,7 +249,7 @@ void CSlime::Check_PillarCol(_float fTimeDelta)
 			vTemp = XMVectorSetY(vTemp, 0.f);
 			_vector vDir = XMVector3Normalize(vTemp);
 			
-			m_pTransformCom->Move(fTimeDelta, vDir);
+			m_pTransformCom->Move(fTimeDelta, vDir, m_pNavigationCom);
 		}
 	}
 }
@@ -276,7 +279,7 @@ void CSlime::Check_SlimeBossCol(_float fTimeDelta)
 
 		_vector vDir = XMVector3Normalize(vSrsPos - vDstPos);
 
-		m_pTransformCom->Move(fTimeDelta * 2.f, vDir);
+		m_pTransformCom->Move(fTimeDelta * 2.f, vDir, m_pNavigationCom);
 	}
 }
 
@@ -326,6 +329,13 @@ HRESULT CSlime::Add_Components(const wstring& _wstrModelTag)
 	ColliderDesc.vCenter = _float3(0.f, 3.6f, 0.f);
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom[HIT], &ColliderDesc)))
+		return E_FAIL;
+
+	/* For.Com_Navigation */
+	CNavigation::NAVIGATION_DESC			NavigationDesc{};
+	NavigationDesc.iCurrentIndex = 0;
+	if (FAILED(__super::Add_Component(LEVEL_SLIMEBOSS, TEXT("Prototype_Component_Navigation") + to_wstring(LEVEL_SLIMEBOSS),
+		TEXT("Com_Navigation"), (CComponent**)&m_pNavigationCom, &NavigationDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -395,6 +405,7 @@ void CSlime::Free()
 	Safe_Release(m_pSlimeBossCollider);
 	Safe_Release(m_pPlayerCollider);
 	Safe_Release(m_pPlayer);
+	Safe_Release(m_pNavigationCom);
 	for (auto& Pair : m_Parts)
 		Safe_Release(Pair.second);
 	m_Parts.clear();

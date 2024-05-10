@@ -50,10 +50,10 @@ void CArrow::Tick(_float fTimeDelta)
 		Set_Dead();
 
 	m_fTime += fTimeDelta;
-
+	m_fAccSpeed += exp(m_fTime * fTimeDelta * 0.005f) * fTimeDelta * 10.8f;
 	if (m_fCollisionTime < 0.01f) {
 		if(m_iLevel == LEVEL_GAMEPLAY)
-			m_pTransformCom->Go_Straight(fTimeDelta * 16.f);
+			m_pTransformCom->Go_Straight(m_fAccSpeed * 0.056f);
 	}
 	else
 		m_fAlpha -= exp(m_fTime * 0.12f) * fTimeDelta;

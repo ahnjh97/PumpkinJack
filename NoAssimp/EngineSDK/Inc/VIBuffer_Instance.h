@@ -44,6 +44,7 @@ public:
 	virtual _float4 Compute_RandPosition(INSTANCE_SHAPE eShape, _bool bRespawnAtMinHeight = false);
 
 	virtual void Drop(_float fTimeDelta);
+	virtual void Rise(_float fTimeDelta);
 	virtual void Spread(_float fTimeDelta);
 	virtual void Spread_XZ(_float fTimeDelta);
 	virtual void Check_LifeTimes(_float fTimeDelta); // 위치이동 X, LifeTime만 확인

@@ -3,6 +3,7 @@
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D g_DiffuseTexture;
 float g_fCamFar;
+float g_fPlayRatio;
 
 struct VS_IN
 {
@@ -71,6 +72,28 @@ PS_OUT PS_MAIN(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_DAMAGABLE(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (0.3f >= vMtrlDiffuse.a)
+        discard;
+
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector((In.vNormal * 0.5f + 0.5f).xyz, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fCamFar, 0.0f, 0.0f);
+    
+    float3 vDamageColor = float3(2.f, 0.45f, 0);
+    
+    if (g_fPlayRatio < 0.5f)
+        Out.vDiffuse.rgb += vDamageColor * g_fPlayRatio;
+    else if (g_fPlayRatio < 1.f)
+        Out.vDiffuse.rgb += vDamageColor * (1 - g_fPlayRatio);
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass Default // 0
@@ -95,5 +118,17 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN();
+    }
+
+    pass Damagable // 2
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_DAMAGABLE();
     }
 }

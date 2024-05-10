@@ -6,6 +6,7 @@
 #include "Lightning.h"
 #include "ElecParts.h"
 #include "ElecChain.h"
+#include "ShockWave.h"
 #include "Terrain.h"
 #include "Slash.h"
 #include "Dash.h"
@@ -122,11 +123,14 @@ HRESULT CLevel_EffectTool::Add_Effect(const wstring& strLayerTag)
 
 HRESULT CLevel_EffectTool::Add_Effect2(const wstring& strLayerTag)
 {
-	CGameObject::GAMEOBJECT_DESC tDesc{};
+	CShockWave::SHOCKWAVE_DESC tDesc{};
 	tDesc.iLevel = LEVEL_EFFECTTOOL;
 
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Explosion"), &tDesc)))
-		return E_FAIL;
+	for (_int i = -7; i < 8; i++) {
+		tDesc.iRotation = i;
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_ShockWave"), &tDesc)))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }

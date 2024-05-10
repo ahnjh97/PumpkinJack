@@ -32,8 +32,10 @@ void CTransform::Set_Height(_float fHeight)
 
 void CTransform::Set_Height(CNavigation* pNavigation)
 {
-	if (pNavigation)
-		pNavigation->Get_PlaneHeight(Get_Pos_Float4());
+	if (pNavigation) {
+		_float fHeight = pNavigation->Get_PlaneHeight(Get_Pos_Float4());
+		Set_Height(fHeight);
+	}
 }
 
 _vector CTransform::Get_Pos_Vector()
