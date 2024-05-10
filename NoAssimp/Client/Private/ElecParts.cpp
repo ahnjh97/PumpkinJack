@@ -90,6 +90,7 @@ void CElecParts::Late_Tick(_float fTimeDelta)
 {
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
 }
+
 HRESULT CElecParts::Render()
 {
 	if (FAILED(Bind_ShaderResources()))

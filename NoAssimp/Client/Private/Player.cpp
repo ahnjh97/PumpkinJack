@@ -2,6 +2,7 @@
 #include "DamageEffect.h"
 #include "ElecArena.h"
 #include "Collider.h"
+#include "Bullets.h"
 #include "Player.h"
 #include "Weapon.h"
 #include "Slash.h"
@@ -102,7 +103,7 @@ HRESULT CPlayer::Initialize(void* pArg)
 		m_pNavigationCom[DEFAULT]->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 
 	m_pCurLevel = m_pGameInstance->Get_CurrentLevelID();
-	m_iHp = 80;
+	m_iHp = 100;
 
 	return S_OK;
 }
@@ -192,9 +193,9 @@ void CPlayer::Tick(_float fTimeDelta)
 	if (m_bIsAttacking)
 		TargetNearestEnemy();
 
-	if (true == m_bAddAttackEffect) {
-		Add_AttackEffect(XMLoadFloat3(&m_vDirection));
-		m_bAddAttackEffect = false;
+	if (true == m_bAddSlash) {
+		Add_Slash(XMLoadFloat3(&m_vDirection));
+		m_bAddSlash = false;
 	}
 
 	Update_PositionToCam();
@@ -361,7 +362,11 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 			m_iLastAttack = 3;
 		}
 		m_bIsAttacking = true;
-		m_bAddAttackEffect = true;
+
+		if(WPN_SPEAR == m_eWeapon || WPN_SCYTHE == m_eWeapon)
+			m_bAddSlash = true;
+		else if(WPN_RIFLE == m_eWeapon)
+			m_bAddBullets = true;
 
 		if (WPN_SPEAR == m_eWeapon && (ATTACK3 == m_eState || ROLL_ATTACK == m_eState)) {
 			CWeapon* pSpear = dynamic_cast<CWeapon*>(Get_Part(TEXT("Part_Spear")));
@@ -937,30 +942,42 @@ void CPlayer::Activate_Weapon()
 	{
 		pWeapon = dynamic_cast<CWeapon*>(Get_Part(TEXT("Part_Rifle")));
 		pWeapon->DeActivate_WeaponCollider();
+		_bool bAttack = { false };
 
 		if (ATTACK1 == m_eState) {
-			if (fAnimPlayRatio > 0.22f && fAnimPlayRatio < 0.27f)
-				pWeapon->Activate_WeaponCollider();
+			if (fAnimPlayRatio > 0.24f && fAnimPlayRatio < 0.28f)
+				bAttack = true;
 		}
 		else if (ATTACK2 == m_eState) {
-			if (fAnimPlayRatio > 0.15f && fAnimPlayRatio < 0.35f)
-				pWeapon->Activate_WeaponCollider();
+			if (fAnimPlayRatio > 0.25f && fAnimPlayRatio < 0.35f)
+				bAttack = true;
 		}
 		else if(ATTACK3 == m_eState) {
-			if (fAnimPlayRatio > 0.22f && fAnimPlayRatio < 0.35f)
-				pWeapon->Activate_WeaponCollider();
+			if (fAnimPlayRatio > 0.25f && fAnimPlayRatio < 0.35f)
+				bAttack = true;
 		}
 		else if (AIR_ATTACK == m_eState) {
-			if (fAnimPlayRatio > 0.3f && fAnimPlayRatio < 0.4f)
-				pWeapon->Activate_WeaponCollider();
+			if (fAnimPlayRatio > 0.35f && fAnimPlayRatio < 0.4f)
+				bAttack = true;
 		}
 		else if (ROLL_ATTACK == m_eState) {
 			if ((fAnimPlayRatio > 0.07f && fAnimPlayRatio < 0.115f) || (fAnimPlayRatio > 0.27f && fAnimPlayRatio < 0.31f)
 				|| (fAnimPlayRatio > 0.48f && fAnimPlayRatio < 0.52f) || (fAnimPlayRatio > 0.68f && fAnimPlayRatio < 0.72f))
-				pWeapon->Activate_WeaponCollider();
-
-			if((fAnimPlayRatio > 0.25f && fAnimPlayRatio < 0.27f) || (fAnimPlayRatio > 0.46f && fAnimPlayRatio < 0.48f) || (fAnimPlayRatio > 0.66f && fAnimPlayRatio < 0.68f))
+				bAttack = true;
+			
+			if ((fAnimPlayRatio > 0.25f && fAnimPlayRatio < 0.27f) || (fAnimPlayRatio > 0.46f && fAnimPlayRatio < 0.48f) || (fAnimPlayRatio > 0.66f && fAnimPlayRatio < 0.68f)) {
 				pWeapon->Reset_Damagable();
+				m_bAddBullets = true;
+			}	
+		}
+
+		if (true == bAttack) {
+			pWeapon->Activate_WeaponCollider();
+
+			if (true == m_bAddBullets) {
+				Add_Bullets(XMLoadFloat3(&m_vDirection));
+				m_bAddBullets = false;
+			}
 		}
 	}
 
@@ -1089,10 +1106,10 @@ void CPlayer::Add_JumpEffect()
 		return;
 }
 
-void CPlayer::Add_AttackEffect(_fvector vDir)
+void CPlayer::Add_Slash(_fvector vDir)
 {
 	_bool bAddSlash = { false };
-
+	
 	if (WPN_SPEAR == m_eWeapon)
 	{
 		if (ATTACK1 == m_eState || ATTACK2 == m_eState) {
@@ -1115,16 +1132,35 @@ void CPlayer::Add_AttackEffect(_fvector vDir)
 		XMStoreFloat4(&tDesc.vPlayerRight,  XMVector3Cross(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), XMVector3Normalize(vDir)));
 
 		tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+		tDesc.matWorld._11 = tDesc.vPlayerRight.x;
 		tDesc.matWorld._12 = tDesc.vPlayerRight.y;
 		tDesc.matWorld._13 = tDesc.vPlayerRight.z;
 		tDesc.matWorld._31 = tDesc.vPlayerLook.x;
 		tDesc.matWorld._32 = tDesc.vPlayerLook.y;
-		//tDesc.vPlayerLook = m_pTransformCom->Get_State_Float4(CTransform::STATE_LOOK);
-		//tDesc.vPlayerRight = m_pTransformCom->Get_State_Float4(CTransform::STATE_RIGHT);
+		tDesc.matWorld._33 = tDesc.vPlayerLook.z;
 		tDesc.pPlayerWorldMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurLevel, TEXT("Layer_AttackEffect"), TEXT("Prototype_GameObject_Slash"), &tDesc)))
 			return;
 	}
+}
+
+void CPlayer::Add_Bullets(_fvector vDir)
+{
+	CBullets::BULLETS_DESC tDesc{};
+	tDesc.iLevel = *m_pCurLevel;
+	tDesc.eWeapon = m_eWeapon;
+	tDesc.eState = m_eState;
+	XMStoreFloat4(&tDesc.vPlayerLook, XMVector3Normalize(vDir));
+	XMStoreFloat4(&tDesc.vPlayerRight, XMVector3Cross(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), XMVector3Normalize(vDir)));
+	tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	tDesc.matWorld._11 = tDesc.vPlayerRight.x;
+	tDesc.matWorld._12 = tDesc.vPlayerRight.y;
+	tDesc.matWorld._13 = tDesc.vPlayerRight.z;
+	tDesc.matWorld._31 = tDesc.vPlayerLook.x;
+	tDesc.matWorld._32 = tDesc.vPlayerLook.y;
+	tDesc.matWorld._33 = tDesc.vPlayerLook.z;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurLevel, TEXT("Layer_AttackEffect"), TEXT("Prototype_GameObject_Bullets"), &tDesc)))
+		return;
 }
 
 HRESULT CPlayer::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)

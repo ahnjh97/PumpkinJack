@@ -37,12 +37,18 @@ HRESULT CPillar_SlimeBossRoom::Initialize(void* pArg)
 	m_pTransformCom->Turn(XMVectorSet(1, 0, 1, 0), 0.1f);
 	m_pTransformCom->Turn(XMVectorSet(0, 1, 0, 0), XMConvertToRadians(m_pGameInstance->RandomNumber(0, 360) / 90.f));
 	m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), XMConvertToRadians(m_pGameInstance->RandomNumber(0, 360) / 90.f));
-	m_iHp = 40;
+	m_iPreHp = m_iHp = 40;
 	return S_OK;
 }
 
 void CPillar_SlimeBossRoom::Tick(_float fTimeDelta)
 {
+	m_fTime += fTimeDelta;
+
+	m_fPlayRatio = m_fTime / m_fEndTime;
+	if (m_fPlayRatio > 1.f)
+		m_fPlayRatio = 1.f;
+
 	if(m_iHp <=0)
 		Set_Dead();
 
@@ -54,7 +60,14 @@ void CPillar_SlimeBossRoom::Tick(_float fTimeDelta)
 
 void CPillar_SlimeBossRoom::Late_Tick(_float fTimeDelta)
 {
+	if (m_iPreHp != m_iHp)
+	{
+		if (m_fTime >= 0.3f)
+			m_fTime = 0.f;
+	}
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	m_iPreHp = m_iHp;
 }
 
 HRESULT CPillar_SlimeBossRoom::Render()
@@ -69,7 +82,7 @@ HRESULT CPillar_SlimeBossRoom::Render()
 		m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE);
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(0)))
+		if (FAILED(m_pShaderCom->Begin(11)))  // Damagable
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -144,6 +157,8 @@ HRESULT CPillar_SlimeBossRoom::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fPlayRatio", &m_fPlayRatio, sizeof(_float))))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -157,7 +172,6 @@ CPillar_SlimeBossRoom* CPillar_SlimeBossRoom::Create(ID3D11Device* pDevice, ID3D
 		Safe_Release(pInstance);
 	}
 	return pInstance;
-
 }
 
 CGameObject* CPillar_SlimeBossRoom::Clone(void* pArg)

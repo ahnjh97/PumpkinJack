@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Soldier.h"
 #include "SoldierWeapon.h"
+#include "SoldierSlash.h"
 
 CSoldier::CSoldier(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -59,12 +60,19 @@ void CSoldier::Tick(_float fTimeDelta)
 			return;
 	}
 
+	m_fTime += fTimeDelta;
+
+	m_fPlayRatio = m_fTime / m_fEndTime;
+	if (m_fPlayRatio > 1.f)
+		m_fPlayRatio = 1.f;
+
 	if (m_eState == SOLDIER_IDLE)
 		m_fIdleTime += fTimeDelta;
 	else
 		m_fIdleTime = 0.f;
 
-	Check_KartCol(fTimeDelta);
+	if(m_iHp > 0)
+		Check_KartCol(fTimeDelta);
 
 	LinkState(fTimeDelta);
 	StateToAnimation();
@@ -119,6 +127,7 @@ void CSoldier::Tick(_float fTimeDelta)
 	if(SOLDIER_ATTACK == m_eState || SOLDIER_SPIN == m_eState)
 		ActivateSoldierWeapon();
 
+	m_pPart_SoldierSlash->Tick(fTimeDelta);
 	m_pPart_Weapon->Tick(fTimeDelta);
 
 	for(_int i = 0; i < COLLIDER_END; i++)
@@ -127,6 +136,7 @@ void CSoldier::Tick(_float fTimeDelta)
 
 void CSoldier::Late_Tick(_float fTimeDelta)
 {
+	m_pPart_SoldierSlash->Late_Tick(fTimeDelta);
 	m_pPart_Weapon->Late_Tick(fTimeDelta);
 	m_pModelCom->Play_Animation(fTimeDelta);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
@@ -202,14 +212,18 @@ void CSoldier::LinkState(_float fTimeDelta)
 		return;
 	}
 
-	if (m_iHp<=0)
+	if (m_iHp <= 0)
 	{
 		m_eState = SOLDIER_DEATH;
+		m_pPart_SoldierSlash->Set_Hide(true);
 		return;
 	}
 
 	if (m_iPreHp != m_iHp)
 	{
+		if (m_fTime >= 0.5f)
+			m_fTime = 0.f;
+
 		if (SOLDIER_HIT == m_eState)
 			m_pModelCom->Reset_Animation(string("chevalier_Anim_hit"));
 
@@ -235,6 +249,7 @@ void CSoldier::LinkState(_float fTimeDelta)
 		{
 			m_eState = SOLDIER_SPIN;
 			m_bSpinAttack = false;
+			m_bResetSoldierSlash = true;
 		}
 	}
 
@@ -327,9 +342,13 @@ void CSoldier::ActivateSoldierWeapon()
 		if (fAnimPlayRatio < 0.3f)
 			m_bResetSpinAttack = true;
 
-		if (fAnimPlayRatio > 0.32f && fAnimPlayRatio < 0.75f) // 0.5f 마다 초기화. 총 7번 초기화
+		if (fAnimPlayRatio > 0.32f && fAnimPlayRatio < 0.75f) { // 0.5f 마다 초기화. 총 7번 초기화
 			pSoldierWeapon->Activate_WeaponCollider();
-
+			if (true == m_bResetSoldierSlash) {
+				m_bResetSoldierSlash = false;
+				m_pPart_SoldierSlash->Reset_Time();
+			}
+		}
 		if ((fAnimPlayRatio > 0.38f && fAnimPlayRatio < 0.43f) || (fAnimPlayRatio > 0.48f && fAnimPlayRatio < 0.53f)
 			|| (fAnimPlayRatio > 0.58f && fAnimPlayRatio < 0.63f) || (fAnimPlayRatio > 0.68f && fAnimPlayRatio < 0.73f)) {
 			if (m_bResetSpinAttack) {
@@ -441,6 +460,17 @@ HRESULT CSoldier::Add_PartObjects(LEVEL eLevel)
 		return E_FAIL;
 
 	m_pPart_Weapon = pSoldierWeapon;
+
+	CSoldierSlash* pSoldierSlash = { nullptr };
+	CPart::PART_DESC tSoldierSlashDesc{};
+	tSoldierSlashDesc.pParentMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	tSoldierSlashDesc.iLevel = eLevel;
+	pSoldierSlash = dynamic_cast<CSoldierSlash*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_SoldierSlash"), &SoldierWeaponDesc));
+	if (nullptr == pSoldierSlash)
+		return E_FAIL;
+
+	m_pPart_SoldierSlash = pSoldierSlash;
+
 	return S_OK;
 }
 
@@ -458,6 +488,8 @@ HRESULT CSoldier::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fCamFar", m_pGameInstance->Get_CamFarPtr(), sizeof(_float))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fPlayRatio", &m_fPlayRatio, sizeof(_float))))
 		return E_FAIL;
 
 	return S_OK;
@@ -497,6 +529,7 @@ void CSoldier::Free()
 
 	Safe_Release(m_pPlayer);
 	Safe_Release(m_pNavigationCom);
+	Safe_Release(m_pPart_SoldierSlash);
 	Safe_Release(m_pPart_Weapon);
 	for(_int i = 0; i<COLLIDER_END; i++)
 		Safe_Release(m_pColliderCom[i]);

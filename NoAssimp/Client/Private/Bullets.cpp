@@ -18,7 +18,7 @@ HRESULT CBullets::Initialize_Prototype()
 
 HRESULT CBullets::Initialize(void* pArg)
 {
-    GAMEOBJECT_DESC* pGameObjectDesc = (GAMEOBJECT_DESC*)pArg;
+    BULLETS_DESC* pGameObjectDesc = (BULLETS_DESC*)pArg;
 
     pGameObjectDesc->fSpeedPerSec = 10.f;
     pGameObjectDesc->fRotationPerSec = XMConvertToRadians(90.0f);
@@ -28,6 +28,29 @@ HRESULT CBullets::Initialize(void* pArg)
 
     if (FAILED(Add_Components(LEVEL(pGameObjectDesc->iLevel))))
         return E_FAIL;
+
+    m_vPivot = m_pVIBufferCom->Get_Pivot();
+
+    _vector vPos = m_pTransformCom->Get_Pos_Vector();
+
+    if (ATTACK1 == pGameObjectDesc->eState)
+        m_pTransformCom->Set_Pos(vPos + XMVectorSet(0, 7.5f, 0, 0) + XMLoadFloat4(&pGameObjectDesc->vPlayerRight) * 1.f
+            + XMLoadFloat4(&pGameObjectDesc->vPlayerLook) * 7.5f);
+    else if (ATTACK2 == pGameObjectDesc->eState)
+        m_pTransformCom->Set_Pos(vPos + XMVectorSet(0, 7.5f, 0, 0) + XMLoadFloat4(&pGameObjectDesc->vPlayerRight) * 1.f
+            + XMLoadFloat4(&pGameObjectDesc->vPlayerLook) * 10.f);
+    else if (ATTACK3 == pGameObjectDesc->eState) 
+        m_pTransformCom->Set_Pos(vPos + XMVectorSet(0, 7.5f, 0, 0) + XMLoadFloat4(&pGameObjectDesc->vPlayerRight) * 1.f
+            + XMLoadFloat4(&pGameObjectDesc->vPlayerLook) * 7.5f);
+    else if (AIR_ATTACK == pGameObjectDesc->eState) {
+        m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), 0.5f);
+        m_pTransformCom->Set_Pos(vPos + XMVectorSet(0, 2.5f, 0, 0) + XMLoadFloat4(&pGameObjectDesc->vPlayerLook) * 7.f);
+    }
+    else if (ROLL_ATTACK == pGameObjectDesc->eState) {
+        m_pTransformCom->Set_Pos(vPos + XMVectorSet(0, 5, 0, 0) 
+            + XMLoadFloat4(&pGameObjectDesc->vPlayerRight) * 1.8f  + XMLoadFloat4(&pGameObjectDesc->vPlayerLook) * 7.5f);
+    }
+        
 
     return S_OK;
 }
@@ -52,7 +75,7 @@ HRESULT CBullets::Render()
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Begin(5)))  // Bullets
+    if (FAILED(m_pShaderCom->Begin(0)))  // Bullets
         return E_FAIL;
 
     if (FAILED(m_pVIBufferCom->Bind_Buffers()))
@@ -67,7 +90,7 @@ HRESULT CBullets::Render()
 HRESULT CBullets::Add_Components(LEVEL eLevel)
 {
     /* For.Com_Shader */
-    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxInstance_Point"),
+    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxInstance_Point_Bullet"),
         TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
         return E_FAIL;
 
@@ -96,6 +119,8 @@ HRESULT CBullets::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition_Float4(), sizeof(_float4))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vPivot", &m_vPivot, sizeof(_float3))))
         return E_FAIL;
     if (FAILED(m_pTextureCom->Bind_ShaderResources(m_pShaderCom, "g_AttackEffect")))
         return E_FAIL;

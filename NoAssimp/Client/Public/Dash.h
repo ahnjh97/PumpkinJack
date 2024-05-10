@@ -33,14 +33,13 @@ private:
 private:
 	_uint m_iSpriteIndex = { 6 };
 
-	_float m_fTime = {};
+	_float m_fTime = { 100.f };
 	_float m_fScale = {};
 
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
-	const _float4x4* m_pTargetWorldMat = { nullptr };
 
 private:
 	HRESULT Add_Components(LEVEL eLevel);

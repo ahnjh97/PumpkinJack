@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "SlimeBoss.h"
 #include "SlimeBoss_Slime.h"
+#include "SwipeEffect.h"
 #include "Player.h"
 #include "Portal.h"
 
@@ -130,9 +131,6 @@ HRESULT CSlimeBoss::Render()
 
 void CSlimeBoss::Link_Animation(_float fTimeDelta)
 {
-	/*if (m_iHp <= 0)
-		m_eState = SLIMEBOSS_DEATH;*/
-
 	if (m_eState == SLIMEBOSS_DEATH)
 	{
 		if (m_pModelCom->isFinished())
@@ -154,6 +152,7 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 			SlimeSpawn();
 			PillarSpawn();
 			PortalSpawn();
+			Add_SwipeEffect();
 			m_eState = SLIMEBOSS_IDLE;
 		}
 	}	
@@ -180,14 +179,17 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 				}
 			}
 
-			if (m_eState == SLIMEBOSS_PILLAR_SPAWN && m_bPillarSpawn == false)
-			{
+			if (m_eState == SLIMEBOSS_FORK && m_bAddSwipeEffect == false) {
+				Add_SwipeEffect();
+				m_bAddSwipeEffect = true;
+			}
+
+			if (m_eState == SLIMEBOSS_PILLAR_SPAWN && m_bPillarSpawn == false) {
 				PillarSpawn();
 				m_bPillarSpawn = true;
 			}
 
-			if (m_eState == SLIMEBOSS_MEGASPAWN && m_bPortalSpawn == false)
-			{
+			if (m_eState == SLIMEBOSS_MEGASPAWN && m_bPortalSpawn == false) {
 				PortalSpawn();
 				m_bPortalSpawn = true;
 			}
@@ -198,6 +200,9 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 					m_iCurPattern = 0;
 				m_eState = m_vecSlimeBossPattern[m_iCurPattern];
 			}
+
+			if (SLIMEBOSS_FORK == m_ePreState && SLIMEBOSS_FORK != m_eState)
+				m_bAddSwipeEffect = false;
 		}
 		else if (m_eState == SLIMEBOSS_INVOKE)
 		{
@@ -360,6 +365,16 @@ void CSlimeBoss::SlimeDamageZoneSpawn(_uint iNum)
 
 void CSlimeBoss::DeathEffect()
 {
+}
+
+void CSlimeBoss::Add_SwipeEffect()
+{
+	CSwipeEffect::SWIPEEFFECT_DESC tDesc{};
+	tDesc.iLevel = LEVEL_SLIMEBOSS;
+	tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	tDesc.vSlimeBossRight = m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_AttactEffect"), TEXT("Prototype_GameObject_SwipeEffect"), &tDesc)))
+		return;
 }
 
 HRESULT CSlimeBoss::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)

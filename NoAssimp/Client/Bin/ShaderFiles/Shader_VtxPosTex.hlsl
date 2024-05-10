@@ -88,6 +88,26 @@ PS_OUT PS_CROWLIFEBAR(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_PORTAL(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    float4 color = float4(0, 0, 0, 0);
+    color = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (color.a == 0.f)
+        discard;
+    
+    if (color.b > color.r && color.b > color.g)
+    {
+        // 보라색을 초록색으로 변환
+        float avg = (color.r + color.b) * 0.5;
+        color = float4(color.r * 0.8f, 1.0, color.g * 0.8f, color.a);
+    }
+
+    Out.vColor = color;
+    return Out;
+}
+
 PS_OUT PS_INVEN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -296,7 +316,7 @@ PS_OUT PS_DASH(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
-    vector vColor;
+    float4 vColor = float4(0, 0, 0, 0);
     if (0 == g_iSpriteIndex)
         vColor = g_AttackEffect[0].Sample(LinearSampler, In.vTexcoord);
     else if (1 == g_iSpriteIndex)
@@ -324,6 +344,33 @@ PS_OUT PS_DASH(PS_IN In)
     if (0.f >= Out.vColor.a)
         discard;
     
+    return Out;
+}
+
+PS_OUT PS_SWIPEEFFECT(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    float4 vColor = float4(0, 0, 0, 0);
+    if (0 == g_iSpriteIndex)
+        vColor = g_AttackEffect[0].Sample(LinearSampler, In.vTexcoord);
+    else if (1 == g_iSpriteIndex)
+        vColor = g_AttackEffect[1].Sample(LinearSampler, In.vTexcoord);
+    else if (2 == g_iSpriteIndex)
+        vColor = g_AttackEffect[2].Sample(LinearSampler, In.vTexcoord);
+    else if (3 == g_iSpriteIndex)
+        vColor = g_AttackEffect[3].Sample(LinearSampler, In.vTexcoord);
+    else if (4 == g_iSpriteIndex)
+        vColor = g_AttackEffect[4].Sample(LinearSampler, In.vTexcoord);
+    else if (5 == g_iSpriteIndex)
+        vColor = g_AttackEffect[5].Sample(LinearSampler, In.vTexcoord);
+    else
+        discard;
+    
+    Out.vColor = vColor;
+    if (Out.vColor.a == 0.0f)
+        discard;
+	
     return Out;
 }
 
@@ -374,7 +421,7 @@ technique11 DefaultTechnique
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_CROWLIFEBAR();
+        PixelShader = compile ps_5_0 PS_PORTAL();
     }
 
     pass Circle // 4
@@ -459,5 +506,17 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_DASH();
+    }
+
+    pass SwipeEffect // 11
+    {
+        SetRasterizerState(RS_NoCull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_SWIPEEFFECT();
     }
 }

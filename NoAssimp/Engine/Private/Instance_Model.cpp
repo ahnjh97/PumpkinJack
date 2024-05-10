@@ -159,7 +159,7 @@ CComponent* CInstance_Model::Clone(void* pArg)
 void CInstance_Model::Free()
 {
 	__super::Free();
-
+	
 	for (auto& material : m_vecMaterials) {
 		for (size_t i = 0; i < AI_TEXTURE_TYPE_MAX; i++)
 			Safe_Release(material.MaterialTextures[i]);

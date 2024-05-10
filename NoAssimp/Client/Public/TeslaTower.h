@@ -40,6 +40,10 @@ private:
 private:
 	_uint m_iNumElecChains = 6;
 
+	_float m_fTime = { 100.f };
+	_float m_fEndTime = { 0.35f };
+	_float m_fPlayRatio = {};
+
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };

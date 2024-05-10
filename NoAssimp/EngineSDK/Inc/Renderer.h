@@ -43,7 +43,6 @@ private:
 
 private:
 	HRESULT Render_Priority();
-	HRESULT	Render_GroundMesh();
 	HRESULT Render_NonBlend();
 	HRESULT Render_NonLight();
 	HRESULT Render_Blend();

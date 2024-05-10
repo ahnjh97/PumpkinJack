@@ -76,7 +76,7 @@ HRESULT CBook::Add_Components(LEVEL eLevel)
 		return E_FAIL;
 
 	/* For.Com_Instance_Model */
-	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Instance_Model"),
+	if (FAILED(__super::Add_Component(eLevel, TEXT("Prototype_Component_Instance_Model_Book"),
 		TEXT("Com_Instance_Model"), (CComponent**)&m_pInstanceModelCom)))
 		return E_FAIL;
 

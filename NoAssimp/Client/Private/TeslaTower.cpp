@@ -48,6 +48,12 @@ HRESULT CTeslaTower::Initialize(void* pArg)
 
 void CTeslaTower::Tick(_float fTimeDelta)
 {
+	m_fTime += fTimeDelta;
+
+	m_fPlayRatio = m_fTime / m_fEndTime;
+	if (m_fPlayRatio > 1.f)
+		m_fPlayRatio = 1.f;
+
 	if (m_iHp <= 0) {
 		Add_DestroyEffect();
 		Set_Dead();
@@ -88,7 +94,13 @@ void CTeslaTower::Late_Tick(_float fTimeDelta)
 			m_pElecChain[i]->Late_Tick(fTimeDelta);
 	}
 
+	if (m_iPreHp != m_iHp) {
+		if (m_fTime >= 0.3f)
+			m_fTime = 0.f;
+	}
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	m_iPreHp = m_iHp;
 }
 
 HRESULT CTeslaTower::Render()
@@ -104,7 +116,7 @@ HRESULT CTeslaTower::Render()
 			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(0))) // Default
+		if (FAILED(m_pShaderCom->Begin(11))) // Damagable
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
@@ -205,6 +217,8 @@ HRESULT CTeslaTower::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fPlayRatio", &m_fPlayRatio, sizeof(_float))))
 		return E_FAIL;
 
 	return S_OK;

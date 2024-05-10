@@ -1,7 +1,6 @@
-- Rifle Effect
-- Soldier Hit Effect, AttackEffect
-- SBR_Pillar Hit Effect
-- TeslaTower Hit Effect
+- SlimeBoss ShockWave
+
+- SBR_Pillars RockParticles
 
 - LevelSlimeBoss TerrainMask
 - LevelSlimeBoss

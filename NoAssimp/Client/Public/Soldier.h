@@ -50,13 +50,17 @@ private:
 	_bool m_bSpinAttack = { false };
 	_bool m_bResetSpinAttack = { true };
 	_bool m_bDeathEffect = { true };
+	_bool m_bResetSoldierSlash = { false };
 
 	_uint m_iDamage = { };
-
+	
 	_float m_fIdleTime = {};
 	_float m_fTurnTime = { 100.f };
 	_float m_fDeathTime = {};
 	_float m_fAlpha = { 1.f };
+	_float m_fTime = { 100.f };
+	_float m_fEndTime = { 0.7f };
+	_float m_fPlayRatio = {};
 
 private:
 	CModel* m_pModelCom = { nullptr };
@@ -66,6 +70,7 @@ private:
 	CGameObject* m_pPlayer = { nullptr };
 	const _float4x4* m_pPlayerWorldMat = { nullptr };
 	CPart* m_pPart_Weapon = { nullptr };
+	class CSoldierSlash* m_pPart_SoldierSlash = { nullptr };
 
 private:
 	HRESULT Add_Components(LEVEL eLevel, const wstring& _wstrModelTag);

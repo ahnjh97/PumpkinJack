@@ -19,7 +19,7 @@ CWizard::CWizard(const CWizard& rhs)
 INFO_WIZARD CWizard::Get_WizardInfo()
 {
 	INFO_WIZARD tInfo = { m_eState, m_pModelCom->Get_AnimationName(), m_iWizardPhase, m_iAttackCount, m_iAttackFinishCount, 
-		m_eSpell, m_fTime, m_fIdleTime, m_fWaitTime, m_fChargeTime, m_fPhaseChangeTime};
+		m_eSpell, m_fStartTime, m_fIdleTime, m_fWaitTime, m_fChargeTime, m_fPhaseChangeTime};
 
 	return tInfo;
 }
@@ -62,8 +62,13 @@ HRESULT CWizard::Initialize(void* pArg)
 void CWizard::Tick(_float fTimeDelta)
 {
 	m_fTime += fTimeDelta;
+	m_fStartTime += fTimeDelta;
 	m_fPhaseChangeTime += fTimeDelta;
 	Get_PlayerPtr();
+
+	m_fPlayRatio = m_fTime / m_fEndTime;
+	if (m_fPlayRatio > 1.f)
+		m_fPlayRatio = 1.f;
 
 	if (WIZARD_DIE == m_eState && m_pModelCom->isFinished()) {
 		Set_Dead();
@@ -86,6 +91,11 @@ void CWizard::Tick(_float fTimeDelta)
 
 void CWizard::Late_Tick(_float fTimeDelta)
 {
+	if (m_iPreHp != m_iHp) {
+		if (m_fTime >= 0.3f)
+			m_fTime = 0.f;
+	}
+
 	m_pModelCom->Play_Animation(fTimeDelta);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_iPreHp = m_iHp;
@@ -164,7 +174,7 @@ void CWizard::Check_WizardHp()
 
 void CWizard::Link_State(_float fTimeDelta)
 {
-	if (m_fTime < 5.f) {
+	if (m_fStartTime < 5.f) {
 		m_eState = WIZARD_AIR_IDLE;
 		return;
 	}
@@ -464,9 +474,11 @@ void CWizard::Tornado()
 
 void CWizard::HoleWall()
 {
-	_int iAngle = m_pGameInstance->RandomNumber(10, 35);
-	_matrix rotationMatrix = XMMatrixRotationX(XMConvertToRadians(iAngle));
-	_matrix matNew = rotationMatrix * m_pTransformCom->Get_WorldMatrix();
+	_int iAngleX = m_pGameInstance->RandomNumber(7, 38);
+	_int iAngleY = m_pGameInstance->RandomNumber(-20, 20);
+	_matrix matRotX = XMMatrixRotationX(XMConvertToRadians(iAngleX));
+	_matrix matRotY = XMMatrixRotationY(XMConvertToRadians(iAngleY));
+	_matrix matNew = matRotX * matRotY * m_pTransformCom->Get_WorldMatrix();
 
 	GAMEOBJECT_DESC tDesc{};
 	tDesc.iLevel = LEVEL_WIZARD;
@@ -663,6 +675,8 @@ HRESULT CWizard::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fCamFar", m_pGameInstance->Get_CamFarPtr(), sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fPlayRatio", &m_fPlayRatio, sizeof(_float))))
 		return E_FAIL;
 
 	return S_OK;

@@ -32,6 +32,9 @@ protected:
 	virtual ~CVIBuffer_Instance() = default;
 
 public:
+	_float3 Get_Pivot() { return m_InstanceDesc.vPivot; }
+
+public:
 	virtual HRESULT Initialize_Prototype(const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc);
 	virtual HRESULT Initialize(void* pArg);
 	virtual HRESULT Bind_Buffers();
@@ -45,6 +48,7 @@ public:
 	virtual void Spread_XZ(_float fTimeDelta);
 	virtual void Check_LifeTimes(_float fTimeDelta); // 위치이동 X, LifeTime만 확인
 	virtual void MoveToPivot(_float fTimeDelta);
+	virtual void TurnAndSpread(_float fTimeDelta, _float fRotationSpeed);
 
 	void	Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceIndex, _float fTimeDelta, _bool bRespawnAtMinHeight = false);
 
@@ -67,6 +71,7 @@ protected:
 	mt19937_64		m_RandomNumber;
 	_float2*		m_pLifeTimes = { nullptr };
 	_float*			m_pSpeeds = { nullptr };
+	_float3*		m_pRotationAxes = { nullptr };
 
 public:
 	virtual CComponent* Clone(void* pArg) = 0;

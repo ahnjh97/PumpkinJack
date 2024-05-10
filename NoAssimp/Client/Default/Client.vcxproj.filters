@@ -244,6 +244,18 @@
     <Filter Include="02.GameObjects\Effects\Bullets">
       <UniqueIdentifier>{1412b6b7-7200-4b83-8b1f-b87f19413b98}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Level_GamePlay\Soldier\Part_SoldierSlash">
+      <UniqueIdentifier>{c2898bfb-dcf9-4ffe-98f4-235cfaf035ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_SlimeBoss\Slime\SlimeParticles">
+      <UniqueIdentifier>{7673e4ba-557e-4508-a90d-6d03c3dbaa23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_SlimeBoss\SlimeBoss\SwipeEffect">
+      <UniqueIdentifier>{95e14c39-aedc-43a2-bbae-7e2952eabba4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_SlimeBoss\SlimeBoss\ShockWave">
+      <UniqueIdentifier>{a92e9564-c30e-4255-9152-4851c5b22153}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -483,6 +495,18 @@
     <ClInclude Include="..\Public\Bullets.h">
       <Filter>02.GameObjects\Effects\Bullets</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SoldierSlash.h">
+      <Filter>02.GameObjects\Level_GamePlay\Soldier\Part_SoldierSlash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SlimeParticles.h">
+      <Filter>02.GameObjects\Level_SlimeBoss\Slime\SlimeParticles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SwipeEffect.h">
+      <Filter>02.GameObjects\Level_SlimeBoss\SlimeBoss\SwipeEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ShockWave.h">
+      <Filter>02.GameObjects\Level_SlimeBoss\SlimeBoss\ShockWave</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -713,6 +737,18 @@
     <ClCompile Include="..\Private\Bullets.cpp">
       <Filter>02.GameObjects\Effects\Bullets</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\SoldierSlash.cpp">
+      <Filter>02.GameObjects\Level_GamePlay\Soldier\Part_SoldierSlash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SlimeParticles.cpp">
+      <Filter>02.GameObjects\Level_SlimeBoss\Slime\SlimeParticles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SwipeEffect.cpp">
+      <Filter>02.GameObjects\Level_SlimeBoss\SlimeBoss\SwipeEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ShockWave.cpp">
+      <Filter>02.GameObjects\Level_SlimeBoss\SlimeBoss\ShockWave</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -759,6 +795,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_ElecArena.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Point_Bullet.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

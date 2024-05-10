@@ -34,12 +34,14 @@ private:
 
 	void DeathEffect();
 	void AttackEffect();
+	void Add_SlimeParticles();
 
 private:
 	SLIME m_eState = { SLIME_MOVE };
 
 	_bool m_bAttackTrigger = { false };
 	_bool m_bDamagedPlayer = { false };
+	_bool m_bRisen = { false };
 
 	_float m_fTime = {};
 

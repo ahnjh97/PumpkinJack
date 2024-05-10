@@ -14,9 +14,6 @@ public:
 	virtual HRESULT Initialize_Prototype(const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc);
 	virtual HRESULT Initialize(void* pArg) override;
 
-private:
-	_uint* m_pSpriteIndexOffsets = { nullptr };
-
 public:
 	static CVIBuffer_Instance_Point* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc);
 	virtual CComponent* Clone(void* pArg) override;

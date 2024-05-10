@@ -12,6 +12,18 @@ BEGIN(Client)
 
 class CBullets final : public CGameObject
 {
+public:
+	typedef struct : public CGameObject::GAMEOBJECT_DESC
+	{
+		const _float4x4* pPlayerWorldMat;
+		_float4 vPlayerLook;
+		_float4 vPlayerRight;
+		_float fWaitTime;
+		_float fDuration = { 0.6f };
+		WEAPON eWeapon;
+		STATE eState;
+	}BULLETS_DESC;
+
 private:
 	CBullets(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CBullets(const CBullets& rhs);
@@ -26,8 +38,10 @@ public:
 
 
 private:
+	_float3 m_vPivot = {};
+
 	_float m_fTime = {};
-	_float m_fDuration = { 0.6f };
+	_float m_fDuration = { 0.3f };
 
 private:
 	CVIBuffer_Instance_Point* m_pVIBufferCom = { nullptr };

@@ -46,7 +46,7 @@ void CSlime_Slime::Late_Tick(_float fTimeDelta)
 {
 	m_pModelCom->Play_Animation(fTimeDelta);
 	XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix() * XMLoadFloat4x4(m_pParentMatrix));
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
 }
 
 HRESULT CSlime_Slime::Render()

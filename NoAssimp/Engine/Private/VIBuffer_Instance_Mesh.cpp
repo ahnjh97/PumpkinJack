@@ -169,39 +169,11 @@ HRESULT CVIBuffer_Instance_Mesh::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CVIBuffer_Instance_Mesh::TurnAndSpread(_float fTimeDelta, _float fRotationSpeed)
-{
-	D3D11_MAPPED_SUBRESOURCE		SubResource{};
-	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
-	VTXMATRIX* pVertices = ((VTXMATRIX*)SubResource.pData);
-
-	for (size_t i = 0; i < m_iNumInstance; i++)
-	{
-		// 자전
-		_vector vRotationAxis = XMVector3Normalize(XMLoadFloat3(&m_pRotationAxes[i]));
-		_matrix	RotationMatrix = XMMatrixRotationAxis(vRotationAxis, m_pSpeeds[i] * fTimeDelta * fRotationSpeed);
-
-		XMStoreFloat4(&pVertices[i].vRight, XMVector4Transform(XMLoadFloat4(&pVertices[i].vRight), RotationMatrix));
-		XMStoreFloat4(&pVertices[i].vUp, XMVector4Transform(XMLoadFloat4(&pVertices[i].vUp), RotationMatrix));
-		XMStoreFloat4(&pVertices[i].vLook, XMVector4Transform(XMLoadFloat4(&pVertices[i].vLook), RotationMatrix));
-			
-		// 이동
-		_vector		vDir = XMVectorSetW(XMLoadFloat4(&pVertices[i].vPosition) - XMLoadFloat3(&m_InstanceDesc.vPivot), 0.f);
-
-		XMStoreFloat4(&pVertices[i].vPosition,
-			XMLoadFloat4(&pVertices[i].vPosition) + XMVector3Normalize(vDir) * m_pSpeeds[i] * fTimeDelta);
-
-		Compute_LifeTime(pVertices, i, fTimeDelta, true);
-	}
-
-	m_pContext->Unmap(m_pVBInstance, 0);
-}
-
 CVIBuffer_Instance_Mesh* CVIBuffer_Instance_Mesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, ifstream& fileStream, const CVIBuffer_Instance::INSTANCE_DESC& InstanceDesc)
 {
 	CVIBuffer_Instance_Mesh* pInstance = new CVIBuffer_Instance_Mesh(pDevice, pContext, fileStream);
 
-	if (FAILED(pInstance->Initialize_Prototype(fileStream, InstanceDesc)))
+ 	if (FAILED(pInstance->Initialize_Prototype(fileStream, InstanceDesc)))
 	{
 		MSG_BOX(TEXT("Failed To Create : CVIBuffer_Instance_Mesh"));
 
@@ -209,17 +181,23 @@ CVIBuffer_Instance_Mesh* CVIBuffer_Instance_Mesh::Create(ID3D11Device* pDevice, 
 	}
 
 	return pInstance;
-
 }
 
 CComponent* CVIBuffer_Instance_Mesh::Clone(void* pArg)
 {
-	return nullptr;
+	CComponent* pInstance = new CVIBuffer_Instance_Mesh(*this);
+
+	if (FAILED(pInstance->Initialize(pArg)))
+	{
+		MSG_BOX(TEXT("Failed To Clone : CVIBuffer_Instance_Mesh"));
+
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
 }
 
 void CVIBuffer_Instance_Mesh::Free()
 {
 	__super::Free();
-
-	Safe_Delete_Array(m_pRotationAxes);
 }

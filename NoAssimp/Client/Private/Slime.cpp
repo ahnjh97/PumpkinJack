@@ -38,6 +38,7 @@ HRESULT CSlime::Initialize(void* pArg)
 	if (FAILED(Add_PartObjects(LEVEL_SLIMEBOSS)))
 		return E_FAIL;
 
+	m_iLevel = LEVEL_SLIMEBOSS;
 	m_pModelCom->Set_LerpTime(0.2f);
 	m_iHp = 10;
 	m_pModelCom->Set_AnimSpeed(SLIME_ATTACK, 2.5f);
@@ -65,25 +66,26 @@ void CSlime::Tick(_float fTimeDelta)
 	if (m_eState != SLIME_ATTACK && m_iHp <= 0)
 		m_eState = SLIME_DEATH;
 
-	if (SLIME_DEATH == m_eState)
-	{
+	if (SLIME_DEATH == m_eState) {
 		DeathEffect();
 		Set_Dead();
 	}
 
 	m_fTime += fTimeDelta;
 
-	if (m_eState == SLIME_ATTACK && m_pModelCom->isFinished()) // ÀÚÆø°ø°Ý
-	{
+	if (m_eState == SLIME_ATTACK && m_pModelCom->isFinished()) { // ÀÚÆø°ø°Ý
 		AttackEffect();
 		Set_Dead();
+		Add_SlimeParticles();
 	}
 	
 	if (m_pPlayer->Get_InSlimeBossRoom())
 		Set_Dead();
 
-	if (m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y <= 0)
+	if (m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y <= 0 && m_bRisen == false)
 		m_pTransformCom->Fall(-fTimeDelta * 1.1f);
+	else
+		m_bRisen = true;
 
 	Check_SlimeCol(fTimeDelta);
 	Check_PillarCol(fTimeDelta);
@@ -102,9 +104,11 @@ void CSlime::Tick(_float fTimeDelta)
 
 	StateToAnimation();
 
-	if (Check_DeathTrigger())
+	if (Check_DeathTrigger()) {
 		Set_Dead();
-
+		Add_SlimeParticles();
+	}
+		
 	for (_int i = 0; i < COLLIDER_END; i++) {
 		if (m_pColliderCom[i] != nullptr)
 			m_pColliderCom[i]->Tick(m_pTransformCom->Get_WorldMatrix());
@@ -116,8 +120,12 @@ void CSlime::Tick(_float fTimeDelta)
 
 void CSlime::Late_Tick(_float fTimeDelta)
 {
+	if (m_iPreHp > 0 && m_iPreHp != m_iHp)
+		Add_SlimeParticles();
+
 	m_pModelCom->Play_Animation(fTimeDelta);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	m_iPreHp = m_iHp;
 
 	for (auto& Pair : m_Parts)
 		Pair.second->Late_Tick(fTimeDelta);
@@ -147,9 +155,6 @@ HRESULT CSlime::Render()
 #ifdef _DEBUG
 	if (m_pColliderCom[HIT] != nullptr)
 		m_pGameInstance->Add_DebugComponents(m_pColliderCom[HIT]);
-
-	/*if (m_pColliderCom[DAMAGE_RANGE] != nullptr)
-		m_pGameInstance->Add_DebugComponents(m_pColliderCom[DAMAGE_RANGE]);*/
 #endif
 	return S_OK;
 }
@@ -281,6 +286,15 @@ void CSlime::DeathEffect()
 
 void CSlime::AttackEffect()
 {
+}
+
+void CSlime::Add_SlimeParticles()
+{
+	GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = m_iLevel;
+	tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_SlimeParticles"), TEXT("Prototype_GameObject_SlimeParticles"), &tDesc)))
+		return;
 }
 
 HRESULT CSlime::Add_Components(const wstring& _wstrModelTag)

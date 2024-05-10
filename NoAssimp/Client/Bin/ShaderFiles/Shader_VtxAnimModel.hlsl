@@ -119,6 +119,27 @@ PS_OUT PS_NO_LIGHT(PS_IN In)
     return Out;
 }
 
+float3 vDamageColor = float3(2.f, 0.45f, 0);
+
+PS_OUT PS_NO_LIGHT_DAMAGABLE (PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (0.3f >= vMtrlDiffuse.a)
+        discard;
+    
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fCamFar, 0.0f, 0.0f);
+    
+    if (g_fPlayRatio < 0.5f)
+        Out.vDiffuse.rgb += vDamageColor * g_fPlayRatio;
+    else if (g_fPlayRatio < 1.f)
+        Out.vDiffuse.rgb += vDamageColor * (1 - g_fPlayRatio);
+    
+    return Out;
+}
+
 PS_OUT PS_JACK(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -131,9 +152,7 @@ PS_OUT PS_JACK(PS_IN In)
     Out.vNormal = vector((In.vNormal * 0.5f + 0.5f).xyz, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fCamFar, 0.0f, 0.0f);
     Out.vPlayerDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fCamFar, 0.0f, 0.0f);
-    
-    float3 vDamageColor = float3(2.f, 0.45f, 0);
-    
+   
     if (g_fPlayRatio < 0.5f)
         Out.vDiffuse.rgb += vDamageColor * g_fPlayRatio;
     else if (g_fPlayRatio < 1.f)
@@ -154,6 +173,11 @@ PS_OUT PS_SOLDIER(PS_IN In)
     Out.vNormal = vector((In.vNormal * 0.5f + 0.5f).xyz, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fCamFar, 0.0f, 0.0f);
     Out.vDiffuse.a = g_fAlpha;
+    
+    if (g_fPlayRatio < 0.5f)
+        Out.vDiffuse.rgb += vDamageColor * g_fPlayRatio;
+    else if (g_fPlayRatio < 1.f)
+        Out.vDiffuse.rgb += vDamageColor * (1 - g_fPlayRatio);
     
     if (0.1 > Out.vDiffuse.a)
         discard;
@@ -208,7 +232,7 @@ technique11 DefaultTechnique
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_NO_LIGHT();
+        PixelShader = compile ps_5_0 PS_NO_LIGHT_DAMAGABLE();
     }
 
     pass Jack // 4

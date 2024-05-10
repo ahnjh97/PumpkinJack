@@ -67,6 +67,11 @@ void CArrow::Tick(_float fTimeDelta)
 	if(false == m_bObstacleCol)
 		Check_PlayerCol();
 
+	if (false == m_bObstacleCol) {
+		if (m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION).y < 9)
+			m_bObstacleCol = true;
+	}
+
 	if (m_pArrowEffect != nullptr)
 		m_pArrowEffect->Tick(fTimeDelta);
 

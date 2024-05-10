@@ -209,6 +209,7 @@
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\Portal.h" />
     <ClInclude Include="..\Public\Rail.h" />
+    <ClInclude Include="..\Public\ShockWave.h" />
     <ClInclude Include="..\Public\SkullCrossBow.h" />
     <ClInclude Include="..\Public\Sky.h" />
     <ClInclude Include="..\Public\SkySphere.h" />
@@ -217,12 +218,15 @@
     <ClInclude Include="..\Public\SlimeBossHead.h" />
     <ClInclude Include="..\Public\SlimeBoss_Slime.h" />
     <ClInclude Include="..\Public\SlimeDamageZone.h" />
+    <ClInclude Include="..\Public\SlimeParticles.h" />
     <ClInclude Include="..\Public\Slime_Slime.h" />
     <ClInclude Include="..\Public\Soldier.h" />
+    <ClInclude Include="..\Public\SoldierSlash.h" />
     <ClInclude Include="..\Public\SoldierWeapon.h" />
     <ClInclude Include="..\Public\SoulEffect.h" />
     <ClInclude Include="..\Public\Slash.h" />
     <ClInclude Include="..\Public\Sphere.h" />
+    <ClInclude Include="..\Public\SwipeEffect.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\Terrain_SlimeBossRoom.h" />
     <ClInclude Include="..\Public\TeslaTower.h" />
@@ -289,6 +293,7 @@
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\Portal.cpp" />
     <ClCompile Include="..\Private\Rail.cpp" />
+    <ClCompile Include="..\Private\ShockWave.cpp" />
     <ClCompile Include="..\Private\SkullCrossBow.cpp" />
     <ClCompile Include="..\Private\Sky.cpp" />
     <ClCompile Include="..\Private\SkySphere.cpp" />
@@ -297,12 +302,15 @@
     <ClCompile Include="..\Private\SlimeBossHead.cpp" />
     <ClCompile Include="..\Private\SlimeBoss_Slime.cpp" />
     <ClCompile Include="..\Private\SlimeDamageZone.cpp" />
+    <ClCompile Include="..\Private\SlimeParticles.cpp" />
     <ClCompile Include="..\Private\Slime_Slime.cpp" />
     <ClCompile Include="..\Private\Soldier.cpp" />
+    <ClCompile Include="..\Private\SoldierSlash.cpp" />
     <ClCompile Include="..\Private\SoldierWeapon.cpp" />
     <ClCompile Include="..\Private\SoulEffect.cpp" />
     <ClCompile Include="..\Private\Slash.cpp" />
     <ClCompile Include="..\Private\Sphere.cpp" />
+    <ClCompile Include="..\Private\SwipeEffect.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\Terrain_SlimeBossRoom.cpp" />
     <ClCompile Include="..\Private\TeslaTower.cpp" />
@@ -337,6 +345,7 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCube.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Mesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Point.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Point_Bullet.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_ElecArena.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Lighted.hlsl" />

@@ -32,7 +32,6 @@ HRESULT CDash::Initialize(void* pArg)
 	if (FAILED(Add_Components(LEVEL(DashDesc.iLevel))))
 		return E_FAIL;
 
-	m_pTargetWorldMat = DashDesc.pParentMatrix;
 	m_iLevel = DashDesc.iLevel;
 
 	m_fScale = 25.f;
@@ -40,11 +39,11 @@ HRESULT CDash::Initialize(void* pArg)
 
 	if (DashDesc.matWorld._11 == 100) {
 		m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), 1);
-		m_pTransformCom->Set_Pos(XMVectorSet(-0.7f, 7.5f, 0, 1));
+		m_pTransformCom->Set_Pos(::XMVectorSet(-0.7f, 7.5f, 0, 1));
 	}
 		
 	else
-		m_pTransformCom->Set_Pos(XMVectorSet(1.2f, 7.5f, 0, 1));
+		m_pTransformCom->Set_Pos(::XMVectorSet(1.2f, 7.5f, 0, 1));
 
 	return S_OK;
 }
@@ -53,36 +52,10 @@ void CDash::Tick(_float fTimeDelta)
 {
 	m_fTime += fTimeDelta;
 
-	if (m_fTime > 0.13f) {
+	if (m_fTime > 0.15f) {
 		m_iSpriteIndex++;
 		m_fTime = 0.f;
 	}
-	
-	/*if (m_iSpriteIndex >= 6)
-		m_iSpriteIndex = 0;*/
-
-	if (m_pTargetWorldMat != nullptr) {
-		//_float4x4 matNewWorld = *m_pTargetWorldMat;
-		//matNewWorld._11 = matNewWorld._22 = matNewWorld._33 = m_fScale;
-
-		//m_pTransformCom->Set_WorldMatrix(matNewWorld);
-
-		//CGameObject* pPlayer = m_pGameInstance->Get_Player(m_iLevel);
-		//if (nullptr == pPlayer)
-		//	return;
-		//Safe_AddRef(pPlayer);
-		//CTransform* pPlayerTransform = dynamic_cast<CTransform*>(pPlayer->Get_Component(g_strTransformTag));
-		//if (nullptr == pPlayerTransform)
-		//	return;
-
-		//_vector vPlayerRight = pPlayerTransform->Get_State_Vector(CTransform::STATE_RIGHT);
-		//_vector vPlayerLook = pPlayerTransform->Get_State_Vector(CTransform::STATE_LOOK);
-		//m_pTransformCom->Turn(vPlayerRight, 0.9f);
-
-		//m_pTransformCom->Set_Pos(XMVectorSet(matNewWorld._41, matNewWorld._42, matNewWorld._43, 1) + vPlayerLook * 6.f);
-		//Safe_Release(pPlayer);
-	}
-	//m_pTransformCom->Look_At(m_pGameInstance->Get_CamPosition_Vector());
 }
 
 void CDash::Late_Tick(_float fTimeDelta)

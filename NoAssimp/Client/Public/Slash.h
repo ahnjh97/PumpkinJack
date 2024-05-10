@@ -22,7 +22,6 @@ public:
 		_float fDuration = { 0.6f };
 		WEAPON eWeapon;
 		STATE eState;
-		_bool bRollSecond = { false };
 	}SLASH_DESC;
 
 private:
@@ -69,7 +68,3 @@ public:
 };
 
 END
-
-
-
-

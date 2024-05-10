@@ -17,6 +17,7 @@ CVIBuffer_Instance::CVIBuffer_Instance(const CVIBuffer_Instance& rhs)
 	, m_InstanceSubResourceData{ rhs.m_InstanceSubResourceData }
 	, m_pSpeeds{ rhs.m_pSpeeds }
 	, m_InstanceDesc{ rhs.m_InstanceDesc }
+	, m_pRotationAxes{ rhs.m_pRotationAxes }
 {
 	m_pLifeTimes = new _float2[m_iNumInstance];
 	memcpy(m_pLifeTimes, rhs.m_pLifeTimes, sizeof(_float2) * m_iNumInstance);
@@ -275,6 +276,34 @@ void CVIBuffer_Instance::MoveToPivot(_float fTimeDelta)
 	m_pContext->Unmap(m_pVBInstance, 0);
 }
 
+void CVIBuffer_Instance::TurnAndSpread(_float fTimeDelta, _float fRotationSpeed)
+{
+	D3D11_MAPPED_SUBRESOURCE		SubResource{};
+	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+	VTXMATRIX* pVertices = ((VTXMATRIX*)SubResource.pData);
+
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		// 자전
+		_vector vRotationAxis = XMVector3Normalize(XMLoadFloat3(&m_pRotationAxes[i]));
+		_matrix	RotationMatrix = XMMatrixRotationAxis(vRotationAxis, m_pSpeeds[i] * fTimeDelta * fRotationSpeed);
+
+		XMStoreFloat4(&pVertices[i].vRight, XMVector4Transform(XMLoadFloat4(&pVertices[i].vRight), RotationMatrix));
+		XMStoreFloat4(&pVertices[i].vUp, XMVector4Transform(XMLoadFloat4(&pVertices[i].vUp), RotationMatrix));
+		XMStoreFloat4(&pVertices[i].vLook, XMVector4Transform(XMLoadFloat4(&pVertices[i].vLook), RotationMatrix));
+
+		// 이동
+		_vector		vDir = XMVectorSetW(XMLoadFloat4(&pVertices[i].vPosition) - XMLoadFloat3(&m_InstanceDesc.vPivot), 0.f);
+
+		XMStoreFloat4(&pVertices[i].vPosition,
+			XMLoadFloat4(&pVertices[i].vPosition) + XMVector3Normalize(vDir) * m_pSpeeds[i] * fTimeDelta);
+
+		Compute_LifeTime(pVertices, i, fTimeDelta, true);
+	}
+
+	m_pContext->Unmap(m_pVBInstance, 0);
+}
+
 void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceIndex, _float fTimeDelta, _bool bRespawnAtMinHeight)
 {
 	m_pLifeTimes[iInstanceIndex].x += fTimeDelta;
@@ -337,6 +366,7 @@ void CVIBuffer_Instance::Free()
 
 	if (false == m_isCloned) {
 		Safe_Delete_Array(m_pSpeeds);
+		Safe_Delete_Array(m_pRotationAxes);
 		Safe_Delete_Array(m_pInstanceVertices);
 	}
 

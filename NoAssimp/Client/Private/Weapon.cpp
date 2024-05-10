@@ -197,7 +197,7 @@ void CWeapon::Check_SlimeCol()
 		return;
 
 	for (auto& slime : slimeList)
-		Check_Collision(slime, 0.65f);
+		Check_Collision(slime, 0.5f);
 }
 
 void CWeapon::Check_SlimeBossRoomPillarCol()

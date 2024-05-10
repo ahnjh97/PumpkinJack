@@ -55,7 +55,7 @@ HRESULT CSlash::Initialize(void* pArg)
             m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), 1);
             m_vOffset = XMVectorSet(0, 7.f, 0, 0) + XMLoadFloat4(&pGameObjectDesc->vPlayerLook) * 4.5f;
             m_pTransformCom->Set_Pos(vPos + m_vOffset);
-            m_fWaitTime = 0.2f;
+             m_fWaitTime = 0.2f;
         }
     }
     else if (WPN_SCYTHE == pGameObjectDesc->eWeapon)

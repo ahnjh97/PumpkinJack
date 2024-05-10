@@ -176,6 +176,4 @@ CComponent* CVIBuffer_Instance_Point::Clone(void* pArg)
 void CVIBuffer_Instance_Point::Free()
 {
 	__super::Free();
-
-	Safe_Delete_Array(m_pSpriteIndexOffsets);
 }

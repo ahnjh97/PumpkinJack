@@ -1,11 +1,13 @@
 #include "stdafx.h"
 #include "Level_EffectTool.h"
+#include "SwipeEffect.h"
 #include "Camera_Free.h"
 #include "HitEffect.h"
 #include "Lightning.h"
 #include "ElecParts.h"
 #include "ElecChain.h"
 #include "Terrain.h"
+#include "Slash.h"
 #include "Dash.h"
 #include "Part.h"
 
@@ -109,10 +111,10 @@ HRESULT CLevel_EffectTool::Ready_Layer_Grid(const wstring& strLayerTag)
 
 HRESULT CLevel_EffectTool::Add_Effect(const wstring& strLayerTag)
 {
-	CGameObject::GAMEOBJECT_DESC tDesc{};;
+	CSwipeEffect::SWIPEEFFECT_DESC tDesc{};
 	tDesc.iLevel = LEVEL_EFFECTTOOL;
-	
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Bullets"), &tDesc)))
+	tDesc.vSlimeBossRight = XMVectorSet(1, 0, 0, 0);
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_SwipeEffect"), &tDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -123,7 +125,7 @@ HRESULT CLevel_EffectTool::Add_Effect2(const wstring& strLayerTag)
 	CGameObject::GAMEOBJECT_DESC tDesc{};
 	tDesc.iLevel = LEVEL_EFFECTTOOL;
 
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Slash"), &tDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_Explosion"), &tDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -131,11 +133,12 @@ HRESULT CLevel_EffectTool::Add_Effect2(const wstring& strLayerTag)
 
 HRESULT CLevel_EffectTool::Add_Object(const wstring& strLayerTag)
 {
-	CGameObject::GAMEOBJECT_DESC tDesc{};
-	tDesc.iLevel = LEVEL_EFFECTTOOL;
-	tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Slash");
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, TEXT("Layer_Arrow"), TEXT("Prototype_GameObject_Monster"), &tDesc)))
-		return E_FAIL;
+	for (_int i = 0; i < 10; i++) {
+		CGameObject::GAMEOBJECT_DESC tDesc{};
+		tDesc.iLevel = LEVEL_EFFECTTOOL;
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_SlimeParticles"), &tDesc)))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }
