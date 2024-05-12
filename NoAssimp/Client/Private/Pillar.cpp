@@ -33,6 +33,9 @@ HRESULT CPillar::Initialize(void* pArg)
 	if (FAILED(Add_Components(GameObjectDesc.wstrModelTag)))
 		return E_FAIL;
 
+	m_pGameInstance->StopSound(SKILL5);
+	m_pGameInstance->Play_Sound(TEXT("EarthMagic6.mp3"), SKILL5, 0.5f);
+
 	return S_OK;
 }
 

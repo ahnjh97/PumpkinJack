@@ -50,6 +50,10 @@ HRESULT CElecParts::Initialize(void* pArg)
 	if (ELEC_CHARGE == tElecPartsDesc.eElecEffect || ELEC_SCATTER == tElecPartsDesc.eElecEffect || ELEC_EARTHQUAKE == tElecPartsDesc.eElecEffect)
 		m_bFadeIn = false;
 
+	if (ELEC_SCATTER == tElecPartsDesc.eElecEffect) {
+		m_pGameInstance->StopSound(SKILL2); // ElecLoop.mp3
+		m_pGameInstance->Play_Sound(TEXT("Elec.mp3"), SKILL3, 0.8f);
+	}
 
 	if (m_pTargetWorldMat != nullptr)
 		m_pTransformCom->Set_Pos(XMVectorSet(m_pTargetWorldMat->_41, m_pTargetWorldMat->_42, m_pTargetWorldMat->_43, 1));

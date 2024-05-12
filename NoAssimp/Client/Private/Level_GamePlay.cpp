@@ -40,9 +40,15 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_LandObject()))
 		return E_FAIL;
 
+#ifdef _DEBUG
 	if (FAILED(m_pGameInstance->Initialize_ImGui(LEVEL_GAMEPLAY, CImGui_Client::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
-	
+#endif
+
+	m_pGameInstance->StopSound(BGM);
+	m_pGameInstance->PlayBGM(TEXT("LevelGamePlay.mp3"));
+	m_pGameInstance->SetVolume(BGM, 0.2f);
+
 	m_InputFile.close();
 
 	return S_OK;
@@ -77,8 +83,8 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
-	LightDesc.vSpecular = _float4(0.1f, 0.1f, 0.1f, 1.f);
+	LightDesc.vAmbient = _float4(0.35f, 0.35f, 0.35f, 1.f);
+	LightDesc.vSpecular = _float4(0.02f, 0.02f, 0.02f, 1.f);
 
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
@@ -259,6 +265,8 @@ CLevel_GamePlay * CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceCon
 
 void CLevel_GamePlay::Free()
 {
+#ifdef _DEBUG
 	m_pGameInstance->Hide_ImGui();
+#endif 
 	__super::Free();
 }

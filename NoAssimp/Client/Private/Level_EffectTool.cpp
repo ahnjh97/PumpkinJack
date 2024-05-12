@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "Level_EffectTool.h"
+#include "RockParticles.h"
 #include "SwipeEffect.h"
 #include "Camera_Free.h"
+#include "FadeInOut.h"
 #include "HitEffect.h"
 #include "Lightning.h"
 #include "ElecParts.h"
@@ -112,37 +114,34 @@ HRESULT CLevel_EffectTool::Ready_Layer_Grid(const wstring& strLayerTag)
 
 HRESULT CLevel_EffectTool::Add_Effect(const wstring& strLayerTag)
 {
-	CSwipeEffect::SWIPEEFFECT_DESC tDesc{};
+	CRockParticles::ROCKPARTICLES_DESC tDesc{};
+	tDesc.wstrTextureName = TEXT("TeslaTower");
 	tDesc.iLevel = LEVEL_EFFECTTOOL;
-	tDesc.vSlimeBossRight = XMVectorSet(1, 0, 0, 0);
-	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_SwipeEffect"), &tDesc)))
-		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_RockParticles"), &tDesc)))
+		return E_FAIL;
+	
 	return S_OK;
 }
 
 HRESULT CLevel_EffectTool::Add_Effect2(const wstring& strLayerTag)
 {
-	CShockWave::SHOCKWAVE_DESC tDesc{};
+	CGameObject::GAMEOBJECT_DESC tDesc{};
 	tDesc.iLevel = LEVEL_EFFECTTOOL;
 
-	for (_int i = -7; i < 8; i++) {
-		tDesc.iRotation = i;
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_ShockWave"), &tDesc)))
-			return E_FAIL;
-	}
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_ChargeCenter"), &tDesc)))
+		return E_FAIL;
 
 	return S_OK;
 }
 
 HRESULT CLevel_EffectTool::Add_Object(const wstring& strLayerTag)
 {
-	for (_int i = 0; i < 10; i++) {
-		CGameObject::GAMEOBJECT_DESC tDesc{};
-		tDesc.iLevel = LEVEL_EFFECTTOOL;
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_SlimeParticles"), &tDesc)))
-			return E_FAIL;
-	}
+	CGameObject::GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = LEVEL_EFFECTTOOL;
+
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_EFFECTTOOL, strLayerTag, TEXT("Prototype_GameObject_ChargeEffect"), &tDesc)))
+		return E_FAIL;
 
 	return S_OK;
 }

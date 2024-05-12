@@ -32,13 +32,17 @@ public:
 	virtual HRESULT Render() override;
 
 private:
+	void Check_PlayerCol();
+
+private:
 	_bool	m_bEnabled = { false };
+	_bool	m_bPlaySwipeSound = { true };
 
 	_uint m_iSpriteIndex = {};
 	_uint m_iWeaponIndex = {};
 
 	_float	m_fTime = { };
-	_float	m_fEndTime = { 0.5f };
+	_float	m_fEndTime = { };
 	_float	m_fWaitTime = {};
 	_float	m_fPlayRatio = {};
 	_float	m_fSpriteTime = {};
@@ -47,6 +51,7 @@ private:
 	CModel* m_pModelCom = { nullptr };
 	CTexture* m_pTextureCom[TEX_END] = { nullptr, nullptr };
 	CShader* m_pShaderCom = { nullptr };
+	CCollider* m_pColliderCom = { nullptr };
 
 private:
 	HRESULT Add_Components(LEVEL eLevel);

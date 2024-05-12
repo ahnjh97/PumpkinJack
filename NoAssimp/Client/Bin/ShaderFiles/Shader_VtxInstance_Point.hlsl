@@ -277,6 +277,53 @@ PS_OUT PS_SHOCKWAVE(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_ROCKPARTICLES(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    if (1.f <= In.fLifeRatio)
+        discard;
+    
+    float fMask = g_MaskTexture.Sample(LinearSampler, In.vTexcoord).r;
+    if (0.3f > fMask)
+        discard;
+    
+    Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord * 0.2f);
+    
+    return Out;
+}
+
+PS_OUT PS_CHARGEEFFECT(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    if (1.f <= In.fLifeRatio)
+        discard;
+    
+    float fMask = g_MaskTexture.Sample(LinearSampler, In.vTexcoord).r;
+    if (0.2f >= fMask)
+        discard;
+
+    float2 vUV = float2(In.vTexcoord.x * 0.4f, In.vTexcoord.y * 0.4f + In.iSpriteIndexOffset * 0.01f + g_fTime * 0.6f);
+    Out.vColor = g_Texture.Sample(LinearSampler, vUV);
+    
+    float4 color = Out.vColor;
+    //float4 vResult = float4(0, 0, 0, 0);
+    if ((color.r > color.g) && (color.r + color.g > color.b * 1.5))
+    {
+        float greenEnhanced = (color.r + color.g) * 0.5;
+        float brightness = (color.r + color.g + color.b) / 3;
+        float whiteComponent = brightness * 0.5; //
+    
+        Out.vColor = vector(whiteComponent, greenEnhanced, whiteComponent, fMask);
+        //Out.vColor.rgb *= 0.85f;
+        //Out.vColor.a *= 0.8f;
+        
+        if (Out.vColor.a <= 0.2f)
+            discard;
+    }
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
 	pass Default // 0
@@ -368,5 +415,31 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_SHOCKWAVE();
+    }
+
+    pass RockParticles // 7
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = compile gs_5_0 GS_MAIN();
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_ROCKPARTICLES();
+    }
+
+    pass ChargeEffect // 8
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = compile gs_5_0 GS_MAIN();
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_CHARGEEFFECT();
     }
 }

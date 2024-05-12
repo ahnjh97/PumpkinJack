@@ -112,6 +112,20 @@ public: /* For.Frustum */
 	_bool isInFrustum_LocalSpace(_fvector vLocalPos, _float fRange = 0.f);
 	void TransformFrustum_LocalSpace(_fmatrix WorldMatrixInv);
 
+public: /* For. Sound_Manager*/
+	_int  SetVolume(CHANNELID eID, _float _vol);
+	_int  VolumeUp(CHANNELID eID, _float _vol);
+	_int  VolumeDown(CHANNELID eID, _float _vol);
+	_int  VolumeMin(CHANNELID eID);
+	_int  BGMVolumeUp(_float _vol);
+	_int  BGMVolumeDown(_float _vol);
+
+	_int  Pause(CHANNELID eID);
+	void Play_Sound(TCHAR* pSoundKey, CHANNELID eID, _float _vol);
+	void PlayBGM(TCHAR* pSoundKey);
+	void StopSound(CHANNELID eID);
+	void StopAll();
+
 public:	/* For.GameInstance */
 	string WstrToStr(const wstring& wstr);
 	wstring StrToWstr(const string& str);
@@ -141,6 +155,7 @@ private:
 	class CRenderTarget_Manager*	m_pRenderTarget_Manager = { nullptr };
 	class CCoordConverter*			m_pCoordConverter = { nullptr };
 	class CFrustum*					m_pFrustum = { nullptr };
+	class CSound_Manager*			m_pSound_Manager = { nullptr };
 
 private:
 	_bool m_bToggle = { true };

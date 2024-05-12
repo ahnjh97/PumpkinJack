@@ -40,7 +40,14 @@ HRESULT CLevel_SlimeBoss::Initialize()
 
 	m_InputFile.close();
 
+#ifdef _DEBUG
 	m_pGameInstance->UnHide_ImGui();
+#endif
+
+	m_pGameInstance->StopSound(BGM);
+	m_pGameInstance->PlayBGM(TEXT("LevelSlimeBoss.mp3"));
+	m_pGameInstance->SetVolume(BGM, 0.2f);
+
 	return S_OK;
 }
 
@@ -89,8 +96,8 @@ HRESULT CLevel_SlimeBoss::Ready_Lights()
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vAmbient = _float4(0.1f, 0.1f, 0.1f, 1.f);
-	LightDesc.vSpecular = _float4(0.1f, 0.1f, 0.1f, 1.f);
+	LightDesc.vAmbient = _float4(0.25f, 0.25f, 0.25f, 1.f);
+	LightDesc.vSpecular = _float4(0.05f, 0.05f, 0.05f, 1.f);
 
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
@@ -245,6 +252,8 @@ CLevel_SlimeBoss* CLevel_SlimeBoss::Create(ID3D11Device* pDevice, ID3D11DeviceCo
 
 void CLevel_SlimeBoss::Free()
 {
+#ifdef _DEBUG
 	m_pGameInstance->Hide_ImGui();
+#endif 
 	__super::Free();
 }

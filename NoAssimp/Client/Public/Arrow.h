@@ -30,6 +30,7 @@ private:
 	
 private:
 	_bool m_bObstacleCol = { false };
+	_bool m_bPlayHitSound = { true };
 
 	_float m_fTime = {};
 	_float m_fCollisionTime = {};

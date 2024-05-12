@@ -155,10 +155,6 @@ HRESULT CMap_SlimeBoss::Bind_ShaderResources()
 			return E_FAIL;
 	}
 
-	const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-	if (nullptr == pLightDesc)
-		return E_FAIL;
-
 	for (_int i = 0; i <= LIGHTED; i++)
 	{
 		if (FAILED(m_pShaderCom[i]->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldFloat4x4_Ptr())))

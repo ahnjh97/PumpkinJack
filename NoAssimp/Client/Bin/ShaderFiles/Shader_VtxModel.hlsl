@@ -189,24 +189,42 @@ PS_OUT PS_SLASH(PS_IN In)
     if (g_fPlayRatio > 0.75f + In.vTexcoord.x * 0.25f)
         discard;
     
-    float2 adjustedUV = In.vTexcoord;
-    adjustedUV.y = (adjustedUV.y * 0.8) + 0.5; // Y 좌표 조정
-    // 텍스처에서 색상 정보를 샘플링
     float4 color = float4(0, 0, 0, 0);
-    //color = g_AttackEffect[0].Sample(LinearSampler, In.vTexcoord);
-    if (g_iSpriteIndex == 0)
-        color = g_AttackEffect[0].Sample(LinearSampler, In.vTexcoord);
-    else if (g_iSpriteIndex == 1)
-        color = g_AttackEffect[1].Sample(LinearSampler, In.vTexcoord);
-    else if (g_iSpriteIndex == 2)
-        color = g_AttackEffect[2].Sample(LinearSampler, In.vTexcoord);
-    else if (g_iSpriteIndex == 3)
-        color = g_AttackEffect[3].Sample(LinearSampler, In.vTexcoord);
-    else if (g_iSpriteIndex == 4)
-        color = g_AttackEffect[4].Sample(LinearSampler, In.vTexcoord);
-    else if (g_iSpriteIndex == 5)
-        color = g_AttackEffect[5].Sample(LinearSampler, In.vTexcoord);
+    float4 vColor1 = float4(0, 0, 0, 0);
+    float4 vColor2 = float4(0, 0, 0, 0);
+    float fRatioOffset = 0;
     
+    if (g_fPlayRatio > 0 && g_fPlayRatio < 1 / 5.f)
+    {
+        vColor1 = g_AttackEffect[0].Sample(LinearSampler, In.vTexcoord);
+        vColor2 = g_AttackEffect[1].Sample(LinearSampler, In.vTexcoord);
+    }
+    else if (g_fPlayRatio >= 1 / 5.f && g_fPlayRatio < 2 / 5.f)
+    {
+        vColor1 = g_AttackEffect[1].Sample(LinearSampler, In.vTexcoord);
+        vColor2 = g_AttackEffect[2].Sample(LinearSampler, In.vTexcoord);
+        fRatioOffset = 1 / 5.f;
+    }
+    else if (g_fPlayRatio >= 2 / 5.f && g_fPlayRatio < 3 / 5.f)
+    {
+        vColor1 = g_AttackEffect[2].Sample(LinearSampler, In.vTexcoord);
+        vColor2 = g_AttackEffect[3].Sample(LinearSampler, In.vTexcoord);
+        fRatioOffset = 2 / 5.f;
+    }
+    else if (g_fPlayRatio >= 3 / 5.f && g_fPlayRatio < 4 / 5.f)
+    {
+        vColor1 = g_AttackEffect[3].Sample(LinearSampler, In.vTexcoord);
+        vColor2 = g_AttackEffect[4].Sample(LinearSampler, In.vTexcoord);
+        fRatioOffset = 3 / 5.f;
+    }
+    else if (g_fPlayRatio >= 4 / 5.f && g_fPlayRatio < 1.f)
+    {
+        vColor1 = g_AttackEffect[4].Sample(LinearSampler, In.vTexcoord);
+        vColor2 = g_AttackEffect[5].Sample(LinearSampler, In.vTexcoord);
+        fRatioOffset = 4 / 5.f;
+    }
+    
+    color = lerp(vColor1, vColor2, (g_fPlayRatio - fRatioOffset) * 5.f);
     if (0.1f >= color.a)
         discard;
     
@@ -232,8 +250,6 @@ PS_OUT PS_SLASH(PS_IN In)
     }
     
     Out.vColor = vResult;
-    if (0.3f >= Out.vColor.a)
-        discard;
     
      return Out;
 }
@@ -247,29 +263,47 @@ PS_OUT PS_SOLDIER_SLASH(PS_IN In)
     if (g_fPlayRatio > 0.75f + In.vTexcoord.x * 0.25f)
         discard;
     
-    float2 adjustedUV = In.vTexcoord;
-    adjustedUV.y = (adjustedUV.y * 0.8) + 0.1; // Y 좌표 조정
-    // 텍스처에서 색상 정보를 샘플링
     float4 color = float4(0, 0, 0, 0);
-    if (g_iSpriteIndex == 0)
-        color = g_AttackEffect[0].Sample(LinearSampler, In.vTexcoord);
-    else if (g_iSpriteIndex == 1)
-        color = g_AttackEffect[1].Sample(LinearSampler, In.vTexcoord);
-    else if (g_iSpriteIndex == 2)
-        color = g_AttackEffect[2].Sample(LinearSampler, In.vTexcoord);
-    else if (g_iSpriteIndex == 3)
-        color = g_AttackEffect[3].Sample(LinearSampler, In.vTexcoord);
-    else if (g_iSpriteIndex == 4)
-        color = g_AttackEffect[4].Sample(LinearSampler, In.vTexcoord);
-    else if (g_iSpriteIndex == 5)
-        color = g_AttackEffect[5].Sample(LinearSampler, In.vTexcoord);
+    float4 vColor1 = float4(0, 0, 0, 0);
+    float4 vColor2 = float4(0, 0, 0, 0);
+    float fRatioOffset = 0;
+    
+    if (g_fPlayRatio > 0 && g_fPlayRatio < 1 / 5.f)
+    {
+        vColor1 = g_AttackEffect[0].Sample(LinearSampler, In.vTexcoord);
+        vColor2 = g_AttackEffect[1].Sample(LinearSampler, In.vTexcoord);
+    }
+    else if (g_fPlayRatio >= 1 / 5.f && g_fPlayRatio < 2 / 5.f)
+    {
+        vColor1 = g_AttackEffect[1].Sample(LinearSampler, In.vTexcoord);
+        vColor2 = g_AttackEffect[2].Sample(LinearSampler, In.vTexcoord);
+        fRatioOffset = 1 / 5.f;
+    }
+    else if (g_fPlayRatio >= 2 / 5.f && g_fPlayRatio < 3 / 5.f)
+    {
+        vColor1 = g_AttackEffect[2].Sample(LinearSampler, In.vTexcoord);
+        vColor2 = g_AttackEffect[3].Sample(LinearSampler, In.vTexcoord);
+        fRatioOffset = 2 / 5.f;
+    }
+    else if (g_fPlayRatio >= 3 / 5.f && g_fPlayRatio < 4 / 5.f)
+    {
+        vColor1 = g_AttackEffect[3].Sample(LinearSampler, In.vTexcoord);
+        vColor2 = g_AttackEffect[4].Sample(LinearSampler, In.vTexcoord);
+        fRatioOffset = 3 / 5.f;
+    }
+    else if (g_fPlayRatio >= 4 / 5.f && g_fPlayRatio < 1.f)
+    {
+        vColor1 = g_AttackEffect[4].Sample(LinearSampler, In.vTexcoord);
+        vColor2 = g_AttackEffect[5].Sample(LinearSampler, In.vTexcoord);
+        fRatioOffset = 4 / 5.f;
+    }
+    
+    color = lerp(vColor1, vColor2, (g_fPlayRatio - fRatioOffset) * 5.f);
 
     if (0.1f >= color.a)
         discard;
 
     Out.vColor = color;
-    if (0.3f >= Out.vColor.a)
-        discard;
         
     return Out;
 }
@@ -284,9 +318,9 @@ PS_OUT PS_DAMAGABLE(PS_IN In)
         discard;
     
     if (g_fPlayRatio < 0.5f)
-        Out.vColor.rgb += vDamageColor * g_fPlayRatio;
+        Out.vColor.rgb += vDamageColor * smoothstep(0.0f, 1.0f, g_fPlayRatio);
     else if (g_fPlayRatio < 1.f)
-        Out.vColor.rgb += vDamageColor * (1 - g_fPlayRatio);
+        Out.vColor.rgb += vDamageColor * smoothstep(0.0f, 1.0f, (1 - g_fPlayRatio));
     
     return Out;
 }
@@ -313,45 +347,29 @@ PS_OUT PS_SWIPEEFFECT(PS_IN In)
     if (g_fPlayRatio > 0.75f + In.vTexcoord.x * 0.25f)
         discard;
     
-    float2 adjustedUV = In.vTexcoord;
-    adjustedUV.y = (adjustedUV.y * 0.8) + 0.5; // Y 좌표 조정
-    // 텍스처에서 색상 정보를 샘플링
     float4 color = float4(0, 0, 0, 0);
-    //color = g_AttackEffect[0].Sample(LinearSampler, In.vTexcoord);
-    if (g_iSpriteIndex == 0)
-        color = g_AttackEffect[0].Sample(LinearSampler, In.vTexcoord);
-    else if (g_iSpriteIndex == 1)
-        color = g_AttackEffect[1].Sample(LinearSampler, In.vTexcoord);
-    else if (g_iSpriteIndex == 2)
-        color = g_AttackEffect[2].Sample(LinearSampler, In.vTexcoord);
-    else if (g_iSpriteIndex == 3)
-        color = g_AttackEffect[3].Sample(LinearSampler, In.vTexcoord);
-    else if (g_iSpriteIndex == 4)
-        color = g_AttackEffect[4].Sample(LinearSampler, In.vTexcoord);
-    else if (g_iSpriteIndex == 5)
-        color = g_AttackEffect[5].Sample(LinearSampler, In.vTexcoord);
+    float4 vColor1 = vColor1 = g_AttackEffect[1].Sample(LinearSampler, In.vTexcoord);
+    float4 vColor2 = vColor2 = g_AttackEffect[2].Sample(LinearSampler, In.vTexcoord);
+    color = lerp(vColor1, vColor2, g_fPlayRatio );
     
     if (0.1f >= color.a)
         discard;
     
     float4 vResult = float4(0, 0, 0, 0);
-    
-    if (g_iWeaponIndex == 0)
+   
+    if (color.b > color.r && color.b > color.g)
     {
-        if (color.b > color.r && color.b > color.g)
-        {
-            // 파란색-> 초록색
-            float avg = (color.r + color.b) * 0.5;
-            vResult = vector(color.r * 0.8f, 1, color.g * 0.8f, color.a);
-        }
+        // 파란색-> 초록색
+        float avg = (color.r + color.b) * 0.5;
+        vResult = vector(color.r * 0.8f, 1, color.g * 0.8f, color.a);
     }
-    
+    else
+        vResult = color;
+
     float fNoise = g_NoiseTexture.Sample(LinearSampler, In.vTexcoord * 2.f);
     vResult.rgb *= fNoise * 0.8f;
-    Out.vColor = vResult;
     
-    if (0.3f >= Out.vColor.a)
-        discard;
+    Out.vColor = vResult;
     
     return Out;
 }

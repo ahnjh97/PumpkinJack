@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "RockParticles.h"
 #include "TeslaTower.h"
 #include "ElecChain.h"
 #include "ElecParts.h"
@@ -35,7 +36,7 @@ HRESULT CTeslaTower::Initialize(void* pArg)
 	if (FAILED(Add_Components(LEVEL(tTeslaTowerDesc.iLevel))))
 		return E_FAIL;
 
-	m_iHp = 30;
+	m_iPreHp = m_iHp = 30;
 
 	m_pSphere = Add_Sphere(LEVEL(tTeslaTowerDesc.iLevel), tTeslaTowerDesc.matWorld);
 	m_pElecParts = Add_ElecParts(LEVEL(tTeslaTowerDesc.iLevel), tTeslaTowerDesc.matWorld);
@@ -56,6 +57,7 @@ void CTeslaTower::Tick(_float fTimeDelta)
 
 	if (m_iHp <= 0) {
 		Add_DestroyEffect();
+		Add_RockParticles();
 		Set_Dead();
 		return;
 	}
@@ -83,6 +85,8 @@ void CTeslaTower::Late_Tick(_float fTimeDelta)
 	if (m_bDead)
 		return;
 
+	m_pGameInstance->Play_Sound(TEXT("ElecLoop.mp3"), SKILL2, 0.35f);
+
 	if (m_pSphere != nullptr)
 		m_pSphere->Late_Tick(fTimeDelta);
 
@@ -97,6 +101,7 @@ void CTeslaTower::Late_Tick(_float fTimeDelta)
 	if (m_iPreHp != m_iHp) {
 		if (m_fTime >= 0.3f)
 			m_fTime = 0.f;
+		Add_RockParticles();
 	}
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
@@ -183,6 +188,33 @@ void CTeslaTower::Add_DestroyEffect()
 
 	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_ElecParts"), TEXT("Prototype_GameObject_ElecParts"), &tElecPartsDesc)))
 		return;
+}
+
+void CTeslaTower::Add_RockParticles()
+{
+	CGameObject* pPlayer = m_pGameInstance->Get_Player(LEVEL_WIZARD);
+	if (nullptr == pPlayer)
+		return;
+
+	CTransform* pPlayerTransform = dynamic_cast<CTransform*>(pPlayer->Get_Component(g_strTransformTag));
+	if (nullptr == pPlayerTransform)
+		return;
+
+	_float4x4 matOriginal = m_pTransformCom->Get_WorldFloat4x4();
+	m_pTransformCom->Set_Pos(m_pTransformCom->Get_Pos_Vector() + XMVector4Normalize(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP)) * 5.f);
+	m_pTransformCom->Look_At(pPlayerTransform->Get_Pos_Vector());
+
+	CRockParticles::ROCKPARTICLES_DESC tDesc{};
+	tDesc.iLevel = LEVEL_WIZARD;
+	tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	tDesc.wstrTextureName = TEXT("TeslaTower");
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_WIZARD, TEXT("Layer_RockParticles"), TEXT("Prototype_GameObject_RockParticles"), &tDesc)))
+		return;
+
+	m_pTransformCom->Set_WorldMatrix(matOriginal);
+
+	m_pGameInstance->StopSound(SKILL4);
+	m_pGameInstance->Play_Sound(TEXT("RockDestroy.mp3"), SKILL4, 0.65f);
 }
 
 HRESULT CTeslaTower::Add_Components(LEVEL eLevel)

@@ -35,7 +35,7 @@ HRESULT CHoleWall::Initialize(void* pArg)
 
 	m_pPlayer = m_pGameInstance->Get_Player(LEVEL_WIZARD);
 	Safe_AddRef(m_pPlayer);
-	m_fFallSpeed = m_pGameInstance->RandomNumber(5, 15) * 0.1f;
+	m_fFallSpeed = m_pGameInstance->RandomNumber(5, 10) * 0.1f;
 
 	CElecParts::ELECPARTS_DESC tElecPartsDesc{};
 	tElecPartsDesc.iLevel = GameObjectDesc.iLevel;
@@ -51,14 +51,17 @@ HRESULT CHoleWall::Initialize(void* pArg)
 
 void CHoleWall::Tick(_float fTimeDelta)
 {
-	if (m_fTime > 9.f)
+	if (m_fTime > 7.f)
 		Set_Dead();
+
+	m_pGameInstance->Play_Sound(TEXT("HoleWall.mp3"), SKILL3, 0.4f);
+	m_pGameInstance->Play_Sound(TEXT("ElecLoop.mp3"), SKILL2, 0.18f);
 
 	m_fTime += fTimeDelta;
 	m_fDamageTime += fTimeDelta;
 	m_pTransformCom->Move(fTimeDelta * 3.f, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
 	m_pTransformCom->Fall(fTimeDelta * m_fFallSpeed);
-
+	
 	Check_PlayerCol();
 
 	m_pElecParts->Tick(fTimeDelta);

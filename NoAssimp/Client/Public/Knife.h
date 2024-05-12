@@ -26,6 +26,7 @@ public:
 
 private:
 	_bool m_bDamaged = { false };
+	_bool m_bPlayHitSound = { true };
 
 	_float m_fTime = {};
 	_float m_fAlpha = { 1.f };

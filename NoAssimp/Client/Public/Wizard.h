@@ -81,6 +81,7 @@ private:
 	_float m_fTime = { 100.f };
 	_float m_fEndTime = { 0.35f };
 	_float m_fPlayRatio = {};
+	_float m_fDeathTime = {};
 
 	_float3 m_vTeslaTowerPos[8] = { _float3(483, 0, 483), _float3(641, 0, 466), _float3(685, 0, 667),  _float3(506 ,0, 691),
 		_float3(471, 0, 510), _float3(655, 0, 500), _float3(667, 0, 667), _float3(511 ,0, 685) };

@@ -134,6 +134,45 @@ PS_OUT PS_BULLETS(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_CHARGEEFFECT(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+	
+    if (In.fLifeRatio < 1 / 6.f)
+        Out.vColor = g_AttackEffect[0].Sample(LinearSampler, In.vTexcoord);
+    else if (In.fLifeRatio < 2 / 6.f)
+        Out.vColor = g_AttackEffect[1].Sample(LinearSampler, In.vTexcoord);
+    else if (In.fLifeRatio < 3 / 6.f)
+        Out.vColor = g_AttackEffect[2].Sample(LinearSampler, In.vTexcoord);
+    else if (In.fLifeRatio < 4 / 6.f)
+        Out.vColor = g_AttackEffect[3].Sample(LinearSampler, In.vTexcoord);
+    else if (In.fLifeRatio < 5 / 6.f)
+        Out.vColor = g_AttackEffect[4].Sample(LinearSampler, In.vTexcoord);
+    else if (In.fLifeRatio < 1.f)
+        Out.vColor = g_AttackEffect[5].Sample(LinearSampler, In.vTexcoord);
+    
+    if (Out.vColor.a <= 0.3f || 1.f <= In.fLifeRatio)
+        discard;
+
+    float4 color = Out.vColor;
+    //float4 vResult = float4(0, 0, 0, 0);
+    if ((color.r > color.g) && (color.r + color.g > color.b * 1.5))
+    {
+        float greenEnhanced = (color.r + color.g) * 0.5;
+        float brightness = (color.r + color.g + color.b) / 3;
+        float whiteComponent = brightness * 0.5; //
+    
+        Out.vColor = vector(whiteComponent, greenEnhanced, whiteComponent, color.a);
+        //Out.vColor.rgb *= 0.85f;
+        //Out.vColor.a *= 0.8f;
+        
+        if (Out.vColor.a <= 0.2f)
+            discard;
+    }
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass Bullets // 0
@@ -147,5 +186,18 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_BULLETS();
+    }
+
+    pass ChargeEffect // 1
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = compile gs_5_0 GS_BULLET();
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_CHARGEEFFECT();
     }
 }

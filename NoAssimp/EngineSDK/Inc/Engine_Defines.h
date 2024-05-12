@@ -9,6 +9,8 @@
 #include <d3dcompiler.h>
 #include <DirectXCollision.h>
 
+
+
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
@@ -17,6 +19,8 @@ namespace Engine
 	enum MOUSEKEYSTATE { DIMKS_LBUTTON, DIMKS_RBUTTON, DIMKS_WHEEL, DIMKS_X, DIMKS_END };
 	enum MOUSEMOVESTATE { DIMMS_X, DIMMS_Y, DIMMS_WHEEL, DIMMS_END };
 	enum TYPE { TYPE_NONANIM, TYPE_ANIM, TYPE_END };
+	enum CHANNELID { BGM, PLAYER, VOICE0, VOICE1, EFFECT, UI, SYSTEM_EFFECT, SYSTEM_EFFECT2, SYSTEM_EFFECT3,
+		ENEMY0, ENEMY1, ENEMY2, SKILL0, SKILL1, SKILL2, SKILL3, SKILL4, SKILL5, MAXCHANNEL };
 }
 
 #include "Effects11/d3dx11effect.h"
@@ -44,6 +48,12 @@ using namespace DirectX;
 #include <vector>
 #include <list>
 #include <map>
+#include <tchar.h>
+#include "fmod.h"
+#include "fmod.hpp"
+#include "fmod_errors.h"
+#include <io.h>
+#pragma comment (lib, "fmod_vc.lib")
 using namespace std;
 
 namespace Engine

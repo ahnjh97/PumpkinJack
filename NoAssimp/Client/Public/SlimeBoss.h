@@ -35,7 +35,10 @@ private:
 	void SlimeDamageZoneSpawn(_uint iNum);
 	void DeathEffect();
 	void Add_SwipeEffect();
-	void Add_ShockWave();
+	void Add_ShockWave(_int iShockWaveCount);
+	void Add_ChargeEffect();
+	void DestroyChargeEffect();
+	void Add_Cauldron();
 
 private:
 	CModel* m_pModelCom = { nullptr };
@@ -55,9 +58,14 @@ private:
 	_bool m_bTurnToPlayer = { false };
 	_bool m_bAddSwipeEffect = { false };
 	_bool m_bAddShockWave = { false };
+	_bool m_bPlaySpawnSound = { true };
+	_bool m_bPlaySpinKnifeSound = { true };
+	_bool m_bDestroyCharge = { true };
 
 	_int m_iCurPattern = { -1};
 	_int m_iLightningCount = {};
+
+	_float m_fTime = {};
 
 	_float4 m_vLightningPos = {};
 

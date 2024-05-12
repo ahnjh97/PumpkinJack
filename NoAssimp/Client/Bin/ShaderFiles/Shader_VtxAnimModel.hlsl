@@ -131,11 +131,15 @@ PS_OUT PS_NO_LIGHT_DAMAGABLE (PS_IN In)
     
     Out.vDiffuse = vMtrlDiffuse;
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fCamFar, 0.0f, 0.0f);
+    Out.vDiffuse.a = g_fAlpha;
     
     if (g_fPlayRatio < 0.5f)
-        Out.vDiffuse.rgb += vDamageColor * g_fPlayRatio;
+        Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, g_fPlayRatio);
     else if (g_fPlayRatio < 1.f)
-        Out.vDiffuse.rgb += vDamageColor * (1 - g_fPlayRatio);
+        Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, (1 - g_fPlayRatio));
+    
+    if (0.1 > Out.vDiffuse.a)
+        discard;
     
     return Out;
 }
@@ -154,10 +158,10 @@ PS_OUT PS_JACK(PS_IN In)
     Out.vPlayerDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fCamFar, 0.0f, 0.0f);
    
     if (g_fPlayRatio < 0.5f)
-        Out.vDiffuse.rgb += vDamageColor * g_fPlayRatio;
+        Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, g_fPlayRatio);
     else if (g_fPlayRatio < 1.f)
-        Out.vDiffuse.rgb += vDamageColor * (1 - g_fPlayRatio);
-    
+        Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, (1 - g_fPlayRatio));
+
     return Out;
 }
 
@@ -175,9 +179,9 @@ PS_OUT PS_SOLDIER(PS_IN In)
     Out.vDiffuse.a = g_fAlpha;
     
     if (g_fPlayRatio < 0.5f)
-        Out.vDiffuse.rgb += vDamageColor * g_fPlayRatio;
+        Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, g_fPlayRatio);
     else if (g_fPlayRatio < 1.f)
-        Out.vDiffuse.rgb += vDamageColor * (1 - g_fPlayRatio);
+        Out.vDiffuse.rgb += vDamageColor * smoothstep(0.0f, 1.0f, (1 - g_fPlayRatio));
     
     if (0.1 > Out.vDiffuse.a)
         discard;
@@ -227,7 +231,7 @@ technique11 DefaultTechnique
     {
         SetRasterizerState(RS_NoCull);
         SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;

@@ -73,6 +73,9 @@ void CLightningEffects::Tick(_float fTimeDelta)
 		Add_ElecParts();
 		Add_Collider();
 		m_bAddElecParts = false;
+
+		m_pGameInstance->StopSound(SKILL0);
+		m_pGameInstance->Play_Sound(TEXT("Lightning2.mp3"), SKILL0, 0.5f);
 	}
 
 	for (_int i = 0; i < 2; i++) {

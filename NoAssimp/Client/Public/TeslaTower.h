@@ -36,6 +36,7 @@ private:
 	CGameObject* Add_ElecChain(LEVEL eLevel, _float4x4 _matWorld, _fvector vReactorPos, _uint iChainIndex);
 
 	void Add_DestroyEffect();
+	void Add_RockParticles();
 
 private:
 	_uint m_iNumElecChains = 6;

@@ -64,6 +64,7 @@ void CElecArena::Tick(_float fTimeDelta)
 		if (m_bAddElecParts) {
 			Add_ElecParts();
 			m_bAddElecParts = false;
+			m_pGameInstance->Play_Sound(TEXT("ElecArena.mp3"), SKILL0, 0.85f);
 		}
 	}
 

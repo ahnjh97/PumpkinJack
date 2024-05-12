@@ -178,6 +178,9 @@
     <Filter Include="01. Utility\02. Components\Model\Mesh\QuadTreeCell">
       <UniqueIdentifier>{f5ea8e33-e69f-4212-88f7-863cee9af071}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\12. Sound">
+      <UniqueIdentifier>{12a9e9de-2ae5-476a-bef5-2f75b4ff10d7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -365,6 +368,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\QuadTree_Terrain.cpp">
       <Filter>01. Utility\02. Components\VIBuffer\Terrain\QuadTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Sound_Manager.cpp">
+      <Filter>01. Utility\12. Sound</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -568,6 +574,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\QuadTree_Terrain.h">
       <Filter>01. Utility\02. Components\VIBuffer\Terrain\QuadTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Sound_Manager.h">
+      <Filter>01. Utility\12. Sound</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,8 @@
 #include "stdafx.h"
+#include "Level_Loading.h"
 #include "DamageEffect.h"
+#include "FadeInOut.h"
+#include "ShockWave.h"
 #include "ElecArena.h"
 #include "Collider.h"
 #include "Bullets.h"
@@ -113,7 +116,7 @@ void CPlayer::Tick(_float fTimeDelta)
 	if (m_pGameInstance->KeyDown(DIK_1))
 		Deduct_HP(20);
 	if(m_pGameInstance->KeyDown(DIK_2))
-		Deduct_HP(-20);
+		Deduct_HP(-100);
 
 	if (m_iHp <= 0)
 		m_iHp = 0;
@@ -166,6 +169,7 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	Check_GoToSlimeBossRoom();
 	Check_GoBackUp();
+	Check_ShockWaveColliders();
 
 	if (!m_bIsRolling)
 		m_fRollEndTime += fTimeDelta;
@@ -218,13 +222,17 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	Get_WeaponPtr()->SavePlayerPos(m_pTransformCom->Get_Pos_Vector());
 
+	if (true == Check_Cauldron())
+		m_eState = DRINK;
+
 	for (auto& Pair : m_Parts)
 		Pair.second->Tick(fTimeDelta);
 
 	if (*m_pCurLevel == LEVEL_WIZARD && m_pGameInstance->KeyDown(DIK_3))
 		m_pTransformCom->Set_Pos(XMVectorSet(580, 10, 555, 1));
 
-	m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
+	if(m_pColliderCom != nullptr)
+		m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
 }
 
 void CPlayer::Late_Tick(_float fTimeDelta)
@@ -249,7 +257,7 @@ void CPlayer::Late_Tick(_float fTimeDelta)
 
 	if (m_iPreHp > m_iHp)
 		DamageEffect();
-
+		
 	m_bPreInSlimeBossRoom = m_bInSlimeBossRoom;
 	m_bPreIsPushingKart = m_bIsPushingKart;
 	m_iPreHp = m_iHp;
@@ -264,7 +272,11 @@ HRESULT CPlayer::Render()
 	if (m_pNavigationCom[m_eNavigation] != nullptr && m_pGameInstance->Get_NavigationMode() == true)
 		m_pNavigationCom[m_eNavigation]->Render();
 #endif
-
+	if (true == m_bChangeLevel) {
+		if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL(*m_pCurLevel + 1)))))
+			return E_FAIL;
+	}
+		
 	return S_OK;
 }
 
@@ -311,9 +323,12 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 		Reset_WeaponCollider(m_eWeapon);
 	}
 
-	if (m_pGameInstance->KeyDown(DIK_LCONTROL) && !m_bIsAttacking && !m_bIsJumping && !m_bIsPushingKart) {
+	if (m_pGameInstance->KeyDown(DIK_LCONTROL) && !m_bIsAttacking && !m_bIsJumping && !m_bIsPushingKart && !m_bIsRolling) {
 		m_eState = ROLL;
 		m_bIsRolling = true;
+		m_pGameInstance->StopSound(VOICE0);
+		wstring wstrSoundKey = TEXT("Jack") + to_wstring(m_pGameInstance->RandomNumber(0, 4)) + TEXT(".mp3");
+		m_pGameInstance->Play_Sound(const_cast<TCHAR*>(wstrSoundKey.c_str()), VOICE0, 0.5f);
 	}
 
 	if(m_eState == ROLL)
@@ -322,7 +337,7 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 	if ((m_pGameInstance->Get_DIKeyState(DIK_W) & 0x80) || (m_pGameInstance->Get_DIKeyState(DIK_S) & 0x80)
 		|| (m_pGameInstance->Get_DIKeyState(DIK_A) & 0x80) || (m_pGameInstance->Get_DIKeyState(DIK_D) & 0x80))
 	{
-		if (!m_bIsAttacking && !m_bIsRolling && !m_bIsPushingKart)
+		if (!m_bIsAttacking && !m_bIsRolling && !m_bIsPushingKart && m_eState != DRINK)
 		{
 			if(m_bIsJumping)
 				m_pTransformCom->Move(fTimeDelta * 0.85f, ::XMLoadFloat3(&m_vDirection), m_pNavigationCom[m_eNavigation]);
@@ -341,6 +356,11 @@ void CPlayer::OnKeyInput(_float fTimeDelta)
 		m_iJumpCount--;
 		pBodyModel->Reset_Animation(m_vecWeaponName[m_eWeapon] + "_Jump");
 		Add_JumpEffect();
+		m_pGameInstance->StopSound(VOICE0);
+		if(1 == m_iJumpCount)
+			m_pGameInstance->Play_Sound(TEXT("Jack1.mp3"), VOICE0, 0.5f);
+		else if(0 == m_iJumpCount)
+			m_pGameInstance->Play_Sound(TEXT("Jack2.mp3"), VOICE0, 0.5f);
 	}
 
 	if (m_pGameInstance->MouseDown(DIMKS_LBUTTON) && !m_bIsAttacking && !m_bIsRolling && !m_bIsPushingKart)
@@ -456,12 +476,15 @@ void CPlayer::Link_Animation()
 			m_bIsAttacking = false;
 			m_eState = IDLE;
 		}
-			
+		
 		m_pTransformCom->AirAttack_End();
 	}
 		
 	else if ((m_eState == AIR_ATTACK_END || m_eState == ATTACK1 || m_eState == ATTACK2 || m_eState == ATTACK3 || m_eState == ROLL_ATTACK) && pBody->Get_IsFinished())
 		m_bIsAttacking = false;
+
+	if (m_eState == DRINK && pBody->Get_IsFinished())
+		m_bChangeLevel = true;
 }
 
 _bool CPlayer::Check_TerrainCol()
@@ -729,8 +752,36 @@ _bool CPlayer::Check_GroundCells(_Out_ _float& _fMinHeight, _Out_ _float& _fMaxH
 	return true;
 }
 
+_bool CPlayer::Check_Cauldron()
+{
+	CGameObject* pCauldron = m_pGameInstance->Get_GameObject(*m_pCurLevel, TEXT("Layer_Cauldron"), TEXT("Prototype_GameObject_Cauldron"));
+	if (nullptr == pCauldron)
+		return false;
+
+	CTransform* pCauldronTransform = dynamic_cast<CTransform*>(pCauldron->Get_Component(g_strTransformTag));
+	if (nullptr == pCauldronTransform)
+		return false;
+
+	_vector vCauldronPos = pCauldronTransform->Get_Pos_Vector();
+	_vector vPos = m_pTransformCom->Get_Pos_Vector();
+	
+	_float fDis = XMVectorGetX(XMVector4Length(vCauldronPos - vPos));
+	
+	if (fDis <= 6.5f) {
+		m_pTransformCom->Look_At_ForLandObject(vCauldronPos);
+		return true;
+	}
+		
+	return _bool();
+}
+
 void CPlayer::Check_GoToSlimeBossRoom()
 {
+	if (m_fHighFallTime >= 0.6f && true == m_bAddFadeInOut) {
+		Add_FadeInOut();
+		m_bAddFadeInOut = false;
+	}
+		
 	if (m_fHighFallTime >= 1.7f)
 	{
 		_vector vSlimeBossRoom = ::XMVectorSet(205, -145, 150, 1);
@@ -744,6 +795,8 @@ void CPlayer::Check_GoToSlimeBossRoom()
 			m_pNavigationCom[m_eNavigation]->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 			m_pNavigationCom[m_eNavigation]->Get_PlaneHeight(m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION));
 		}
+
+		m_pGameInstance->StopSound(SKILL0);
 	}
 }
 
@@ -767,19 +820,34 @@ void CPlayer::Check_GoBackUp()
 			}
 		}
 
-		if (bNullPointers == true)
-		{
-			m_bInSlimeBossRoom = false;
-			m_iSlimeBossRoomEscapeCount++;
-			m_eNavigation = DEFAULT;
+		if (false == bNullPointers)
+			return;
 
-			if(m_pNavigationCom[m_eNavigation] != nullptr)	// curCell 다시검사
-				m_pNavigationCom[m_eNavigation]->Find_CurrentIndex(vTeleportPos);
+		CGameObject* pFadeInOut = m_pGameInstance->Get_GameObject(*m_pCurLevel, TEXT("Layer_FadeInOut"), TEXT("Prototype_GameObject_FadeInOut"));
+		if (nullptr == pFadeInOut) {
+			Add_FadeInOut();
+			return;
+		}
 
-			_float4 vPosFloat{};
-			::XMStoreFloat4(&vPosFloat, vTeleportPos);
-			vPosFloat.y = m_pNavigationCom[m_eNavigation]->Get_PlaneHeight(vPosFloat);
-			m_pTransformCom->Set_Pos(vPosFloat);
+		if (nullptr != pFadeInOut) {
+			CFadeInOut* pFadeInOutEffect = dynamic_cast<CFadeInOut*>(pFadeInOut);
+			_float fPlayRatio = pFadeInOutEffect->Get_PlayRatio();
+
+			if (fPlayRatio > 0.5f) {
+  				m_bInSlimeBossRoom = false;
+				m_iSlimeBossRoomEscapeCount++;
+				m_eNavigation = DEFAULT;
+
+				if (m_pNavigationCom[m_eNavigation] != nullptr)	// curCell 다시검사
+					m_pNavigationCom[m_eNavigation]->Find_CurrentIndex(vTeleportPos);
+
+				_float4 vPosFloat{};
+				::XMStoreFloat4(&vPosFloat, vTeleportPos);
+				vPosFloat.y = m_pNavigationCom[m_eNavigation]->Get_PlaneHeight(vPosFloat);
+				m_pTransformCom->Set_Pos(vPosFloat);
+
+				m_bAddFadeInOut = true;
+			}
 		}
 	}
 }
@@ -945,7 +1013,7 @@ void CPlayer::Activate_Weapon()
 		_bool bAttack = { false };
 
 		if (ATTACK1 == m_eState) {
-			if (fAnimPlayRatio > 0.24f && fAnimPlayRatio < 0.28f)
+			if (fAnimPlayRatio > 0.25f && fAnimPlayRatio < 0.3f)
 				bAttack = true;
 		}
 		else if (ATTACK2 == m_eState) {
@@ -976,6 +1044,8 @@ void CPlayer::Activate_Weapon()
 
 			if (true == m_bAddBullets) {
 				Add_Bullets(XMLoadFloat3(&m_vDirection));
+				m_pGameInstance->StopSound(PLAYER);
+				m_pGameInstance->Play_Sound(TEXT("Rifle.mp3"), PLAYER, 0.12f);
 				m_bAddBullets = false;
 			}
 		}
@@ -1003,6 +1073,7 @@ void CPlayer::Activate_Weapon()
 				pWeapon->Activate_WeaponCollider();
 		}
 		else if (ROLL_ATTACK == m_eState) {
+			_bool bPlaySound = { false };
 			if ((fAnimPlayRatio > 0.15f && fAnimPlayRatio < 0.7f))
 				pWeapon->Activate_WeaponCollider();
 
@@ -1010,17 +1081,24 @@ void CPlayer::Activate_Weapon()
 				if (m_bScytheRifleRollAttack) {
 					pWeapon->Reset_Damagable();
 					m_bScytheRifleRollAttack = false;
+					bPlaySound = true;
 				}
 			}
 
-			else if (fAnimPlayRatio > 0.4f && fAnimPlayRatio < 0.45f) {
+			else if (fAnimPlayRatio > 0.375f && fAnimPlayRatio < 0.425f) {
 				if (!m_bScytheRifleRollAttack) {
 					pWeapon->Reset_Damagable();
 					m_bScytheRifleRollAttack = true;
+					bPlaySound = true;
 				}
 			}
 			else if (fAnimPlayRatio > 0.7f)
 				m_bScytheRifleRollAttack = true;
+
+			if (true == bPlaySound)	{
+				/*m_pGameInstance->StopSound(PLAYER);
+				m_pGameInstance->Play_Sound(TEXT("Woosh0.mp3"), PLAYER, 0.5f);*/
+			}
 		}
 	}
 }
@@ -1160,6 +1238,71 @@ void CPlayer::Add_Bullets(_fvector vDir)
 	tDesc.matWorld._32 = tDesc.vPlayerLook.y;
 	tDesc.matWorld._33 = tDesc.vPlayerLook.z;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurLevel, TEXT("Layer_AttackEffect"), TEXT("Prototype_GameObject_Bullets"), &tDesc)))
+		return;
+}
+
+void CPlayer::Check_ShockWaveColliders()
+{
+	if (LEVEL_SLIMEBOSS != *m_pCurLevel)
+		return;
+
+	if (true == m_bInSlimeBossRoom)
+		return;
+
+	list<CGameObject*> shockWaveList = m_pGameInstance->Get_ObjectList(LEVEL_SLIMEBOSS, TEXT("Layer_ShockWave"));
+	if (shockWaveList.empty())
+		return;
+
+	_bool bCollided = { false };
+	_int iShockWaveIndex = { -1 };
+	for (auto& shockWave : shockWaveList)
+	{
+		if (nullptr == shockWave)
+			continue;
+
+		CCollider* pShockWaveCollider = dynamic_cast<CCollider*>(shockWave->Get_Component(TEXT("Com_Collider")));
+		if (nullptr == pShockWaveCollider)
+			continue;
+
+		if (true == pShockWaveCollider->Get_Disabled())
+			continue;
+
+		if (true == m_pColliderCom->Intersect(pShockWaveCollider)) {
+			bCollided = true;
+			CShockWave* pShockWave = dynamic_cast<CShockWave*>(shockWave);
+			iShockWaveIndex = pShockWave->Get_ShockWaveIndex();
+			Deduct_HP(10); // 플레이어 체력감소
+			pShockWaveCollider->Set_Disabled(true);
+			break;
+		}
+	}
+
+	if (-1 == iShockWaveIndex)
+		return;
+
+	for (auto& shockWave : shockWaveList)
+	{
+		if (nullptr == shockWave)
+			continue;
+
+		CShockWave* pShockWave = dynamic_cast<CShockWave*>(shockWave);
+		if (iShockWaveIndex == pShockWave->Get_ShockWaveIndex())
+		{
+			CCollider* pShockWaveCollider = dynamic_cast<CCollider*>(shockWave->Get_Component(TEXT("Com_Collider")));
+			if (nullptr == pShockWaveCollider)
+				continue;
+
+			pShockWaveCollider->Set_Disabled(true);
+		}	
+	}
+}
+
+void CPlayer::Add_FadeInOut()
+{
+	CGameObject::GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = *m_pCurLevel;
+
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurLevel, TEXT("Layer_FadeInOut"), TEXT("Prototype_GameObject_FadeInOut"), &tDesc)))
 		return;
 }
 

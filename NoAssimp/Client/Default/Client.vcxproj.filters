@@ -256,6 +256,21 @@
     <Filter Include="02.GameObjects\Level_SlimeBoss\SlimeBoss\ShockWave">
       <UniqueIdentifier>{a92e9564-c30e-4255-9152-4851c5b22153}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effects\RockParticles">
+      <UniqueIdentifier>{addd641e-22a2-40dc-aade-4d80000b827e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effects\FadeInOut">
+      <UniqueIdentifier>{a48f88ea-8333-4142-aac4-44aeef67a6e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_SlimeBoss\SlimeBoss\ChargeEffect">
+      <UniqueIdentifier>{644c1a7b-9f9f-49ee-b198-81301c50edf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Level_SlimeBoss\SlimeBoss\ChargeCenter">
+      <UniqueIdentifier>{033e48fd-a724-4479-839d-c3249de0db2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Cauldron">
+      <UniqueIdentifier>{849e876d-e561-48c7-ac5d-0e2a8b9ae410}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -507,6 +522,21 @@
     <ClInclude Include="..\Public\ShockWave.h">
       <Filter>02.GameObjects\Level_SlimeBoss\SlimeBoss\ShockWave</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\RockParticles.h">
+      <Filter>02.GameObjects\Effects\RockParticles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FadeInOut.h">
+      <Filter>02.GameObjects\Effects\FadeInOut</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ChargeEffect.h">
+      <Filter>02.GameObjects\Level_SlimeBoss\SlimeBoss\ChargeEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ChargeCenter.h">
+      <Filter>02.GameObjects\Level_SlimeBoss\SlimeBoss\ChargeCenter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Cauldron.h">
+      <Filter>02.GameObjects\Cauldron</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -748,6 +778,21 @@
     </ClCompile>
     <ClCompile Include="..\Private\ShockWave.cpp">
       <Filter>02.GameObjects\Level_SlimeBoss\SlimeBoss\ShockWave</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RockParticles.cpp">
+      <Filter>02.GameObjects\Effects\RockParticles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FadeInOut.cpp">
+      <Filter>02.GameObjects\Effects\FadeInOut</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ChargeEffect.cpp">
+      <Filter>02.GameObjects\Level_SlimeBoss\SlimeBoss\ChargeEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ChargeCenter.cpp">
+      <Filter>02.GameObjects\Level_SlimeBoss\SlimeBoss\ChargeCenter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Cauldron.cpp">
+      <Filter>02.GameObjects\Cauldron</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

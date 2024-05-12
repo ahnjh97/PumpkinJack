@@ -53,6 +53,11 @@ void CDash::Tick(_float fTimeDelta)
 	m_fTime += fTimeDelta;
 
 	if (m_fTime > 0.15f) {
+		if (0 == m_iSpriteIndex) {
+			m_pGameInstance->StopSound(PLAYER);
+			m_pGameInstance->Play_Sound(TEXT("Dash.mp3"), PLAYER, 0.45f);
+		}
+			
 		m_iSpriteIndex++;
 		m_fTime = 0.f;
 	}

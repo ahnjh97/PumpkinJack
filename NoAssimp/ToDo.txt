@@ -1,9 +1,2 @@
-- SBR_Pillars RockParticles
-- TeslaTower RockParticles
-- ShockWave Collider
-
-- Make Light Darker, Add Point Lighting
-
-5/10~5/12
-- Fmod, Sound
-- Video Recording
+- Level Change Event
+- Kart Particles

@@ -68,16 +68,12 @@ void CWizard::Tick(_float fTimeDelta)
 
 	m_fPlayRatio = m_fTime / m_fEndTime;
 	if (m_fPlayRatio > 1.f)
-		m_fPlayRatio = 1.f;
-
-	if (WIZARD_DIE == m_eState && m_pModelCom->isFinished()) {
-		Set_Dead();
-		return;
-	}				
+		m_fPlayRatio = 1.f;			
 
 	Check_WizardHp();
 
-	TurnTowards_Player();
+	if(WIZARD_DIE != m_eState)
+		TurnTowards_Player();
 	Link_State(fTimeDelta);
 	StateToAnimation();
 
@@ -94,6 +90,9 @@ void CWizard::Late_Tick(_float fTimeDelta)
 	if (m_iPreHp != m_iHp) {
 		if (m_fTime >= 0.3f)
 			m_fTime = 0.f;
+
+		m_pGameInstance->StopSound(ENEMY0);
+		m_pGameInstance->Play_Sound(TEXT("Hit1.mp3"), ENEMY0, 0.55f);
 	}
 
 	m_pModelCom->Play_Animation(fTimeDelta);
@@ -174,6 +173,20 @@ void CWizard::Check_WizardHp()
 
 void CWizard::Link_State(_float fTimeDelta)
 {
+	if (WIZARD_DIE == m_eState)	{
+		if (m_pModelCom->isFinished())
+		{
+			m_fDeathTime += fTimeDelta;
+
+			if (m_fAlpha <= 0.f)
+				Set_Dead();
+
+			// 알파값을 점점 감소
+			m_fAlpha -= exp(m_fDeathTime * fTimeDelta * 5.f) * fTimeDelta;
+		}
+		return;
+	}
+
 	if (m_fStartTime < 5.f) {
 		m_eState = WIZARD_AIR_IDLE;
 		return;
@@ -474,7 +487,7 @@ void CWizard::Tornado()
 
 void CWizard::HoleWall()
 {
-	_int iAngleX = m_pGameInstance->RandomNumber(7, 38);
+	_int iAngleX = m_pGameInstance->RandomNumber(7, 20);
 	_int iAngleY = m_pGameInstance->RandomNumber(-20, 20);
 	_matrix matRotX = XMMatrixRotationX(XMConvertToRadians(iAngleX));
 	_matrix matRotY = XMMatrixRotationY(XMConvertToRadians(iAngleY));
@@ -678,7 +691,8 @@ HRESULT CWizard::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fPlayRatio", &m_fPlayRatio, sizeof(_float))))
 		return E_FAIL;
-
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+		return E_FAIL;
 	return S_OK;
 }
 

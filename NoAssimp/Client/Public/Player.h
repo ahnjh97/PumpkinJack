@@ -56,6 +56,7 @@ private:
 	_bool Check_SlimeBossPortalCol(_float fTimeDelta);
 	_bool Check_Kart();
 	_bool Check_GroundCells(_Out_ _float& _fMinHeight, _Out_ _float& _fMaxHeight);
+	_bool Check_Cauldron();
 
 	void Check_GoToSlimeBossRoom();
 	void Check_GoBackUp();
@@ -72,6 +73,8 @@ private:
 	void Add_JumpEffect();
 	void Add_Slash(_fvector vDir);
 	void Add_Bullets(_fvector vDir);
+	void Check_ShockWaveColliders();
+	void Add_FadeInOut();
 
 private:
 	STATE m_eState = { PLAYER_END };
@@ -96,6 +99,8 @@ private:
 	_bool m_bIsDashDirDetermined = { false };
 	_bool m_bAddSlash = { false };
 	_bool m_bAddBullets = { false };
+	_bool m_bAddFadeInOut = { true };
+	_bool m_bChangeLevel = { false };
 
 	_uint m_iJumpCount = { 2 };
 	_uint m_iSlimeBossRoomEscapeCount = {};

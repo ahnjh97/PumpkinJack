@@ -298,6 +298,9 @@ void CSlime::Add_SlimeParticles()
 	tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_SlimeParticles"), TEXT("Prototype_GameObject_SlimeParticles"), &tDesc)))
 		return;
+
+	m_pGameInstance->StopSound(ENEMY1);
+	m_pGameInstance->Play_Sound(TEXT("KnifeHit.mp3"), ENEMY1, 0.45f);
 }
 
 HRESULT CSlime::Add_Components(const wstring& _wstrModelTag)

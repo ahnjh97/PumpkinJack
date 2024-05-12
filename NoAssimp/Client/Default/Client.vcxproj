@@ -172,6 +172,9 @@
     <ClInclude Include="..\Public\Bullets.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
     <ClInclude Include="..\Public\Camera_Jack.h" />
+    <ClInclude Include="..\Public\Cauldron.h" />
+    <ClInclude Include="..\Public\ChargeCenter.h" />
+    <ClInclude Include="..\Public\ChargeEffect.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\CollisionCube.h" />
     <ClInclude Include="..\Public\CrateBox.h" />
@@ -181,6 +184,7 @@
     <ClInclude Include="..\Public\ElecChain.h" />
     <ClInclude Include="..\Public\ElecParts.h" />
     <ClInclude Include="..\Public\Explosion.h" />
+    <ClInclude Include="..\Public\FadeInOut.h" />
     <ClInclude Include="..\Public\Grid.h" />
     <ClInclude Include="..\Public\HitEffect.h" />
     <ClInclude Include="..\Public\HoleWall.h" />
@@ -209,6 +213,7 @@
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\Portal.h" />
     <ClInclude Include="..\Public\Rail.h" />
+    <ClInclude Include="..\Public\RockParticles.h" />
     <ClInclude Include="..\Public\ShockWave.h" />
     <ClInclude Include="..\Public\SkullCrossBow.h" />
     <ClInclude Include="..\Public\Sky.h" />
@@ -257,6 +262,9 @@
     <ClCompile Include="..\Private\Bullets.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Camera_Jack.cpp" />
+    <ClCompile Include="..\Private\Cauldron.cpp" />
+    <ClCompile Include="..\Private\ChargeCenter.cpp" />
+    <ClCompile Include="..\Private\ChargeEffect.cpp" />
     <ClCompile Include="..\Private\CollisionCube.cpp" />
     <ClCompile Include="..\Private\CrateBox.cpp" />
     <ClCompile Include="..\Private\DamageEffect.cpp" />
@@ -265,6 +273,7 @@
     <ClCompile Include="..\Private\ElecChain.cpp" />
     <ClCompile Include="..\Private\ElecParts.cpp" />
     <ClCompile Include="..\Private\Explosion.cpp" />
+    <ClCompile Include="..\Private\FadeInOut.cpp" />
     <ClCompile Include="..\Private\Grid.cpp" />
     <ClCompile Include="..\Private\HitEffect.cpp" />
     <ClCompile Include="..\Private\HoleWall.cpp" />
@@ -293,6 +302,7 @@
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\Portal.cpp" />
     <ClCompile Include="..\Private\Rail.cpp" />
+    <ClCompile Include="..\Private\RockParticles.cpp" />
     <ClCompile Include="..\Private\ShockWave.cpp" />
     <ClCompile Include="..\Private\SkullCrossBow.cpp" />
     <ClCompile Include="..\Private\Sky.cpp" />

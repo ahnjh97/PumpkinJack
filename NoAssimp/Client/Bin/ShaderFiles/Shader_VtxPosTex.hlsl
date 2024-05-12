@@ -300,9 +300,9 @@ PS_OUT PS_DAMAGE(PS_IN In)
     float fAlpha;
     
     if (g_fPlayRatio < 0.5f)
-        fAlpha = g_fPlayRatio * 2.f;
+        fAlpha = smoothstep(0.0f, 1.0f, g_fPlayRatio * 2.f);
     else
-        fAlpha = 1 - (g_fPlayRatio - 0.5f) * 2.f;
+        fAlpha = smoothstep(0.0f, 1.0f, 1 - (g_fPlayRatio - 0.5f) * 2.f);
     
     Out.vColor.a *= fAlpha;
     
@@ -371,6 +371,58 @@ PS_OUT PS_SWIPEEFFECT(PS_IN In)
     if (Out.vColor.a == 0.0f)
         discard;
 	
+    return Out;
+}
+
+PS_OUT PS_FADEINOUT(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    Out.vColor = vector(1, 1, 1, 1);
+
+    float fAlpha;
+    
+    if (g_fPlayRatio < 0.5f)
+        fAlpha = smoothstep(0.0f, 1.0f, g_fPlayRatio * 2.f);
+    else
+        fAlpha = smoothstep(0.0f, 1.0f, 1 - (g_fPlayRatio - 0.5f) * 2.f);
+    
+    Out.vColor.a *= fAlpha;
+    
+    if (g_fPlayRatio >= 1.f || 0.f >= Out.vColor.a)
+        discard;
+    
+    return Out;
+}
+
+PS_OUT PS_CHARGECENTER(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    float fMask = g_NoiseTexture.Sample(LinearSampler, In.vTexcoord).r;
+    if (0.2f >= fMask)
+        discard;
+    
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    
+    float4 color = Out.vColor;
+    if ((color.r > color.g) && (color.r + color.g > color.b * 1.5))
+    {
+        float greenEnhanced = (color.r + color.g) * 0.5;
+        float brightness = (color.r + color.g + color.b) / 3;
+        float whiteComponent = brightness * 0.5; //
+    
+        Out.vColor = vector(whiteComponent, greenEnhanced, whiteComponent, fMask);
+        //Out.vColor.rgb *= 0.85f;
+        //Out.vColor.a *= 0.8f;
+        
+        if (Out.vColor.a <= 0.2f)
+            discard;
+    }
+    
+    if (g_fPlayRatio >= 1.f || 0.f >= Out.vColor.a)
+        discard;
+    
     return Out;
 }
 
@@ -518,5 +570,30 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_SWIPEEFFECT();
+    }
+
+    pass FadeInOut // 12
+    {
+        
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_FADEINOUT();
+    }
+
+    pass ChargeCenter // 13
+    {
+        SetRasterizerState(RS_Sky);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_CHARGECENTER();
     }
 }

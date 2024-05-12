@@ -32,6 +32,8 @@ HRESULT CSlash::Initialize(void* pArg)
     m_iWeaponIndex = pGameObjectDesc->eWeapon;
     m_fWaitTime = pGameObjectDesc->fWaitTime;
     m_fEndTime = pGameObjectDesc->fDuration;
+    m_eWeapon = pGameObjectDesc->eWeapon;
+    m_eState = pGameObjectDesc->eState;
 
     _float fScale = 5.f;
     m_pTransformCom->Set_Scaled(fScale, fScale * 0.6f, fScale);
@@ -120,6 +122,28 @@ void CSlash::Tick(_float fTimeDelta)
             m_bEnabled = true;
             m_fTime = 0.f;
             m_fSpriteTime = 0.f;
+
+            m_pGameInstance->StopSound(PLAYER);
+            wstring wstrSoundKey;
+
+            if (true == m_bTurn) {
+
+            }
+            else {
+                if (true == m_bPlaySound) {
+                    if (WPN_SPEAR == m_eWeapon) 
+                        wstrSoundKey = TEXT("ShovelHit") + to_wstring(m_pGameInstance->RandomNumber(0, 2)) + TEXT(".mp3");
+                    else if (WPN_SCYTHE == m_eWeapon) {
+                        if (m_eState == ATTACK1 || m_eState == ATTACK2 || m_eState == ATTACK3)
+                            wstrSoundKey = TEXT("Scythe") + to_wstring(m_eState - ATTACK1) + TEXT(".mp3");
+                        else if (m_eState == AIR_ATTACK)
+                            wstrSoundKey = TEXT("Scythe1.mp3");
+                    }
+                   
+                    m_pGameInstance->Play_Sound(const_cast<TCHAR*>(wstrSoundKey.c_str()), PLAYER, 0.25f);
+                    m_bPlaySound = false;
+                }
+            }
         }
     }
         
@@ -128,9 +152,14 @@ void CSlash::Tick(_float fTimeDelta)
         if (m_pPlayerWorldMat != nullptr) 
             m_pTransformCom->Set_Pos(XMVectorSet(m_pPlayerWorldMat->_41, m_pPlayerWorldMat->_42, m_pPlayerWorldMat->_43, 1) + m_vOffset);
         
-        if (true == m_bTurn) 
+        if (true == m_bTurn) {
             m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), fTimeDelta * 15.5f);
-    
+            if (true == m_bPlaySound && m_iSpriteIndex <= 5) {
+                m_pGameInstance->Play_Sound(TEXT("Spin3.mp3"), PLAYER, 0.55f);
+                m_bPlaySound = false;
+            }
+        }
+           
         if (m_fSpriteTime >= m_fEndTime / 6.f) {
             m_iSpriteIndex--;
             m_fSpriteTime = 0.f;

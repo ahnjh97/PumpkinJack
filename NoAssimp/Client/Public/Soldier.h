@@ -51,6 +51,8 @@ private:
 	_bool m_bResetSpinAttack = { true };
 	_bool m_bDeathEffect = { true };
 	_bool m_bResetSoldierSlash = { false };
+	_bool m_bPlayLandSound = { true };
+	_bool m_bPlayAttackSound = { true };
 
 	_uint m_iDamage = { };
 	

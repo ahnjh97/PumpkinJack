@@ -41,6 +41,9 @@ HRESULT CArrow::Initialize(void* pArg)
 	if (FAILED(Add_PartObjects(LEVEL(GameObjectDesc.iLevel))))
 		return E_FAIL;
 
+	m_pGameInstance->StopSound(SKILL0);
+	m_pGameInstance->Play_Sound(TEXT("Woosh2.mp3"), SKILL0, 0.15f);
+
 	return S_OK;
 }
 
@@ -50,14 +53,20 @@ void CArrow::Tick(_float fTimeDelta)
 		Set_Dead();
 
 	m_fTime += fTimeDelta;
-	m_fAccSpeed += exp(m_fTime * fTimeDelta * 0.005f) * fTimeDelta * 10.8f;
+	m_fAccSpeed += exp(m_fTime * fTimeDelta * 0.005f) * fTimeDelta * 5.5f;
 	if (m_fCollisionTime < 0.01f) {
 		if(m_iLevel == LEVEL_GAMEPLAY)
 			m_pTransformCom->Go_Straight(m_fAccSpeed * 0.056f);
 	}
-	else
+	else {
 		m_fAlpha -= exp(m_fTime * 0.12f) * fTimeDelta;
-	
+		if (true == m_bPlayHitSound) {
+			m_pGameInstance->StopSound(SYSTEM_EFFECT2);
+			m_pGameInstance->Play_Sound(TEXT("Hit1.mp3"), SYSTEM_EFFECT2, 0.08f);
+			m_bPlayHitSound = false;
+		}
+	}
+		
 	if (m_bObstacleCol)
 		m_fCollisionTime += fTimeDelta;
 

@@ -5,6 +5,7 @@
 #include "RenderTarget_Manager.h"
 #include "CoordConverter.h"
 #include "Object_Manager.h"
+#include "Sound_Manager.h"
 #include "Level_Manager.h"
 #include "Timer_Manager.h"
 #include "ImGui_Manager.h"
@@ -88,6 +89,12 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	m_pCoordConverter = CCoordConverter::Create(*ppDevice, *ppContext);
 	if (nullptr == m_pCoordConverter)
 		return E_FAIL;
+
+	m_pSound_Manager = CSound_Manager::Create();
+	if (nullptr == m_pSound_Manager){
+		MB("Failed to Create : CInput_Manager");
+		return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -498,6 +505,9 @@ _float4 CGameInstance::Get_CamPosition_Float4() const
 
 void CGameInstance::Transform_PickingToLocalSpace(const CTransform* pTransform, _float3* pRayDir, _float3* pRayPos)
 {
+	if (nullptr == m_pPicking)
+		return;
+
 	m_pPicking->Transform_PickingToLocalSpace(pTransform, pRayDir, pRayPos);
 }
 
@@ -651,6 +661,86 @@ void CGameInstance::TransformFrustum_LocalSpace(_fmatrix WorldMatrixInv)
 		m_pFrustum->Transform_LocalSpace(WorldMatrixInv);
 }
 
+_int CGameInstance::SetVolume(CHANNELID eID, _float _vol)
+{
+	if (m_pSound_Manager == nullptr)
+		return _int();
+
+	return m_pSound_Manager->SetVolume(eID, _vol);
+}
+
+_int CGameInstance::VolumeUp(CHANNELID eID, _float _vol)
+{
+	if (m_pSound_Manager == nullptr)
+		return _int();
+
+	return m_pSound_Manager->VolumeUp(eID, _vol);
+}
+
+_int CGameInstance::VolumeDown(CHANNELID eID, _float _vol)
+{
+	if (m_pSound_Manager == nullptr)
+		return _int();
+
+	return m_pSound_Manager->VolumeDown(eID, _vol);
+}
+
+_int CGameInstance::VolumeMin(CHANNELID eID)
+{
+	if (m_pSound_Manager == nullptr)
+		return _int();
+
+	return m_pSound_Manager->VolumeMin(eID);
+}
+
+_int CGameInstance::BGMVolumeUp(_float _vol)
+{
+	if (m_pSound_Manager == nullptr)
+		return _int();
+
+	return m_pSound_Manager->BGMVolumeUp(_vol);
+}
+
+_int CGameInstance::BGMVolumeDown(_float _vol)
+{
+	if (m_pSound_Manager == nullptr)
+		return _int();
+
+	return m_pSound_Manager->BGMVolumeDown(_vol);
+}
+
+_int CGameInstance::Pause(CHANNELID eID)
+{
+	if (m_pSound_Manager == nullptr)
+		return _int();
+
+	return m_pSound_Manager->Pause(eID);
+}
+
+void CGameInstance::Play_Sound(TCHAR* pSoundKey, CHANNELID eID, _float _vol)
+{
+	if (m_pSound_Manager != nullptr)
+		return m_pSound_Manager->Play_Sound(pSoundKey, eID, _vol);
+}
+
+void CGameInstance::PlayBGM(TCHAR* pSoundKey)
+{
+	if (m_pSound_Manager != nullptr)
+		return m_pSound_Manager->PlayBGM(pSoundKey);
+}
+
+void CGameInstance::StopSound(CHANNELID eID)
+{
+	if (m_pSound_Manager != nullptr)
+		return m_pSound_Manager->StopSound(eID);
+}
+
+void CGameInstance::StopAll()
+{
+	if (m_pSound_Manager != nullptr)
+		return m_pSound_Manager->StopAll();
+}
+
 string CGameInstance::WstrToStr(const wstring& wstr)
 {
 	wstring_convert<codecvt_utf8<wchar_t>> cnvt;
@@ -695,6 +785,7 @@ void CGameInstance::Release_Engine()
 
 void CGameInstance::Free()
 {
+	Safe_Release(m_pSound_Manager);
 	Safe_Release(m_pFrustum);
 	Safe_Release(m_pCoordConverter);
 	Safe_Release(m_pRenderTarget_Manager);

@@ -46,7 +46,7 @@ HRESULT CSoldier::Initialize(void* pArg)
 		Soldier_AnimSpeed();
 
 	m_pModelCom->Set_Animation(10, false); // SPAWN
-	m_iPreHp = m_iHp = 70;
+	m_iPreHp = m_iHp = 65;
 	m_pNavigationCom->Find_CurrentIndex(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 
 	return S_OK;
@@ -221,9 +221,12 @@ void CSoldier::LinkState(_float fTimeDelta)
 
 	if (m_iPreHp != m_iHp)
 	{
-		if (m_fTime >= 0.5f)
+		if (m_fTime >= 0.5f) {
 			m_fTime = 0.f;
-
+			m_pGameInstance->StopSound(ENEMY0);
+			m_pGameInstance->Play_Sound(TEXT("SoldierHit0.mp3"), ENEMY0, 0.3f);
+		}
+			
 		if (SOLDIER_HIT == m_eState)
 			m_pModelCom->Reset_Animation(string("chevalier_Anim_hit"));
 
@@ -253,8 +256,23 @@ void CSoldier::LinkState(_float fTimeDelta)
 		}
 	}
 
-	if ((m_eState == SOLDIER_ATTACK || m_eState == SOLDIER_SPIN || m_eState == SOLDIER_SPAWN || m_eState == SOLDIER_HIT) && m_pModelCom->isFinished())
+	if (m_eState == SOLDIER_ATTACK && m_pModelCom->Get_AnimPlayRatio() > 0.15f && true == m_bPlayAttackSound) {
+		m_pGameInstance->StopSound(ENEMY0);
+		m_pGameInstance->Play_Sound(TEXT("Woosh0.mp3"), ENEMY0, 0.3f);
+		m_bPlayAttackSound = false;
+	}
+
+	if (m_eState == SOLDIER_SPAWN && m_pModelCom->Get_AnimPlayRatio() > 0.42f && true == m_bPlayLandSound){
+		m_pGameInstance->StopSound(ENEMY0);
+		m_pGameInstance->Play_Sound(TEXT("Land.mp3"), ENEMY0, 0.5f);
+		m_bPlayLandSound = false;
+	}
+
+	if ((m_eState == SOLDIER_ATTACK || m_eState == SOLDIER_SPIN || m_eState == SOLDIER_SPAWN || m_eState == SOLDIER_HIT) && m_pModelCom->isFinished()) {
+		if (m_eState == SOLDIER_ATTACK || m_eState == SOLDIER_SPIN)
+			m_bPlayAttackSound = true;
 		m_eState = SOLDIER_IDLE;
+	}
 }
 
 void CSoldier::StateToAnimation()
@@ -354,6 +372,8 @@ void CSoldier::ActivateSoldierWeapon()
 			if (m_bResetSpinAttack) {
 				pSoldierWeapon->Reset_Damagable();
 				m_bResetSpinAttack = false;
+				m_pGameInstance->StopSound(ENEMY0);
+				m_pGameInstance->Play_Sound(TEXT("Woosh1.mp3"), ENEMY0, 0.3f);
 			}
 		}
 		else if ((fAnimPlayRatio > 0.43f && fAnimPlayRatio < 0.48f) || (fAnimPlayRatio > 0.53f && fAnimPlayRatio < 0.58f)
@@ -361,6 +381,8 @@ void CSoldier::ActivateSoldierWeapon()
 			if (!m_bResetSpinAttack) {
 				pSoldierWeapon->Reset_Damagable();
 				m_bResetSpinAttack = true;
+				m_pGameInstance->StopSound(ENEMY0);
+				m_pGameInstance->Play_Sound(TEXT("Woosh1.mp3"), ENEMY0, 0.3f);
 			}
 		}
 	}

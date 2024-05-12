@@ -34,6 +34,12 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
 	if (nullptr == m_pLoader)
 		return E_FAIL;		
 	Ready_Layer_BackGround();
+
+	if (eNextLevelID == LEVEL_GAMEPLAY || eNextLevelID == LEVEL_SLIMEBOSS || eNextLevelID == LEVEL_WIZARD) {
+		m_pGameInstance->StopSound(BGM);
+		m_pGameInstance->Play_Sound(TEXT("LevelLoading.mp3"), BGM, 0.18f);
+	}
+
 	return S_OK;
 }
 

@@ -190,6 +190,7 @@
     <ClCompile Include="..\Private\QuadTree_Terrain.cpp" />
     <ClCompile Include="..\Private\RenderTarget.cpp" />
     <ClCompile Include="..\Private\RenderTarget_Manager.cpp" />
+    <ClCompile Include="..\Private\Sound_Manager.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Instance.cpp" />
     <ClCompile Include="..\Private\Navigation.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Cell.cpp" />
@@ -259,6 +260,7 @@
     <ClInclude Include="..\Public\QuadTree_Terrain.h" />
     <ClInclude Include="..\Public\RenderTarget.h" />
     <ClInclude Include="..\Public\RenderTarget_Manager.h" />
+    <ClInclude Include="..\Public\Sound_Manager.h" />
     <ClInclude Include="..\Public\VIBuffer_Instance.h" />
     <ClInclude Include="..\Public\Navigation.h" />
     <ClInclude Include="..\Public\VIBuffer_Cell.h" />

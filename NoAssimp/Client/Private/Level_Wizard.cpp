@@ -37,13 +37,19 @@ HRESULT CLevel_Wizard::Initialize()
 	if (FAILED(Ready_Layer_BackGround()))
 		return E_FAIL;
 
-
 	if (FAILED(Ready_LandObject()))
 		return E_FAIL;
 
 	m_InputFile.close();
 
+#ifdef _DEBUG
 	m_pGameInstance->UnHide_ImGui();
+#endif
+
+	m_pGameInstance->StopSound(BGM);
+	m_pGameInstance->PlayBGM(TEXT("LevelWizard.mp3"));
+	m_pGameInstance->SetVolume(BGM, 0.25f);
+
 	return S_OK;
 }
 
@@ -72,8 +78,8 @@ HRESULT CLevel_Wizard::Ready_Lights()
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vAmbient = _float4(0.1f, 0.1f, 0.1f, 1.f);
-	LightDesc.vSpecular = _float4(0.1f, 0.1f, 0.1f, 1.f);
+	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
+	LightDesc.vSpecular = _float4(0.01f, 0.01f, 0.01f, 1.f);
 
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
@@ -226,6 +232,5 @@ CLevel_Wizard* CLevel_Wizard::Create(ID3D11Device* pDevice, ID3D11DeviceContext*
 
 void CLevel_Wizard::Free()
 {
-	//m_pGameInstance->Hide_ImGui();
 	__super::Free();
 }

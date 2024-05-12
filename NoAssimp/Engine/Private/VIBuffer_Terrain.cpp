@@ -4,9 +4,9 @@
 #include "Transform.h"
 
 CVIBuffer_Terrain::CVIBuffer_Terrain(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	: CVIBuffer{ pDevice, pContext }
+	: CVIBuffer{ pDevice, pContext }, m_pGameInstance{ CGameInstance::Get_Instance() }
 {
-
+	Safe_AddRef(m_pGameInstance);
 }
 
 CVIBuffer_Terrain::CVIBuffer_Terrain(const CVIBuffer_Terrain & rhs)
@@ -14,8 +14,10 @@ CVIBuffer_Terrain::CVIBuffer_Terrain(const CVIBuffer_Terrain & rhs)
 	m_iNumVerticesX{rhs.m_iNumVerticesX}, 
 	m_iNumVerticesZ{ rhs.m_iNumVerticesZ }, 
 	m_pVerticesPos{rhs.m_pVerticesPos },
-	m_pQuadTree_Terrain{ rhs.m_pQuadTree_Terrain }
+	m_pQuadTree_Terrain{ rhs.m_pQuadTree_Terrain },
+	m_pGameInstance{rhs.m_pGameInstance}
 {
+	Safe_AddRef(m_pGameInstance);
 	Safe_AddRef(m_pQuadTree_Terrain);
 }
 
@@ -286,6 +288,8 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const wstring& strHeightMapFileP
 
 HRESULT CVIBuffer_Terrain::Initialize(void * pArg)
 {
+
+
 	return S_OK;
 }
 
@@ -444,4 +448,5 @@ void CVIBuffer_Terrain::Free()
 		Safe_Delete_Array(m_pVerticesPos);
 
 	Safe_Release(m_pQuadTree_Terrain);
+	Safe_Release(m_pGameInstance);
 }

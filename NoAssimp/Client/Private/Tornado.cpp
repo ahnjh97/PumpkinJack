@@ -66,6 +66,8 @@ void CTornado::Tick(_float fTimeDelta)
 	m_pTransformCom->Turn(XMVectorSet(0, 1, 0, 0), fTimeDelta * 4.f * m_iTurnDir);
 
 	if (m_bMove) {			
+		m_pGameInstance->Play_Sound(TEXT("Tornado2.mp3"), SKILL1, 0.35f);
+		m_pGameInstance->Play_Sound(TEXT("ElecLoop.mp3"), SKILL2, 0.18f);
 		_float3 vScale = m_pTransformCom->Get_Scaled();
 		if (vScale.x < 15.f)
 			EnlargeTornado(fTimeDelta);

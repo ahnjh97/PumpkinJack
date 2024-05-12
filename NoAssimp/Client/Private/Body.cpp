@@ -63,6 +63,15 @@ void CBody::Tick(_float fTimeDelta)
 		m_fPlayRatio = 1.f;
 
 	StateToAnimation();
+
+	if (*m_pState == DRINK && m_pModelCom->Get_AnimPlayRatio() > 0.4f)
+	{
+		if (true == m_bPlayDrinkSound) {
+			m_pGameInstance->StopSound(VOICE0);
+			m_pGameInstance->Play_Sound(TEXT("Drink.mp3"), VOICE0, 0.8f);
+			m_bPlayDrinkSound = false;
+		}
+	}
 }
 
 void CBody::Late_Tick(_float fTimeDelta)
@@ -172,6 +181,8 @@ void CBody::StateToAnimation()
 
 	if (*m_pState == IDLE && *m_pIsJumping == true)
 		m_pModelCom->Play_FinalFrame(strWeapon + "Jump");
+	else if(*m_pState == DRINK)
+		m_pModelCom->Change_Animation(string("Drinking"), false);
 	else
 		m_pModelCom->Change_Animation(strWeapon + strState, bLoop);
 }

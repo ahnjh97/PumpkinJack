@@ -84,11 +84,22 @@ void CKart::Tick(_float fTimeDelta)
 
 		CGameObject* pBallista = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Ballista"), TEXT("Prototype_GameObject_Ballista"));
 		if (pBallista != nullptr) {
-			pBallista->Set_Dead();
 			Add_Explosion(pBallista);
+			CTransform* pBallistaTransform = dynamic_cast<CTransform*>(pBallista->Get_Component(g_strTransformTag));
+			if (pBallistaTransform != nullptr)
+			{
+				_float4 vBallistaPos = pBallistaTransform->Get_Pos_Float4();
+				GAMEOBJECT_DESC tDesc{};
+				tDesc.iLevel = LEVEL_GAMEPLAY;
+				tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Cauldron");
+				tDesc.matWorld._41 = vBallistaPos.x;
+				tDesc.matWorld._42 = -15;
+				tDesc.matWorld._43 = vBallistaPos.z;
+				m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, TEXT("Layer_Cauldron"), TEXT("Prototype_GameObject_Cauldron"), &tDesc);
+			}
+			pBallista->Set_Dead();
 		}
 			
-
 		CGameObject* pBallistaRotator = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_BallistaRotator"), TEXT("Prototype_GameObject_BallistaRotator"));
 		if (pBallistaRotator != nullptr) {
 			pBallistaRotator->Set_Dead();
@@ -104,6 +115,8 @@ void CKart::Tick(_float fTimeDelta)
 			
 		Set_Dead();
 		Add_Explosion(this);
+		m_pGameInstance->StopSound(SYSTEM_EFFECT);
+		m_pGameInstance->Play_Sound(TEXT("Explosion.mp3"), SYSTEM_EFFECT, 0.5f);
 	}
 
 	for (_int i = 0; i < COLLIDER_END; i++)
@@ -117,7 +130,10 @@ void CKart::Tick(_float fTimeDelta)
 		m_vDirection = ::XMVector3Normalize(m_vFrontDir + m_vRearDir);
 		m_pTransformCom->Move(fTimeDelta, m_vDirection);
 		Turn_Kart(fTimeDelta);
+		m_pGameInstance->Play_Sound(TEXT("Kart.mp3"), SYSTEM_EFFECT3, 0.65f);
 	}
+	else
+		m_pGameInstance->StopSound(SYSTEM_EFFECT3);
 }
 
 void CKart::Late_Tick(_float fTimeDelta)

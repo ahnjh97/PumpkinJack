@@ -34,6 +34,7 @@
 #include "Explosion.h"
 #include "Ballista.h"
 #include "CrateBox.h"
+#include "Cauldron.h"
 #include "Trigger.h"
 #include "Soldier.h"
 #include "Arrow.h"
@@ -45,10 +46,14 @@
 #include "SlimeBoss_Slime.h"
 #include "SlimeDamageZone.h"
 #include "SlimeParticles.h"
+#include "RockParticles.h"
 #include "SlimeBossHead.h"
 #include "Map_SlimeBoss.h"
+#include "ChargeCenter.h"
+#include "ChargeEffect.h"
 #include "Slime_Slime.h"
 #include "SwipeEffect.h"
+#include "FadeInOut.h"
 #include "ShockWave.h"
 #include "SlimeBoss.h"
 #include "Pillar.h"
@@ -274,7 +279,7 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	vector<string> vecNonAnimModelNames = { "Spear", "Rifle", "Scythe", "LevelGamePlay",
 		"ballistaArrow", "ballistaBase", "ballistaRotator", "crateBoxPotion", "fenceStack_SmallCol", "Cube",
 		"Kart", "MinePlatform", "Rail", "RailLeft60", "RailLeft90", "RailRight60", "RailRight90",
-		"Slash" };
+		"Slash", "Cauldron" };
 
 	if (FAILED(Add_Models(eLevel, vecAnimModelNames, vecNonAnimModelNames)))
 		return E_FAIL;
@@ -319,6 +324,7 @@ HRESULT CLoader::Loading_For_GamePlay(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Dash"), CDash);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Bullets"), CBullets);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SoldierSlash"), CSoldierSlash);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Cauldron"), CCauldron);
 
 
 	m_strLoadingText = TEXT("Loading Complete: Level_GamePlay");
@@ -357,6 +363,13 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Noise", "Effects/reaperSolid.dds")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Rock", "Effects/Rock.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Pillar", "Effects/Pillar.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Charge", "Effects/Charge0.dds")))
+		return E_FAIL;
+
 
 	m_strLoadingText = TEXT("Loading NavigationCells for Level_SlimeBoss...");
 	/* Prototype_Component_VIBuffer_Terrain_SlimeBoss */
@@ -384,7 +397,7 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 	m_strLoadingText = TEXT("Loading Models for Level_SlimeBoss...");
 	vector<string> vecAnimModelNames = { "Jack", "PartSlime", "PartSlimeBoss", "Slime", "SlimeBoss" };
 	vector<string> vecNonAnimModelNames = { "Spear", "Rifle", "Scythe", "LevelSlimeBoss",
-		"cemeteryFence1", "cemeteryPillar", "Knife", "NotOpen", "SlimeBossHead", "SlimeDamageZone", "Slash", "SlimeParticle" };
+		"cemeteryFence1", "cemeteryPillar", "Knife", "NotOpen", "SlimeBossHead", "SlimeDamageZone", "Slash", "SlimeParticle", "Cauldron"};
 
 	if (FAILED(Add_Models(eLevel, vecAnimModelNames, vecNonAnimModelNames)))
 		return E_FAIL;
@@ -414,6 +427,10 @@ HRESULT CLoader::Loading_For_SlimeBoss(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SlimeParticles"), CSlimeParticles);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SwipeEffect"), CSwipeEffect);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ShockWave"), CShockWave);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("RockParticles"), CRockParticles);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FadeInOut"), CFadeInOut);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ChargeEffect"), CChargeEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ChargeCenter"), CChargeCenter);
 
 
 	m_strLoadingText = TEXT("Loading Complete: Level_SlimeBoss");
@@ -451,6 +468,12 @@ HRESULT CLoader::Loading_For_Wizard(LEVEL eLevel)
 	if (FAILED(Add_Texture(eLevel, "BaseBeam", "Effects/BaseBeam.dds")))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "ElecChain", "Effects/ElecChain%d.png", 8)))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Rock", "Effects/Rock.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "TeslaTower", "Effects/TeslaTower.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Particle", "Effects/Particle0.dds")))
 		return E_FAIL;
 
 
@@ -552,6 +575,14 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "NewTex", "Effects/NewTex.png")))
 		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Rock", "Effects/Rock.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Pillar", "Effects/Pillar.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "TeslaTower", "Effects/TeslaTower.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "Charge", "Effects/Charge0.dds")))
+		return E_FAIL;
 
 
 	m_strLoadingText = TEXT("Loading VIBuffers for Level_EffectTool...");
@@ -614,8 +645,12 @@ HRESULT CLoader::Loading_For_EffectTool(LEVEL eLevel)
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SlimeParticles"), CSlimeParticles);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SwipeEffect"), CSwipeEffect);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ShockWave"), CShockWave);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("RockParticles"), CRockParticles);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FadeInOut"), CFadeInOut);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ChargeEffect"), CChargeEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("ChargeCenter"), CChargeCenter);
 
-
+	
 	m_strLoadingText = TEXT("Loading Complete: Level_EffectTool");
 	m_isFinished = true;
 	return S_OK;
@@ -917,7 +952,7 @@ HRESULT CLoader::Add_VIBuffer_Instance_Points(LEVEL eLevel)
 		CVIBuffer_Instance::INSTANCE_DESC	InstanceDesc{};
 		InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
 		InstanceDesc.vRange = _float3(2.5f, 2.5f, 2.5f);
-		InstanceDesc.vPivot = _float3(0.f, -2.3f, -3.f);
+		InstanceDesc.vPivot = _float3(0.f, -2.3f, 2.8f);
 		InstanceDesc.vMinScale = _float3(0.8f, 0.8f, 0.8f);
 		InstanceDesc.vMaxScale = _float3(1.f, 1.f, 1.f);
 		InstanceDesc.vSpeed = _float2(18, 24);
@@ -934,11 +969,41 @@ HRESULT CLoader::Add_VIBuffer_Instance_Points(LEVEL eLevel)
 		InstanceDesc.vMaxScale = _float3(2.2f, 2.2f, 2.2f);
 		InstanceDesc.vSpeed = _float2(0, 0);
 		InstanceDesc.iNumInstance = 300;
-		InstanceDesc.vLifeTime = _float2(8.f, 8.f);
+		InstanceDesc.vLifeTime = _float2(5.f, 5.f);
 		InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_DEFAULT;
 		InstanceDesc.isLoop = true;
 		InstanceDesc.iSpriteIndexOffset = 99;
 		wstrPrototypeTag = TEXT("Prototype_Component_VIBuffer_Instance_Point_ShockWave");
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext, InstanceDesc))))
+			return E_FAIL;
+
+		InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+		InstanceDesc.vRange = _float3(55, 55, 55);
+		InstanceDesc.vPivot = _float3(0.f, 0, 0.f);
+		InstanceDesc.vMinScale = _float3(7, 7, 7);
+		InstanceDesc.vMaxScale = _float3(8, 8, 8);
+		InstanceDesc.vSpeed = _float2(60, 80);
+		InstanceDesc.iNumInstance = 85;
+		InstanceDesc.vLifeTime = _float2(35, 35);
+		InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_CYLINDER;
+		InstanceDesc.fDistanceLimit = 25.f;
+		wstrPrototypeTag = TEXT("Prototype_Component_VIBuffer_Instance_Point_ChargeEffect");
+		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext, InstanceDesc))))
+			return E_FAIL;
+	}
+
+	if (eLevel == LEVEL_SLIMEBOSS || eLevel == LEVEL_WIZARD || eLevel == LEVEL_EFFECTTOOL) {
+		CVIBuffer_Instance::INSTANCE_DESC	InstanceDesc{};
+		InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+		InstanceDesc.vRange = _float3(5, 5, 5);
+		InstanceDesc.vPivot = _float3(0.f, -1.f, 6.5f);
+		InstanceDesc.vMinScale = _float3(3.5f, 3.5f, 3.5f);
+		InstanceDesc.vMaxScale = _float3(4.5f, 4.5f, 4.5f);
+		InstanceDesc.vSpeed = _float2(28, 35);
+		InstanceDesc.iNumInstance = 60;
+		InstanceDesc.vLifeTime = _float2(0.3f, 0.5f);
+		InstanceDesc.eShape = CVIBuffer_Instance::SHAPE_SPHERE;
+		wstring wstrPrototypeTag = TEXT("Prototype_Component_VIBuffer_Instance_Point_RockParticles");
 		if (FAILED(m_pGameInstance->Add_Prototype(eLevel, wstrPrototypeTag, CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext, InstanceDesc))))
 			return E_FAIL;
 	}
@@ -1022,6 +1087,7 @@ void CLoader::SetUp_ModelScaleRotation() // Scale, Degaree, NewScale, RootIndex
 	m_ModelConfigs.emplace("RailRight60", MODEL_CONFIG{ 5.8f, 180.f, 5.8f });
 	m_ModelConfigs.emplace("RailRight90", MODEL_CONFIG{ 5.8f, 180.f, 5.8f });
 	m_ModelConfigs.emplace("MinePlatform", MODEL_CONFIG{ 4.2f, 0.f, 4.2f });
+	m_ModelConfigs.emplace("Cauldron", MODEL_CONFIG{ 9.f, 0.f, 9.f });
 
 	/* Level_SlimeBoss */
 	m_ModelConfigs.emplace("Knife", MODEL_CONFIG{ 8.2f, 0.f, 8.2f });

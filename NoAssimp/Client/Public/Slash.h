@@ -37,10 +37,13 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	_vector m_vOffset = { };
+	WEAPON m_eWeapon = {};
+	STATE m_eState = {};
+
 
 	_bool	m_bEnabled = { false };
 	_bool	m_bTurn = { false };
+	_bool	m_bPlaySound = { true };
 
 	_uint	m_iWeaponIndex = {};
 	_uint	m_iSpriteIndex = { 5 };
@@ -51,6 +54,7 @@ private:
 	_float	m_fWaitTime = {};
 	_float	m_fSpriteTime = {};
 
+	_vector m_vOffset = { };
 private:
 	CModel*		m_pModelCom = { nullptr };
 	CShader*	m_pShaderCom = { nullptr };

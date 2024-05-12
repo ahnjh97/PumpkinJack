@@ -38,10 +38,10 @@ public:
 
 
 private:
-	_float3 m_vPivot = {};
-
 	_float m_fTime = {};
 	_float m_fDuration = { 0.3f };
+
+	_float3 m_vPivot = {};
 
 private:
 	CVIBuffer_Instance_Point* m_pVIBufferCom = { nullptr };

@@ -74,9 +74,8 @@ void CSlimeBossHead::Tick(_float fTimeDelta)
 		CCollider* pPlayerCollider = dynamic_cast<CCollider*>(m_pPlayer->Get_Component(TEXT("Com_Collider")));
 		if (m_pColliderCom->Intersect(pPlayerCollider))
 		{
-			if (m_fDamageTime >= 1.f)
-			{
-				m_pPlayer->Deduct_HP(20);
+			if (m_fDamageTime >= 1.f) {
+				m_pPlayer->Deduct_HP(12);
 				m_fDamageTime = 0.f;
 				m_bCollision = true;
 			}
@@ -93,8 +92,7 @@ void CSlimeBossHead::Tick(_float fTimeDelta)
 
 			CCollider* pPillar2Collider = dynamic_cast<CCollider*>(pillar2->Get_Component(TEXT("Com_Collider")));
 
-			if (m_pColliderCom->Intersect(pPillar2Collider))
-			{
+			if (m_pColliderCom->Intersect(pPillar2Collider)) {
 				m_bCollision = true;
 				break;
 			}
@@ -190,11 +188,17 @@ void CSlimeBossHead::StateToAction(_float fTimeDelta)
 		_float fMaxSpeed = 52.f;
 		m_fDashTime += fTimeDelta;
 		m_pTransformCom->Move(cos(m_fDashTime * 0.7f) * fMaxSpeed * fTimeDelta, m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), m_pNavigationCom);
+		
+		if (true == m_bPlayDashSound) {
+			m_pGameInstance->StopSound(SKILL5);
+			m_pGameInstance->Play_Sound(TEXT("SlimeBossHead.mp3"), SKILL5, 0.5f);
+			m_bPlayDashSound = false;
+		}
 
-		if (m_fDashTime >= 1.f || m_bCollision)
-		{
+		if (m_fDashTime >= 1.f || m_bCollision)	{
 			m_eState = HEAD_IDLE;
 			m_fDashTime = 0.f;
+			m_bPlayDashSound = true;
 		}
 	}
 
@@ -239,7 +243,6 @@ HRESULT CSlimeBossHead::Bind_ShaderResources()
 
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))

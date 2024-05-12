@@ -68,8 +68,8 @@ struct PS_IN
 struct PS_OUT_ELECARENA
 {
     float4 vColor : SV_TARGET0;
-    //float4 vNormal : SV_TARGET1;
-    //float4 vDepth : SV_TARGET2;
+    float4 vNormal : SV_TARGET1;
+    float4 vDepth : SV_TARGET2;
     //float4 vFieldDepth : SV_TARGET3;
     float4 vMagicCircle : SV_TARGET3;
     float4 vSkillDepth : SV_TARGET5;
@@ -260,8 +260,8 @@ PS_OUT_ELECARENA PS_ELECARENA(PS_IN In)
     if (fDissolve < g_fDissolveTime * 1.3f)
         discard;
     
-    //Out.vNormal = vector((In.vNormal * 0.5f + 0.5f).xyz, 0.f);
-    //Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fCamFar, 0.0f, 0.0f);
+    Out.vNormal = vector((In.vNormal * 0.5f + 0.5f).xyz, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fCamFar, 0.0f, 0.0f);
     
     //Out.vFieldDepth = vector(In.vProjPos.z / In.vProjPos.w, 0, 0, 0); //  월드위치 추출하기 위한 깊이
     

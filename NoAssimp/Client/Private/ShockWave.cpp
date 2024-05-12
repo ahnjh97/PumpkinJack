@@ -31,13 +31,17 @@ HRESULT CShockWave::Initialize(void* pArg)
 	if (FAILED(Add_Components(LEVEL(GameObjectDesc.iLevel))))
 		return E_FAIL;
 
-	m_fDuration = 8.f;
+	m_iShockWaveIndex = GameObjectDesc.iShockWaveIndex;
+	m_fDuration = 5.f;
 
 	_float fAngle = 0.1f;
 	m_pTransformCom->Turn(XMVectorSet(0, 1, 0, 0), fAngle * GameObjectDesc.iRotation);
 
 	//_vector vOffset = XMVectorSet(0, 3.5f, 0, 0) - m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 2.f;
 	//m_pTransformCom->Set_Pos(m_pTransformCom->Get_Pos_Vector() + vOffset);
+
+	m_pGameInstance->StopSound(SKILL3);
+	m_pGameInstance->Play_Sound(TEXT("Spell0.mp3"), SKILL3, 0.45f);
 
 	return S_OK;
 }
@@ -51,6 +55,9 @@ void CShockWave::Tick(_float fTimeDelta)
 	m_pTransformCom->Go_Straight(fTimeDelta * 9.f);
 
 	m_pVIBufferCom->Check_LifeTimes(fTimeDelta);
+
+	if (m_pColliderCom != nullptr)
+		m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
 }
 
 void CShockWave::Late_Tick(_float fTimeDelta)
@@ -71,6 +78,11 @@ HRESULT CShockWave::Render()
 
 	if (FAILED(m_pVIBufferCom->Render()))
 		return E_FAIL;
+
+#ifdef _DEBUG
+	if (m_pColliderCom != nullptr)
+		m_pGameInstance->Add_DebugComponents(m_pColliderCom);
+#endif 
 
 	return S_OK;
 }
@@ -94,6 +106,14 @@ HRESULT CShockWave::Add_Components(LEVEL eLevel)
 	/* For.Com_VIBuffer */
 	wstring wstrPrototypeTag = TEXT("Prototype_Component_VIBuffer_Instance_Point_ShockWave");
 	if (FAILED(__super::Add_Component(eLevel, wstrPrototypeTag, TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
+		return E_FAIL;
+
+	/* For.Com_Collider */
+	CBounding_OBB::BOUNDING_OBB_DESC		ColliderDesc{};
+	ColliderDesc.vSize = _float3(25, 11.f, 6.5f);
+	ColliderDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"),
+		TEXT("Com_Collider"), (CComponent**)&m_pColliderCom, &ColliderDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -153,6 +173,7 @@ void CShockWave::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pVIBufferCom);
 	for (_int i = 0; i < TEX_END; i++)
 		Safe_Release(m_pTextureCom[i]);

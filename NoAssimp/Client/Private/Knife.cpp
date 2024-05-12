@@ -36,6 +36,7 @@ HRESULT CKnife::Initialize(void* pArg)
 	_float fAngle = m_pGameInstance->RandomNumber(0, 359) / 90.f;
 	m_pTransformCom->Turn(XMVectorSet(0, 1, 0, 0), fAngle);
 	m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), 0.15f);
+
 	return S_OK;
 }
 
@@ -51,6 +52,11 @@ void CKnife::Tick(_float fTimeDelta)
 	else {
 		m_fDeathTime += fTimeDelta;
 		m_fAlpha -= exp(m_fDeathTime * fTimeDelta * 6.f) * fTimeDelta;
+		if (true == m_bPlayHitSound) {
+			m_pGameInstance->StopSound(SKILL5);
+			m_pGameInstance->Play_Sound(TEXT("Hit0.mp3"), SKILL5, 0.3f);
+			m_bPlayHitSound = false;
+		}
 		return;
 	}
 
@@ -60,7 +66,7 @@ void CKnife::Tick(_float fTimeDelta)
 		if (m_pColliderCom->Intersect(pPlayerCollider))
 		{
 			if(m_bDamaged == false)
-				pPlayer->Deduct_HP(20);
+				pPlayer->Deduct_HP(10);
 			m_bDamaged = true;
 		}
 	}

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "SlimeBoss.h"
 #include "SlimeBoss_Slime.h"
+#include "ChargeCenter.h"
+#include "ChargeEffect.h"
 #include "SwipeEffect.h"
 #include "ShockWave.h"
 #include "Player.h"
@@ -30,7 +32,7 @@ HRESULT CSlimeBoss::Initialize(void* pArg)
 
 	GameObjectDesc.fSpeedPerSec = 10.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-	m_iLevel = GameObjectDesc.iLevel = LEVEL_SLIMEBOSS;
+	GameObjectDesc.iLevel = LEVEL_SLIMEBOSS;
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
@@ -40,10 +42,14 @@ HRESULT CSlimeBoss::Initialize(void* pArg)
 	if (FAILED(Add_PartObjects(LEVEL(GameObjectDesc.iLevel))))
 		return E_FAIL;
 
+	m_iLevel = LEVEL_SLIMEBOSS;
 	m_pModelCom->Set_Animation(SLIMEBOSS_SPAWN, false);
 	m_pModelCom->Set_LerpTime(0.2f);
 	m_pModelCom->Set_AnimSpeed(SLIMEBOSS_MEGASPAWN, 0.7f);
 	m_iHp = 100;
+	m_pGameInstance->StopSound(BGM);
+	m_pGameInstance->Play_Sound(TEXT("SlimeBossSpawn3.mp3"), BGM, 0.2f);
+
 	return S_OK;
 }
 
@@ -59,6 +65,13 @@ void CSlimeBoss::Tick(_float fTimeDelta)
 		}
 	}
 
+	m_fTime += fTimeDelta;
+	if (m_fTime > 9.f && true == m_bPlaySpawnSound) {
+		m_pGameInstance->PlayBGM(TEXT("LevelSlimeBoss1.mp3"));
+		m_pGameInstance->SetVolume(BGM, 0.2f);
+		m_bPlaySpawnSound = false;
+	}
+
 	if (m_pPlayer != nullptr)
 	{
 		if (m_pPlayer->Get_InSlimeBossRoom())
@@ -69,8 +82,15 @@ void CSlimeBoss::Tick(_float fTimeDelta)
 			m_bSlimeDamageZoneSpawn = false;
 			m_eState = SLIMEBOSS_HIT;
 			m_iCurPattern = 0;
+
+			if (true == m_bDestroyCharge) {
+				DestroyChargeEffect();
+				m_bDestroyCharge = false;
+			}
 			return;
 		}
+		else
+			m_bDestroyCharge = true;
 			
 		if (m_pPlayer->Get_SlimeBossRoomEscapeCount() >= 2)
 			m_eState = SLIMEBOSS_DEATH;
@@ -87,6 +107,7 @@ void CSlimeBoss::Tick(_float fTimeDelta)
 
 	if (m_pModelCom->Get_Shrinked()) {
 		DeathEffect();
+		Add_Cauldron();
 		Set_Dead();
 	}
 }
@@ -149,11 +170,11 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 	{
 		if (m_pModelCom->isFinished())
 		{
-			KnifeSpawn();
+			/*KnifeSpawn();
 			SlimeSpawn();
 			PillarSpawn();
 			PortalSpawn();
-			Add_SwipeEffect();
+			Add_SwipeEffect();*/
 			m_eState = SLIMEBOSS_IDLE;
 		}
 	}	
@@ -173,23 +194,6 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 		{
 			if (m_eState == SLIMEBOSS_INVOKE_BEGIN && m_pModelCom->Get_AnimPlayRatio() > 0.32f)
 			{
-				/*_float fAnimPlayRatio = m_pModelCom->Get_AnimPlayRatio();
-
-				if (fAnimPlayRatio < 0.37f || (fAnimPlayRatio > 0.42f && fAnimPlayRatio < 0.47f) 
-					|| (fAnimPlayRatio > 0.52f && fAnimPlayRatio < 0.57f) 
-					|| (fAnimPlayRatio > 0.62f && fAnimPlayRatio < 0.67f)) {
-					if (false == m_bAddShockWave) {
-						Add_ShockWave();
-						m_bAddShockWave = true;
-					}
-				}
-
-				if ((fAnimPlayRatio > 0.37f && fAnimPlayRatio < 0.42f)
-					|| (fAnimPlayRatio > 0.47f && fAnimPlayRatio < 0.52f)
-					|| (fAnimPlayRatio > 0.57f && fAnimPlayRatio < 0.62f)
-					|| fAnimPlayRatio > 0.67f)
-					m_bAddShockWave = false;*/
-
 				if (m_pPlayer->Get_SlimeBossRoomEscapeCount() >= 1 && m_bSlimeDamageZoneSpawn == false)
 				{
 					SlimeDamageZoneSpawn(10);
@@ -212,8 +216,15 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 
 			if (m_eState == SLIMEBOSS_MEGASPAWN && m_bPortalSpawn == false) {
 				PortalSpawn();
+				Add_ChargeEffect();
 				m_bPortalSpawn = true;
+
+				m_pGameInstance->StopSound(SKILL0);
+				m_pGameInstance->Play_Sound(TEXT("Charge1.mp3"), SKILL0, 0.6f);
 			}
+
+			if (m_eState == SLIMEBOSS_MEGASPAWN && m_pModelCom->Get_AnimPlayRatio() > 0.9f)
+				DestroyChargeEffect();
 
 			if (m_pModelCom->isFinished() && m_ePreState != SLIMEBOSS_HIT) {
 				++m_iCurPattern;
@@ -230,7 +241,7 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 			_float fAnimPlayRatio = m_pModelCom->Get_AnimPlayRatio();
 			if (fAnimPlayRatio < 0.1f) {
 				if (false == m_bAddShockWave) {
-					Add_ShockWave();
+					Add_ShockWave(m_pModelCom->Get_AnimPlayCount(SLIMEBOSS_INVOKE));
 					m_bAddShockWave = true;
 				}
 			}
@@ -246,8 +257,17 @@ void CSlimeBoss::Link_Animation(_float fTimeDelta)
 		else if (m_eState == SLIMEBOSS_LIGHTNING)
 		{
 			_float fPlayRatio = m_pModelCom->Get_AnimPlayRatio();
-			if (m_iLightningCount == m_pModelCom->Get_AnimPlayCount(SLIMEBOSS_LIGHTNING) && fPlayRatio > 0.6f)
-				KnifeSpawn();
+			if (m_iLightningCount == m_pModelCom->Get_AnimPlayCount(SLIMEBOSS_LIGHTNING)) {
+				if (fPlayRatio > 0.27f && true == m_bPlaySpinKnifeSound) {
+					m_pGameInstance->StopSound(SKILL3);
+					m_pGameInstance->Play_Sound(TEXT("SpinKnife.mp3"), SKILL3, 0.4f);
+					m_bPlaySpinKnifeSound = false;
+				}
+
+				if(fPlayRatio > 0.6f)
+					KnifeSpawn();
+			}
+				
 
 			if (m_bSlimeSpawn == false)	{
 				SlimeSpawn();
@@ -298,6 +318,7 @@ void CSlimeBoss::KnifeSpawn()
 	tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Knife");
 	m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_Knife"), TEXT("Prototype_GameObject_Knife"), &tDesc);
 	m_iLightningCount++;
+	m_bPlaySpinKnifeSound = true;
 }
 
 void CSlimeBoss::PillarSpawn()
@@ -407,16 +428,63 @@ void CSlimeBoss::Add_SwipeEffect()
 		return;
 }
 
-void CSlimeBoss::Add_ShockWave()
+void CSlimeBoss::Add_ShockWave(_int iShockWaveCount)
 {
 	CShockWave::SHOCKWAVE_DESC tDesc{};
 	tDesc.iLevel = LEVEL_SLIMEBOSS;
 	tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	tDesc.iShockWaveIndex = iShockWaveCount;
+
 	for (_int i = -7; i < 8; i++) {
 		tDesc.iRotation = i;
-		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_AttackEffect"), TEXT("Prototype_GameObject_ShockWave"), &tDesc)))
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_ShockWave"), TEXT("Prototype_GameObject_ShockWave"), &tDesc)))
 			return;
 	}
+}
+
+void CSlimeBoss::Add_ChargeEffect()
+{
+	_vector vPos = m_pTransformCom->Get_Pos_Vector();
+	_vector vRight = m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
+	_vector vNewPos = vPos + XMVector4Normalize(vRight) * 70.f + XMVectorSet(0, 80.f, 0, 0);
+
+	GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = LEVEL_SLIMEBOSS;
+	tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	tDesc.matWorld._41 = XMVectorGetX(vNewPos);
+	tDesc.matWorld._42 = XMVectorGetY(vNewPos);
+	tDesc.matWorld._43 = XMVectorGetZ(vNewPos);
+
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_Charge"), TEXT("Prototype_GameObject_ChargeEffect"), &tDesc)))
+		return;
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_Charge"), TEXT("Prototype_GameObject_ChargeCenter"), &tDesc)))
+		return;
+}
+
+void CSlimeBoss::DestroyChargeEffect()
+{
+	list<CGameObject*> chargeList =  m_pGameInstance->Get_ObjectList(m_iLevel, TEXT("Layer_Charge"));
+	if (chargeList.empty())
+		return;
+
+	for (auto& charge : chargeList)
+	{
+		if (nullptr == charge)
+			continue;
+
+		charge->Set_Dead();
+	}
+}
+
+void CSlimeBoss::Add_Cauldron()
+{
+	GAMEOBJECT_DESC tDesc{};
+	tDesc.iLevel = LEVEL_SLIMEBOSS;
+	tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Cauldron");
+	tDesc.matWorld._41 = 231;
+	tDesc.matWorld._42 = -15;
+	tDesc.matWorld._43 = 190;
+	m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_Cauldron"), TEXT("Prototype_GameObject_Cauldron"), &tDesc);
 }
 
 HRESULT CSlimeBoss::Add_Components(LEVEL eLevel, const wstring& _wstrModelTag)

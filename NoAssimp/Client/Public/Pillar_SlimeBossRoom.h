@@ -26,6 +26,8 @@ public:
 private:
 	_bool Check_HeadCol();
 
+	void Add_RockParticles(_bool bIsPlayer = true);
+
 private:
 	_float m_fTime = { 100.f };
 	_float m_fEndTime = { 0.35f };

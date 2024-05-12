@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Pillar_SlimeBossRoom.h"
+#include "RockParticles.h"
 #include "Player.h"
 
 CPillar_SlimeBossRoom::CPillar_SlimeBossRoom(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -52,9 +53,11 @@ void CPillar_SlimeBossRoom::Tick(_float fTimeDelta)
 	if(m_iHp <=0)
 		Set_Dead();
 
-	if (Check_HeadCol())
+	if (true == Check_HeadCol()) {
 		Set_Dead();
-
+		Add_RockParticles(false); // 플레이어가 아니면 false
+	}
+		
 	m_pColliderCom->Tick(m_pTransformCom->Get_WorldMatrix());
 }
 
@@ -64,6 +67,8 @@ void CPillar_SlimeBossRoom::Late_Tick(_float fTimeDelta)
 	{
 		if (m_fTime >= 0.3f)
 			m_fTime = 0.f;
+
+		Add_RockParticles();
 	}
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
@@ -122,6 +127,50 @@ _bool CPillar_SlimeBossRoom::Check_HeadCol()
 	}
 
 	return false;
+}
+
+void CPillar_SlimeBossRoom::Add_RockParticles(_bool bIsPlayer)
+{
+	CGameObject* pEnemy = { nullptr };
+	if (true == bIsPlayer) {
+		CPlayer* pPlayer = dynamic_cast<CPlayer*>(m_pGameInstance->Get_Player(LEVEL_SLIMEBOSS));
+		_bool bInSlimeBossRoom = false;
+
+		if (nullptr == pPlayer)
+			return;
+
+		bInSlimeBossRoom = pPlayer->Get_InSlimeBossRoom();
+		if (bInSlimeBossRoom == false)
+			return;
+
+		pEnemy = pPlayer;
+	}
+	else
+	{
+		pEnemy = m_pGameInstance->Get_GameObject(LEVEL_SLIMEBOSS, TEXT("Layer_SlimeBossHead"), TEXT("Prototype_GameObject_SlimeBossHead"));
+		if (nullptr == pEnemy)
+			return;
+	}
+
+	CTransform* pEnemyTransform = dynamic_cast<CTransform*>(pEnemy->Get_Component(g_strTransformTag));
+	if (nullptr == pEnemyTransform)
+		return;
+
+	_float4x4 matOriginal = m_pTransformCom->Get_WorldFloat4x4();
+	m_pTransformCom->Set_Pos(m_pTransformCom->Get_Pos_Vector() + XMVector4Normalize(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP)) * 19.f);
+	m_pTransformCom->Look_At(pEnemyTransform->Get_Pos_Vector());
+
+	CRockParticles::ROCKPARTICLES_DESC tDesc{};
+	tDesc.iLevel = LEVEL_SLIMEBOSS;
+	tDesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	tDesc.wstrTextureName = TEXT("Pillar");
+	if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SLIMEBOSS, TEXT("Layer_RockParticles"), TEXT("Prototype_GameObject_RockParticles"), &tDesc)))
+		return;
+
+	m_pTransformCom->Set_WorldMatrix(matOriginal);
+
+	m_pGameInstance->StopSound(SKILL4);
+	m_pGameInstance->Play_Sound(TEXT("RockDestroy.mp3"), SKILL4, 0.65f);
 }
 
 HRESULT CPillar_SlimeBossRoom::Add_Components(const wstring& _wstrModelTag)

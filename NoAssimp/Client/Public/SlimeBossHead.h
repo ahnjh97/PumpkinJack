@@ -36,6 +36,7 @@ private:
 	_bool m_bPreInSlimeBossRoom = { false };
 	_bool m_bInSlimeBossRoom = { false };
 	_bool m_bCollision = { false };
+	_bool m_bPlayDashSound = { true };
 
 	_float m_fTime = {};
 	_float m_fDamageTime = { 1.f };
