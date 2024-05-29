@@ -1039,78 +1039,78 @@ HRESULT CLoader::Add_VIBuffer_Instance_Points(LEVEL eLevel)
 
 void CLoader::SetUp_ModelScaleRotation() // Scale, Degaree, NewScale, RootIndex
 {
-	m_ModelConfigs.emplace("Ballista", MODEL_CONFIG{ 0.1f, 180.f, 9.f });
-	m_ModelConfigs.emplace("Bat", MODEL_CONFIG{ 0.005f, 0.f, 0.5f, 4 });
-	m_ModelConfigs.emplace("Charon", MODEL_CONFIG{ 0.03f, 180.f, 2.6f, 4 });
-	m_ModelConfigs.emplace("Crow", MODEL_CONFIG{ 0.0003f, 180.f, 0.03f, 1 });
-	m_ModelConfigs.emplace("Dummy", MODEL_CONFIG{ 0.005f, 0.f, 0.5f, 3 });
-	m_ModelConfigs.emplace("GarGoyle", MODEL_CONFIG{ 0.01f, 0.f, 1.f, 4 });
-	m_ModelConfigs.emplace("Horse", MODEL_CONFIG{ 0.03f, 180.f, 2.6f, 3 });
-	m_ModelConfigs.emplace("Jack", MODEL_CONFIG{ 0.0025f, 180.f, 0.25f, 3 });
-	m_ModelConfigs.emplace("Mummy", MODEL_CONFIG{ 0.03f, 0.f, 2.2f, 4 });
-	m_ModelConfigs.emplace("Owl", MODEL_CONFIG{ 0.03f, 0.f, 1.f, 4 });
-	m_ModelConfigs.emplace("SkeletonBoss", MODEL_CONFIG{ 0.03f, 0.f, 2.6f, 3 });
-	m_ModelConfigs.emplace("Slime", MODEL_CONFIG{ 0.027f, 180.f, 2.7f });
-	m_ModelConfigs.emplace("PartSlime", MODEL_CONFIG{ 0.027f, 180.f, 2.7f });
-	m_ModelConfigs.emplace("SlimeBoss", MODEL_CONFIG{ 0.044f, 180.f, 4.4f });
-	m_ModelConfigs.emplace("PartSlimeBoss", MODEL_CONFIG{ 0.044f, 180.f, 4.4f });
-	m_ModelConfigs.emplace("Sniper", MODEL_CONFIG{ 0.05f, 180.f, 5.f, 3 });
-	m_ModelConfigs.emplace("Soldier", MODEL_CONFIG{ 0.05f, 180.f, 5.f, 5 });
-	m_ModelConfigs.emplace("Trabuchet", MODEL_CONFIG{ 0.03f, 0.f, 2.6f, 2 });
+	m_ModelConfigs.emplace("Ballista", MODEL_CONFIG( 0.1f, 180.f, 9.f));
+	m_ModelConfigs.emplace("Bat", MODEL_CONFIG(0.005f, 0.f, 0.5f, 4));
+	m_ModelConfigs.emplace("Charon", MODEL_CONFIG(0.03f, 180.f, 2.6f, 4));
+	m_ModelConfigs.emplace("Crow", MODEL_CONFIG(0.0003f, 180.f, 0.03f, 1 ));
+	m_ModelConfigs.emplace("Dummy", MODEL_CONFIG( 0.005f, 0.f, 0.5f, 3 ));
+	m_ModelConfigs.emplace("GarGoyle", MODEL_CONFIG(0.01f, 0.f, 1.f, 4 ));
+	m_ModelConfigs.emplace("Horse", MODEL_CONFIG(0.03f, 180.f, 2.6f, 3));
+	m_ModelConfigs.emplace("Jack", MODEL_CONFIG(0.0025f, 180.f, 0.25f, 3));
+	m_ModelConfigs.emplace("Mummy", MODEL_CONFIG(0.03f, 0.f, 2.2f, 4));
+	m_ModelConfigs.emplace("Owl", MODEL_CONFIG(0.03f, 0.f, 1.f, 4));
+	m_ModelConfigs.emplace("SkeletonBoss", MODEL_CONFIG(0.03f, 0.f, 2.6f, 3));
+	m_ModelConfigs.emplace("Slime", MODEL_CONFIG(0.027f, 180.f, 2.7f));
+	m_ModelConfigs.emplace("PartSlime", MODEL_CONFIG(0.027f, 180.f, 2.7f));
+	m_ModelConfigs.emplace("SlimeBoss", MODEL_CONFIG(0.044f, 180.f, 4.4f));
+	m_ModelConfigs.emplace("PartSlimeBoss", MODEL_CONFIG(0.044f, 180.f, 4.4f));
+	m_ModelConfigs.emplace("Sniper", MODEL_CONFIG(0.05f, 180.f, 5.f, 3));
+	m_ModelConfigs.emplace("Soldier", MODEL_CONFIG(0.05f, 180.f, 5.f, 5));
+	m_ModelConfigs.emplace("Trabuchet", MODEL_CONFIG( 0.03f, 0.f, 2.6f, 2));
 
-	m_ModelConfigs.emplace("DestroyedBarn", MODEL_CONFIG{ 3.f, 0.f, 3.f });
-	m_ModelConfigs.emplace("bone", MODEL_CONFIG{ 3.f, 0.f, 3.f });
-	m_ModelConfigs.emplace("fence1", MODEL_CONFIG{ 3.f, 0.f, 3.f });
-	m_ModelConfigs.emplace("fence2", MODEL_CONFIG{ 3.f, 0.f, 3.f });
-	m_ModelConfigs.emplace("fence3", MODEL_CONFIG{ 3.f, 0.f, 3.f });
-	m_ModelConfigs.emplace("fence4", MODEL_CONFIG{ 3.f, 0.f, 3.f });
-	m_ModelConfigs.emplace("fenceClose", MODEL_CONFIG{ 3.f, 0.f, 3.f });
-	m_ModelConfigs.emplace("fenceStack", MODEL_CONFIG{ 3.f, 0.f, 3.f });
-	m_ModelConfigs.emplace("fenceStackSmall", MODEL_CONFIG{ 3.f, 0.f, 3.f });
-	m_ModelConfigs.emplace("grassMeshYellow", MODEL_CONFIG{ 3.f, 0.f, 3.f });
-	m_ModelConfigs.emplace("shroom", MODEL_CONFIG{ 3.f, 0.f, 3.f });
+	m_ModelConfigs.emplace("DestroyedBarn", MODEL_CONFIG( 3.f, 0.f, 3.f));
+	m_ModelConfigs.emplace("bone", MODEL_CONFIG( 3.f, 0.f, 3.f));
+	m_ModelConfigs.emplace("fence1", MODEL_CONFIG( 3.f, 0.f, 3.f ));
+	m_ModelConfigs.emplace("fence2", MODEL_CONFIG( 3.f, 0.f, 3.f ));
+	m_ModelConfigs.emplace("fence3", MODEL_CONFIG( 3.f, 0.f, 3.f ));
+	m_ModelConfigs.emplace("fence4", MODEL_CONFIG( 3.f, 0.f, 3.f ));
+	m_ModelConfigs.emplace("fenceClose", MODEL_CONFIG( 3.f, 0.f, 3.f ));
+	m_ModelConfigs.emplace("fenceStack", MODEL_CONFIG( 3.f, 0.f, 3.f ));
+	m_ModelConfigs.emplace("fenceStackSmall", MODEL_CONFIG( 3.f, 0.f, 3.f ));
+	m_ModelConfigs.emplace("grassMeshYellow", MODEL_CONFIG( 3.f, 0.f, 3.f ));
+	m_ModelConfigs.emplace("shroom", MODEL_CONFIG( 3.f, 0.f, 3.f));
 
-	m_ModelConfigs.emplace("Rifle", MODEL_CONFIG{ 3.f, 0.f, 3.f });
-	m_ModelConfigs.emplace("Scythe", MODEL_CONFIG{ 0.22f, 0.f, 0.22f });
-	m_ModelConfigs.emplace("Spear", MODEL_CONFIG{ 6.4f, 0.f, 6.4f });
+	m_ModelConfigs.emplace("Rifle", MODEL_CONFIG( 3.f, 0.f, 3.f));
+	m_ModelConfigs.emplace("Scythe", MODEL_CONFIG( 0.22f, 0.f, 0.22f));
+	m_ModelConfigs.emplace("Spear", MODEL_CONFIG( 6.4f, 0.f, 6.4f));
 
 	/* Level_GamePlay */
-	m_ModelConfigs.emplace("ballistaArrow", MODEL_CONFIG{ 9.f, 0.f, 9.f });
-	m_ModelConfigs.emplace("ballistaBase", MODEL_CONFIG{ 9.f, 0.f, 9.f });
-	m_ModelConfigs.emplace("ballistaRotator", MODEL_CONFIG{ 9.f, 0.f, 9.f });
-	m_ModelConfigs.emplace("SkullCrossBow", MODEL_CONFIG{ 0.07f, 0.f, 7.f });
-	m_ModelConfigs.emplace("Kart", MODEL_CONFIG{ 7.f, 0.f, 7.f });
-	m_ModelConfigs.emplace("crateBoxPotion", MODEL_CONFIG{ 6.f, 0.f, 6.f });
-	m_ModelConfigs.emplace("Rail", MODEL_CONFIG{ 5.8f, 180.f, 5.8f });
-	m_ModelConfigs.emplace("RailLeft60", MODEL_CONFIG{ 5.8f, 180.f, 5.8f });
-	m_ModelConfigs.emplace("RailLeft90", MODEL_CONFIG{ 5.8f, 180.f, 5.8f });
-	m_ModelConfigs.emplace("RailRight60", MODEL_CONFIG{ 5.8f, 180.f, 5.8f });
-	m_ModelConfigs.emplace("RailRight90", MODEL_CONFIG{ 5.8f, 180.f, 5.8f });
-	m_ModelConfigs.emplace("MinePlatform", MODEL_CONFIG{ 4.2f, 0.f, 4.2f });
-	m_ModelConfigs.emplace("Cauldron", MODEL_CONFIG{ 9.f, 0.f, 9.f });
+	m_ModelConfigs.emplace("ballistaArrow", MODEL_CONFIG( 9.f, 0.f, 9.f));
+	m_ModelConfigs.emplace("ballistaBase", MODEL_CONFIG( 9.f, 0.f, 9.f));
+	m_ModelConfigs.emplace("ballistaRotator", MODEL_CONFIG( 9.f, 0.f, 9.f));
+	m_ModelConfigs.emplace("SkullCrossBow", MODEL_CONFIG( 0.07f, 0.f, 7.f));
+	m_ModelConfigs.emplace("Kart", MODEL_CONFIG( 7.f, 0.f, 7.f ));
+	m_ModelConfigs.emplace("crateBoxPotion", MODEL_CONFIG( 6.f, 0.f, 6.f));
+	m_ModelConfigs.emplace("Rail", MODEL_CONFIG( 5.8f, 180.f, 5.8f ));
+	m_ModelConfigs.emplace("RailLeft60", MODEL_CONFIG( 5.8f, 180.f, 5.8f ));
+	m_ModelConfigs.emplace("RailLeft90", MODEL_CONFIG( 5.8f, 180.f, 5.8f ));
+	m_ModelConfigs.emplace("RailRight60", MODEL_CONFIG( 5.8f, 180.f, 5.8f ));
+	m_ModelConfigs.emplace("RailRight90", MODEL_CONFIG( 5.8f, 180.f, 5.8f ));
+	m_ModelConfigs.emplace("MinePlatform", MODEL_CONFIG( 4.2f, 0.f, 4.2f));
+	m_ModelConfigs.emplace("Cauldron", MODEL_CONFIG( 9.f, 0.f, 9.f));
 
 	/* Level_SlimeBoss */
-	m_ModelConfigs.emplace("Knife", MODEL_CONFIG{ 8.2f, 0.f, 8.2f });
-	m_ModelConfigs.emplace("NotOpen", MODEL_CONFIG{ 4.1f, 0.f, 4.1f });
-	m_ModelConfigs.emplace("cemeteryPillar", MODEL_CONFIG{ 6.5f, 0.f, 6.5f });
-	m_ModelConfigs.emplace("SlimeBossHead", MODEL_CONFIG{ 10.f, 0.f, 10.f });
-	m_ModelConfigs.emplace("SlimeDamageZone", MODEL_CONFIG{ 6.f, 0.f, 6.f });
-	m_ModelConfigs.emplace("cemeteryFence1", MODEL_CONFIG{ 4.3f, 0.f, 4.3f });
+	m_ModelConfigs.emplace("Knife", MODEL_CONFIG( 8.2f, 0.f, 8.2f));
+	m_ModelConfigs.emplace("NotOpen", MODEL_CONFIG( 4.1f, 0.f, 4.1f));
+	m_ModelConfigs.emplace("cemeteryPillar", MODEL_CONFIG( 6.5f, 0.f, 6.5f));
+	m_ModelConfigs.emplace("SlimeBossHead", MODEL_CONFIG( 10.f, 0.f, 10.f));
+	m_ModelConfigs.emplace("SlimeDamageZone", MODEL_CONFIG( 6.f, 0.f, 6.f));
+	m_ModelConfigs.emplace("cemeteryFence1", MODEL_CONFIG( 4.3f, 0.f, 4.3f));
 
 	/* Level_Wizard */
-	m_ModelConfigs.emplace("Wizard", MODEL_CONFIG{ 0.12f, 180.f, 12.f });
-	m_ModelConfigs.emplace("LevelWizard", MODEL_CONFIG{ 2.4f, 0.f, 2.4f });
-	m_ModelConfigs.emplace("Amulet", MODEL_CONFIG{ 5.2f, 0.f, 5.2f });
-	m_ModelConfigs.emplace("Book", MODEL_CONFIG{ 4.f, 0.f, 4.f });
+	m_ModelConfigs.emplace("Wizard", MODEL_CONFIG( 0.12f, 180.f, 12.f));
+	m_ModelConfigs.emplace("LevelWizard", MODEL_CONFIG( 2.4f, 0.f, 2.4f));
+	m_ModelConfigs.emplace("Amulet", MODEL_CONFIG( 5.2f, 0.f, 5.2f));
+	m_ModelConfigs.emplace("Book", MODEL_CONFIG( 4.f, 0.f, 4.f));
 	for (_int i = 1; i < 4; i++)
-		m_ModelConfigs.emplace("elecArena" + to_string(i), MODEL_CONFIG{ 13.85f + 0.05f * i, 0.f, 13.85f + 0.05f * i });
-	m_ModelConfigs.emplace("HoleWall", MODEL_CONFIG{ 12.f, 0.f, 12.f });
-	m_ModelConfigs.emplace("TeslaTower", MODEL_CONFIG{ 20.f, 0.f, 20.f });
-	//m_ModelConfigs.emplace("Tornado", MODEL_CONFIG{ 15.f, 0.f, 15.f });
-	m_ModelConfigs.emplace("WizardBrickGround", MODEL_CONFIG{ 12.f, 0.f, 12.f });
-	m_ModelConfigs.emplace("WizardTower", MODEL_CONFIG{ 15.f, 0.f, 15.f });
-	m_ModelConfigs.emplace("SkySphere", MODEL_CONFIG{ 0.2f, 0.f, 0.2f });
-	m_ModelConfigs.emplace("Sphere", MODEL_CONFIG{ 10.f, 0.f, 10.f });
+		m_ModelConfigs.emplace("elecArena" + to_string(i), MODEL_CONFIG( 13.85f + 0.05f * i, 0.f, 13.85f + 0.05f * i));
+	m_ModelConfigs.emplace("HoleWall", MODEL_CONFIG( 12.f, 0.f, 12.f));
+	m_ModelConfigs.emplace("TeslaTower", MODEL_CONFIG( 20.f, 0.f, 20.f));
+	//m_ModelConfigs.emplace("Tornado", MODEL_CONFIG( 15.f, 0.f, 15.f });
+	m_ModelConfigs.emplace("WizardBrickGround", MODEL_CONFIG( 12.f, 0.f, 12.f));
+	m_ModelConfigs.emplace("WizardTower", MODEL_CONFIG( 15.f, 0.f, 15.f));
+	m_ModelConfigs.emplace("SkySphere", MODEL_CONFIG( 0.2f, 0.f, 0.2f));
+	m_ModelConfigs.emplace("Sphere", MODEL_CONFIG( 10.f, 0.f, 10.f));
 }
 
 void CLoader::TraverseAnimModels(LEVEL eLevel, const wstring& rootFolderPath)

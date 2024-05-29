@@ -132,8 +132,10 @@ _float4 CModel::Check_Meshes(const CTransform* pTransform) const
 	_float4 fResult = {};
 	for (auto& iter : vecPickPos)
 	{
-		if (iter.w <= fShortest)
+		if (iter.w < fShortest) {
+			fShortest = iter.w;
 			fResult = iter;
+		}
 	}
 	return fResult;
 }

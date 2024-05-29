@@ -132,8 +132,8 @@ HRESULT CLoader::Loading_For_GamePlay()
 		return E_FAIL;*/
 	
 
-	TraverseAnimModels(TEXT("../../../Resources/Models/"));
-	TraverseNonAnimModels(TEXT("../../../Resources/Models/NonAnimModels/"));
+	TraverseAnimModels(TEXT("../../../Resources/Models/Anim/"));
+	TraverseNonAnimModels(TEXT("../../../Resources/Models/NonAnim/"));
 
 	//m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
 	///* For.Prototype_Component_Shader_VtxNorTex */
@@ -176,7 +176,7 @@ HRESULT CLoader::Loading_For_GamePlay()
 
 HRESULT CLoader::Add_AnimPrototype(wstring& ModelName)
 {
-	m_strLoadingText = TEXT("../../../Resources/Models/") + ModelName + TEXT("/") + ModelName + TEXT(".fbx");
+	m_strLoadingText = TEXT("../../../Resources/Models/Anim/") + ModelName + TEXT("/") + ModelName + TEXT(".fbx");
 
 	wstring_convert<codecvt_utf8<wchar_t>> converter;
 	string strModelName = converter.to_bytes(ModelName);
@@ -184,14 +184,14 @@ HRESULT CLoader::Add_AnimPrototype(wstring& ModelName)
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, L"Prototype_Component_Model_" + ModelName,
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Resources/Models/" + strModelName + "/" + strModelName + ".fbx", TransformMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../../../Resources/Models/Anim/" + strModelName + "/" + strModelName + ".fbx", TransformMatrix))))
 		return E_FAIL;
 	return S_OK;
 }
 
 HRESULT CLoader::Add_NonAnimPrototype(wstring& ModelName)
 {
-	m_strLoadingText = TEXT("../../../Resources/Models/") + ModelName + TEXT("/") + ModelName + TEXT(".fbx");
+	m_strLoadingText = TEXT("../../../Resources/Models/NonAnim/") + ModelName + TEXT("/") + ModelName + TEXT(".fbx");
 
 	wstring_convert<codecvt_utf8<wchar_t>> converter;
 	string strModelName = converter.to_bytes(ModelName);
@@ -199,7 +199,7 @@ HRESULT CLoader::Add_NonAnimPrototype(wstring& ModelName)
 	TransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, L"Prototype_Component_Model_" + ModelName,
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Resources/Models/NonAnimModels/" + strModelName + "/" + strModelName + ".fbx", TransformMatrix))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../../../Resources/Models/NonAnim/" + strModelName + "/" + strModelName + ".fbx", TransformMatrix))))
 		return E_FAIL;
 	return S_OK;
 }
@@ -222,8 +222,6 @@ void CLoader::TraverseAnimModels(const wstring& rootFolderPath)
 			if (wcscmp(findFileData.cFileName, L".") != 0 && wcscmp(findFileData.cFileName, L"..") != 0)
 			{
 				wstring temp = wstring(findFileData.cFileName);
-				if (wstring(findFileData.cFileName) == L"NonAnimModels")
-					continue;
 
 				_bool bExist = { false };
 				for (auto txt : txtList)

@@ -296,8 +296,11 @@ CGameObject* CObject_Manager::Select_ModelByPicking(_uint iLevelIndex, const wst
 	CGameObject* pResult = { nullptr };
 	for (int i = 0; i< vecPickPos.size(); i++)
 	{
-		if (vecPickPos[i].w <= fShortest)
+		if (vecPickPos[i].w < fShortest) {
+			fShortest = vecPickPos[i].w;
 			pResult = vecPickedObjects[i];
+		}
+			
 	}
 	return pResult;
 }

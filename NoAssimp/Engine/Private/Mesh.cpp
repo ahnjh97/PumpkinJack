@@ -131,8 +131,8 @@ _float4 CMesh::Get_PickPos(const CTransform* pTransform) const
 		{
 			vPickPos = vecRayPos + vecRayDir * fDis;
 
-			_matrix* pWorldMatrix = &pTransform->Get_WorldMatrix();
-			vPickPos = XMVector3TransformCoord(vPickPos, *pWorldMatrix);
+			_matrix pWorldMatrix = pTransform->Get_WorldMatrix();
+			vPickPos = XMVector3TransformCoord(vPickPos, pWorldMatrix);
 			_float4 tempPos;
 			::XMStoreFloat4(&tempPos, vPickPos);
 			tempPos.w = fDis;
@@ -146,10 +146,12 @@ _float4 CMesh::Get_PickPos(const CTransform* pTransform) const
 
 	_float fShortest = { FLT_MAX };
 	_float4 fResult = {};
-	for (auto& iter : vecPickPos) // 카메라와 가장 거리가 가까운놈 계산 
+	for (auto& iter : vecPickPos) // 카메라와 가장 거리가 가까운 위치 계산 
 	{
-		if (iter.w <= fShortest)
+		if (iter.w < fShortest) {
+			fShortest = iter.w;
 			fResult = iter;
+		}
 	}
 	
 	return fResult;

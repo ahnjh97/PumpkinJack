@@ -346,8 +346,8 @@ _float3 CVIBuffer_Terrain::Get_PickPos(const CTransform* pTransform) const
 				{
 					vPickPos = vecRayPos + vecRayDir * fDis;
 
-					_matrix* pWorldMatrix = &pTransform->Get_WorldMatrix();
-					vPickPos = XMVector3TransformCoord(vPickPos, *pWorldMatrix);
+					_matrix pWorldMatrix = pTransform->Get_WorldMatrix();
+					vPickPos = XMVector3TransformCoord(vPickPos, pWorldMatrix);
 					_float3 tempPos;
 					::XMStoreFloat3(&tempPos, vPickPos);
 					return tempPos;
@@ -404,7 +404,7 @@ CVIBuffer_Terrain * CVIBuffer_Terrain::Create(ID3D11Device * pDevice, ID3D11Devi
 
 	if (FAILED(pInstance->Initialize_Prototype(strHeightMapFilePath, bQuadTree)))
 	{
-		MSG_BOX(TEXT("Failed To Create : CVIBuffer_Rect"));
+		MSG_BOX(TEXT("Failed To Create : CVIBuffer_Terrain"));
 
 		Safe_Release(pInstance);
 	}
@@ -418,7 +418,7 @@ CVIBuffer_Terrain* CVIBuffer_Terrain::Create(ID3D11Device* pDevice, ID3D11Device
 
 	if (FAILED(pInstance->Initialize_Prototype(iX, iZ)))
 	{
-		MSG_BOX(TEXT("Failed To Create : CVIBuffer_Rect"));
+		MSG_BOX(TEXT("Failed To Create : CVIBuffer_Terrain"));
 
 		Safe_Release(pInstance);
 	}

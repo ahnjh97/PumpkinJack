@@ -142,12 +142,8 @@ HRESULT CVIBuffer_Instance_Mesh::Initialize_Prototype(ifstream& fileStream, cons
 		XMStoreFloat4(&m_pInstanceVertices[i].vUp, XMVectorSet(0.f, 1.f, 0.f, 0.f) * fScale);
 		XMStoreFloat4(&m_pInstanceVertices[i].vLook, XMVectorSet(0.f, 0.f, 1.f, 0.f) * fScale);
 		m_pInstanceVertices[i].vPosition = Compute_RandPosition(InstanceDesc.eShape);
-
 		m_pInstanceVertices[i].fLifeRatio = 0;
 
-
-		/* 0.f 현재 라이프타임 */
-		/* LifeTime(m_RandomNumber) 인스턴스마다 랜덤하게 설정된 각각의 라이프타임디다. */
 		m_pLifeTimes[i] = _float2(0.f, LifeTime(m_RandomNumber));
 		m_pSpeeds[i] = Speed(m_RandomNumber);
 		m_pRotationAxes[i] = _float3(RotationAxis(m_RandomNumber), RotationAxis(m_RandomNumber), RotationAxis(m_RandomNumber));

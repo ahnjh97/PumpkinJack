@@ -200,7 +200,7 @@ HRESULT CLevel_GamePlay::Ready_ParsedObjects()
 				return E_FAIL;
 		}
 	}
-	
+	m_InputFile.close();
 	return S_OK;
 }
 
