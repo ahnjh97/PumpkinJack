@@ -941,8 +941,11 @@ void CPlayer::Check_EnemyDistance(LEVEL eLevel, const wstring& wstrLayerTag, con
 		_vector vResult = vPlayerPos - XMLoadFloat3(&vCenter);
 		_float fDis = ::XMVectorGetX(::XMVector3Length(vResult));
 
-		if (fDis < m_fEnemyDistance) 
+		if (fDis < m_fEnemyDistance)
+		{
+			m_fEnemyDistance = fDis;
 			m_pNearestEnemyCollider = pEnemyCollider;
+		}
 	}
 }
 
