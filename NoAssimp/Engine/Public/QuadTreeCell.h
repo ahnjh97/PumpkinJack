@@ -13,13 +13,13 @@ private:
 	virtual ~CQuadTreeCell() = default;
 
 public:
-	HRESULT Initialize(_float2 fRT, _float2 fRB, _float2 fLB, _float2 fLT, vector<FACE> _vecFaces);
+	HRESULT Initialize(_float2 fRT, _float2 fRB, _float2 fLB, _float2 fLT, const vector<FACE>& _vecFaces);
 
 public:
 	_bool Check_QuadTreeCell(_fvector vPlayerPos, _matrix matWorld, _Out_ _float& _fHeight);
 	CORNER Check_Corner(_fvector vPos);
 
-	void PartitionFaces(vector<FACE>& _vecRT, vector<FACE>& _vecRB, vector<FACE>& _vecLB, vector<FACE>& _vecLT, vector<FACE> _vecFaces);
+	void PartitionFaces(vector<FACE>& _vecRT, vector<FACE>& _vecRB, vector<FACE>& _vecLB, vector<FACE>& _vecLT, const vector<FACE>& _vecFaces);
 	void PushIfNotAlreadyInserted(vector<CORNER>& _vecQuad, CORNER eQuad);
 
 private:
@@ -30,7 +30,7 @@ private:
 	vector<class CCell*> m_vecGroundCells;
 
 public:
-	static CQuadTreeCell* Create(_float2 fRT, _float2 fRB, _float2 fLB, _float2 fLT, vector<FACE> _vecFaces);
+	static CQuadTreeCell* Create(_float2 fRT, _float2 fRB, _float2 fLB, _float2 fLT, const vector<FACE>& _vecFaces);
 	virtual void Free() override;
 };
 
